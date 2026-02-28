@@ -7,19 +7,31 @@
     "wc-mcp": "./build/index.js"
   },
   "main": "./build/index.js",
-  "files": ["build", "README.md", "CHANGELOG.md"],
+  "files": [
+    "build",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "build": "tsc && chmod 755 build/index.js",
     "dev": "tsc --watch",
     "test": "vitest run",
     "test:watch": "vitest",
     "type-check": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "prepublishOnly": "pnpm run build && pnpm test"
   },
   "keywords": [
-    "mcp", "model-context-protocol", "web-components",
-    "custom-elements", "lit", "design-system",
-    "claude", "ai", "developer-tools"
+    "mcp",
+    "model-context-protocol",
+    "web-components",
+    "custom-elements",
+    "lit",
+    "design-system",
+    "claude",
+    "ai",
+    "developer-tools"
   ],
   "license": "MIT",
   "dependencies": {
@@ -29,6 +41,7 @@
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@vitest/coverage-v8": "^3.0.0",
+    "prettier": "^3.0.0",
     "typescript": "^5.7.2",
     "vitest": "^3.0.0"
   },

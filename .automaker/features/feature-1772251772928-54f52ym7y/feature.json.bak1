@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Install and configure Prettier. Create .prettierrc (singleQuote, semi, 2 spaces, 100 char width) and .prettierignore (build/, node_modules/, coverage/). Add format and format:check scripts to package.json. Verify pnpm format:check passes on all source files.",
   "title": "Add Prettier formatting",
-  "status": "done",
+  "status": "in_progress",
   "dependencies": [
     "feature-1772251710534-r4l5eoz0o"
   ],
@@ -31,21 +31,9 @@
       "reason": "Feature created"
     }
   ],
-  "updatedAt": "2026-02-28T06:03:38.757Z",
+  "updatedAt": "2026-02-28T06:02:22.042Z",
   "featureType": "code",
   "model": "claude-sonnet-4-6",
   "costUsd": 0.69331225,
-  "lastSessionId": "1f82c7be-3705-4215-8799-40d47c318d20",
-  "executionHistory": [
-    {
-      "id": "550636e7-245b-47f5-942d-39c709310946",
-      "startedAt": "2026-02-28T06:02:21.963Z",
-      "completedAt": "2026-02-28T06:03:38.764Z",
-      "durationMs": 76802,
-      "costUsd": 0.69331225,
-      "model": "claude-sonnet-4-6",
-      "success": true,
-      "trigger": "manual"
-    }
-  ]
+  "lastSessionId": "1f82c7be-3705-4215-8799-40d47c318d20"
 }

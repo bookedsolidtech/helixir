@@ -1,0 +1,40 @@
+{
+  "category": "Uncategorized",
+  "description": "Implement 5 utility modules in src/shared/ per the specs in CLAUDE.md. git.ts: GitOperations class with withBranch(branch, fn) that stashes, checks out, runs fn, restores — used by diff tools. file-ops.ts: SafeFileOperations with readJSON using Zod schema validation and fileExists. error-handling.ts: MCPError extending Error with category field, ErrorCategory enum (VALIDATION, NOT_FOUND, GIT, FILESYSTEM, UNKNOWN), handleToolError wrapper. mcp-helpers.ts: createSuccessResponse and createErrorResponse matching MCP SDK content format. validation.ts: TagNameSchema factory function accepting componentPrefix config (empty string accepts any tag name), FilePathSchema using Zod that rejects path traversal (..) and absolute paths. Write tests for validation.ts FIRST — TagNameSchema with custom prefix, empty prefix, invalid tag; FilePathSchema rejecting traversal and absolute paths. Path security tests are critical.",
+  "title": "Implement shared utilities (src/shared/)",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1772252040574-z91y08glf"
+  ],
+  "epicId": "feature-1772252025617-0gjkoppe7",
+  "complexity": "medium",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "b37bd8cb-5f30-43e0-ae18-5fccd050e87e",
+  "id": "feature-1772252081915-sru8qq0xm",
+  "branchName": "feature/port-shared-utilities-from-helix",
+  "descriptionHistory": [
+    {
+      "description": "Port 5 utility files from the Helix mcp-servers/shared/src/ into src/shared/. Copy verbatim: git.ts (GitOperations — withBranch, stash/unstash), file-ops.ts (SafeFileOperations — readJSON with Zod validation, fileExists), error-handling.ts (MCPError class, ErrorCategory enum, handleToolError), mcp-helpers.ts (createSuccessResponse, createErrorResponse). Adapt: validation.ts — remove hardcoded hx- prefix from TagNameSchema, replace with a factory function that accepts configurable componentPrefix. All imports use .js extensions. Write tests for validation.ts covering TagNameSchema with custom prefix, empty prefix (accept any tag), and FilePathSchema rejecting path traversal and absolute paths. Path security tests are critical.",
+      "timestamp": "2026-02-28T04:14:41.915Z",
+      "source": "initial"
+    },
+    {
+      "description": "Implement 5 utility modules in src/shared/ per the specs in CLAUDE.md. git.ts: GitOperations class with withBranch(branch, fn) that stashes, checks out, runs fn, restores — used by diff tools. file-ops.ts: SafeFileOperations with readJSON using Zod schema validation and fileExists. error-handling.ts: MCPError extending Error with category field, ErrorCategory enum (VALIDATION, NOT_FOUND, GIT, FILESYSTEM, UNKNOWN), handleToolError wrapper. mcp-helpers.ts: createSuccessResponse and createErrorResponse matching MCP SDK content format. validation.ts: TagNameSchema factory function accepting componentPrefix config (empty string accepts any tag name), FilePathSchema using Zod that rejects path traversal (..) and absolute paths. Write tests for validation.ts FIRST — TagNameSchema with custom prefix, empty prefix, invalid tag; FilePathSchema rejecting traversal and absolute paths. Path security tests are critical.",
+      "timestamp": "2026-02-28T04:23:31.362Z",
+      "source": "edit"
+    }
+  ],
+  "createdAt": "2026-02-28T04:14:41.915Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-28T04:14:41.915Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code"
+}

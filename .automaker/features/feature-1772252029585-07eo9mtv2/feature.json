@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Milestone 6: Ship it. README (OSS marketing asset per planning.md section 13), CHANGELOG, example configs, npm pack dry run, smoke test against Helix, npm publish v0.1.0. Depends on Product Implementation milestone.",
+  "title": "Release",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1772252025617-0gjkoppe7"
+  ],
+  "isEpic": true,
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "11882f9e-a52c-4555-aca5-1b088d06804f",
+  "id": "feature-1772252029585-07eo9mtv2",
+  "branchName": "feature/release",
+  "descriptionHistory": [
+    {
+      "description": "Milestone 6: Ship it. README (OSS marketing asset per planning.md section 13), CHANGELOG, example configs, npm pack dry run, smoke test against Helix, npm publish v0.1.0. Depends on Product Implementation milestone.",
+      "timestamp": "2026-02-28T04:13:49.585Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-28T04:13:49.585Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-28T04:13:49.585Z",
+      "reason": "Feature created"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "category": "Uncategorized",
+  "description": "Implement src/tools/health.ts registering 4 tools that call the health handler functions. score_component returns JSON with score, grade, dimensions, issues, timestamp. score_all_components maps over all components. get_health_trend returns dataPoints array with trend direction and changePercent. get_health_diff returns before/after comparison with improvement/regression verdict. Write tests for the tool layer — verify output shape, verify grade calculation (A=90+, B=80+, C=70+, D=60+, F=below 60), verify trend direction logic edge cases (single data point = stable, two identical scores = stable).",
+  "title": "Health tools — score_component, score_all_components, get_health_trend, get_health_diff",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1772252128235-immrmb8yb"
+  ],
+  "epicId": "feature-1772252025617-0gjkoppe7",
+  "complexity": "medium",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "38e9322d-3fe7-4814-985f-c24de18a7c61",
+  "id": "feature-1772252138620-99ongypqn",
+  "branchName": "feature/health-tools-scorecomponent",
+  "descriptionHistory": [
+    {
+      "description": "Implement src/tools/health.ts registering 4 tools that call the health handler functions. score_component returns JSON with score, grade, dimensions, issues, timestamp. score_all_components maps over all components. get_health_trend returns dataPoints array with trend direction and changePercent. get_health_diff returns before/after comparison with improvement/regression verdict. Write tests for the tool layer — verify output shape, verify grade calculation (A=90+, B=80+, C=70+, D=60+, F=below 60), verify trend direction logic edge cases (single data point = stable, two identical scores = stable).",
+      "timestamp": "2026-02-28T04:15:38.620Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-28T04:15:38.620Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-28T04:15:38.620Z",
+      "reason": "Feature created"
+    }
+  ]
+}

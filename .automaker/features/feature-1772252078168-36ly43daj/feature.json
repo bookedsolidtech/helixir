@@ -1,0 +1,40 @@
+{
+  "category": "Uncategorized",
+  "description": "TDD starts here — fixtures before handlers. Create tests/__fixtures__/ with synthetic JSON files that exercise all code paths. Do NOT copy from any specific project — write fixtures that represent any generic web component library. Required: custom-elements.json with 3 components (e.g. my-button, my-card, my-select) covering: members with descriptions, members without descriptions (for validateCompleteness), events with type annotations, events without (edge case), slots, CSS parts, CSS custom properties. tokens.json in W3C DTCG format with color, spacing, and typography categories. health-history/ with JSON score files for 2 components across multiple dates (for trend and diff tests). These fixtures define what the handlers must produce — write them first.",
+  "title": "Create test fixtures (CEM, tokens, health history)",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1772252040574-z91y08glf"
+  ],
+  "epicId": "feature-1772252025617-0gjkoppe7",
+  "complexity": "small",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "2f60b058-e3f3-4235-99b3-e1c0a9698fb1",
+  "id": "feature-1772252078168-36ly43daj",
+  "branchName": "feature/create-test-fixtures-cem-tokens-health",
+  "descriptionHistory": [
+    {
+      "description": "TDD starts here — fixtures before handlers. Create tests/__fixtures__/ with real JSON files sourced from the Helix platform. Required files: custom-elements.json covering hx-button, hx-card, hx-select with full CEM shape (events, slots, CSS parts, CSS properties, missing descriptions for validateCompleteness edge cases). tokens.json in W3C DTCG format with color, spacing, and typography tokens. health-history/ with JSON score files for at least 2 components testing trend and diff scenarios. These fixtures are the ground truth spec — every handler test reads real JSON from disk, no mocking of file I/O.",
+      "timestamp": "2026-02-28T04:14:38.168Z",
+      "source": "initial"
+    },
+    {
+      "description": "TDD starts here — fixtures before handlers. Create tests/__fixtures__/ with synthetic JSON files that exercise all code paths. Do NOT copy from any specific project — write fixtures that represent any generic web component library. Required: custom-elements.json with 3 components (e.g. my-button, my-card, my-select) covering: members with descriptions, members without descriptions (for validateCompleteness), events with type annotations, events without (edge case), slots, CSS parts, CSS custom properties. tokens.json in W3C DTCG format with color, spacing, and typography categories. health-history/ with JSON score files for 2 components across multiple dates (for trend and diff tests). These fixtures define what the handlers must produce — write them first.",
+      "timestamp": "2026-02-28T04:23:23.928Z",
+      "source": "edit"
+    }
+  ],
+  "createdAt": "2026-02-28T04:14:38.168Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-28T04:14:38.168Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code"
+}

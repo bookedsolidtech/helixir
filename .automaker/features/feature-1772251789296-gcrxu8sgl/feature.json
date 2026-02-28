@@ -1,0 +1,40 @@
+{
+  "category": "Uncategorized",
+  "description": "Create an integration test harness that spawns the compiled wc-mcp server as a child process and exercises it via the MCP JSON-RPC protocol over stdio. Playwright is not appropriate for a CLI server — use Vitest with Node child_process. Tests must: spawn build/index.js, send initialize handshake, call list tools, call specific tools with fixture data, assert correct JSON-RPC responses. This validates the full server stack end-to-end without any browser involvement.",
+  "title": "Vitest stdio integration test harness",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1772251713621-8rwdhp0qc"
+  ],
+  "epicId": "feature-1772251716355-mcfscgdic",
+  "complexity": "medium",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "89484a6f-c869-495b-a4ac-53fae0e05e52",
+  "id": "feature-1772251789296-gcrxu8sgl",
+  "branchName": "feature/setup-playwright-e2e-testing",
+  "descriptionHistory": [
+    {
+      "description": "Install @playwright/test and create playwright.config.ts. Add E2E tests that exercise the MCP server via stdio transport with a real CEM fixture. Configure headless CI mode and headed local mode. Note: for an MCP stdio server, E2E tests spawn the server as a child process and communicate via stdin/stdout using the MCP protocol.",
+      "timestamp": "2026-02-28T04:09:49.303Z",
+      "source": "initial"
+    },
+    {
+      "description": "Create an integration test harness that spawns the compiled wc-mcp server as a child process and exercises it via the MCP JSON-RPC protocol over stdio. Playwright is not appropriate for a CLI server — use Vitest with Node child_process. Tests must: spawn build/index.js, send initialize handshake, call list tools, call specific tools with fixture data, assert correct JSON-RPC responses. This validates the full server stack end-to-end without any browser involvement.",
+      "timestamp": "2026-02-28T04:12:06.739Z",
+      "source": "edit"
+    }
+  ],
+  "createdAt": "2026-02-28T04:09:49.303Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-28T04:09:49.303Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code"
+}

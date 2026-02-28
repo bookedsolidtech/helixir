@@ -1,0 +1,34 @@
+{
+  "category": "Uncategorized",
+  "description": "Implement src/tools/discovery.ts registering 3 tools. list_components: calls listAllComponents(config), returns formatted text. find_component: NEW, not in Helix — semantic search using token-overlap scoring: tokenize query, score each component by (tag name matches x3) + (description matches x2) + (member name matches x1), return top 3 with scores above zero. get_library_summary: NEW — aggregates CEM component count, reads health-history dir if it exists for average score and grade distribution, returns last check timestamp. Write tests/tools/discovery.test.ts FIRST — test find_component scoring logic thoroughly (exact match, partial match, zero results, query that matches member names). These are pure functions — easy to test.",
+  "title": "Discovery tools — list_components, find_component, get_library_summary",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1772252100820-d34l3dp4c"
+  ],
+  "epicId": "feature-1772252025617-0gjkoppe7",
+  "complexity": "medium",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "c280c7aa-11b6-4266-95c9-6aecc40ce85e",
+  "id": "feature-1772252111729-3vu172t2d",
+  "branchName": "feature/discovery-tools-listcomponents",
+  "descriptionHistory": [
+    {
+      "description": "Implement src/tools/discovery.ts registering 3 tools. list_components: calls listAllComponents(config), returns formatted text. find_component: NEW, not in Helix — semantic search using token-overlap scoring: tokenize query, score each component by (tag name matches x3) + (description matches x2) + (member name matches x1), return top 3 with scores above zero. get_library_summary: NEW — aggregates CEM component count, reads health-history dir if it exists for average score and grade distribution, returns last check timestamp. Write tests/tools/discovery.test.ts FIRST — test find_component scoring logic thoroughly (exact match, partial match, zero results, query that matches member names). These are pure functions — easy to test.",
+      "timestamp": "2026-02-28T04:15:11.730Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-28T04:15:11.730Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-28T04:15:11.730Z",
+      "reason": "Feature created"
+    }
+  ]
+}

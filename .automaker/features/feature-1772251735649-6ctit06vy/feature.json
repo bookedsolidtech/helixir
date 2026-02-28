@@ -1,0 +1,31 @@
+{
+  "category": "Uncategorized",
+  "description": "Configure TypeScript with strict mode for wc-mcp.\\n\\n## Acceptance Criteria\\n- `tsconfig.json` at repo root with `strict: true`, `module: NodeNext`, `moduleResolution: NodeNext`, `target: ES2022`\\n- `outDir: \\\"./build\\\"`, `rootDir: \\\"./src\\\"`\\n- `declaration: true`, `declarationMap: true`, `sourceMap: true`\\n- TypeScript 5.7 installed as devDependency\\n- `build` script: `tsc && chmod 755 build/index.js`\\n- `type-check` script: `tsc --noEmit`\\n- Module format: `\\\"type\\\": \\\"module\\\"` in package.json\\n- All imports use `.js` extensions (ESM requirement)\\n\\n## Reference\\nSee planning.md Section 7 (Tech Stack) and Section 8 (package.json target).",
+  "title": "Setup TypeScript 5.7 strict mode",
+  "status": "backlog",
+  "epicId": "feature-1772251710534-r4l5eoz0o",
+  "complexity": "large",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "8ae10b09-a2d7-4064-8a5e-1422cdeb7ee0",
+  "id": "feature-1772251735649-6ctit06vy",
+  "branchName": "feature/setup-typescript-57-strict-mode",
+  "descriptionHistory": [
+    {
+      "description": "Configure TypeScript with strict mode for wc-mcp.\\n\\n## Acceptance Criteria\\n- `tsconfig.json` at repo root with `strict: true`, `module: NodeNext`, `moduleResolution: NodeNext`, `target: ES2022`\\n- `outDir: \\\"./build\\\"`, `rootDir: \\\"./src\\\"`\\n- `declaration: true`, `declarationMap: true`, `sourceMap: true`\\n- TypeScript 5.7 installed as devDependency\\n- `build` script: `tsc && chmod 755 build/index.js`\\n- `type-check` script: `tsc --noEmit`\\n- Module format: `\\\"type\\\": \\\"module\\\"` in package.json\\n- All imports use `.js` extensions (ESM requirement)\\n\\n## Reference\\nSee planning.md Section 7 (Tech Stack) and Section 8 (package.json target).",
+      "timestamp": "2026-02-28T04:08:55.650Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-28T04:08:55.650Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-28T04:08:55.650Z",
+      "reason": "Feature created"
+    }
+  ]
+}

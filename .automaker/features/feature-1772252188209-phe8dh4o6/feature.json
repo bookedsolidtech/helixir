@@ -1,0 +1,41 @@
+{
+  "category": "Uncategorized",
+  "description": "Publish wc-mcp to the npm registry. Pre-requisites: smoke test passed, README approved, tarball audit clean, all CI checks green on main. Steps: verify npm authentication, run pnpm publish --access public, verify npx wc-mcp works for a first-time user with no local install, tag v0.1.0 in git, create GitHub release with CHANGELOG content. Post-publish: submit to awesome-mcp-servers list, post announcement to Lit Discord and Web Components Community Group. This is the finish line for v0.1.0.",
+  "title": "npm publish v0.1.0",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1772252162005-ww7jjoud8"
+  ],
+  "epicId": "feature-1772252029585-07eo9mtv2",
+  "complexity": "small",
+  "assignee": "agent",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "4ca94a4e-d82f-437a-95b7-ad28fc8e9690",
+  "id": "feature-1772252188209-phe8dh4o6",
+  "branchName": "feature/npm-publish-v010",
+  "descriptionHistory": [
+    {
+      "description": "Publish wc-mcp to the npm registry. Pre-requisites: smoke test passed, README approved, tarball audit clean, all CI checks green on main. Steps: verify npm login for clarity-house-press scope if applicable, run pnpm publish --access public, verify npx wc-mcp works for a first-time user with no local install, tag v0.1.0 in git, create GitHub release with CHANGELOG content. Post-publish: submit to awesome-mcp-servers list, post to Lit Discord and Web Components Community Group. This is the finish line for v0.1.0.",
+      "timestamp": "2026-02-28T04:16:28.210Z",
+      "source": "initial"
+    },
+    {
+      "description": "Publish wc-mcp to the npm registry. Pre-requisites: smoke test passed, README approved, tarball audit clean, all CI checks green on main. Steps: verify npm authentication, run pnpm publish --access public, verify npx wc-mcp works for a first-time user with no local install, tag v0.1.0 in git, create GitHub release with CHANGELOG content. Post-publish: submit to awesome-mcp-servers list, post announcement to Lit Discord and Web Components Community Group. This is the finish line for v0.1.0.",
+      "timestamp": "2026-02-28T04:24:21.737Z",
+      "source": "edit"
+    }
+  ],
+  "createdAt": "2026-02-28T04:16:28.210Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-28T04:16:28.210Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code"
+}

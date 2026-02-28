@@ -1,0 +1,35 @@
+{
+  "category": "Uncategorized",
+  "description": "Implement src/handlers/tokens.ts and src/tools/tokens.ts. Token tools are only registered when config.tokensPath is set — if null, the tool group is skipped entirely (as shown in planning.md index.ts sketch). Handler reads tokens.json in W3C DTCG format, parses the nested token structure into flat array of {name, value, category, description}. get_design_tokens: optionally filter by category (color, spacing, typography, border-radius etc). find_token: query by value or name pattern using case-insensitive substring match. Write tests/handlers/tokens.test.ts FIRST using fixture tokens.json — test category filtering, find by value substring, find by name pattern, empty results, and graceful error when tokensPath file does not exist.",
+  "title": "Token handler and tools — get_design_tokens, find_token",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1772252089963-q8o5bskqw",
+    "feature-1772252078168-36ly43daj"
+  ],
+  "epicId": "feature-1772252025617-0gjkoppe7",
+  "complexity": "medium",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "6eba6b3e-e21e-4dfd-ac4b-f34e71c5fd1c",
+  "id": "feature-1772252145146-ipcfaqebq",
+  "branchName": "feature/token-handler-and-tools-getdesigntokens",
+  "descriptionHistory": [
+    {
+      "description": "Implement src/handlers/tokens.ts and src/tools/tokens.ts. Token tools are only registered when config.tokensPath is set — if null, the tool group is skipped entirely (as shown in planning.md index.ts sketch). Handler reads tokens.json in W3C DTCG format, parses the nested token structure into flat array of {name, value, category, description}. get_design_tokens: optionally filter by category (color, spacing, typography, border-radius etc). find_token: query by value or name pattern using case-insensitive substring match. Write tests/handlers/tokens.test.ts FIRST using fixture tokens.json — test category filtering, find by value substring, find by name pattern, empty results, and graceful error when tokensPath file does not exist.",
+      "timestamp": "2026-02-28T04:15:45.147Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-28T04:15:45.147Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-28T04:15:45.147Z",
+      "reason": "Feature created"
+    }
+  ]
+}

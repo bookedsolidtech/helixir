@@ -1,0 +1,45 @@
+{
+  "category": "Uncategorized",
+  "description": "Critical architectural feature. wc-mcp uses ONE server with a single ListToolsRequestSchema handler returning all tools from all groups, and ONE CallToolRequestSchema handler that dispatches to the correct group. Each src/tools/*.ts exports getTools() returning tool definitions and handleCall(toolName, args, config) returning a result or null if the tool name is not in that group. index.ts collects all getTools() results, dispatches CallTool by trying each group's handleCall until one returns non-null. Token tools only added when config.tokensPath is set. Write integration test: spawn the built server process, send MCP initialize handshake, send tools/list, assert all 16 tool names present (14 core always + 2 token when configured). This is the wiring test proving the full server assembles correctly end to end.",
+  "title": "Wire up server dispatcher — single ListTools + CallTool handlers in index.ts",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1772252111729-3vu172t2d",
+    "feature-1772252116968-hkluy1fci",
+    "feature-1772252121023-c9uu41285",
+    "feature-1772252138620-99ongypqn",
+    "feature-1772252145146-ipcfaqebq",
+    "feature-1772252149951-nulsj76pv"
+  ],
+  "epicId": "feature-1772252025617-0gjkoppe7",
+  "complexity": "medium",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "dc1a457f-2d17-4eb6-95c5-4fc035b114ee",
+  "id": "feature-1772252162005-ww7jjoud8",
+  "branchName": "feature/wire-up-server-dispatcher-single",
+  "descriptionHistory": [
+    {
+      "description": "Critical architectural feature. Unlike Helix (3 separate servers), wc-mcp uses ONE server with a single ListToolsRequestSchema handler returning all tools from all groups, and ONE CallToolRequestSchema handler that dispatches to the correct group. Each tools/*.ts file exports a getTools() function returning tool definitions, and a handleCall(toolName, args, config) function. index.ts collects all getTools() results into one array, and the dispatch handler tries each group's handleCall in sequence until one handles the tool name. Token tools only added to the array when config.tokensPath is set. Write integration test: spawn the built server, send initialize + tools/list, assert all 16 tool names are present (14 core + 2 token if tokensPath set). This is the wiring test that proves the full server assembles correctly.",
+      "timestamp": "2026-02-28T04:16:02.005Z",
+      "source": "initial"
+    },
+    {
+      "description": "Critical architectural feature. wc-mcp uses ONE server with a single ListToolsRequestSchema handler returning all tools from all groups, and ONE CallToolRequestSchema handler that dispatches to the correct group. Each src/tools/*.ts exports getTools() returning tool definitions and handleCall(toolName, args, config) returning a result or null if the tool name is not in that group. index.ts collects all getTools() results, dispatches CallTool by trying each group's handleCall until one returns non-null. Token tools only added when config.tokensPath is set. Write integration test: spawn the built server process, send MCP initialize handshake, send tools/list, assert all 16 tool names present (14 core always + 2 token when configured). This is the wiring test proving the full server assembles correctly end to end.",
+      "timestamp": "2026-02-28T04:24:15.231Z",
+      "source": "edit"
+    }
+  ],
+  "createdAt": "2026-02-28T04:16:02.005Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-28T04:16:02.005Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code"
+}

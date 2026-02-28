@@ -1,0 +1,41 @@
+{
+  "category": "Uncategorized",
+  "description": "The critical path. Implement src/handlers/cem.ts per the specifications in planning.md. parseCem(tagName, config): reads CEM from config.cemPath via SafeFileOperations, resolves the component by tag name, returns typed metadata (members, events, slots, cssProperties, cssParts). Throws MCPError NOT_FOUND if component missing. validateCompleteness(tagName, config): checks CEM coverage, returns score 0-100 with issues list. listAllComponents(config): reads CEM, returns all component tag names. diffCem(tagName, baseBranch, config): uses GitOperations.withBranch to read CEM on base branch, compares against current branch — removed properties, changed types, removed events are BREAKING. Component that exists only on current branch (new): flag as NEW, not breaking. TDD: write tests/handlers/cem.test.ts FIRST using fixture custom-elements.json. Cover: happy path, missing component, incomplete docs, breaking removal, new component. Target 100% coverage.",
+  "title": "CEM handler — parseCem, validateCompleteness, listAllComponents, diffCem",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1772252089963-q8o5bskqw",
+    "feature-1772252078168-36ly43daj"
+  ],
+  "epicId": "feature-1772252025617-0gjkoppe7",
+  "complexity": "large",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "63edffcd-c92b-455b-8f1f-9c230609d4c1",
+  "id": "feature-1772252100820-d34l3dp4c",
+  "branchName": "feature/cem-handler-parsecem-validatecompletenes",
+  "descriptionHistory": [
+    {
+      "description": "The critical path. Adapt src/handlers/cem.ts from Helix cem-analyzer/handlers.ts. Functions: parseCem(tagName, config) reads CEM from config.cemPath and returns typed component metadata (members, events, slots, cssProperties, cssParts). validateCompleteness(tagName, config) checks CEM coverage and returns score with issues list. listAllComponents(config) returns all component tag names. diffCem(tagName, baseBranch, config) uses GitOperations to checkout base branch CEM and compare — detects removed properties, changed types, removed events as breaking. New component on current branch that does not exist on base: flag as NEW not breaking. TDD mandate: write tests/handlers/cem.test.ts FIRST using fixture custom-elements.json. Tests must cover: happy path parsing, missing component (MCPError), validateCompleteness with incomplete docs, diff detecting a breaking removal, diff detecting a new component (not breaking). Target 100% coverage of this file.",
+      "timestamp": "2026-02-28T04:15:00.820Z",
+      "source": "initial"
+    },
+    {
+      "description": "The critical path. Implement src/handlers/cem.ts per the specifications in planning.md. parseCem(tagName, config): reads CEM from config.cemPath via SafeFileOperations, resolves the component by tag name, returns typed metadata (members, events, slots, cssProperties, cssParts). Throws MCPError NOT_FOUND if component missing. validateCompleteness(tagName, config): checks CEM coverage, returns score 0-100 with issues list. listAllComponents(config): reads CEM, returns all component tag names. diffCem(tagName, baseBranch, config): uses GitOperations.withBranch to read CEM on base branch, compares against current branch — removed properties, changed types, removed events are BREAKING. Component that exists only on current branch (new): flag as NEW, not breaking. TDD: write tests/handlers/cem.test.ts FIRST using fixture custom-elements.json. Cover: happy path, missing component, incomplete docs, breaking removal, new component. Target 100% coverage.",
+      "timestamp": "2026-02-28T04:23:50.967Z",
+      "source": "edit"
+    }
+  ],
+  "createdAt": "2026-02-28T04:15:00.820Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-28T04:15:00.820Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code"
+}

@@ -1,0 +1,19 @@
+node_modules/
+build/
+dist/
+coverage/
+
+# Automaker runtime data (operational, not source)
+.automaker/events/
+.automaker/.backups/
+.automaker/quarantine/
+.automaker/agents/
+.automaker/worktrees/
+
+# Reports (generated artifacts)
+protoLabs.report.html
+*.report.html
+
+# Env
+.env
+.env.local

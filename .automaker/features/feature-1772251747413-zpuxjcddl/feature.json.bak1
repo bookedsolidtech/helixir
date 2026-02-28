@@ -1,0 +1,40 @@
+{
+  "category": "Uncategorized",
+  "description": "Create GitHub Actions workflows for build, test, format check, and security audit.\\n\\n## Files to create\\n- `.github/workflows/ci.yml` — runs on PR and push to main\\n  - Jobs: `build` (tsc --noEmit), `test` (vitest run), `format` (prettier --check), `audit` (pnpm audit)\\n- All jobs use `pnpm install --frozen-lockfile`\\n- Node.js 20, ubuntu-latest\\n\\n## Acceptance Criteria\\n- All 4 checks pass on a clean repo\\n- PRs cannot merge without all checks green",
+  "title": "Setup GitHub Actions CI/CD pipeline",
+  "status": "in_progress",
+  "dependencies": [
+    "feature-1772251710534-r4l5eoz0o"
+  ],
+  "epicId": "feature-1772251713621-8rwdhp0qc",
+  "complexity": "medium",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "8f7b2db2-eae4-4673-b40b-d151e13759f7",
+  "id": "feature-1772251747413-zpuxjcddl",
+  "branchName": "feature/setup-github-actions-cicd-pipeline",
+  "descriptionHistory": [
+    {
+      "description": "Create GitHub Actions workflows for build, test, format check, and security audit.\\n\\n## Files to create\\n- `.github/workflows/ci.yml` — runs on PR and push to main\\n  - Jobs: `build` (tsc --noEmit), `test` (vitest run), `format` (prettier --check), `audit` (pnpm audit)\\n- All jobs use `pnpm install --frozen-lockfile`\\n- Node.js 20, ubuntu-latest\\n\\n## Acceptance Criteria\\n- All 4 checks pass on a clean repo\\n- PRs cannot merge without all checks green",
+      "timestamp": "2026-02-28T04:09:07.413Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-28T04:09:07.413Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-28T04:09:07.413Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-28T04:38:14.531Z"
+    }
+  ],
+  "featureType": "code"
+}

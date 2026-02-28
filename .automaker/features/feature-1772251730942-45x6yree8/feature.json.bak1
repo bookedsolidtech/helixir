@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Initialize pnpm as the package manager for wc-mcp.\\n\\n## Acceptance Criteria\\n- `pnpm-lock.yaml` committed at repo root\\n- `package.json` engines field specifies `\\\"pnpm\\\": \\\">=9\\\"`\\n- `.npmrc` with `engine-strict=true`\\n- `node_modules/` and any npm/yarn lockfiles removed/gitignored\\n- CI scripts updated to use `pnpm install --frozen-lockfile`\\n\\n## Steps\\n1. `npm install -g pnpm` (if not present)\\n2. `pnpm init` or create `package.json` per planning.md spec\\n3. `pnpm install` to generate lockfile\\n4. Update `.gitignore` to exclude `node_modules/`",
   "title": "Setup pnpm as package manager",
-  "status": "done",
+  "status": "in_progress",
   "epicId": "feature-1772251710534-r4l5eoz0o",
   "complexity": "medium",
   "priority": 1,
@@ -31,31 +31,7 @@
       "from": "backlog",
       "to": "in_progress",
       "timestamp": "2026-02-28T04:27:39.331Z"
-    },
-    {
-      "from": "in_progress",
-      "to": "blocked",
-      "timestamp": "2026-02-28T04:29:26.764Z",
-      "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/packages/wc-mcp/.worktrees/feature-setup-pnpm-as-package-manager: git workflow failed — uncommitted work in worktree at /Volumes/Development/packages/wc-mcp/.worktrees/feature-setup-pnpm-as-package-manager: Command failed: git add -A -- ':!.automaker/' '.automaker/memory/' '.automaker/skills/'\nfatal: pathspec '.automaker/memory/' did not match any files\n"
-    },
-    {
-      "from": "blocked",
-      "to": "review",
-      "timestamp": "2026-02-28T04:31:41.130Z"
-    },
-    {
-      "from": "review",
-      "to": "done",
-      "timestamp": "2026-02-28T04:37:24.596Z"
     }
   ],
-  "featureType": "code",
-  "updatedAt": "2026-02-28T04:27:40.997Z",
-  "model": "claude-sonnet-4-6",
-  "costUsd": 0.80238375,
-  "lastSessionId": "fadbaa3c-7a00-4916-9e59-e61954e61cdf",
-  "statusChangeReason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/packages/wc-mcp/.worktrees/feature-setup-pnpm-as-package-manager: git workflow failed — uncommitted work in worktree at /Volumes/Development/packages/wc-mcp/.worktrees/feature-setup-pnpm-as-package-manager: Command failed: git add -A -- ':!.automaker/' '.automaker/memory/' '.automaker/skills/'\nfatal: pathspec '.automaker/memory/' did not match any files\n",
-  "failureCount": 1,
-  "reviewStartedAt": "2026-02-28T04:31:41.130Z",
-  "completedAt": "2026-02-28T04:37:24.596Z"
+  "featureType": "code"
 }

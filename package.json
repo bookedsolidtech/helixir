@@ -1,0 +1,39 @@
+{
+  "name": "wc-mcp",
+  "version": "0.1.0",
+  "description": "MCP server that gives AI agents full situational awareness of any web component library",
+  "type": "module",
+  "bin": {
+    "wc-mcp": "./build/index.js"
+  },
+  "main": "./build/index.js",
+  "files": ["build", "README.md", "CHANGELOG.md"],
+  "scripts": {
+    "build": "tsc && chmod 755 build/index.js",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "pnpm run build && pnpm test"
+  },
+  "keywords": [
+    "mcp", "model-context-protocol", "web-components",
+    "custom-elements", "lit", "design-system",
+    "claude", "ai", "developer-tools"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^3.0.0",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9"
+  }
+}

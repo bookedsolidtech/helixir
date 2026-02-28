@@ -1,0 +1,439 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "tests/__fixtures__/custom-elements.json",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/my-button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A generic button component with various style variants and states.",
+          "name": "MyButton",
+          "tagName": "my-button",
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": { "text": "'primary' | 'secondary' | 'danger'" },
+              "default": "'primary'",
+              "description": "The visual style variant of the button.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "When true, prevents user interaction and applies disabled styling.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "loading",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Displays a loading spinner and disables interaction.",
+              "attribute": "loading",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": { "text": "'sm' | 'md' | 'lg'" },
+              "default": "'md'",
+              "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "focus",
+              "description": "Programmatically focuses the button element.",
+              "return": { "type": { "text": "void" } }
+            },
+            {
+              "kind": "method",
+              "name": "click",
+              "return": { "type": { "text": "void" } }
+            }
+          ],
+          "events": [
+            {
+              "name": "my-click",
+              "type": { "text": "CustomEvent<{ originalEvent: MouseEvent }>" },
+              "description": "Fired when the button is clicked and not disabled or loading."
+            },
+            {
+              "name": "my-focus",
+              "type": { "text": "CustomEvent<void>" },
+              "description": "Fired when the button receives focus."
+            },
+            {
+              "name": "my-blur"
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "Default slot for button label text."
+            },
+            {
+              "name": "prefix",
+              "description": "Slot for an icon or element displayed before the label."
+            },
+            {
+              "name": "suffix",
+              "description": "Slot for an icon or element displayed after the label."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "base",
+              "description": "The inner <button> element."
+            },
+            {
+              "name": "label",
+              "description": "The container wrapping the default slot content."
+            },
+            {
+              "name": "spinner",
+              "description": "The loading spinner element, visible when loading is true."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--my-button-bg",
+              "default": "var(--color-primary, #3366ff)",
+              "description": "Background color of the button in its default state."
+            },
+            {
+              "name": "--my-button-color",
+              "default": "#ffffff",
+              "description": "Text color of the button."
+            },
+            {
+              "name": "--my-button-border-radius",
+              "default": "4px",
+              "description": "Border radius applied to the button."
+            },
+            {
+              "name": "--my-button-padding",
+              "default": "0.5rem 1rem"
+            }
+          ],
+          "superclass": { "name": "HTMLElement" }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "my-button",
+          "declaration": { "name": "MyButton", "module": "src/components/my-button.js" }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/my-card.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A flexible card component for displaying grouped content.",
+          "name": "MyCard",
+          "tagName": "my-card",
+          "members": [
+            {
+              "kind": "field",
+              "name": "heading",
+              "type": { "text": "string" },
+              "default": "''",
+              "description": "The card heading text rendered in the header region.",
+              "attribute": "heading"
+            },
+            {
+              "kind": "field",
+              "name": "elevated",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Applies an elevated shadow to visually lift the card.",
+              "attribute": "elevated",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": { "text": "string | undefined" },
+              "attribute": "href"
+            },
+            {
+              "kind": "method",
+              "name": "scrollIntoView",
+              "description": "Scrolls the card into the viewport."
+            }
+          ],
+          "events": [
+            {
+              "name": "my-card-expand",
+              "type": { "text": "CustomEvent<{ expanded: boolean }>" },
+              "description": "Fired when the card expand/collapse toggle is activated."
+            },
+            {
+              "name": "my-card-action"
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "Primary content area of the card."
+            },
+            {
+              "name": "header",
+              "description": "Optional custom header content, overrides the heading attribute."
+            },
+            {
+              "name": "footer",
+              "description": "Footer content such as actions or metadata."
+            },
+            {
+              "name": "media",
+              "description": "Media content (image, video) displayed above the card body."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "base",
+              "description": "The root wrapper element of the card."
+            },
+            {
+              "name": "header",
+              "description": "The header region containing the heading slot."
+            },
+            {
+              "name": "body",
+              "description": "The main content region."
+            },
+            {
+              "name": "footer",
+              "description": "The footer region."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--my-card-bg",
+              "default": "#ffffff",
+              "description": "Background color of the card."
+            },
+            {
+              "name": "--my-card-border",
+              "default": "1px solid #e0e0e0",
+              "description": "Border style applied to the card."
+            },
+            {
+              "name": "--my-card-shadow",
+              "default": "none"
+            },
+            {
+              "name": "--my-card-padding",
+              "default": "1rem",
+              "description": "Internal padding for the card body."
+            },
+            {
+              "name": "--my-card-border-radius",
+              "default": "8px",
+              "description": "Border radius of the card."
+            }
+          ],
+          "superclass": { "name": "HTMLElement" }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "my-card",
+          "declaration": { "name": "MyCard", "module": "src/components/my-card.js" }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/my-select.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A custom select/dropdown component with search and multi-select support.",
+          "name": "MySelect",
+          "tagName": "my-select",
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": { "text": "string | string[]" },
+              "default": "''",
+              "description": "The currently selected value(s). An array when multiple is true.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": { "text": "string" },
+              "default": "'Select an option'",
+              "description": "Placeholder text shown when no value is selected.",
+              "attribute": "placeholder"
+            },
+            {
+              "kind": "field",
+              "name": "multiple",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Enables multi-selection mode.",
+              "attribute": "multiple",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "searchable",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Adds an inline search input to filter options.",
+              "attribute": "searchable",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "open",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Controls the open/closed state of the dropdown panel.",
+              "attribute": "open",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "description": "Opens the dropdown panel programmatically.",
+              "return": { "type": { "text": "void" } }
+            },
+            {
+              "kind": "method",
+              "name": "hide",
+              "description": "Closes the dropdown panel programmatically.",
+              "return": { "type": { "text": "void" } }
+            },
+            {
+              "kind": "method",
+              "name": "clear",
+              "return": { "type": { "text": "void" } }
+            }
+          ],
+          "events": [
+            {
+              "name": "my-change",
+              "type": { "text": "CustomEvent<{ value: string | string[] }>" },
+              "description": "Fired when the selected value changes."
+            },
+            {
+              "name": "my-show",
+              "type": { "text": "CustomEvent<void>" },
+              "description": "Fired when the dropdown panel opens."
+            },
+            {
+              "name": "my-hide",
+              "type": { "text": "CustomEvent<void>" },
+              "description": "Fired when the dropdown panel closes."
+            },
+            {
+              "name": "my-clear"
+            },
+            {
+              "name": "my-search"
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "Accepts <my-option> elements as the list of options."
+            },
+            {
+              "name": "prefix",
+              "description": "Content displayed before the selected value label."
+            },
+            {
+              "name": "clear-icon",
+              "description": "Custom icon for the clear button."
+            },
+            {
+              "name": "expand-icon",
+              "description": "Custom icon for the expand/collapse indicator."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "base",
+              "description": "The outermost wrapper element."
+            },
+            {
+              "name": "trigger",
+              "description": "The clickable trigger element that toggles the dropdown."
+            },
+            {
+              "name": "panel",
+              "description": "The dropdown panel containing the options list."
+            },
+            {
+              "name": "search-input",
+              "description": "The search input inside the panel when searchable is true."
+            },
+            {
+              "name": "tag",
+              "description": "Individual selection tags rendered in multiple mode."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--my-select-trigger-height",
+              "default": "2.5rem",
+              "description": "Height of the trigger element."
+            },
+            {
+              "name": "--my-select-panel-max-height",
+              "default": "300px",
+              "description": "Maximum height of the dropdown options panel."
+            },
+            {
+              "name": "--my-select-border-color",
+              "default": "#cccccc",
+              "description": "Border color of the trigger element."
+            },
+            {
+              "name": "--my-select-focus-ring",
+              "default": "0 0 0 3px rgba(51,102,255,0.3)"
+            },
+            {
+              "name": "--my-select-bg",
+              "default": "#ffffff",
+              "description": "Background color of the trigger and panel."
+            }
+          ],
+          "superclass": { "name": "HTMLElement" }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "my-select",
+          "declaration": { "name": "MySelect", "module": "src/components/my-select.js" }
+        }
+      ]
+    }
+  ]
+}

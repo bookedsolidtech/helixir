@@ -1,0 +1,70 @@
+{
+  "component": "my-button",
+  "date": "2024-03-10",
+  "score": 88,
+  "breakdown": {
+    "documentation": {
+      "score": 87,
+      "weight": 0.4,
+      "details": {
+        "membersWithDescriptions": 5,
+        "membersTotal": 6,
+        "eventsWithDescriptions": 2,
+        "eventsTotal": 3,
+        "slotsWithDescriptions": 3,
+        "slotsTotal": 3,
+        "cssPropertiesWithDescriptions": 3,
+        "cssPropertiesTotal": 4
+      }
+    },
+    "accessibility": {
+      "score": 90,
+      "weight": 0.3,
+      "details": {
+        "hasAriaRole": true,
+        "hasKeyboardSupport": true,
+        "hasFocusManagement": true,
+        "hasFocusVisible": true
+      }
+    },
+    "completeness": {
+      "score": 90,
+      "weight": 0.2,
+      "details": {
+        "hasSlots": true,
+        "hasCssParts": true,
+        "hasCssProperties": true,
+        "hasEvents": true
+      }
+    },
+    "consistency": {
+      "score": 80,
+      "weight": 0.1,
+      "details": {
+        "namingConventionCompliant": true,
+        "eventNamingCompliant": true,
+        "attributeNamingCompliant": true
+      }
+    }
+  },
+  "issues": [
+    {
+      "severity": "warning",
+      "code": "MISSING_MEMBER_DESCRIPTION",
+      "message": "Member 'size' is missing a description.",
+      "member": "size"
+    },
+    {
+      "severity": "warning",
+      "code": "MISSING_EVENT_DESCRIPTION",
+      "message": "Event 'my-blur' is missing a description.",
+      "event": "my-blur"
+    },
+    {
+      "severity": "info",
+      "code": "MISSING_EVENT_TYPE",
+      "message": "Event 'my-blur' has no type annotation.",
+      "event": "my-blur"
+    }
+  ]
+}

@@ -16,7 +16,7 @@
 - Query design tokens
 - Get TypeScript diagnostics for component source files
 
-**Tagline:** *Give Claude eyes into your design system.*
+**Tagline:** _Give Claude eyes into your design system._
 
 **npm package name:** `wc-mcp`
 
@@ -83,16 +83,16 @@ helix/
 
 ### 3.2 What to Port Directly (minimal changes)
 
-| Helix File | Target File | Changes Required |
-|---|---|---|
-| `shared/src/git.ts` | `src/shared/git.ts` | None — copy verbatim |
-| `shared/src/file-ops.ts` | `src/shared/file-ops.ts` | None — copy verbatim |
-| `shared/src/error-handling.ts` | `src/shared/error-handling.ts` | None — copy verbatim |
-| `shared/src/mcp-helpers.ts` | `src/shared/mcp-helpers.ts` | None — copy verbatim |
-| `shared/src/validation.ts` | `src/shared/validation.ts` | Remove `TagNameSchema` regex (was `^hx-`); replace with configurable prefix check |
-| `cem-analyzer/src/handlers.ts` | `src/handlers/cem.ts` | Make `CEM_PATH` configurable via config object, not hardcoded |
-| `health-scorer/src/handlers.ts` | `src/handlers/health.ts` | Make `HEALTH_HISTORY_DIR` configurable, make project root configurable |
-| `typescript-diagnostics/src/handlers.ts` | `src/handlers/typescript.ts` | Make tsconfig path configurable |
+| Helix File                               | Target File                    | Changes Required                                                                  |
+| ---------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------- |
+| `shared/src/git.ts`                      | `src/shared/git.ts`            | None — copy verbatim                                                              |
+| `shared/src/file-ops.ts`                 | `src/shared/file-ops.ts`       | None — copy verbatim                                                              |
+| `shared/src/error-handling.ts`           | `src/shared/error-handling.ts` | None — copy verbatim                                                              |
+| `shared/src/mcp-helpers.ts`              | `src/shared/mcp-helpers.ts`    | None — copy verbatim                                                              |
+| `shared/src/validation.ts`               | `src/shared/validation.ts`     | Remove `TagNameSchema` regex (was `^hx-`); replace with configurable prefix check |
+| `cem-analyzer/src/handlers.ts`           | `src/handlers/cem.ts`          | Make `CEM_PATH` configurable via config object, not hardcoded                     |
+| `health-scorer/src/handlers.ts`          | `src/handlers/health.ts`       | Make `HEALTH_HISTORY_DIR` configurable, make project root configurable            |
+| `typescript-diagnostics/src/handlers.ts` | `src/handlers/typescript.ts`   | Make tsconfig path configurable                                                   |
 
 ### 3.3 Key Helix-isms to Remove
 
@@ -111,6 +111,7 @@ The Helix servers have these hardcoded assumptions that must become configuratio
 ### 4.1 Single Server, Multiple Tool Groups
 
 Unlike Helix (which has 3 separate servers), the OSS version consolidates into **one server** with 16 tools organized into logical groups. This is better for:
+
 - Simpler installation (one entry in `.mcp.json`)
 - Better MCP Market discoverability
 - Shared config context across all tools
@@ -126,19 +127,20 @@ The server reads configuration from (in priority order):
 ```typescript
 interface McpWcConfig {
   // Required (or must be in env)
-  cemPath: string;           // Path to custom-elements.json, relative to projectRoot
-                             // Default: "custom-elements.json"
+  cemPath: string; // Path to custom-elements.json, relative to projectRoot
+  // Default: "custom-elements.json"
 
   // Optional
-  projectRoot?: string;      // Absolute path to project root. Default: process.cwd()
-  componentPrefix?: string;  // Tag name prefix (e.g. "hx-", "my-", ""). Default: "" (any)
+  projectRoot?: string; // Absolute path to project root. Default: process.cwd()
+  componentPrefix?: string; // Tag name prefix (e.g. "hx-", "my-", ""). Default: "" (any)
   healthHistoryDir?: string; // Where to read/write health history. Default: ".mcp-wc/health"
-  tokensPath?: string;       // Path to tokens.json. Default: null (token tools disabled)
-  tsconfigPath?: string;     // Path to tsconfig. Default: "tsconfig.json"
+  tokensPath?: string; // Path to tokens.json. Default: null (token tools disabled)
+  tsconfigPath?: string; // Path to tsconfig. Default: "tsconfig.json"
 }
 ```
 
 **Environment variable names:**
+
 - `MCP_WC_CEM_PATH`
 - `MCP_WC_PROJECT_ROOT`
 - `MCP_WC_COMPONENT_PREFIX`
@@ -180,11 +182,13 @@ src/
 ### Group 1: Discovery
 
 #### `list_components`
+
 List all components registered in the CEM.
 
 ```typescript
 // Input
-{}
+{
+}
 
 // Output (text)
 // "Found 14 components: hx-alert, hx-badge, hx-button, ..."
@@ -195,12 +199,13 @@ Ported from: `listAllComponents()` in Helix `cem-analyzer/handlers.ts`
 ---
 
 #### `find_component`
+
 Semantic search — describe what you need, get the right component.
 
 ```typescript
 // Input
 {
-  query: string  // e.g., "a dropdown selector", "toggle switch", "text field with label"
+  query: string; // e.g., "a dropdown selector", "toggle switch", "text field with label"
 }
 
 // Output (text)
@@ -213,11 +218,13 @@ Semantic search — describe what you need, get the right component.
 ---
 
 #### `get_library_summary`
+
 High-level overview of the component library.
 
 ```typescript
 // Input
-{}
+{
+}
 
 // Output (text)
 // "Library summary:
@@ -235,6 +242,7 @@ High-level overview of the component library.
 ### Group 2: Component API
 
 #### `get_component`
+
 Full CEM metadata for a component.
 
 ```typescript
@@ -261,12 +269,13 @@ Ported from: `parseCem()` in Helix `cem-analyzer/handlers.ts`
 ---
 
 #### `validate_cem`
+
 Check whether a component's CEM entry is complete — all properties documented, descriptions present.
 
 ```typescript
 // Input
 {
-  tagName: string
+  tagName: string;
 }
 
 // Output (text)
@@ -280,6 +289,7 @@ Ported from: `validateCompleteness()` in Helix `cem-analyzer/handlers.ts`
 ---
 
 #### `suggest_usage`
+
 Generate a practical usage example for a component based on its CEM.
 
 ```typescript
@@ -307,6 +317,7 @@ Generate a practical usage example for a component based on its CEM.
 ---
 
 #### `generate_import`
+
 Generate the correct import statement for a component.
 
 ```typescript
@@ -329,6 +340,7 @@ Generate the correct import statement for a component.
 ### Group 3: Health Scoring
 
 #### `score_component`
+
 Get comprehensive health score for a component across 17 dimensions.
 
 ```typescript
@@ -355,6 +367,7 @@ Ported from: `scoreComponent()` in Helix `health-scorer/handlers.ts`
 ---
 
 #### `score_all_components`
+
 Score every component in the library at once.
 
 ```typescript
@@ -370,6 +383,7 @@ Ported from: `scoreAllComponents()` in Helix `health-scorer/handlers.ts`
 ---
 
 #### `get_health_trend`
+
 Historical health trend for a component over N days.
 
 ```typescript
@@ -394,6 +408,7 @@ Ported from: `getHealthTrend()` in Helix `health-scorer/handlers.ts`
 ---
 
 #### `get_health_diff`
+
 Compare component health between current branch and a base branch.
 
 ```typescript
@@ -414,6 +429,7 @@ Ported from: `getHealthDiff()` in Helix `health-scorer/handlers.ts`
 ### Group 4: Safety (Breaking Changes)
 
 #### `diff_cem`
+
 Compare a component's CEM between current branch and base branch. Flags breaking changes.
 
 ```typescript
@@ -433,6 +449,7 @@ Ported from: `diffCem()` in Helix `cem-analyzer/handlers.ts`
 ---
 
 #### `check_breaking_changes`
+
 Check ALL components in the library for breaking API changes vs the base branch.
 
 ```typescript
@@ -455,6 +472,7 @@ Check ALL components in the library for breaking API changes vs the base branch.
 ### Group 5: Design Tokens (optional — only if `tokensPath` configured)
 
 #### `get_design_tokens`
+
 List all design tokens, optionally filtered by category.
 
 ```typescript
@@ -472,12 +490,13 @@ List all design tokens, optionally filtered by category.
 ---
 
 #### `find_token`
+
 Find design tokens by value or name pattern.
 
 ```typescript
 // Input
 {
-  query: string  // e.g., "primary", "blue", "16px", "border"
+  query: string; // e.g., "primary", "blue", "16px", "border"
 }
 
 // Output (JSON stringified)
@@ -491,12 +510,13 @@ Find design tokens by value or name pattern.
 ### Group 6: TypeScript Diagnostics
 
 #### `get_file_diagnostics`
+
 Get TypeScript compiler errors for a specific file.
 
 ```typescript
 // Input
 {
-  filePath: string  // relative to projectRoot
+  filePath: string; // relative to projectRoot
 }
 
 // Output (JSON stringified)
@@ -508,11 +528,13 @@ Ported from: `get-diagnostics` in Helix `typescript-diagnostics`
 ---
 
 #### `get_project_diagnostics`
+
 Get all TypeScript errors across the project.
 
 ```typescript
 // Input
-{}
+{
+}
 
 // Output (JSON stringified)
 // { errorCount, warningCount, errors: [...], warnings: [...] }
@@ -573,16 +595,16 @@ mcp-web-components/
 
 ## 7. Tech Stack
 
-| Concern | Choice | Rationale |
-|---|---|---|
-| Language | TypeScript 5.7 | Matches Helix; strict mode |
-| Runtime | Node.js ≥20 | LTS; ESM native |
-| MCP SDK | `@modelcontextprotocol/sdk` ^1.26.0 | Same version as Helix |
-| Validation | `zod` ^3.22.0 | Same version as Helix; type-safe input parsing |
-| Build | `tsc` only | Simple; no bundler needed for a CLI server |
-| Testing | `vitest` ^3 | Same as Helix; fast, ESM-native |
-| Module format | `"type": "module"` (ESM) | Same as Helix |
-| Publish | `npm` | Broad reach; `npx` install story |
+| Concern       | Choice                              | Rationale                                      |
+| ------------- | ----------------------------------- | ---------------------------------------------- |
+| Language      | TypeScript 5.7                      | Matches Helix; strict mode                     |
+| Runtime       | Node.js ≥20                         | LTS; ESM native                                |
+| MCP SDK       | `@modelcontextprotocol/sdk` ^1.26.0 | Same version as Helix                          |
+| Validation    | `zod` ^3.22.0                       | Same version as Helix; type-safe input parsing |
+| Build         | `tsc` only                          | Simple; no bundler needed for a CLI server     |
+| Testing       | `vitest` ^3                         | Same as Helix; fast, ESM-native                |
+| Module format | `"type": "module"` (ESM)            | Same as Helix                                  |
+| Publish       | `npm`                               | Broad reach; `npx` install story               |
 
 **No additional runtime dependencies.** Keep the dependency surface minimal — this is a developer tool that will be installed everywhere.
 
@@ -610,9 +632,15 @@ mcp-web-components/
     "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [
-    "mcp", "model-context-protocol", "web-components",
-    "custom-elements", "lit", "design-system",
-    "claude", "ai", "developer-tools"
+    "mcp",
+    "model-context-protocol",
+    "web-components",
+    "custom-elements",
+    "lit",
+    "design-system",
+    "claude",
+    "ai",
+    "developer-tools"
   ],
   "license": "MIT",
   "dependencies": {
@@ -684,10 +712,7 @@ import { registerTypescriptTools } from './tools/typescript.js';
 async function main() {
   const config = loadConfig();
 
-  const server = new Server(
-    { name: 'wc-mcp', version: '0.1.0' },
-    { capabilities: { tools: {} } }
-  );
+  const server = new Server({ name: 'wc-mcp', version: '0.1.0' }, { capabilities: { tools: {} } });
 
   registerDiscoveryTools(server, config);
   registerComponentTools(server, config);
@@ -721,6 +746,7 @@ Each `tools/*.ts` file receives the `Server` instance and `config` object. It ca
 ### Health scoring when no history exists
 
 The Helix health scorer depends on pre-computed JSON files in `.claude/health-history/`. For the OSS version, when no history directory exists, `score_component` and `score_all_components` should fall back to a CEM-derived score (documentation dimensions only):
+
 - Description present: +15 points
 - All properties have descriptions: +25 points
 - All events have type annotations: +20 points
@@ -733,6 +759,7 @@ This gives a useful "documentation health" score even without the full 17-dimens
 ### Semantic find_component (no ML required)
 
 The `find_component` tool uses simple token-overlap scoring:
+
 1. Tokenize the query (split on spaces, lowercase)
 2. For each component, score = (matching tokens in tagName × 3) + (matching tokens in description × 2) + (matching tokens in member names × 1)
 3. Return top 3 by score with scores above 0
@@ -816,4 +843,4 @@ Build in this sequence to have something testable at each step:
 
 ---
 
-*Document version: 1.0 | Created: 2026-02-27 | Source: Clarity House Press / ProtoLabs OSS Strategy*
+_Document version: 1.0 | Created: 2026-02-27 | Source: Clarity House Press / ProtoLabs OSS Strategy_

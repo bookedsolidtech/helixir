@@ -1,0 +1,87 @@
+{
+  "component": "my-card",
+  "date": "2024-01-15",
+  "score": 50,
+  "breakdown": {
+    "documentation": {
+      "score": 40,
+      "weight": 0.4,
+      "details": {
+        "membersWithDescriptions": 2,
+        "membersTotal": 4,
+        "eventsWithDescriptions": 1,
+        "eventsTotal": 2,
+        "slotsWithDescriptions": 2,
+        "slotsTotal": 4,
+        "cssPropertiesWithDescriptions": 1,
+        "cssPropertiesTotal": 5
+      }
+    },
+    "accessibility": {
+      "score": 60,
+      "weight": 0.3,
+      "details": {
+        "hasAriaRole": false,
+        "hasKeyboardSupport": false,
+        "hasFocusManagement": false,
+        "hasFocusVisible": false
+      }
+    },
+    "completeness": {
+      "score": 60,
+      "weight": 0.2,
+      "details": {
+        "hasSlots": true,
+        "hasCssParts": true,
+        "hasCssProperties": true,
+        "hasEvents": true
+      }
+    },
+    "consistency": {
+      "score": 55,
+      "weight": 0.1,
+      "details": {
+        "namingConventionCompliant": true,
+        "eventNamingCompliant": false,
+        "attributeNamingCompliant": true
+      }
+    }
+  },
+  "issues": [
+    {
+      "severity": "error",
+      "code": "MISSING_ACCESSIBILITY_ROLE",
+      "message": "Component 'my-card' does not define an ARIA role."
+    },
+    {
+      "severity": "warning",
+      "code": "MISSING_MEMBER_DESCRIPTION",
+      "message": "Member 'href' is missing a description.",
+      "member": "href"
+    },
+    {
+      "severity": "warning",
+      "code": "MISSING_EVENT_DESCRIPTION",
+      "message": "Event 'my-card-action' is missing a description.",
+      "event": "my-card-action"
+    },
+    {
+      "severity": "warning",
+      "code": "MISSING_CSS_PROPERTY_DESCRIPTION",
+      "message": "CSS property '--my-card-shadow' is missing a description.",
+      "property": "--my-card-shadow"
+    },
+    {
+      "severity": "info",
+      "code": "MISSING_EVENT_TYPE",
+      "message": "Event 'my-card-action' has no type annotation.",
+      "event": "my-card-action"
+    },
+    {
+      "severity": "warning",
+      "code": "MISSING_SLOT_DESCRIPTION",
+      "message": "Slot 'media' is missing a description.",
+      "slot": "media"
+    }
+  ]
+}

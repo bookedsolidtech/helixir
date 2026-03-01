@@ -1,0 +1,31 @@
+{
+  "category": "Uncategorized",
+  "description": "## Problem\n`.github/workflows/ci.yml` only runs `pnpm install`. It has a comment saying \"Full gates added after core implementation\" — but this means broken code can be merged to main right now. The CI provides zero protection.\n\n## Current State\n```yaml\njobs:\n  install:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: pnpm/action-setup@v4\n      - uses: actions/setup-node@v4\n      - name: Install dependencies\n        run: pnpm install --frozen-lockfile\n```\n\n## Fix\nExpand the CI workflow to include ALL quality gates immediately. Don't wait for \"core implementation.\" The CI should enforce the quality gates from day one:\n\n```yaml\njobs:\n  ci:\n    runs-on: ubuntu-latest\n    steps:\n      - checkout + setup (existing)\n      - pnpm install --frozen-lockfile\n      - pnpm run format:check       # prettier\n      - pnpm run type-check         # tsc --noEmit  \n      - pnpm run lint               # eslint\n      - pnpm run build              # tsc + chmod\n      - pnpm test                   # vitest run\n```\n\nAlso add Node.js matrix: `[20, 22]` to verify against both supported versions.\n\n## Acceptance Criteria\n- CI runs build, type-check, lint, format:check, and tests on every PR and push to main\n- The `.coderabbit.yaml` formatting issue (see related ticket) is fixed so format:check passes\n- Matrix covers Node.js 20 and 22",
+  "title": "CRITICAL: Add build, test, lint, and format-check jobs to CI pipeline",
+  "status": "backlog",
+  "epicId": "feature-1772251713621-8rwdhp0qc",
+  "complexity": "small",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "d1c279b8-1700-483f-9053-8de1e72912f8",
+  "id": "feature-1772348807325-8vyafe5b0",
+  "branchName": "feature/critical-add-build-test-lint-and-format",
+  "descriptionHistory": [
+    {
+      "description": "## Problem\n`.github/workflows/ci.yml` only runs `pnpm install`. It has a comment saying \"Full gates added after core implementation\" — but this means broken code can be merged to main right now. The CI provides zero protection.\n\n## Current State\n```yaml\njobs:\n  install:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: pnpm/action-setup@v4\n      - uses: actions/setup-node@v4\n      - name: Install dependencies\n        run: pnpm install --frozen-lockfile\n```\n\n## Fix\nExpand the CI workflow to include ALL quality gates immediately. Don't wait for \"core implementation.\" The CI should enforce the quality gates from day one:\n\n```yaml\njobs:\n  ci:\n    runs-on: ubuntu-latest\n    steps:\n      - checkout + setup (existing)\n      - pnpm install --frozen-lockfile\n      - pnpm run format:check       # prettier\n      - pnpm run type-check         # tsc --noEmit  \n      - pnpm run lint               # eslint\n      - pnpm run build              # tsc + chmod\n      - pnpm test                   # vitest run\n```\n\nAlso add Node.js matrix: `[20, 22]` to verify against both supported versions.\n\n## Acceptance Criteria\n- CI runs build, type-check, lint, format:check, and tests on every PR and push to main\n- The `.coderabbit.yaml` formatting issue (see related ticket) is fixed so format:check passes\n- Matrix covers Node.js 20 and 22",
+      "timestamp": "2026-03-01T07:06:47.326Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-01T07:06:47.326Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-01T07:06:47.326Z",
+      "reason": "Feature created"
+    }
+  ]
+}

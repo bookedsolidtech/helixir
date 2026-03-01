@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Add tsconfig.json, vitest.config.ts, and src/index.ts entry point stub to the already-scaffolded wc-mcp package.\n\nNOTE: package.json and pnpm-lock.yaml already exist on main (PR #1 merged). Do NOT recreate or overwrite them.\n\n## What to create\n\n### tsconfig.json (project root)\nReference planning.md Section 3 for exact compiler options. Key requirements:\n- target: ES2022, module: NodeNext, moduleResolution: NodeNext\n- strict: true, noUncheckedIndexedAccess: true\n- outDir: build/, rootDir: src/\n- No composite (single package, not a monorepo)\n\nUse /Volumes/Development/helix as a sanity-check reference for a working NodeNext ESM tsconfig — do not copy, adapt.\n\n### vitest.config.ts (project root)\n- Use @vitest/coverage-v8\n- testMatch: tests/**/*.test.ts\n- coverage: src/**/*.ts, threshold 80% (individual handlers will have higher targets)\n\n### src/index.ts (entry point stub)\nMinimal MCP server stub — enough to compile and respond to a ping:\n- Import Server from @modelcontextprotocol/sdk/server/index.js\n- Import StdioServerTransport from @modelcontextprotocol/sdk/server/stdio.js\n- Register ListToolsRequestSchema returning []\n- Register CallToolRequestSchema throwing ToolNotFoundError\n- Export a main() that creates Server + StdioServerTransport and calls server.connect(transport)\n- Call main() at the bottom\n\n## Acceptance Criteria\n- pnpm run build succeeds (tsc compiles src/ → build/)\n- pnpm test runs (vitest finds tests/ dir, 0 tests is OK at this stage)\n- build/index.js exists and has shebang (#!/usr/bin/env node)\n- All .js import extensions in src/index.ts (NodeNext requires explicit extensions)",
   "title": "Scaffold package.json, tsconfig.json, and server entry point",
-  "status": "blocked",
+  "status": "done",
   "dependencies": [
     "feature-1772251710534-r4l5eoz0o"
   ],
@@ -51,6 +51,11 @@
       "to": "blocked",
       "timestamp": "2026-02-28T04:41:53.035Z",
       "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/packages/wc-mcp/.worktrees/feature-scaffold-packagejson-tsconfigjson-and: git workflow failed — uncommitted work in worktree at /Volumes/Development/packages/wc-mcp/.worktrees/feature-scaffold-packagejson-tsconfigjson-and: Command failed: git add -A -- ':!.automaker/' '.automaker/memory/' '.automaker/skills/'\nfatal: pathspec '.automaker/memory/' did not match any files\n"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-01T07:20:49.707Z"
     }
   ],
   "featureType": "code",
@@ -59,5 +64,6 @@
   "costUsd": 1.3105307500000003,
   "lastSessionId": "f7b956b3-f7d2-49b8-999f-dd3ba5dced3d",
   "statusChangeReason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/packages/wc-mcp/.worktrees/feature-scaffold-packagejson-tsconfigjson-and: git workflow failed — uncommitted work in worktree at /Volumes/Development/packages/wc-mcp/.worktrees/feature-scaffold-packagejson-tsconfigjson-and: Command failed: git add -A -- ':!.automaker/' '.automaker/memory/' '.automaker/skills/'\nfatal: pathspec '.automaker/memory/' did not match any files\n",
-  "failureCount": 1
+  "failureCount": 1,
+  "completedAt": "2026-03-01T07:20:49.707Z"
 }

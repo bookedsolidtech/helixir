@@ -1,0 +1,34 @@
+{
+  "category": "Uncategorized",
+  "description": "## Problem\nWhen `tokensPath` is null (the default), token tools (`get_design_tokens`, `find_token`) should NOT appear in the `tools/list` response. Currently `TOKEN_TOOL_DEFINITIONS` is unconditional. Once the server dispatcher is wired up, these tools would appear for all users even when no tokens file is configured — and every call would return an error.\n\nThis is bad DX: an AI agent will try to call `get_design_tokens` based on the tool list, only to receive \"Token tools are disabled: tokensPath is not configured.\"\n\n## Fix\nIn the server dispatcher (`src/index.ts`), when building the `ListTools` response:\n- Only include `TOKEN_TOOL_DEFINITIONS` if `config.tokensPath !== null`\n\nIn `CallTool` dispatch:\n- If `isTokenTool(name)` and `config.tokensPath === null`, return a clear error: \"Token tools are not enabled. Set tokensPath in mcpwc.config.json or MCP_WC_TOKENS_PATH.\"\n\n## Acceptance Criteria\n- With `tokensPath: null` (default), `tools/list` does NOT include token tools\n- With `tokensPath` set, `tools/list` DOES include token tools\n- Integration test covers both cases\n- Tool descriptions mention that tokens must be configured",
+  "title": "Conditionally register token tools when tokensPath is null",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1772252162005-ww7jjoud8"
+  ],
+  "epicId": "feature-1772252025617-0gjkoppe7",
+  "complexity": "small",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "4832e6d9-07f1-44d1-851f-e8a5c992ab9b",
+  "id": "feature-1772348879452-7pvcvjq2i",
+  "branchName": "feature/conditionally-register-token-tools-when",
+  "descriptionHistory": [
+    {
+      "description": "## Problem\nWhen `tokensPath` is null (the default), token tools (`get_design_tokens`, `find_token`) should NOT appear in the `tools/list` response. Currently `TOKEN_TOOL_DEFINITIONS` is unconditional. Once the server dispatcher is wired up, these tools would appear for all users even when no tokens file is configured — and every call would return an error.\n\nThis is bad DX: an AI agent will try to call `get_design_tokens` based on the tool list, only to receive \"Token tools are disabled: tokensPath is not configured.\"\n\n## Fix\nIn the server dispatcher (`src/index.ts`), when building the `ListTools` response:\n- Only include `TOKEN_TOOL_DEFINITIONS` if `config.tokensPath !== null`\n\nIn `CallTool` dispatch:\n- If `isTokenTool(name)` and `config.tokensPath === null`, return a clear error: \"Token tools are not enabled. Set tokensPath in mcpwc.config.json or MCP_WC_TOKENS_PATH.\"\n\n## Acceptance Criteria\n- With `tokensPath: null` (default), `tools/list` does NOT include token tools\n- With `tokensPath` set, `tools/list` DOES include token tools\n- Integration test covers both cases\n- Tool descriptions mention that tokens must be configured",
+      "timestamp": "2026-03-01T07:07:59.452Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-01T07:07:59.452Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-01T07:07:59.452Z",
+      "reason": "Feature created"
+    }
+  ]
+}

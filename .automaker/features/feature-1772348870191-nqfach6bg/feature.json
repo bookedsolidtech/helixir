@@ -1,0 +1,31 @@
+{
+  "category": "Uncategorized",
+  "description": "## Problem\n`src/index.ts` does not call `loadConfig()` and makes no attempt to verify that the CEM file exists or is parseable. When an agent calls any CEM-related tool, they get a raw filesystem error deep in the call stack with no actionable guidance.\n\n## Fix\nIn `src/index.ts`, during server startup (before connecting the transport):\n1. Call `loadConfig()` to get the resolved config\n2. Check that `cemPath` resolves to an existing, readable file\n3. If the file is missing, write a clear error to stderr and exit 1:\n   `Fatal: CEM file not found. Set MCP_WC_CEM_PATH or add cemPath to mcpwc.config.json`\n4. If the file exists but is malformed JSON, write a clear parse error and exit 1\n\nThe config should be loaded once at startup and passed to all handlers, not re-read on every tool call. This also improves performance.\n\n## Acceptance Criteria\n- Server exits cleanly with a helpful error message if CEM file is missing\n- Server exits cleanly with a helpful error message if CEM file is malformed\n- Config is loaded once at startup and threaded through handlers\n- Tests cover the startup validation path",
+  "title": "Add startup CEM validation — fail fast with actionable error",
+  "status": "backlog",
+  "epicId": "feature-1772252025617-0gjkoppe7",
+  "complexity": "small",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "882a57e7-6209-499d-909a-bb6c6057b9c9",
+  "id": "feature-1772348870191-nqfach6bg",
+  "branchName": "feature/add-startup-cem-validation-fail-fast",
+  "descriptionHistory": [
+    {
+      "description": "## Problem\n`src/index.ts` does not call `loadConfig()` and makes no attempt to verify that the CEM file exists or is parseable. When an agent calls any CEM-related tool, they get a raw filesystem error deep in the call stack with no actionable guidance.\n\n## Fix\nIn `src/index.ts`, during server startup (before connecting the transport):\n1. Call `loadConfig()` to get the resolved config\n2. Check that `cemPath` resolves to an existing, readable file\n3. If the file is missing, write a clear error to stderr and exit 1:\n   `Fatal: CEM file not found. Set MCP_WC_CEM_PATH or add cemPath to mcpwc.config.json`\n4. If the file exists but is malformed JSON, write a clear parse error and exit 1\n\nThe config should be loaded once at startup and passed to all handlers, not re-read on every tool call. This also improves performance.\n\n## Acceptance Criteria\n- Server exits cleanly with a helpful error message if CEM file is missing\n- Server exits cleanly with a helpful error message if CEM file is malformed\n- Config is loaded once at startup and threaded through handlers\n- Tests cover the startup validation path",
+      "timestamp": "2026-03-01T07:07:50.191Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-01T07:07:50.192Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-01T07:07:50.192Z",
+      "reason": "Feature created"
+    }
+  ]
+}

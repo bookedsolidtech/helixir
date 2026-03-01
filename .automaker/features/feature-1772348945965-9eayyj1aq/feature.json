@@ -1,0 +1,31 @@
+{
+  "category": "Uncategorized",
+  "description": "## Problem\n`src/shared/error-handling.ts` exports `handleToolError()` which normalizes unknown thrown values into `MCPError` instances with proper categories. However, tool dispatch files (`src/tools/tokens.ts`, `src/tools/typescript.ts`) do their own inline error handling:\n\n```\ncatch (err) {\n  const message = err instanceof Error ? err.message : String(err);\n  return createErrorResponse(message);\n}\n```\n\nThis bypasses the error category system and loses structured error information. When `MCPError` instances with specific categories (NOT_FOUND, VALIDATION, GIT) are thrown by handlers, the tool layer flattens them to a plain string.\n\n## Fix\nReplace inline catch blocks in all tool dispatch functions with `handleToolError`:\n\n```\ncatch (err) {\n  const mcpErr = handleToolError(err);\n  return createErrorResponse(`[${mcpErr.category}] ${mcpErr.message}`);\n}\n```\n\nApply to: `handleTokenCall()`, `handleTypeScriptCall()`, and all future tool dispatch functions.\n\n## Acceptance Criteria\n- All tool dispatch catch blocks use `handleToolError` from `shared/error-handling.ts`\n- Error responses include the category prefix (e.g. `[NOT_FOUND] Component \"foo\" not found`)\n- Add a test verifying category appears in the error response for NOT_FOUND errors",
+  "title": "Use shared handleToolError in all tool dispatch functions",
+  "status": "backlog",
+  "epicId": "feature-1772252025617-0gjkoppe7",
+  "complexity": "small",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "0aed7f45-b76d-4383-9caa-167481c4ebea",
+  "id": "feature-1772348945965-9eayyj1aq",
+  "branchName": "feature/use-shared-handletoolerror-in-all-tool",
+  "descriptionHistory": [
+    {
+      "description": "## Problem\n`src/shared/error-handling.ts` exports `handleToolError()` which normalizes unknown thrown values into `MCPError` instances with proper categories. However, tool dispatch files (`src/tools/tokens.ts`, `src/tools/typescript.ts`) do their own inline error handling:\n\n```\ncatch (err) {\n  const message = err instanceof Error ? err.message : String(err);\n  return createErrorResponse(message);\n}\n```\n\nThis bypasses the error category system and loses structured error information. When `MCPError` instances with specific categories (NOT_FOUND, VALIDATION, GIT) are thrown by handlers, the tool layer flattens them to a plain string.\n\n## Fix\nReplace inline catch blocks in all tool dispatch functions with `handleToolError`:\n\n```\ncatch (err) {\n  const mcpErr = handleToolError(err);\n  return createErrorResponse(`[${mcpErr.category}] ${mcpErr.message}`);\n}\n```\n\nApply to: `handleTokenCall()`, `handleTypeScriptCall()`, and all future tool dispatch functions.\n\n## Acceptance Criteria\n- All tool dispatch catch blocks use `handleToolError` from `shared/error-handling.ts`\n- Error responses include the category prefix (e.g. `[NOT_FOUND] Component \"foo\" not found`)\n- Add a test verifying category appears in the error response for NOT_FOUND errors",
+      "timestamp": "2026-03-01T07:09:05.966Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-01T07:09:05.966Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-01T07:09:05.966Z",
+      "reason": "Feature created"
+    }
+  ]
+}

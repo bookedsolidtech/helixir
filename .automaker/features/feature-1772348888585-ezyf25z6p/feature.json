@@ -1,0 +1,31 @@
+{
+  "category": "Uncategorized",
+  "description": "## Problem\n`src/handlers/health.ts` defines its own loose interface types for CEM entities (lines 11-41): `CemMember`, `CemEvent`, `CemSlot`, `CemCssPart`, `CemDeclaration`. These are SEPARATE from the Zod-validated types in `src/handlers/cem.ts`. Two different type systems for the same domain objects.\n\nWhen `cem.ts` types evolve (adding a new CEM field), `health.ts` won't see the change. Additionally, `CemDeclaration` in `health.ts` has `tagName: string` (required) while the Zod schema in `cem.ts` has `tagName: z.string().optional()` — these are inconsistent.\n\n## Fix\n1. Extract CEM types to `src/types/cem.ts` (or export inferred Zod types from `cem.ts`)\n2. Replace the manually-defined interfaces in `health.ts` with imports from the shared location\n3. Decide whether `tagName` is required or optional and enforce consistently\n4. Ensure `scoreCemFallback` and `scoreComponent` use the same `CemDeclaration` type the CEM handler produces\n\n## Acceptance Criteria\n- No duplicate type definitions for CEM entities across the codebase\n- Types derived from a single source of truth (Zod inference preferred)\n- All 131 existing tests still pass\n- TypeScript type-check passes clean",
+  "title": "Eliminate duplicate CEM type definitions across cem.ts and health.ts",
+  "status": "backlog",
+  "epicId": "feature-1772252025617-0gjkoppe7",
+  "complexity": "small",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "7a9e711c-de22-497e-b50d-df6510654ff8",
+  "id": "feature-1772348888585-ezyf25z6p",
+  "branchName": "feature/eliminate-duplicate-cem-type",
+  "descriptionHistory": [
+    {
+      "description": "## Problem\n`src/handlers/health.ts` defines its own loose interface types for CEM entities (lines 11-41): `CemMember`, `CemEvent`, `CemSlot`, `CemCssPart`, `CemDeclaration`. These are SEPARATE from the Zod-validated types in `src/handlers/cem.ts`. Two different type systems for the same domain objects.\n\nWhen `cem.ts` types evolve (adding a new CEM field), `health.ts` won't see the change. Additionally, `CemDeclaration` in `health.ts` has `tagName: string` (required) while the Zod schema in `cem.ts` has `tagName: z.string().optional()` — these are inconsistent.\n\n## Fix\n1. Extract CEM types to `src/types/cem.ts` (or export inferred Zod types from `cem.ts`)\n2. Replace the manually-defined interfaces in `health.ts` with imports from the shared location\n3. Decide whether `tagName` is required or optional and enforce consistently\n4. Ensure `scoreCemFallback` and `scoreComponent` use the same `CemDeclaration` type the CEM handler produces\n\n## Acceptance Criteria\n- No duplicate type definitions for CEM entities across the codebase\n- Types derived from a single source of truth (Zod inference preferred)\n- All 131 existing tests still pass\n- TypeScript type-check passes clean",
+      "timestamp": "2026-03-01T07:08:08.585Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-01T07:08:08.585Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-01T07:08:08.585Z",
+      "reason": "Feature created"
+    }
+  ]
+}

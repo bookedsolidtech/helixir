@@ -1,0 +1,31 @@
+{
+  "category": "Uncategorized",
+  "description": "## Problem\n`src/handlers/typescript.ts` imports `typescript` directly at runtime:\n```ts\nimport ts from 'typescript';\n```\nHowever, `typescript` is listed in `devDependencies` in `package.json`. When a user installs `wc-mcp` from npm (`npm install -g wc-mcp`), devDependencies are NOT installed. The TypeScript diagnostic tools will crash at runtime for ALL npm users with a module-not-found error.\n\n## Fix\nEither:\n1. Move `typescript` to `dependencies` (adds ~5MB to package size but is correct), OR\n2. Make the TypeScript handler use a dynamic `import()` with a try/catch and gracefully disable the TS diagnostic tools when `typescript` isn't available, documenting it as a peer dependency.\n\n**Recommended:** Option 1 — move to `dependencies`. The tool's value prop includes TS diagnostics; making it optional reduces product value. Document in README that `typescript` is required.\n\n## Acceptance Criteria\n- `package.json` has `typescript` in `dependencies`, not `devDependencies`\n- `pnpm run build` succeeds\n- All tests pass\n- `npm pack --dry-run` shows the package installs correctly without devDeps",
+  "title": "CRITICAL: Move `typescript` from devDependencies to dependencies",
+  "status": "backlog",
+  "epicId": "feature-1772252025617-0gjkoppe7",
+  "complexity": "small",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "ab2642bc-e08d-4db1-ba59-60e2d7ed7ab8",
+  "id": "feature-1772348798721-85m6z918s",
+  "branchName": "feature/critical-move-typescript-from",
+  "descriptionHistory": [
+    {
+      "description": "## Problem\n`src/handlers/typescript.ts` imports `typescript` directly at runtime:\n```ts\nimport ts from 'typescript';\n```\nHowever, `typescript` is listed in `devDependencies` in `package.json`. When a user installs `wc-mcp` from npm (`npm install -g wc-mcp`), devDependencies are NOT installed. The TypeScript diagnostic tools will crash at runtime for ALL npm users with a module-not-found error.\n\n## Fix\nEither:\n1. Move `typescript` to `dependencies` (adds ~5MB to package size but is correct), OR\n2. Make the TypeScript handler use a dynamic `import()` with a try/catch and gracefully disable the TS diagnostic tools when `typescript` isn't available, documenting it as a peer dependency.\n\n**Recommended:** Option 1 — move to `dependencies`. The tool's value prop includes TS diagnostics; making it optional reduces product value. Document in README that `typescript` is required.\n\n## Acceptance Criteria\n- `package.json` has `typescript` in `dependencies`, not `devDependencies`\n- `pnpm run build` succeeds\n- All tests pass\n- `npm pack --dry-run` shows the package installs correctly without devDeps",
+      "timestamp": "2026-03-01T07:06:38.722Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-01T07:06:38.722Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-01T07:06:38.722Z",
+      "reason": "Feature created"
+    }
+  ]
+}

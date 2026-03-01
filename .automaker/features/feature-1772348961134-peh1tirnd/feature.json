@@ -1,0 +1,31 @@
+{
+  "category": "Uncategorized",
+  "description": "## Problem\n`vitest.config.ts` has `passWithNoTests: true`. This setting allows the test runner to exit with success code 0 even if zero test files are found. If the `include: ['tests/**/*.test.ts']` glob somehow stops matching, or tests are deleted, CI will silently pass.\n\nThis is a CI safety net anti-pattern — it defeats the purpose of required test coverage.\n\n## Fix\nRemove `passWithNoTests: true` from `vitest.config.ts`. Once there are real tests in place (which there are — 131 passing), this option provides no value and hides potential regressions.\n\nAlso add `--coverage` to the test script OR create a separate `test:coverage` script. The coverage thresholds configured in vitest.config.ts (`statements: 80, branches: 75, functions: 90, lines: 80`) are never enforced because the base `vitest run` command doesn't collect coverage.\n\nRecommended scripts:\n- `\"test\": \"vitest run\"` — fast, no coverage (for dev)\n- `\"test:coverage\": \"vitest run --coverage\"` — for CI\n\n## Acceptance Criteria\n- `passWithNoTests` is removed from vitest.config.ts\n- `test:coverage` script added to package.json\n- CI workflow runs `test:coverage` (not just `test`) so coverage thresholds are enforced\n- All existing 131 tests still pass",
+  "title": "Remove passWithNoTests: true from vitest.config.ts",
+  "status": "backlog",
+  "epicId": "feature-1772251716355-mcfscgdic",
+  "complexity": "small",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "f922aff1-ac15-4632-8d35-a2ad5f75c5d1",
+  "id": "feature-1772348961134-peh1tirnd",
+  "branchName": "feature/remove-passwithnotests-true-from",
+  "descriptionHistory": [
+    {
+      "description": "## Problem\n`vitest.config.ts` has `passWithNoTests: true`. This setting allows the test runner to exit with success code 0 even if zero test files are found. If the `include: ['tests/**/*.test.ts']` glob somehow stops matching, or tests are deleted, CI will silently pass.\n\nThis is a CI safety net anti-pattern — it defeats the purpose of required test coverage.\n\n## Fix\nRemove `passWithNoTests: true` from `vitest.config.ts`. Once there are real tests in place (which there are — 131 passing), this option provides no value and hides potential regressions.\n\nAlso add `--coverage` to the test script OR create a separate `test:coverage` script. The coverage thresholds configured in vitest.config.ts (`statements: 80, branches: 75, functions: 90, lines: 80`) are never enforced because the base `vitest run` command doesn't collect coverage.\n\nRecommended scripts:\n- `\"test\": \"vitest run\"` — fast, no coverage (for dev)\n- `\"test:coverage\": \"vitest run --coverage\"` — for CI\n\n## Acceptance Criteria\n- `passWithNoTests` is removed from vitest.config.ts\n- `test:coverage` script added to package.json\n- CI workflow runs `test:coverage` (not just `test`) so coverage thresholds are enforced\n- All existing 131 tests still pass",
+      "timestamp": "2026-03-01T07:09:21.134Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-01T07:09:21.134Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-01T07:09:21.134Z",
+      "reason": "Feature created"
+    }
+  ]
+}

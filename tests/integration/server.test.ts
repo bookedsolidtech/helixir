@@ -244,6 +244,48 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
       expect(hasRpcError || hasToolError).toBe(true);
     });
   });
+
+  describe('CEM in-memory cache', () => {
+    it('returns consistent results across repeated list_components calls', async () => {
+      const id1 = sendRequest('tools/call', { name: 'list_components', arguments: {} });
+      const r1 = await recv();
+      const id2 = sendRequest('tools/call', { name: 'list_components', arguments: {} });
+      const r2 = await recv();
+      const id3 = sendRequest('tools/call', { name: 'list_components', arguments: {} });
+      const r3 = await recv();
+
+      expect(r1.id).toBe(id1);
+      expect(r2.id).toBe(id2);
+      expect(r3.id).toBe(id3);
+
+      const text1 =
+        ((r1.result as Record<string, unknown>)?.content as Array<{ text?: string }>)?.[0]?.text ??
+        '';
+      const text2 =
+        ((r2.result as Record<string, unknown>)?.content as Array<{ text?: string }>)?.[0]?.text ??
+        '';
+      const text3 =
+        ((r3.result as Record<string, unknown>)?.content as Array<{ text?: string }>)?.[0]?.text ??
+        '';
+
+      expect(text1).toBe(text2);
+      expect(text2).toBe(text3);
+    });
+
+    it('get_library_summary includes a cacheAge field matching /^\\d+s$/', async () => {
+      const id = sendRequest('tools/call', { name: 'get_library_summary', arguments: {} });
+      const response = await recv();
+
+      expect(response.id).toBe(id);
+      const content =
+        ((response.result as Record<string, unknown>)?.content as Array<{ text?: string }>)?.[0]
+          ?.text ?? '';
+      const parsed = JSON.parse(content) as Record<string, unknown>;
+      expect(parsed).toHaveProperty('cacheAge');
+      expect(typeof parsed.cacheAge).toBe('string');
+      expect(parsed.cacheAge).toMatch(/^\d+s$/);
+    });
+  });
 });
 
 describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (without tokensPath configured)', () => {

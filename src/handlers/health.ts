@@ -351,9 +351,15 @@ export async function getHealthTrend(
   };
 }
 
+// Minimal type for parsing a raw CEM file when deriving base-branch health.
+interface CemFile {
+  modules: Array<{ declarations?: CemDeclaration[] }>;
+}
+
 /**
  * Compares component health between the current branch and a base branch.
- * Uses GitOperations.withBranch to temporarily check out the base branch.
+ * Reads the base branch CEM via `git show` — no stash, no checkout, no working-tree mutation.
+ * Base health is derived by running scoreCemFallback against the base branch's CEM declaration.
  */
 export async function getHealthDiff(
   config: McpWcConfig,
@@ -365,20 +371,34 @@ export async function getHealthDiff(
   const current = await scoreComponent(config, tagName, cemDecl);
 
   const git = gitOps ?? new GitOperations();
-  const base = await git.withBranch(baseBranch, async () => {
-    try {
-      return await scoreComponent(config, tagName, cemDecl);
-    } catch {
-      return {
+
+  let base: ComponentHealth;
+  try {
+    const cemContent = await git.gitShow(baseBranch, config.cemPath);
+    const cem = JSON.parse(cemContent) as CemFile;
+    const baseDecl = cem.modules.flatMap((m) => m.declarations ?? []).find((d) => d.tagName === tagName);
+    if (baseDecl) {
+      base = scoreCemFallback(baseDecl);
+    } else {
+      base = {
         tagName,
         score: 0,
-        grade: 'F' as const,
+        grade: 'F',
         dimensions: {},
         issues: ['Component not found in base branch'],
         timestamp: new Date().toISOString(),
       };
     }
-  });
+  } catch {
+    base = {
+      tagName,
+      score: 0,
+      grade: 'F',
+      dimensions: {},
+      issues: ['Component not found in base branch'],
+      timestamp: new Date().toISOString(),
+    };
+  }
 
   const scoreDelta = current.score - base.score;
   const improved = scoreDelta > 0;

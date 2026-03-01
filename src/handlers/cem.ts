@@ -248,24 +248,22 @@ export async function diffCem(
   // Get current branch component metadata
   const current = await parseCem(tagName, config);
 
-  // Read base branch's CEM inside a git branch switch
-  const fileOps = new SafeFileOperations();
+  // Read base branch's CEM via git show — no stash, no checkout, no working-tree mutation
   const gitOps = new GitOperations();
-  const cemAbsPath = resolve(config.projectRoot, config.cemPath);
 
   let baseMeta: ComponentMetadata | null = null;
 
-  await gitOps.withBranch(baseBranch, async () => {
-    try {
-      const baseCem = await fileOps.readJSON(cemAbsPath, CemSchema);
-      const baseDecl = findDeclaration(baseCem, tagName);
-      if (baseDecl) {
-        baseMeta = mapDeclaration(baseDecl);
-      }
-    } catch {
-      // CEM missing or unreadable on base branch — component is new
+  try {
+    const cemContent = await gitOps.gitShow(baseBranch, config.cemPath);
+    const rawJson: unknown = JSON.parse(cemContent);
+    const baseCem = CemSchema.parse(rawJson);
+    const baseDecl = findDeclaration(baseCem, tagName);
+    if (baseDecl) {
+      baseMeta = mapDeclaration(baseDecl);
     }
-  });
+  } catch {
+    // CEM missing or unreadable on base branch — component is new
+  }
 
   if (!baseMeta) {
     return { isNew: true, breaking: [], additions: [] };

@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Problem\n`.github/workflows/ci.yml` only runs `pnpm install`. It has a comment saying \"Full gates added after core implementation\" — but this means broken code can be merged to main right now. The CI provides zero protection.\n\n## Current State\n```yaml\njobs:\n  install:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: pnpm/action-setup@v4\n      - uses: actions/setup-node@v4\n      - name: Install dependencies\n        run: pnpm install --frozen-lockfile\n```\n\n## Fix\nExpand the CI workflow to include ALL quality gates immediately. Don't wait for \"core implementation.\" The CI should enforce the quality gates from day one:\n\n```yaml\njobs:\n  ci:\n    runs-on: ubuntu-latest\n    steps:\n      - checkout + setup (existing)\n      - pnpm install --frozen-lockfile\n      - pnpm run format:check       # prettier\n      - pnpm run type-check         # tsc --noEmit  \n      - pnpm run lint               # eslint\n      - pnpm run build              # tsc + chmod\n      - pnpm test                   # vitest run\n```\n\nAlso add Node.js matrix: `[20, 22]` to verify against both supported versions.\n\n## Acceptance Criteria\n- CI runs build, type-check, lint, format:check, and tests on every PR and push to main\n- The `.coderabbit.yaml` formatting issue (see related ticket) is fixed so format:check passes\n- Matrix covers Node.js 20 and 22",
   "title": "CRITICAL: Add build, test, lint, and format-check jobs to CI pipeline",
-  "status": "backlog",
+  "status": "done",
   "epicId": "feature-1772251713621-8rwdhp0qc",
   "complexity": "small",
   "priority": 1,
@@ -26,6 +26,29 @@
       "to": "backlog",
       "timestamp": "2026-03-01T07:06:47.326Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-01T07:23:42.978Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-01T07:24:45.630Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 0.33735500000000007,
+  "lastSessionId": "4136e78e-0a4f-468a-9163-af6084f6f6cd",
+  "executionHistory": [
+    {
+      "id": "5e596338-5bde-4c2c-b63b-0d562c905e36",
+      "startedAt": "2026-03-01T07:23:43.346Z",
+      "completedAt": "2026-03-01T07:24:45.635Z",
+      "durationMs": 62289,
+      "costUsd": 0.33735500000000007,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: CI Quality Gates\n\n### Changes Implemented\n- Expanded `.github/workflows/ci.yml` from a stub `install` job to a full `ci` job with all quality gates\n- Added Node.js matrix strategy covering versions 20 and 22\n- Added steps: `format:check`, `type-check`, `lint`, `build`, `test`\n- Fixed Prettier formatting in `.coderabbit.yaml` (ran `prettier --write`)\n- Added `.claude/` to `.prettierignore` to exclude local Claude settings from format checks\n\n### Files Modified\n- `.github/workflows/ci.yml` — full CI workflow with matrix\n- `.coderabbit.yaml` — Prettier formatting fix\n- `.prettierignore` — added `.claude/` entry\n\n### Risks/Blockers Encountered\n- `.claude/settings.local.json` was also failing `format:check`. Added `.claude/` to `.prettierignore` since it's a local dev folder that shouldn't be enforced in CI.\n\n### Learnings\n- The `.coderabbit.yaml` Prettier failure was just quote style / trailing newline differences — a simple `prettier --write` fixed it.\n- `.claude/` local settings should always be in `.prettierignore` to avoid CI noise.\n\n### Notes for Developer\n- All 131 tests pass, build succeeds, format:check passes, type-check and lint clean.\n- CI will now enforce all quality gates on every PR and push to main across Node.js 20 and 22.\n\n### Verification Status\n- Playwright verification not applicable — this is a CI configuration change with no UI or server endpoints to exercise. Verification performed via direct gate execution: `pnpm run format:check` ✓, `pnpm run build` ✓, `pnpm test` (131/131 pass) ✓."
 }

@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Problem\n`src/shared/git.ts` implements `withBranch()` using `git stash push` + `git checkout` + `git stash pop`. This is used by both `diffCem` (handlers/cem.ts) and `getHealthDiff` (handlers/health.ts) to read file content from another branch.\n\n**This is catastrophically dangerous for an MCP server:**\n1. It modifies the user's actual working tree mid-session\n2. If the server crashes between `git checkout` and restoration, the user is left on the wrong branch\n3. It fires watchers/HMR in any running dev servers the user has open\n4. The stash detection is locale-sensitive (`!stashOutput.includes('No local changes to save')` — breaks with non-English git installations)\n5. It stashes `--include-untracked` which can affect files users haven't committed\n\n## Fix\n**Never switch branches.** Use `git show <ref>:<path>` to read file content at a specific ref without touching the working tree:\n\n```ts\nasync function gitShow(ref: string, filePath: string): Promise<string> {\n  const { stdout } = await execFileAsync('git', ['show', `${ref}:${filePath}`]);\n  return stdout;\n}\n```\n\nRefactor `diffCem` to:\n1. Read current CEM from disk (already done)\n2. Read base branch CEM via `git show <baseBranch>:<cemPath>` — no checkout needed\n3. Parse both and diff\n\nRefactor `getHealthDiff` similarly — but note: health history files in `.mcp-wc/health` are almost certainly NOT committed to the base branch. The health diff should compare the CURRENT history file against a synthetic CEM-derived score on the base branch's CEM, not branch-switch.\n\nRemove `withBranch()` entirely from `GitOperations` once both callers are refactored.\n\n## Acceptance Criteria\n- `git.ts` has no `withBranch()` method\n- `diffCem` reads base branch content via `git show` (no stash, no checkout)\n- `getHealthDiff` works without branch switching\n- Tests verify the new git approach with mocked `execFileAsync`\n- The server cannot accidentally leave a user on the wrong git branch",
   "title": "CRITICAL: Replace git checkout/stash with `git show` for branch diffing",
-  "status": "backlog",
+  "status": "blocked",
   "epicId": "feature-1772252025617-0gjkoppe7",
   "complexity": "medium",
   "priority": 1,
@@ -26,6 +26,24 @@
       "to": "backlog",
       "timestamp": "2026-03-01T07:07:01.661Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-01T07:24:51.511Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-01T07:29:09.495Z"
+    },
+    {
+      "from": "backlog",
+      "to": "blocked",
+      "timestamp": "2026-03-01T07:31:47.481Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-01T07:24:51.879Z",
+  "model": "claude-sonnet-4-6"
 }

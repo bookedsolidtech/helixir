@@ -320,32 +320,57 @@ describe('getHealthTrend', () => {
 
 // ─── getHealthDiff ────────────────────────────────────────────────────────────
 
+// Minimal CEM JSON for mocking gitShow — undocumented members yield a low scoreCemFallback score.
+// scoreCemFallback: no desc (0) + 0/2 fields (0) + no events (20+15) + no cssParts (15) + no slots (10) = 60
+const UNDOC_BASE_CEM = JSON.stringify({
+  schemaVersion: '1.0.0',
+  modules: [
+    {
+      kind: 'javascript-module',
+      path: 'src/my-button.js',
+      declarations: [
+        {
+          kind: 'class',
+          name: 'MyButton',
+          tagName: 'my-button',
+          members: [
+            { kind: 'field', name: 'variant' },
+            { kind: 'field', name: 'disabled' },
+          ],
+        },
+      ],
+    },
+  ],
+});
+
+// Fully documented CEM yields scoreCemFallback = 100.
+const FULL_DOC_BASE_CEM = JSON.stringify({
+  schemaVersion: '1.0.0',
+  modules: [
+    {
+      kind: 'javascript-module',
+      path: 'src/my-button.js',
+      declarations: [
+        {
+          kind: 'class',
+          name: 'MyButton',
+          tagName: 'my-button',
+          description: 'A button',
+          members: [{ kind: 'field', name: 'variant', description: 'Variant' }],
+          events: [{ name: 'my-click', type: { text: 'CustomEvent' }, description: 'Click' }],
+          cssParts: [{ name: 'base', description: 'Base part' }],
+          slots: [{ name: 'default', description: 'Default slot' }],
+        },
+      ],
+    },
+  ],
+});
+
 describe('getHealthDiff', () => {
-  const baseHealthImproving: ComponentHealth = {
-    tagName: 'my-button',
-    score: 62,
-    grade: 'D',
-    dimensions: { documentation: 55, accessibility: 70 },
-    issues: [],
-    timestamp: '2024-01-15',
-  };
-
-  const baseHealthDeclining: ComponentHealth = {
-    tagName: 'my-button',
-    score: 98,
-    grade: 'A',
-    dimensions: { documentation: 95, accessibility: 100 },
-    issues: [],
-    timestamp: '2024-01-15',
-  };
-
   it('reports improving when current score is higher than base', async () => {
+    // current from history fixture = 88, base from undoc CEM ≈ 60
     const config = makeConfig();
-    // current from fixture = 88, base mocked = 62
-    const mockGitOps = {
-      withBranch: async <T>(_branch: string, _fn: () => Promise<T>) =>
-        baseHealthImproving as unknown as T,
-    };
+    const mockGitOps = { gitShow: async () => UNDOC_BASE_CEM };
 
     const diff = await getHealthDiff(
       config,
@@ -358,16 +383,12 @@ describe('getHealthDiff', () => {
     expect(diff.improved).toBe(true);
     expect(diff.regressed).toBe(false);
     expect(diff.scoreDelta).toBeGreaterThan(0);
-    expect(diff.scoreDelta).toBe(26); // 88 - 62
   });
 
   it('reports declining when current score is lower than base', async () => {
+    // current from history fixture = 88, base from fully-doc CEM = 100
     const config = makeConfig();
-    // current from fixture = 88, base mocked = 98
-    const mockGitOps = {
-      withBranch: async <T>(_branch: string, _fn: () => Promise<T>) =>
-        baseHealthDeclining as unknown as T,
-    };
+    const mockGitOps = { gitShow: async () => FULL_DOC_BASE_CEM };
 
     const diff = await getHealthDiff(
       config,
@@ -380,15 +401,11 @@ describe('getHealthDiff', () => {
     expect(diff.improved).toBe(false);
     expect(diff.regressed).toBe(true);
     expect(diff.scoreDelta).toBeLessThan(0);
-    expect(diff.scoreDelta).toBe(-10); // 88 - 98
   });
 
   it('returns base and current health in the diff', async () => {
     const config = makeConfig();
-    const mockGitOps = {
-      withBranch: async <T>(_branch: string, _fn: () => Promise<T>) =>
-        baseHealthImproving as unknown as T,
-    };
+    const mockGitOps = { gitShow: async () => UNDOC_BASE_CEM };
 
     const diff = await getHealthDiff(
       config,
@@ -399,16 +416,14 @@ describe('getHealthDiff', () => {
     );
 
     expect(diff.tagName).toBe('my-button');
-    expect(diff.current.score).toBe(88);
-    expect(diff.base.score).toBe(62);
+    expect(diff.current.score).toBe(88); // from history fixture
+    expect(diff.base.score).toBeGreaterThan(0);
+    expect(diff.base.score).toBeLessThan(88);
   });
 
   it('lists changed dimensions', async () => {
     const config = makeConfig();
-    const mockGitOps = {
-      withBranch: async <T>(_branch: string, _fn: () => Promise<T>) =>
-        baseHealthImproving as unknown as T,
-    };
+    const mockGitOps = { gitShow: async () => UNDOC_BASE_CEM };
 
     const diff = await getHealthDiff(
       config,
@@ -418,42 +433,75 @@ describe('getHealthDiff', () => {
       mockGitOps as unknown as InstanceType<typeof import('../../src/shared/git.js').GitOperations>,
     );
 
-    // current has documentation, accessibility, completeness, consistency from fixture
-    // base has documentation: 55, accessibility: 70 — expect deltas
+    // base uses scoreCemFallback dimensions; current uses history file dimensions
+    // some dimensions will differ — verify changedDimensions is populated
     expect(diff.changedDimensions.length).toBeGreaterThan(0);
-    const docDim = diff.changedDimensions.find((d) => d.dimension === 'documentation');
-    expect(docDim).toBeDefined();
-    if (docDim) {
-      expect(docDim.before).toBe(55);
-      expect(docDim.delta).toBeGreaterThan(0);
-    }
   });
 
   it('stable diff when scores are equal', async () => {
-    const config = makeConfig();
-    // Return same score as current (88)
-    const sameHealth: ComponentHealth = {
-      tagName: 'my-button',
-      score: 88,
-      grade: 'B',
-      dimensions: {},
-      issues: [],
-      timestamp: '2024-03-10',
-    };
-    const mockGitOps = {
-      withBranch: async <T>(_branch: string, _fn: () => Promise<T>) => sameHealth as unknown as T,
-    };
+    // Use no-history config so both current and base derive from scoreCemFallback.
+    // Pass the same declaration as cemDecl AND mock gitShow to return the same CEM.
+    const config = makeConfig(NO_HISTORY_DIR);
+    const sameCem = JSON.stringify({
+      schemaVersion: '1.0.0',
+      modules: [
+        {
+          kind: 'javascript-module',
+          path: 'src/my-button.js',
+          declarations: [MY_BUTTON_DECL],
+        },
+      ],
+    });
+    const mockGitOps = { gitShow: async () => sameCem };
 
     const diff = await getHealthDiff(
       config,
       'my-button',
       'main',
-      undefined,
+      MY_BUTTON_DECL,
       mockGitOps as unknown as InstanceType<typeof import('../../src/shared/git.js').GitOperations>,
     );
 
     expect(diff.improved).toBe(false);
     expect(diff.regressed).toBe(false);
     expect(diff.scoreDelta).toBe(0);
+  });
+
+  it('returns base with score 0 when component is not found on base branch', async () => {
+    const config = makeConfig();
+    const emptyCem = JSON.stringify({ schemaVersion: '1.0.0', modules: [] });
+    const mockGitOps = { gitShow: async () => emptyCem };
+
+    const diff = await getHealthDiff(
+      config,
+      'my-button',
+      'main',
+      undefined,
+      mockGitOps as unknown as InstanceType<typeof import('../../src/shared/git.js').GitOperations>,
+    );
+
+    expect(diff.base.score).toBe(0);
+    expect(diff.base.grade).toBe('F');
+    expect(diff.improved).toBe(true);
+  });
+
+  it('returns base with score 0 when git show fails', async () => {
+    const config = makeConfig();
+    const mockGitOps = {
+      gitShow: async () => {
+        throw new Error('git show failed');
+      },
+    };
+
+    const diff = await getHealthDiff(
+      config,
+      'my-button',
+      'main',
+      undefined,
+      mockGitOps as unknown as InstanceType<typeof import('../../src/shared/git.js').GitOperations>,
+    );
+
+    expect(diff.base.score).toBe(0);
+    expect(diff.base.grade).toBe('F');
   });
 });

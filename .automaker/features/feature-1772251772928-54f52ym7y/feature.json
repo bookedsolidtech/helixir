@@ -3,9 +3,7 @@
   "description": "Install and configure Prettier. Create .prettierrc (singleQuote, semi, 2 spaces, 100 char width) and .prettierignore (build/, node_modules/, coverage/). Add format and format:check scripts to package.json. Verify pnpm format:check passes on all source files.",
   "title": "Add Prettier formatting",
   "status": "done",
-  "dependencies": [
-    "feature-1772251710534-r4l5eoz0o"
-  ],
+  "dependencies": [],
   "epicId": "feature-1772251713621-8rwdhp0qc",
   "complexity": "small",
   "priority": 2,

@@ -254,22 +254,15 @@ describe('listAllComponents', () => {
 // ---------------------------------------------------------------------------
 
 describe('diffCem', () => {
-  function mockWithBranchImpl(
-    branchFn: (branch: string, fn: () => Promise<void>) => Promise<void>,
-  ) {
+  function mockGitShowImpl(mockFn: (ref: string, filePath: string) => Promise<string>) {
     vi.mocked(GitOperations).mockImplementation(
-      () => ({ withBranch: branchFn }) as unknown as GitOperations,
+      () => ({ gitShow: mockFn }) as unknown as GitOperations,
     );
   }
 
   it('returns isNew: true when component does not exist on base branch', async () => {
     const emptyCem = { schemaVersion: '1.0.0', modules: [] };
-
-    mockWithBranchImpl(async (_branch, fn) => {
-      const spy = vi.spyOn(SafeFileOperations.prototype, 'readJSON');
-      spy.mockResolvedValueOnce(emptyCem as never);
-      await fn();
-    });
+    mockGitShowImpl(async () => JSON.stringify(emptyCem));
 
     const result = await diffCem('my-button', 'main', makeConfig());
     expect(result.isNew).toBe(true);
@@ -277,11 +270,9 @@ describe('diffCem', () => {
     expect(result.additions).toHaveLength(0);
   });
 
-  it('returns isNew: true when CEM file is missing on base branch (read error)', async () => {
-    mockWithBranchImpl(async (_branch, fn) => {
-      const spy = vi.spyOn(SafeFileOperations.prototype, 'readJSON');
-      spy.mockRejectedValueOnce(new Error('File not found') as never);
-      await fn();
+  it('returns isNew: true when CEM file is missing on base branch (git show error)', async () => {
+    mockGitShowImpl(async () => {
+      throw new Error('git show failed');
     });
 
     const result = await diffCem('my-button', 'main', makeConfig());
@@ -289,11 +280,7 @@ describe('diffCem', () => {
   });
 
   it('returns no breaking changes when component is identical on both branches', async () => {
-    mockWithBranchImpl(async (_branch, fn) => {
-      const spy = vi.spyOn(SafeFileOperations.prototype, 'readJSON');
-      spy.mockResolvedValueOnce(FIXTURE_CEM as never);
-      await fn();
-    });
+    mockGitShowImpl(async () => JSON.stringify(FIXTURE_CEM));
 
     const result = await diffCem('my-button', 'main', makeConfig());
     expect(result.isNew).toBe(false);
@@ -338,11 +325,7 @@ describe('diffCem', () => {
       ],
     };
 
-    mockWithBranchImpl(async (_branch, fn) => {
-      const spy = vi.spyOn(SafeFileOperations.prototype, 'readJSON');
-      spy.mockResolvedValueOnce(baseCem as never);
-      await fn();
-    });
+    mockGitShowImpl(async () => JSON.stringify(baseCem));
 
     const result = await diffCem('my-button', 'main', makeConfig());
     expect(result.isNew).toBe(false);
@@ -384,11 +367,7 @@ describe('diffCem', () => {
       ],
     };
 
-    mockWithBranchImpl(async (_branch, fn) => {
-      const spy = vi.spyOn(SafeFileOperations.prototype, 'readJSON');
-      spy.mockResolvedValueOnce(baseCem as never);
-      await fn();
-    });
+    mockGitShowImpl(async () => JSON.stringify(baseCem));
 
     const result = await diffCem('my-button', 'main', makeConfig());
     const typeChange = result.breaking.find(
@@ -433,11 +412,7 @@ describe('diffCem', () => {
       ],
     };
 
-    mockWithBranchImpl(async (_branch, fn) => {
-      const spy = vi.spyOn(SafeFileOperations.prototype, 'readJSON');
-      spy.mockResolvedValueOnce(baseCem as never);
-      await fn();
-    });
+    mockGitShowImpl(async () => JSON.stringify(baseCem));
 
     const result = await diffCem('my-button', 'main', makeConfig());
     const eventRemoved = result.breaking.find(
@@ -478,11 +453,7 @@ describe('diffCem', () => {
       ],
     };
 
-    mockWithBranchImpl(async (_branch, fn) => {
-      const spy = vi.spyOn(SafeFileOperations.prototype, 'readJSON');
-      spy.mockResolvedValueOnce(baseCem as never);
-      await fn();
-    });
+    mockGitShowImpl(async () => JSON.stringify(baseCem));
 
     const result = await diffCem('my-button', 'main', makeConfig());
     expect(result.isNew).toBe(false);
@@ -517,11 +488,7 @@ describe('diffCem', () => {
       ],
     };
 
-    mockWithBranchImpl(async (_branch, fn) => {
-      const spy = vi.spyOn(SafeFileOperations.prototype, 'readJSON');
-      spy.mockResolvedValueOnce(baseCem as never);
-      await fn();
-    });
+    mockGitShowImpl(async () => JSON.stringify(baseCem));
 
     const result = await diffCem('my-button', 'main', makeConfig());
     expect(result.breaking).toHaveLength(0);
@@ -530,8 +497,8 @@ describe('diffCem', () => {
   });
 
   it('throws MCPError NOT_FOUND when the component does not exist on the current branch', async () => {
-    // withBranch won't even be called — parseCem throws first
-    mockWithBranchImpl(async (_branch, fn) => fn());
+    // gitShow won't even be called — parseCem throws first
+    mockGitShowImpl(async () => JSON.stringify({ schemaVersion: '1.0.0', modules: [] }));
 
     const err = await diffCem('no-such-component', 'main', makeConfig()).catch((e) => e);
     expect(err).toBeInstanceOf(MCPError);

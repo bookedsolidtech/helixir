@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Problem\n`src/handlers/typescript.ts` imports `typescript` directly at runtime:\n```ts\nimport ts from 'typescript';\n```\nHowever, `typescript` is listed in `devDependencies` in `package.json`. When a user installs `wc-mcp` from npm (`npm install -g wc-mcp`), devDependencies are NOT installed. The TypeScript diagnostic tools will crash at runtime for ALL npm users with a module-not-found error.\n\n## Fix\nEither:\n1. Move `typescript` to `dependencies` (adds ~5MB to package size but is correct), OR\n2. Make the TypeScript handler use a dynamic `import()` with a try/catch and gracefully disable the TS diagnostic tools when `typescript` isn't available, documenting it as a peer dependency.\n\n**Recommended:** Option 1 — move to `dependencies`. The tool's value prop includes TS diagnostics; making it optional reduces product value. Document in README that `typescript` is required.\n\n## Acceptance Criteria\n- `package.json` has `typescript` in `dependencies`, not `devDependencies`\n- `pnpm run build` succeeds\n- All tests pass\n- `npm pack --dry-run` shows the package installs correctly without devDeps",
   "title": "CRITICAL: Move `typescript` from devDependencies to dependencies",
-  "status": "backlog",
+  "status": "done",
   "epicId": "feature-1772252025617-0gjkoppe7",
   "complexity": "small",
   "priority": 1,
@@ -26,6 +26,29 @@
       "to": "backlog",
       "timestamp": "2026-03-01T07:06:38.722Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-01T07:22:37.341Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-01T07:23:15.363Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 0.19836250000000002,
+  "lastSessionId": "4f03f78f-3d5a-4015-a3e1-484e4ca3f13c",
+  "executionHistory": [
+    {
+      "id": "75bf8b13-8e10-4cdb-ab80-9ae76d890054",
+      "startedAt": "2026-03-01T07:22:37.716Z",
+      "completedAt": "2026-03-01T07:23:15.369Z",
+      "durationMs": 37653,
+      "costUsd": 0.19836250000000002,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Move `typescript` to `dependencies`\n\n### Changes Implemented\n- Moved `typescript: ^5.7.2` from `devDependencies` to `dependencies` in `package.json`\n\n### Files Modified\n- `package.json`\n\n### Risks/Blockers Encountered\n- None. The change was straightforward.\n\n### Learnings\n- `typescript` is used at runtime in `src/handlers/typescript.ts` for diagnostics, so it must be in `dependencies` to work when installed via npm (devDependencies are not installed for end users)\n- Option 1 (move to dependencies) was chosen over Option 2 (dynamic import + graceful degradation) because TS diagnostics are a core value proposition of the tool\n\n### Notes for Developer\n- Build succeeds (exit 0)\n- All 131 tests pass\n- Only `package.json` was modified (aside from automaker tracking files)\n- `npm pack --dry-run` confirms the package structure is correct\n\n### Verification Status\n- Playwright verification was skipped as this is a dependency classification change, not a UI feature. Verified instead via: `pnpm run build` (exit 0) + `pnpm test` (131/131 passing) + `npm pack --dry-run` (confirms correct packaging)"
 }

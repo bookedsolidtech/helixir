@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "The critical path. Implement src/handlers/cem.ts per the specifications in planning.md. parseCem(tagName, config): reads CEM from config.cemPath via SafeFileOperations, resolves the component by tag name, returns typed metadata (members, events, slots, cssProperties, cssParts). Throws MCPError NOT_FOUND if component missing. validateCompleteness(tagName, config): checks CEM coverage, returns score 0-100 with issues list. listAllComponents(config): reads CEM, returns all component tag names. diffCem(tagName, baseBranch, config): uses GitOperations.withBranch to read CEM on base branch, compares against current branch — removed properties, changed types, removed events are BREAKING. Component that exists only on current branch (new): flag as NEW, not breaking. TDD: write tests/handlers/cem.test.ts FIRST using fixture custom-elements.json. Cover: happy path, missing component, incomplete docs, breaking removal, new component. Target 100% coverage.",
   "title": "CEM handler — parseCem, validateCompleteness, listAllComponents, diffCem",
-  "status": "backlog",
+  "status": "blocked",
   "dependencies": [
     "feature-1772252089963-q8o5bskqw",
     "feature-1772252078168-36ly43daj"
@@ -35,6 +35,81 @@
       "to": "backlog",
       "timestamp": "2026-02-28T04:15:00.820Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-01T07:24:15.811Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-01T07:25:18.623Z"
+    },
+    {
+      "from": "backlog",
+      "to": "blocked",
+      "timestamp": "2026-03-01T07:27:28.925Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-01T07:27:30.782Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-01T07:27:30.790Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-01T07:28:01.447Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-01T07:28:01.471Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-01T07:28:01.477Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-01T07:29:09.213Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-01T07:30:05.158Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-01T07:30:05.166Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-01T07:30:55.849Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-01T07:31:13.704Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-01T07:31:13.711Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-01T07:32:40.436Z"
     }
   ],
   "featureType": "code"

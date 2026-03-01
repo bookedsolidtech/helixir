@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Implement McpWcConfig interface and loadConfig() function with priority order: env vars (MCP_WC_CEM_PATH, MCP_WC_PROJECT_ROOT, MCP_WC_COMPONENT_PREFIX, MCP_WC_HEALTH_HISTORY_DIR, MCP_WC_TOKENS_PATH, MCP_WC_TSCONFIG_PATH) take precedence over mcpwc.config.json at project root, which takes precedence over defaults (cemPath=custom-elements.json, projectRoot=process.cwd(), componentPrefix=empty string meaning any prefix, healthHistoryDir=.mcp-wc/health, tsconfigPath=tsconfig.json, tokensPath=null meaning token tools disabled). Write config.test.ts using Vitest — test all 3 config sources, verify priority order, verify defaults, verify that setting MCP_WC_TOKENS_PATH=null disables token tools. No file I/O mocking — use temp directories and real files in tests.",
   "title": "Implement config system (src/config.ts)",
-  "status": "backlog",
+  "status": "done",
   "dependencies": [
     "feature-1772252081915-sru8qq0xm"
   ],
@@ -29,6 +29,29 @@
       "to": "backlog",
       "timestamp": "2026-02-28T04:14:49.963Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-01T07:23:10.148Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-01T07:23:45.654Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 0.208036,
+  "lastSessionId": "18651b4b-1116-43a5-925f-d6c4c0a7c5ba",
+  "executionHistory": [
+    {
+      "id": "54e11f2b-9067-415c-bb16-5d3ba3267caa",
+      "startedAt": "2026-03-01T07:23:10.485Z",
+      "completedAt": "2026-03-01T07:23:45.662Z",
+      "durationMs": 35177,
+      "costUsd": 0.208036,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Implement McpWcConfig interface and loadConfig() function\n\n### Changes Implemented\n- No changes were required — `src/config.ts` and `tests/config.test.ts` were already fully implemented.\n- The `McpWcConfig` interface, `loadConfig()` function, and all 17 tests covering defaults, config file, env vars, priority order, and `tokensPath=null` behavior were already in place.\n\n### Files Modified\n- None (already implemented)\n\n### Risks/Blockers Encountered\n- None\n\n### Learnings\n- This feature was already implemented in a prior session. The MEMORY.md notes the config handler was among the implemented handlers, but didn't note the config.ts itself as done. Memory was already accurate about `src/handlers/` being implemented.\n\n### Notes for Developer\n- All 131 tests pass (17 config tests specifically)\n- Build exits cleanly with code 0\n- Priority order is: env vars → mcpwc.config.json → defaults, exactly as specified\n- `MCP_WC_TOKENS_PATH=null` (string \"null\") correctly sets `tokensPath` to `null`\n\n### Verification Status\n- Playwright not applicable — this is a pure TypeScript config module with no UI/HTTP surface\n- Verified via `pnpm test` (131 tests passed) and `pnpm run build` (exit code 0)"
 }

@@ -1,0 +1,7 @@
+{
+  "name": "my-stencil-lib",
+  "version": "1.0.0",
+  "devDependencies": {
+    "@stencil/core": "^4.0.0"
+  }
+}

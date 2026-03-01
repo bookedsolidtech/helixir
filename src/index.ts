@@ -26,6 +26,11 @@ import {
 } from './tools/typescript.js';
 import { isTypescriptAvailable } from './handlers/typescript.js';
 import { TOKEN_TOOL_DEFINITIONS, handleTokenCall, isTokenTool } from './tools/tokens.js';
+import {
+  FRAMEWORK_TOOL_DEFINITIONS,
+  handleFrameworkCall,
+  isFrameworkTool,
+} from './tools/framework.js';
 import { createErrorResponse } from './shared/mcp-helpers.js';
 import type { MCPToolResult } from './shared/mcp-helpers.js';
 
@@ -107,6 +112,7 @@ async function main(): Promise<void> {
     ...COMPONENT_TOOL_DEFINITIONS,
     ...SAFETY_TOOL_DEFINITIONS,
     ...HEALTH_TOOL_DEFINITIONS,
+    ...FRAMEWORK_TOOL_DEFINITIONS,
     ...tsTools,
   ];
 
@@ -147,6 +153,7 @@ async function main(): Promise<void> {
         }
         return handleTypeScriptCall(name, typedArgs, config);
       }
+      if (isFrameworkTool(name)) return handleFrameworkCall(name, typedArgs, config);
       if (isTokenTool(name)) {
         if (!config.tokensPath) {
           return createErrorResponse(

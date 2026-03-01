@@ -31,6 +31,7 @@ import {
   handleFrameworkCall,
   isFrameworkTool,
 } from './tools/framework.js';
+import { VALIDATE_TOOL_DEFINITIONS, handleValidateCall, isValidateTool } from './tools/validate.js';
 import { createErrorResponse } from './shared/mcp-helpers.js';
 import type { MCPToolResult } from './shared/mcp-helpers.js';
 
@@ -113,6 +114,7 @@ async function main(): Promise<void> {
     ...SAFETY_TOOL_DEFINITIONS,
     ...HEALTH_TOOL_DEFINITIONS,
     ...FRAMEWORK_TOOL_DEFINITIONS,
+    ...VALIDATE_TOOL_DEFINITIONS,
     ...tsTools,
   ];
 
@@ -154,6 +156,13 @@ async function main(): Promise<void> {
         return handleTypeScriptCall(name, typedArgs, config);
       }
       if (isFrameworkTool(name)) return handleFrameworkCall(name, typedArgs, config);
+      if (isValidateTool(name)) {
+        if (cemCache === null)
+          return createErrorResponse(
+            'CEM not yet loaded — server is still initializing. Please retry.',
+          );
+        return handleValidateCall(name, typedArgs, cemCache);
+      }
       if (isTokenTool(name)) {
         if (!config.tokensPath) {
           return createErrorResponse(

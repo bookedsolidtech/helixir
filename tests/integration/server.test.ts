@@ -140,7 +140,7 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
       });
     });
 
-    it('returns all expected tool names (21 core + 2 token when configured)', async () => {
+    it('returns all expected tool names (22 core + 2 token when configured)', async () => {
       sendRequest('tools/list', {});
       const response = await recv();
 
@@ -172,6 +172,8 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
         'analyze_accessibility',
         // framework
         'detect_framework',
+        // validate
+        'validate_usage',
         // typescript
         'get_file_diagnostics',
         'get_project_diagnostics',

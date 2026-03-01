@@ -1,0 +1,80 @@
+name: Bug Report
+description: Report a bug or unexpected behavior in wc-mcp
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please fill out the fields below to help us diagnose the issue quickly.
+
+  - type: input
+    id: wc-mcp-version
+    attributes:
+      label: wc-mcp version
+      description: Run `wc-mcp --version` or check your package.json
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      description: Run `node --version`
+      placeholder: "v20.11.0"
+    validations:
+      required: true
+
+  - type: input
+    id: framework
+    attributes:
+      label: Web component framework in use
+      description: e.g. Shoelace, Lit, Stencil, FAST, custom
+      placeholder: "Shoelace 2.x"
+    validations:
+      required: true
+
+  - type: textarea
+    id: cem-excerpt
+    attributes:
+      label: CEM excerpt (first 50 lines)
+      description: Paste the first 50 lines of your `custom-elements.json` file. This helps us reproduce the issue without your full library.
+      render: json
+    validations:
+      required: false
+
+  - type: textarea
+    id: command
+    attributes:
+      label: Command or tool call used
+      description: The MCP tool name and arguments that triggered the bug
+      placeholder: |
+        Tool: get_component_api
+        Arguments: { "componentName": "my-button" }
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected output
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual output
+      description: What actually happened? Include full error messages and stack traces if available.
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: mcpwc.config.json (optional)
+      description: Share your config file if relevant (remove any sensitive values)
+      render: json
+    validations:
+      required: false

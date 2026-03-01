@@ -1,0 +1,66 @@
+name: Framework Support Request
+description: Request support for a new web component framework or CEM variant
+labels: ["framework-support"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        wc-mcp aims to support any library that ships a Custom Elements Manifest. Use this template to request first-class support or report compatibility issues with a specific framework.
+
+  - type: input
+    id: framework-name
+    attributes:
+      label: Framework name
+      description: The name and version of the web component framework
+      placeholder: "FAST Element 2.x"
+    validations:
+      required: true
+
+  - type: input
+    id: github-repo
+    attributes:
+      label: GitHub repository
+      description: Link to the framework's GitHub repository
+      placeholder: "https://github.com/microsoft/fast"
+    validations:
+      required: true
+
+  - type: textarea
+    id: cem-excerpt
+    attributes:
+      label: Sample CEM excerpt
+      description: |
+        Paste a representative excerpt from the framework's `custom-elements.json`. Include at least one component with:
+        - Attributes / properties
+        - Events
+        - Slots (if applicable)
+        - CSS parts or CSS custom properties (if applicable)
+      render: json
+    validations:
+      required: true
+
+  - type: textarea
+    id: edge-cases
+    attributes:
+      label: Specific edge cases
+      description: |
+        Describe any known quirks, non-standard fields, or patterns in this framework's CEM output that might require special handling. For example:
+        - Non-standard field names
+        - Missing required CEM fields
+        - Framework-specific metadata fields
+        - Unusual inheritance patterns
+      placeholder: |
+        - FAST components use `@attr` decorator metadata not present in standard CEM
+        - The `resolveTagName` field is framework-specific and controls tag registration
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before submitting
+      options:
+        - label: I have verified the framework ships a `custom-elements.json` or `custom-elements-manifest.json`
+          required: true
+        - label: I have included a CEM excerpt that demonstrates the framework's structure
+          required: true

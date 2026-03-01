@@ -1,7 +1,5 @@
-import { resolve } from 'path';
 import { z } from 'zod';
 import type { McpWcConfig } from '../config.js';
-import { SafeFileOperations } from '../shared/file-ops.js';
 import { GitOperations } from '../shared/git.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
 
@@ -63,8 +61,12 @@ export const CemSchema = z.object({
   modules: z.array(CemModuleSchema),
 });
 
-type Cem = z.infer<typeof CemSchema>;
-type CemDeclaration = z.infer<typeof CemDeclarationSchema>;
+export type Cem = z.infer<typeof CemSchema>;
+export type CemMember = z.infer<typeof CemMemberSchema>;
+export type CemEvent = z.infer<typeof CemEventSchema>;
+export type CemSlot = z.infer<typeof CemSlotSchema>;
+export type CemCssPart = z.infer<typeof CemCssPartSchema>;
+export type CemDeclaration = z.infer<typeof CemDeclarationSchema>;
 
 // --- Public types ---
 
@@ -134,16 +136,9 @@ function mapDeclaration(decl: CemDeclaration): ComponentMetadata {
   };
 }
 
-async function readCem(config: McpWcConfig): Promise<Cem> {
-  const fileOps = new SafeFileOperations();
-  const cemAbsPath = resolve(config.projectRoot, config.cemPath);
-  return fileOps.readJSON(cemAbsPath, CemSchema);
-}
-
 // --- Public API ---
 
-export async function parseCem(tagName: string, config: McpWcConfig): Promise<ComponentMetadata> {
-  const cem = await readCem(config);
+export function parseCem(tagName: string, cem: Cem): ComponentMetadata {
   const decl = findDeclaration(cem, tagName);
   if (!decl) {
     throw new MCPError(`Component "${tagName}" not found in CEM.`, ErrorCategory.NOT_FOUND);
@@ -151,11 +146,7 @@ export async function parseCem(tagName: string, config: McpWcConfig): Promise<Co
   return mapDeclaration(decl);
 }
 
-export async function validateCompleteness(
-  tagName: string,
-  config: McpWcConfig,
-): Promise<CompletenessResult> {
-  const cem = await readCem(config);
+export function validateCompleteness(tagName: string, cem: Cem): CompletenessResult {
   const decl = findDeclaration(cem, tagName);
   if (!decl) {
     throw new MCPError(`Component "${tagName}" not found in CEM.`, ErrorCategory.NOT_FOUND);
@@ -227,8 +218,87 @@ export async function validateCompleteness(
   return { score, issues };
 }
 
-export async function listAllComponents(config: McpWcConfig): Promise<string[]> {
-  const cem = await readCem(config);
+// --- Cross-component aggregation types ---
+
+export interface EventRow {
+  eventName: string;
+  tagName: string;
+  description: string;
+  type: string;
+}
+
+export interface SlotRow {
+  slotName: string;
+  tagName: string;
+  description: string;
+  isDefault: boolean;
+}
+
+export interface CssPartRow {
+  partName: string;
+  tagName: string;
+  description: string;
+}
+
+// --- Cross-component aggregation functions ---
+
+export function listAllEvents(cem: Cem, tagName?: string): EventRow[] {
+  const rows: EventRow[] = [];
+  for (const mod of cem.modules) {
+    for (const decl of mod.declarations ?? []) {
+      if (!decl.tagName) continue;
+      if (tagName && decl.tagName !== tagName) continue;
+      for (const event of decl.events ?? []) {
+        rows.push({
+          eventName: event.name,
+          tagName: decl.tagName,
+          description: event.description ?? '',
+          type: event.type?.text ?? '',
+        });
+      }
+    }
+  }
+  return rows;
+}
+
+export function listAllSlots(cem: Cem, tagName?: string): SlotRow[] {
+  const rows: SlotRow[] = [];
+  for (const mod of cem.modules) {
+    for (const decl of mod.declarations ?? []) {
+      if (!decl.tagName) continue;
+      if (tagName && decl.tagName !== tagName) continue;
+      for (const slot of decl.slots ?? []) {
+        rows.push({
+          slotName: slot.name,
+          tagName: decl.tagName,
+          description: slot.description ?? '',
+          isDefault: slot.name === '',
+        });
+      }
+    }
+  }
+  return rows;
+}
+
+export function listAllCssParts(cem: Cem, tagName?: string): CssPartRow[] {
+  const rows: CssPartRow[] = [];
+  for (const mod of cem.modules) {
+    for (const decl of mod.declarations ?? []) {
+      if (!decl.tagName) continue;
+      if (tagName && decl.tagName !== tagName) continue;
+      for (const part of decl.cssParts ?? []) {
+        rows.push({
+          partName: part.name,
+          tagName: decl.tagName,
+          description: part.description ?? '',
+        });
+      }
+    }
+  }
+  return rows;
+}
+
+export function listAllComponents(cem: Cem): string[] {
   const tagNames: string[] = [];
   for (const mod of cem.modules) {
     for (const decl of mod.declarations ?? []) {
@@ -244,9 +314,10 @@ export async function diffCem(
   tagName: string,
   baseBranch: string,
   config: McpWcConfig,
+  cem: Cem,
 ): Promise<DiffResult> {
-  // Get current branch component metadata
-  const current = await parseCem(tagName, config);
+  // Get current branch component metadata from cached CEM
+  const current = parseCem(tagName, cem);
 
   // Read base branch's CEM via git show — no stash, no checkout, no working-tree mutation
   const gitOps = new GitOperations();

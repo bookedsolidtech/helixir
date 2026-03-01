@@ -1,0 +1,438 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "https://opensource.adobe.com/spectrum-web-components/",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "packages/button/src/Button.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Buttons allow users to trigger an action or event with a single click.",
+          "name": "Button",
+          "tagName": "sp-button",
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'accent' | 'primary' | 'secondary' | 'negative' | 'white' | 'black' | 'cta' | undefined"
+              },
+              "description": "The visual variant to apply to the button.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "treatment",
+              "type": { "text": "'fill' | 'outline' | undefined" },
+              "description": "The treatment of the button — fill or outline.",
+              "attribute": "treatment",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": { "text": "'s' | 'm' | 'l' | 'xl' | undefined" },
+              "description": "The size of the button.",
+              "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "description": "Disable this control. It will not receive focus or events.",
+              "attribute": "disabled",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": { "text": "string | undefined" },
+              "description": "The URL to link to, rendered as an anchor element when provided.",
+              "attribute": "href"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": { "text": "string | undefined" },
+              "description": "An accessible label that describes the component. Applied to aria-label.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "pending",
+              "type": { "text": "boolean" },
+              "description": "Whether to display the button in a pending/loading state.",
+              "attribute": "pending",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "staticColor",
+              "type": { "text": "'black' | 'white' | undefined" },
+              "description": "The static color variant for use on dark or colored backgrounds.",
+              "attribute": "static-color",
+              "reflects": true
+            }
+          ],
+          "events": [
+            {
+              "name": "click",
+              "type": { "text": "PointerEvent" },
+              "description": "Dispatched when the button is clicked."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "The label for the button."
+            },
+            {
+              "name": "icon",
+              "description": "An icon to place at the start of the button, before the label."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "button",
+              "description": "The button element wrapper."
+            },
+            {
+              "name": "label",
+              "description": "The label slot container."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--mod-button-border-radius",
+              "description": "Override the border radius of the button."
+            },
+            {
+              "name": "--mod-button-min-width",
+              "description": "Override the minimum width of the button."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/textfield/src/Textfield.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Text fields allow users to input custom text entries with a keyboard.",
+          "name": "Textfield",
+          "tagName": "sp-textfield",
+          "members": [
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "description": "Disable this control.",
+              "attribute": "disabled",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "invalid",
+              "type": { "text": "boolean" },
+              "description": "Whether the textfield is in an invalid state.",
+              "attribute": "invalid",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": { "text": "string" },
+              "description": "A label for the field.",
+              "attribute": "label",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "maxlength",
+              "type": { "text": "number" },
+              "description": "Limits the number of characters that can be entered.",
+              "attribute": "maxlength",
+              "default": "-1"
+            },
+            {
+              "kind": "field",
+              "name": "minlength",
+              "type": { "text": "number" },
+              "description": "The minimum number of characters the user must enter.",
+              "attribute": "minlength",
+              "default": "-1"
+            },
+            {
+              "kind": "field",
+              "name": "multiline",
+              "type": { "text": "boolean" },
+              "description": "Whether the textfield renders as a textarea.",
+              "attribute": "multiline",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "pattern",
+              "type": { "text": "string" },
+              "description": "A regular expression the value must match to be valid.",
+              "attribute": "pattern",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": { "text": "string" },
+              "description": "Placeholder text for the field.",
+              "attribute": "placeholder",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "quiet",
+              "type": { "text": "boolean" },
+              "description": "Uses the quiet variant of the Spectrum textfield.",
+              "attribute": "quiet",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "readonly",
+              "type": { "text": "boolean" },
+              "description": "Whether the textfield is read-only.",
+              "attribute": "readonly",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": { "text": "boolean" },
+              "description": "Whether the textfield is required.",
+              "attribute": "required",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "'email' | 'number' | 'password' | 'search' | 'tel' | 'text' | 'url'"
+              },
+              "description": "The type of the underlying input element.",
+              "attribute": "type",
+              "default": "'text'"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": { "text": "string" },
+              "description": "The value held by the form control.",
+              "attribute": "value",
+              "default": "''"
+            }
+          ],
+          "events": [
+            {
+              "name": "change",
+              "type": { "text": "Event" },
+              "description": "An alteration to the value of the element has been committed by the user."
+            },
+            {
+              "name": "input",
+              "type": { "text": "Event" },
+              "description": "The value of the element has changed."
+            }
+          ],
+          "slots": [
+            {
+              "name": "help-text",
+              "description": "Default or non-negative help text to associate with your form element."
+            },
+            {
+              "name": "negative-help-text",
+              "description": "Negative help text to associate with your form element when it is invalid."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "field",
+              "description": "The element that wraps the label and input."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/dialog/src/Dialog.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Dialogs display important information that users need to acknowledge.",
+          "name": "Dialog",
+          "tagName": "sp-dialog",
+          "members": [
+            {
+              "kind": "field",
+              "name": "dismissable",
+              "type": { "text": "boolean" },
+              "description": "Whether to include a dismiss (close) button in the dialog.",
+              "attribute": "dismissable",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "error",
+              "type": { "text": "boolean" },
+              "description": "Whether the dialog should be rendered in an error state.",
+              "attribute": "error",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "headline",
+              "type": { "text": "string" },
+              "description": "The heading of the dialog.",
+              "attribute": "headline",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "mode",
+              "type": { "text": "'fullscreen' | 'fullscreenTakeover' | undefined" },
+              "description": "The mode of the dialog — fullscreen or fullscreenTakeover.",
+              "attribute": "mode"
+            },
+            {
+              "kind": "field",
+              "name": "noDivider",
+              "type": { "text": "boolean" },
+              "description": "Whether the footer divider should be hidden.",
+              "attribute": "no-divider",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "underlay",
+              "type": { "text": "boolean" },
+              "description": "Whether to render an underlay element behind the dialog.",
+              "attribute": "underlay",
+              "default": "false",
+              "reflects": true
+            }
+          ],
+          "events": [
+            {
+              "name": "close",
+              "type": { "text": "Event" },
+              "description": "Dispatched when the dialog is dismissed."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "The content of the dialog."
+            },
+            {
+              "name": "heading",
+              "description": "A slot for the heading of the dialog."
+            },
+            {
+              "name": "hero",
+              "description": "A decorative image at the top of the dialog."
+            },
+            {
+              "name": "footer",
+              "description": "Content for the footer area of the dialog."
+            },
+            {
+              "name": "button",
+              "description": "Action buttons for the dialog footer."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "heading",
+              "description": "The heading element."
+            },
+            {
+              "name": "content",
+              "description": "The scrollable content area."
+            },
+            {
+              "name": "footer",
+              "description": "The footer element."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/theme/src/Theme.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The sp-theme component wraps a tree of Spectrum components with theme settings.",
+          "name": "Theme",
+          "tagName": "sp-theme",
+          "members": [
+            {
+              "kind": "field",
+              "name": "color",
+              "type": { "text": "'light' | 'dark' | 'darkest' | undefined" },
+              "description": "The color stop of the Spectrum theme.",
+              "attribute": "color",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "scale",
+              "type": { "text": "'medium' | 'large' | undefined" },
+              "description": "The platform scale of the Spectrum theme.",
+              "attribute": "scale",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "system",
+              "type": { "text": "'spectrum' | 'express' | undefined" },
+              "description": "The design system to apply.",
+              "attribute": "system",
+              "reflects": true
+            }
+          ],
+          "events": [],
+          "slots": [
+            {
+              "name": "",
+              "description": "The Spectrum components to which the theme is applied."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--spectrum-global-color-blue-500",
+              "description": "The primary blue color token."
+            },
+            {
+              "name": "--spectrum-alias-background-color-default",
+              "description": "The default background color."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

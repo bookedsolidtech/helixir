@@ -4,6 +4,7 @@ import type { McpWcConfig } from '../config.js';
 import { getDesignTokens, findToken } from '../handlers/tokens.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
+import { handleToolError } from '../shared/error-handling.js';
 
 const GetDesignTokensArgsSchema = z.object({
   category: z.string().optional(),
@@ -17,7 +18,7 @@ export const TOKEN_TOOL_DEFINITIONS = [
   {
     name: 'get_design_tokens',
     description:
-      'List all design tokens from the configured tokens file, optionally filtered by category (e.g. "color", "spacing", "typography").',
+      'List all design tokens from the configured tokens file, optionally filtered by category (e.g. "color", "spacing", "typography"). Requires tokensPath to be set in mcpwc.config.json or MCP_WC_TOKENS_PATH.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -27,12 +28,13 @@ export const TOKEN_TOOL_DEFINITIONS = [
             'Optional category to filter by (e.g. "color", "spacing", "typography"). Case-insensitive.',
         },
       },
+      additionalProperties: false,
     },
   },
   {
     name: 'find_token',
     description:
-      'Find design tokens by name pattern or value using a case-insensitive substring match.',
+      'Find design tokens by name pattern or value using a case-insensitive substring match. Requires tokensPath to be set in mcpwc.config.json or MCP_WC_TOKENS_PATH.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -43,6 +45,7 @@ export const TOKEN_TOOL_DEFINITIONS = [
         },
       },
       required: ['query'],
+      additionalProperties: false,
     },
   },
 ];
@@ -71,8 +74,8 @@ export function handleTokenCall(
 
     return createErrorResponse(`Unknown token tool: ${name}`);
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    return createErrorResponse(message);
+    const mcpErr = handleToolError(err);
+    return createErrorResponse(`[${mcpErr.category}] ${mcpErr.message}`);
   }
 }
 

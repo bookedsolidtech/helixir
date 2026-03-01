@@ -1,0 +1,400 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "https://github.com/microsoft/fluentui/tree/master/packages/web-components",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/button/button.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A Button implementation based on FAST Foundation that integrates the Fluent design system.",
+          "name": "FluentButton",
+          "tagName": "fluent-button",
+          "members": [
+            {
+              "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'accent' | 'lightweight' | 'neutral' | 'outline' | 'stealth' | undefined"
+              },
+              "description": "The visual appearance of the button.",
+              "attribute": "appearance"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "description": "The disabled state of the button.",
+              "attribute": "disabled",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "formId",
+              "type": { "text": "string | undefined" },
+              "description": "The id of a form to associate the element to.",
+              "attribute": "form"
+            },
+            {
+              "kind": "field",
+              "name": "iconOnly",
+              "type": { "text": "boolean" },
+              "description": "Indicates the button has only an icon.",
+              "attribute": "icon-only",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "autofocus",
+              "type": { "text": "boolean" },
+              "description": "Determines if the element should receive document focus on page load.",
+              "attribute": "autofocus",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": { "text": "'submit' | 'reset' | 'button'" },
+              "description": "The default behavior of the button.",
+              "attribute": "type",
+              "default": "'submit'"
+            }
+          ],
+          "events": [
+            {
+              "name": "click",
+              "type": { "text": "MouseEvent" },
+              "description": "Fires when the button is clicked."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "The default slot for button content."
+            },
+            {
+              "name": "start",
+              "description": "Content which can be provided before the button content."
+            },
+            {
+              "name": "end",
+              "description": "Content which can be provided after the button content."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--accent-fill-rest",
+              "description": "Background color in the rest state for accent appearance."
+            },
+            {
+              "name": "--neutral-fill-rest",
+              "description": "Background color in the rest state for neutral appearance."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "control",
+              "description": "The element representing the button control."
+            },
+            {
+              "name": "content",
+              "description": "The element wrapping button content."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/text-field/text-field.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A Text Field implementation based on FAST Foundation.",
+          "name": "FluentTextField",
+          "tagName": "fluent-text-field",
+          "members": [
+            {
+              "kind": "field",
+              "name": "appearance",
+              "type": { "text": "'filled' | 'outline' | undefined" },
+              "description": "The visual appearance of the text field.",
+              "attribute": "appearance"
+            },
+            {
+              "kind": "field",
+              "name": "autofocus",
+              "type": { "text": "boolean" },
+              "description": "Indicates that this element should receive focus on page load.",
+              "attribute": "autofocus",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "description": "Sets the element's disabled state.",
+              "attribute": "disabled",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "maxlength",
+              "type": { "text": "number | undefined" },
+              "description": "The maximum number of characters a user can enter.",
+              "attribute": "maxlength"
+            },
+            {
+              "kind": "field",
+              "name": "minlength",
+              "type": { "text": "number | undefined" },
+              "description": "The minimum number of characters a user can enter.",
+              "attribute": "minlength"
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": { "text": "string | undefined" },
+              "description": "Sets the placeholder value of the element.",
+              "attribute": "placeholder"
+            },
+            {
+              "kind": "field",
+              "name": "readOnly",
+              "type": { "text": "boolean" },
+              "description": "When true, the control will be immutable by user interaction.",
+              "attribute": "readonly",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": { "text": "boolean" },
+              "description": "Indicates that the user must fill in a value before submitting a form.",
+              "attribute": "required",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "spellcheck",
+              "type": { "text": "boolean" },
+              "description": "Controls whether or not to enable spell checking for the input field.",
+              "attribute": "spellcheck"
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "'email' | 'number' | 'password' | 'search' | 'tel' | 'text' | 'url'"
+              },
+              "description": "Allows setting a type or accept attribute on the underlying input.",
+              "attribute": "type",
+              "default": "'text'"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": { "text": "string" },
+              "description": "The value of the element.",
+              "attribute": "value",
+              "default": "''"
+            }
+          ],
+          "events": [
+            {
+              "name": "change",
+              "type": { "text": "Event" },
+              "description": "Fires a custom 'change' event when the value has changed."
+            },
+            {
+              "name": "input",
+              "type": { "text": "InputEvent" },
+              "description": "Fires a custom 'input' event when the value changes."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "The default slot."
+            },
+            {
+              "name": "label",
+              "description": "The slot for the label."
+            },
+            {
+              "name": "start",
+              "description": "Content which can be provided before the input."
+            },
+            {
+              "name": "end",
+              "description": "Content which can be provided after the input."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "label",
+              "description": "The label element."
+            },
+            {
+              "name": "root",
+              "description": "The element wrapping the control including the label and helper text."
+            },
+            {
+              "name": "control",
+              "description": "The element representing the input control."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/checkbox/checkbox.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A Checkbox implementation based on FAST Foundation.",
+          "name": "FluentCheckbox",
+          "tagName": "fluent-checkbox",
+          "members": [
+            {
+              "kind": "field",
+              "name": "checked",
+              "type": { "text": "boolean" },
+              "description": "The checked state of the checkbox.",
+              "attribute": "checked",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "description": "Sets the element's disabled state.",
+              "attribute": "disabled",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "indeterminate",
+              "type": { "text": "boolean" },
+              "description": "The indeterminate state of the component.",
+              "attribute": "indeterminate",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": { "text": "boolean" },
+              "description": "Indicates that the user must fill in a value before submitting a form.",
+              "attribute": "required",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": { "text": "string" },
+              "description": "The initial value of the form.",
+              "attribute": "value"
+            }
+          ],
+          "events": [
+            {
+              "name": "change",
+              "type": { "text": "Event" },
+              "description": "Fires a custom 'change' event when the checked state changes."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "The default slot for the label."
+            },
+            {
+              "name": "checked-indicator",
+              "description": "The checked indicator."
+            },
+            {
+              "name": "indeterminate-indicator",
+              "description": "The indeterminate indicator."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "control",
+              "description": "The element representing the visual checkbox control."
+            },
+            {
+              "name": "label",
+              "description": "The label element."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/data-grid/data-grid.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A Data Grid implementation based on FAST Foundation.",
+          "name": "FluentDataGrid",
+          "tagName": "fluent-data-grid",
+          "members": [
+            {
+              "kind": "field",
+              "name": "generateHeader",
+              "type": { "text": "'default' | 'sticky' | 'none'" },
+              "description": "When true, the component will not add a row element for column headers.",
+              "attribute": "generate-header",
+              "default": "'default'"
+            },
+            {
+              "kind": "field",
+              "name": "gridTemplateColumns",
+              "type": { "text": "string | undefined" },
+              "description": "String that gets applied to the the css gridTemplateColumns attribute of child rows.",
+              "attribute": "grid-template-columns"
+            },
+            {
+              "kind": "field",
+              "name": "noTabbing",
+              "type": { "text": "boolean" },
+              "description": "Optionally the grid can be told not to focus on selected rows by setting this flag.",
+              "attribute": "no-tabbing",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "rowsData",
+              "type": { "text": "object[]" },
+              "description": "The data being displayed in the grid.",
+              "attribute": "rows-data"
+            }
+          ],
+          "events": [
+            {
+              "name": "row-focused",
+              "type": { "text": "CustomEvent" },
+              "description": "Fires a custom 'row-focused' event when focus is on an element within the grid row."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "The default slot for fluent-data-grid-row elements."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

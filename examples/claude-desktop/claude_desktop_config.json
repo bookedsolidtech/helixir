@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "wc-mcp": {
+      "command": "npx",
+      "args": ["wc-mcp"],
+      "env": {
+        "MCP_WC_PROJECT_ROOT": "/path/to/your/project"
+      }
+    }
+  }
+}

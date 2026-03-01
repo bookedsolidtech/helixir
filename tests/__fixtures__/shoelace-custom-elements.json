@@ -1,0 +1,401 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "https://github.com/shoelace-style/shoelace",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/button/button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Buttons represent actions that are available to the user.",
+          "name": "SlButton",
+          "tagName": "sl-button",
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'default' | 'primary' | 'success' | 'neutral' | 'warning' | 'danger' | 'text'"
+              },
+              "default": "'default'",
+              "description": "The button's theme variant.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": { "text": "'small' | 'medium' | 'large'" },
+              "default": "'medium'",
+              "description": "The button's size.",
+              "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Disables the button.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "loading",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Draws the button in a loading state.",
+              "attribute": "loading",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "outline",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Draws an outlined button.",
+              "attribute": "outline",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "pill",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Draws a pill-style button with rounded edges.",
+              "attribute": "pill",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": { "text": "string | undefined" },
+              "description": "When set, the underlying button will be rendered as an <a> with this href.",
+              "attribute": "href"
+            },
+            {
+              "kind": "method",
+              "name": "click",
+              "description": "Simulates a click on the button.",
+              "return": { "type": { "text": "void" } }
+            },
+            {
+              "kind": "method",
+              "name": "focus",
+              "return": { "type": { "text": "void" } }
+            }
+          ],
+          "slots": [
+            { "name": "", "description": "The button's label." },
+            { "name": "prefix", "description": "A presentational prefix icon or similar element." },
+            { "name": "suffix", "description": "A presentational suffix icon or similar element." }
+          ],
+          "events": [
+            { "name": "sl-blur", "description": "Emitted when the button loses focus." },
+            { "name": "sl-focus", "description": "Emitted when the button gains focus." }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "sl-button",
+          "declaration": { "name": "SlButton" }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/icon/icon.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Icons are symbols that can be used to represent various options within an application.",
+          "name": "SlIcon",
+          "tagName": "sl-icon",
+          "members": [
+            {
+              "kind": "field",
+              "name": "name",
+              "type": { "text": "string | undefined" },
+              "description": "The name of the icon to draw. Available names depend on the icon library being used.",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "src",
+              "type": { "text": "string | undefined" },
+              "description": "An external URL of an SVG file. Be sure you trust the content you are including.",
+              "attribute": "src"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": { "text": "string" },
+              "default": "''",
+              "description": "An accessible, short-text label. Provides an alternative to using role=\"img\" with an aria-label.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "library",
+              "type": { "text": "string" },
+              "default": "'default'",
+              "description": "The name of a registered custom icon library.",
+              "attribute": "library"
+            }
+          ],
+          "slots": [],
+          "events": [
+            { "name": "sl-load", "description": "Emitted when the icon has loaded." },
+            {
+              "name": "sl-error",
+              "description": "Emitted when the icon fails to load due to an error."
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "sl-icon",
+          "declaration": { "name": "SlIcon" }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/input/input.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Inputs collect data from the user.",
+          "name": "SlInput",
+          "tagName": "sl-input",
+          "members": [
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "'date' | 'datetime-local' | 'email' | 'number' | 'password' | 'search' | 'tel' | 'text' | 'time' | 'url'"
+              },
+              "default": "'text'",
+              "description": "The type of input.",
+              "attribute": "type",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": { "text": "'small' | 'medium' | 'large'" },
+              "default": "'medium'",
+              "description": "The input's size.",
+              "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": { "text": "string" },
+              "default": "''",
+              "description": "The input's label.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": { "text": "string" },
+              "default": "''",
+              "description": "Placeholder text to show as a hint when the input is empty.",
+              "attribute": "placeholder"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Disables the input.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Makes the input a required field.",
+              "attribute": "required",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": { "text": "string" },
+              "default": "''",
+              "description": "The current value of the input.",
+              "attribute": "value"
+            }
+          ],
+          "slots": [
+            { "name": "label", "description": "The input's label." },
+            {
+              "name": "prefix",
+              "description": "Used to prepend a presentational icon or similar element to the input."
+            },
+            {
+              "name": "suffix",
+              "description": "Used to append a presentational icon or similar element to the input."
+            },
+            { "name": "help-text", "description": "Text that describes how to use the input." }
+          ],
+          "events": [
+            {
+              "name": "sl-change",
+              "description": "Emitted when an alteration to the control's value is committed."
+            },
+            { "name": "sl-input", "description": "Emitted when the control receives input." }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "sl-input",
+          "declaration": { "name": "SlInput" }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/dialog/dialog.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Dialogs, sometimes called 'modals', appear above the page and require the user's immediate attention.",
+          "name": "SlDialog",
+          "tagName": "sl-dialog",
+          "members": [
+            {
+              "kind": "field",
+              "name": "open",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Indicates whether or not the dialog is open.",
+              "attribute": "open",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": { "text": "string" },
+              "default": "''",
+              "description": "The dialog's label as displayed in the header.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "noHeader",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Disables the header.",
+              "attribute": "no-header",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "description": "Shows the dialog.",
+              "return": { "type": { "text": "Promise<void>" } }
+            },
+            {
+              "kind": "method",
+              "name": "hide",
+              "description": "Hides the dialog.",
+              "return": { "type": { "text": "Promise<void>" } }
+            }
+          ],
+          "slots": [
+            { "name": "", "description": "The dialog's main content." },
+            { "name": "label", "description": "The dialog's label." },
+            { "name": "header-actions", "description": "Optional actions to add to the header." },
+            {
+              "name": "footer",
+              "description": "The dialog's footer, usually one or more buttons representing various options."
+            }
+          ],
+          "events": [
+            { "name": "sl-show", "description": "Emitted when the dialog opens." },
+            { "name": "sl-hide", "description": "Emitted when the dialog closes." },
+            {
+              "name": "sl-after-show",
+              "description": "Emitted after the dialog opens and all animations are complete."
+            },
+            {
+              "name": "sl-after-hide",
+              "description": "Emitted after the dialog closes and all animations are complete."
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "sl-dialog",
+          "declaration": { "name": "SlDialog" }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/badge/badge.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Badges are used to draw attention and display statuses or counts.",
+          "name": "SlBadge",
+          "tagName": "sl-badge",
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": { "text": "'primary' | 'success' | 'neutral' | 'warning' | 'danger'" },
+              "default": "'primary'",
+              "description": "The badge's theme variant.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "pill",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Draws a pill-style badge with rounded edges.",
+              "attribute": "pill",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "pulse",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Makes the badge pulsate to draw attention.",
+              "attribute": "pulse",
+              "reflects": true
+            }
+          ],
+          "slots": [{ "name": "", "description": "The badge's content." }],
+          "events": []
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "sl-badge",
+          "declaration": { "name": "SlBadge" }
+        }
+      ]
+    }
+  ]
+}

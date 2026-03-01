@@ -1,6 +1,6 @@
 import { resolve, dirname } from 'path';
 
-import ts from 'typescript';
+import type * as TSType from 'typescript';
 
 import type { McpWcConfig } from '../config.js';
 import { FilePathSchema } from '../shared/validation.js';
@@ -20,17 +20,41 @@ export interface ProjectDiagnosticsResult {
   warnings: DiagnosticResult[];
 }
 
-function formatDiagnostic(diagnostic: ts.Diagnostic): DiagnosticResult {
+let ts: typeof TSType | null = null;
+try {
+  const mod = await import('typescript');
+  ts = (mod.default ?? mod) as typeof TSType;
+} catch {
+  ts = null;
+}
+
+export function isTypescriptAvailable(): boolean {
+  return ts !== null;
+}
+
+function requireTs(): typeof TSType {
+  if (ts === null) {
+    throw new Error(
+      'TypeScript diagnostics require TypeScript to be installed.\n' +
+        'Run: npm install typescript --save-dev\n' +
+        'Then restart wc-mcp.',
+    );
+  }
+  return ts;
+}
+
+function formatDiagnostic(diagnostic: TSType.Diagnostic): DiagnosticResult {
+  const tsModule = requireTs();
   const file = diagnostic.file?.fileName ?? '';
   const { line, character } =
     diagnostic.file && diagnostic.start !== undefined
-      ? ts.getLineAndCharacterOfPosition(diagnostic.file, diagnostic.start)
+      ? tsModule.getLineAndCharacterOfPosition(diagnostic.file, diagnostic.start)
       : { line: 0, character: 0 };
-  const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+  const message = tsModule.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
   const severity =
-    diagnostic.category === ts.DiagnosticCategory.Error
+    diagnostic.category === tsModule.DiagnosticCategory.Error
       ? 'error'
-      : diagnostic.category === ts.DiagnosticCategory.Warning
+      : diagnostic.category === tsModule.DiagnosticCategory.Warning
         ? 'warning'
         : 'info';
 
@@ -45,18 +69,23 @@ function formatDiagnostic(diagnostic: ts.Diagnostic): DiagnosticResult {
 
 function parseTsConfig(config: McpWcConfig): {
   fileNames: string[];
-  compilerOptions: ts.CompilerOptions;
+  compilerOptions: TSType.CompilerOptions;
 } {
+  const tsModule = requireTs();
   const tsconfigAbsPath = resolve(config.projectRoot, config.tsconfigPath);
-  const configFile = ts.readConfigFile(tsconfigAbsPath, ts.sys.readFile);
+  const configFile = tsModule.readConfigFile(tsconfigAbsPath, tsModule.sys.readFile);
 
   if (configFile.error) {
-    const msg = ts.flattenDiagnosticMessageText(configFile.error.messageText, '\n');
+    const msg = tsModule.flattenDiagnosticMessageText(configFile.error.messageText, '\n');
     throw new Error(`Failed to read tsconfig: ${msg}`);
   }
 
   const basePath = dirname(tsconfigAbsPath);
-  const parsedConfig = ts.parseJsonConfigFileContent(configFile.config, ts.sys, basePath);
+  const parsedConfig = tsModule.parseJsonConfigFileContent(
+    configFile.config,
+    tsModule.sys,
+    basePath,
+  );
 
   return {
     fileNames: parsedConfig.fileNames,
@@ -69,13 +98,14 @@ function parseTsConfig(config: McpWcConfig): {
  * filePath must pass FilePathSchema validation (no path traversal, no absolute paths).
  */
 export function getFileDiagnostics(config: McpWcConfig, filePath: string): DiagnosticResult[] {
+  const tsModule = requireTs();
   FilePathSchema.parse(filePath);
 
   const absoluteFilePath = resolve(config.projectRoot, filePath);
   const { compilerOptions } = parseTsConfig(config);
 
-  const program = ts.createProgram([absoluteFilePath], compilerOptions);
-  const diagnostics = ts.getPreEmitDiagnostics(program);
+  const program = tsModule.createProgram([absoluteFilePath], compilerOptions);
+  const diagnostics = tsModule.getPreEmitDiagnostics(program);
 
   return Array.from(diagnostics)
     .filter((d) => d.file !== undefined)
@@ -87,10 +117,11 @@ export function getFileDiagnostics(config: McpWcConfig, filePath: string): Diagn
  * Returns error and warning counts along with the full diagnostic arrays.
  */
 export function getProjectDiagnostics(config: McpWcConfig): ProjectDiagnosticsResult {
+  const tsModule = requireTs();
   const { fileNames, compilerOptions } = parseTsConfig(config);
 
-  const program = ts.createProgram(fileNames, compilerOptions);
-  const diagnostics = ts.getPreEmitDiagnostics(program);
+  const program = tsModule.createProgram(fileNames, compilerOptions);
+  const diagnostics = tsModule.getPreEmitDiagnostics(program);
 
   const formatted = Array.from(diagnostics)
     .filter((d) => d.file !== undefined)

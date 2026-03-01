@@ -5,6 +5,7 @@ import { getFileDiagnostics, getProjectDiagnostics } from '../handlers/typescrip
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { FilePathSchema } from '../shared/validation.js';
+import { handleToolError } from '../shared/error-handling.js';
 
 const GetFileDiagnosticsArgsSchema = z.object({
   filePath: FilePathSchema,
@@ -25,6 +26,7 @@ export const TYPESCRIPT_TOOL_DEFINITIONS = [
         },
       },
       required: ['filePath'],
+      additionalProperties: false,
     },
   },
   {
@@ -34,6 +36,7 @@ export const TYPESCRIPT_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {},
+      additionalProperties: false,
     },
   },
 ];
@@ -61,8 +64,8 @@ export function handleTypeScriptCall(
 
     return createErrorResponse(`Unknown TypeScript tool: ${name}`);
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    return createErrorResponse(message);
+    const mcpErr = handleToolError(err);
+    return createErrorResponse(`[${mcpErr.category}] ${mcpErr.message}`);
   }
 }
 

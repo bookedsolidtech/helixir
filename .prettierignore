@@ -3,4 +3,5 @@ node_modules/
 coverage/
 .automaker/
 .beads/
+.claude/
 pnpm-lock.yaml

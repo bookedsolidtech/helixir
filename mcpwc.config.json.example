@@ -1,0 +1,8 @@
+{
+  "cemPath": "custom-elements.json",
+  "projectRoot": "/absolute/path/to/your/component-library",
+  "componentPrefix": "",
+  "healthHistoryDir": ".mcp-wc/health",
+  "tsconfigPath": "tsconfig.json",
+  "tokensPath": null
+}

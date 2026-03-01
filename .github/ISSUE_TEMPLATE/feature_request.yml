@@ -1,0 +1,62 @@
+name: Feature Request
+description: Propose a new tool or capability for wc-mcp
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea for a new tool or capability? Tell us about it. The more concrete your proposal, the faster we can evaluate it.
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case description
+      description: Describe the problem you're trying to solve. What are you trying to do, and why is the current toolset insufficient?
+      placeholder: "When working with a large component library, I often need to..."
+    validations:
+      required: true
+
+  - type: input
+    id: tool-name
+    attributes:
+      label: Proposed tool name
+      description: Suggest a name following the snake_case convention (e.g. `get_component_slots`, `find_tokens_by_prefix`)
+      placeholder: "get_component_dependencies"
+    validations:
+      required: false
+
+  - type: textarea
+    id: tool-arguments
+    attributes:
+      label: Proposed tool arguments
+      description: What inputs would the tool accept? Use JSON Schema style or plain English.
+      placeholder: |
+        {
+          "componentName": "string (required) — name of the component",
+          "includeTransitive": "boolean (optional, default false) — include indirect dependencies"
+        }
+    validations:
+      required: false
+
+  - type: textarea
+    id: example-output
+    attributes:
+      label: Example output
+      description: What would the tool return? Show a concrete example.
+      render: json
+      placeholder: |
+        {
+          "component": "sl-dialog",
+          "dependencies": ["sl-icon-button", "sl-visually-hidden"]
+        }
+    validations:
+      required: false
+
+  - type: textarea
+    id: framework-context
+    attributes:
+      label: Framework context
+      description: Is this specific to a particular framework (Shoelace, Stencil, FAST, etc.) or general to all CEM-compliant libraries?
+      placeholder: "This would work for any CEM-compliant library, but I specifically need it for Stencil-generated manifests which include..."
+    validations:
+      required: false

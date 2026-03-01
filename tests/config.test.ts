@@ -98,11 +98,34 @@ describe('loadConfig', () => {
       expect(() => loadConfig()).not.toThrow();
     });
 
-    it('silently ignores malformed config file', () => {
+    it('writes a warning to stderr for malformed config file but does not throw', () => {
       writeFileSync(join(tmpDir, 'mcpwc.config.json'), 'not-valid-json{{{');
       vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
 
-      expect(() => loadConfig()).not.toThrow();
+      const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+      try {
+        expect(() => loadConfig()).not.toThrow();
+        expect(stderrSpy).toHaveBeenCalledWith(
+          '[wc-mcp] Warning: mcpwc.config.json is malformed. Using defaults.\n',
+        );
+      } finally {
+        stderrSpy.mockRestore();
+      }
+    });
+
+    it('uses defaults when config file is malformed', () => {
+      writeFileSync(join(tmpDir, 'mcpwc.config.json'), 'not-valid-json{{{');
+      vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+
+      const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+      try {
+        const config = loadConfig();
+        expect(config.cemPath).toBe('custom-elements.json');
+        expect(config.tsconfigPath).toBe('tsconfig.json');
+        expect(config.tokensPath).toBeNull();
+      } finally {
+        stderrSpy.mockRestore();
+      }
     });
   });
 

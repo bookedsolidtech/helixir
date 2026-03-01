@@ -7,8 +7,9 @@ import {
   validateCompleteness,
   listAllComponents,
   diffCem,
+  CemSchema,
 } from '../../src/handlers/cem.js';
-import { SafeFileOperations } from '../../src/shared/file-ops.js';
+import type { Cem } from '../../src/handlers/cem.js';
 import { GitOperations } from '../../src/shared/git.js';
 import { ErrorCategory, MCPError } from '../../src/shared/error-handling.js';
 import type { McpWcConfig } from '../../src/config.js';
@@ -21,10 +22,10 @@ vi.mock('../../src/shared/git.js', () => ({
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = resolve(__dirname, '../__fixtures__');
 
-// Load fixture CEM as a plain object for use in diffCem mock setups
-const FIXTURE_CEM = JSON.parse(
-  readFileSync(resolve(FIXTURES_DIR, 'custom-elements.json'), 'utf-8'),
-) as unknown;
+// Load and parse fixture CEM once for all tests
+const FIXTURE_CEM: Cem = CemSchema.parse(
+  JSON.parse(readFileSync(resolve(FIXTURES_DIR, 'custom-elements.json'), 'utf-8')),
+);
 
 function makeConfig(): McpWcConfig {
   return {
@@ -47,15 +48,15 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 
 describe('parseCem', () => {
-  it('returns metadata for an existing component', async () => {
-    const result = await parseCem('my-button', makeConfig());
+  it('returns metadata for an existing component', () => {
+    const result = parseCem('my-button', FIXTURE_CEM);
     expect(result.tagName).toBe('my-button');
     expect(result.name).toBe('MyButton');
     expect(result.description).toContain('button');
   });
 
-  it('returns correct field members for my-button', async () => {
-    const result = await parseCem('my-button', makeConfig());
+  it('returns correct field members for my-button', () => {
+    const result = parseCem('my-button', FIXTURE_CEM);
     const fieldNames = result.members.filter((m) => m.kind === 'field').map((m) => m.name);
     expect(fieldNames).toContain('variant');
     expect(fieldNames).toContain('disabled');
@@ -63,47 +64,47 @@ describe('parseCem', () => {
     expect(fieldNames).toContain('size');
   });
 
-  it('includes method members in the members array', async () => {
-    const result = await parseCem('my-button', makeConfig());
+  it('includes method members in the members array', () => {
+    const result = parseCem('my-button', FIXTURE_CEM);
     const methodNames = result.members.filter((m) => m.kind === 'method').map((m) => m.name);
     expect(methodNames).toContain('focus');
     expect(methodNames).toContain('click');
   });
 
-  it('returns correct events for my-button', async () => {
-    const result = await parseCem('my-button', makeConfig());
+  it('returns correct events for my-button', () => {
+    const result = parseCem('my-button', FIXTURE_CEM);
     const eventNames = result.events.map((e) => e.name);
     expect(eventNames).toContain('my-click');
     expect(eventNames).toContain('my-focus');
     expect(eventNames).toContain('my-blur');
   });
 
-  it('returns typed event metadata', async () => {
-    const result = await parseCem('my-button', makeConfig());
+  it('returns typed event metadata', () => {
+    const result = parseCem('my-button', FIXTURE_CEM);
     const myClick = result.events.find((e) => e.name === 'my-click');
     expect(myClick).toBeDefined();
     expect(myClick!.type).toBe('CustomEvent<{ originalEvent: MouseEvent }>');
     expect(myClick!.description).toContain('clicked');
   });
 
-  it('returns empty strings for missing optional fields (my-blur)', async () => {
-    const result = await parseCem('my-button', makeConfig());
+  it('returns empty strings for missing optional fields (my-blur)', () => {
+    const result = parseCem('my-button', FIXTURE_CEM);
     const myBlur = result.events.find((e) => e.name === 'my-blur');
     expect(myBlur).toBeDefined();
     expect(myBlur!.description).toBe('');
     expect(myBlur!.type).toBe('');
   });
 
-  it('returns correct slots for my-button', async () => {
-    const result = await parseCem('my-button', makeConfig());
+  it('returns correct slots for my-button', () => {
+    const result = parseCem('my-button', FIXTURE_CEM);
     const slotNames = result.slots.map((s) => s.name);
     expect(slotNames).toContain('');
     expect(slotNames).toContain('prefix');
     expect(slotNames).toContain('suffix');
   });
 
-  it('returns correct cssProperties for my-button', async () => {
-    const result = await parseCem('my-button', makeConfig());
+  it('returns correct cssProperties for my-button', () => {
+    const result = parseCem('my-button', FIXTURE_CEM);
     const propNames = result.cssProperties.map((p) => p.name);
     expect(propNames).toContain('--my-button-bg');
     expect(propNames).toContain('--my-button-color');
@@ -111,29 +112,39 @@ describe('parseCem', () => {
     expect(propNames).toContain('--my-button-padding');
   });
 
-  it('returns correct cssParts for my-button', async () => {
-    const result = await parseCem('my-button', makeConfig());
+  it('returns correct cssParts for my-button', () => {
+    const result = parseCem('my-button', FIXTURE_CEM);
     const partNames = result.cssParts.map((p) => p.name);
     expect(partNames).toContain('base');
     expect(partNames).toContain('label');
     expect(partNames).toContain('spinner');
   });
 
-  it('returns metadata for my-card', async () => {
-    const result = await parseCem('my-card', makeConfig());
+  it('returns metadata for my-card', () => {
+    const result = parseCem('my-card', FIXTURE_CEM);
     expect(result.tagName).toBe('my-card');
     expect(result.name).toBe('MyCard');
     expect(result.description).toContain('card');
   });
 
-  it('throws MCPError with NOT_FOUND category for a missing component', async () => {
-    const err = await parseCem('no-such-component', makeConfig()).catch((e) => e);
+  it('throws MCPError with NOT_FOUND category for a missing component', () => {
+    let err: unknown;
+    try {
+      parseCem('no-such-component', FIXTURE_CEM);
+    } catch (e) {
+      err = e;
+    }
     expect(err).toBeInstanceOf(MCPError);
     expect((err as MCPError).category).toBe(ErrorCategory.NOT_FOUND);
   });
 
-  it('throws MCPError mentioning the missing tag name', async () => {
-    const err = await parseCem('unknown-element', makeConfig()).catch((e) => e);
+  it('throws MCPError mentioning the missing tag name', () => {
+    let err: unknown;
+    try {
+      parseCem('unknown-element', FIXTURE_CEM);
+    } catch (e) {
+      err = e;
+    }
     expect((err as MCPError).message).toContain('unknown-element');
   });
 });
@@ -143,74 +154,79 @@ describe('parseCem', () => {
 // ---------------------------------------------------------------------------
 
 describe('validateCompleteness', () => {
-  it('returns an object with a numeric score and issues array', async () => {
-    const result = await validateCompleteness('my-button', makeConfig());
+  it('returns an object with a numeric score and issues array', () => {
+    const result = validateCompleteness('my-button', FIXTURE_CEM);
     expect(typeof result.score).toBe('number');
     expect(Array.isArray(result.issues)).toBe(true);
   });
 
-  it('score is between 0 and 100 inclusive', async () => {
-    const result = await validateCompleteness('my-button', makeConfig());
+  it('score is between 0 and 100 inclusive', () => {
+    const result = validateCompleteness('my-button', FIXTURE_CEM);
     expect(result.score).toBeGreaterThanOrEqual(0);
     expect(result.score).toBeLessThanOrEqual(100);
   });
 
-  it('detects missing description for field "size" in my-button', async () => {
-    const result = await validateCompleteness('my-button', makeConfig());
+  it('detects missing description for field "size" in my-button', () => {
+    const result = validateCompleteness('my-button', FIXTURE_CEM);
     const sizeIssue = result.issues.find(
       (i) => i.includes('size') && i.toLowerCase().includes('description'),
     );
     expect(sizeIssue).toBeDefined();
   });
 
-  it('detects missing event description for "my-blur" in my-button', async () => {
-    const result = await validateCompleteness('my-button', makeConfig());
+  it('detects missing event description for "my-blur" in my-button', () => {
+    const result = validateCompleteness('my-button', FIXTURE_CEM);
     const blurDesc = result.issues.find(
       (i) => i.includes('my-blur') && i.toLowerCase().includes('description'),
     );
     expect(blurDesc).toBeDefined();
   });
 
-  it('detects missing event type annotation for "my-blur" in my-button', async () => {
-    const result = await validateCompleteness('my-button', makeConfig());
+  it('detects missing event type annotation for "my-blur" in my-button', () => {
+    const result = validateCompleteness('my-button', FIXTURE_CEM);
     const blurType = result.issues.find(
       (i) => i.includes('my-blur') && i.toLowerCase().includes('type'),
     );
     expect(blurType).toBeDefined();
   });
 
-  it('detects missing CSS property description for "--my-button-padding"', async () => {
-    const result = await validateCompleteness('my-button', makeConfig());
+  it('detects missing CSS property description for "--my-button-padding"', () => {
+    const result = validateCompleteness('my-button', FIXTURE_CEM);
     const paddingIssue = result.issues.find((i) => i.includes('--my-button-padding'));
     expect(paddingIssue).toBeDefined();
   });
 
-  it('score is less than 100 for my-button (has incomplete docs)', async () => {
-    const result = await validateCompleteness('my-button', makeConfig());
+  it('score is less than 100 for my-button (has incomplete docs)', () => {
+    const result = validateCompleteness('my-button', FIXTURE_CEM);
     expect(result.score).toBeLessThan(100);
   });
 
-  it('score is greater than 0 for my-button (has some docs)', async () => {
-    const result = await validateCompleteness('my-button', makeConfig());
+  it('score is greater than 0 for my-button (has some docs)', () => {
+    const result = validateCompleteness('my-button', FIXTURE_CEM);
     expect(result.score).toBeGreaterThan(0);
   });
 
-  it('throws MCPError with NOT_FOUND for a missing component', async () => {
-    const err = await validateCompleteness('no-such-component', makeConfig()).catch((e) => e);
+  it('throws MCPError with NOT_FOUND for a missing component', () => {
+    let err: unknown;
+    try {
+      validateCompleteness('no-such-component', FIXTURE_CEM);
+    } catch (e) {
+      err = e;
+    }
     expect(err).toBeInstanceOf(MCPError);
     expect((err as MCPError).category).toBe(ErrorCategory.NOT_FOUND);
   });
 
-  it('detects missing field description for "href" in my-card', async () => {
-    const result = await validateCompleteness('my-card', makeConfig());
+  it('detects missing field description for "href" in my-card', () => {
+    const result = validateCompleteness('my-card', FIXTURE_CEM);
     const hrefIssue = result.issues.find(
       (i) => i.includes('href') && i.toLowerCase().includes('description'),
     );
     expect(hrefIssue).toBeDefined();
   });
 
-  it('detects missing event issues for "my-card-action" in my-card', async () => {
-    const result = await validateCompleteness('my-card', makeConfig());
+  it('detects missing event issues for "my-card-action" in my-card', () => {
+    const result = validateCompleteness('my-card', FIXTURE_CEM);
     const actionIssues = result.issues.filter((i) => i.includes('my-card-action'));
     expect(actionIssues.length).toBeGreaterThan(0);
   });
@@ -221,30 +237,28 @@ describe('validateCompleteness', () => {
 // ---------------------------------------------------------------------------
 
 describe('listAllComponents', () => {
-  it('returns all component tag names from the fixture', async () => {
-    const result = await listAllComponents(makeConfig());
+  it('returns all component tag names from the fixture', () => {
+    const result = listAllComponents(FIXTURE_CEM);
     expect(result).toContain('my-button');
     expect(result).toContain('my-card');
     expect(result).toContain('my-select');
   });
 
-  it('returns exactly 3 components from the fixture', async () => {
-    const result = await listAllComponents(makeConfig());
+  it('returns exactly 3 components from the fixture', () => {
+    const result = listAllComponents(FIXTURE_CEM);
     expect(result).toHaveLength(3);
   });
 
-  it('returns an array of strings', async () => {
-    const result = await listAllComponents(makeConfig());
+  it('returns an array of strings', () => {
+    const result = listAllComponents(FIXTURE_CEM);
     for (const tagName of result) {
       expect(typeof tagName).toBe('string');
     }
   });
 
-  it('returns an empty array for a CEM with no components', async () => {
-    const emptyCem = { schemaVersion: '1.0.0', modules: [] };
-    const spy = vi.spyOn(SafeFileOperations.prototype, 'readJSON');
-    spy.mockResolvedValueOnce(emptyCem as never);
-    const result = await listAllComponents(makeConfig());
+  it('returns an empty array for a CEM with no components', () => {
+    const emptyCem = CemSchema.parse({ schemaVersion: '1.0.0', modules: [] });
+    const result = listAllComponents(emptyCem);
     expect(result).toEqual([]);
   });
 });
@@ -264,7 +278,7 @@ describe('diffCem', () => {
     const emptyCem = { schemaVersion: '1.0.0', modules: [] };
     mockGitShowImpl(async () => JSON.stringify(emptyCem));
 
-    const result = await diffCem('my-button', 'main', makeConfig());
+    const result = await diffCem('my-button', 'main', makeConfig(), FIXTURE_CEM);
     expect(result.isNew).toBe(true);
     expect(result.breaking).toHaveLength(0);
     expect(result.additions).toHaveLength(0);
@@ -275,14 +289,14 @@ describe('diffCem', () => {
       throw new Error('git show failed');
     });
 
-    const result = await diffCem('my-button', 'main', makeConfig());
+    const result = await diffCem('my-button', 'main', makeConfig(), FIXTURE_CEM);
     expect(result.isNew).toBe(true);
   });
 
   it('returns no breaking changes when component is identical on both branches', async () => {
     mockGitShowImpl(async () => JSON.stringify(FIXTURE_CEM));
 
-    const result = await diffCem('my-button', 'main', makeConfig());
+    const result = await diffCem('my-button', 'main', makeConfig(), FIXTURE_CEM);
     expect(result.isNew).toBe(false);
     expect(result.breaking).toHaveLength(0);
   });
@@ -327,7 +341,7 @@ describe('diffCem', () => {
 
     mockGitShowImpl(async () => JSON.stringify(baseCem));
 
-    const result = await diffCem('my-button', 'main', makeConfig());
+    const result = await diffCem('my-button', 'main', makeConfig(), FIXTURE_CEM);
     expect(result.isNew).toBe(false);
     const labelTextBreaking = result.breaking.find(
       (b) => b.includes('labelText') && b.toLowerCase().includes('removed'),
@@ -369,7 +383,7 @@ describe('diffCem', () => {
 
     mockGitShowImpl(async () => JSON.stringify(baseCem));
 
-    const result = await diffCem('my-button', 'main', makeConfig());
+    const result = await diffCem('my-button', 'main', makeConfig(), FIXTURE_CEM);
     const typeChange = result.breaking.find(
       (b) => b.includes('variant') && b.toLowerCase().includes('type'),
     );
@@ -414,7 +428,7 @@ describe('diffCem', () => {
 
     mockGitShowImpl(async () => JSON.stringify(baseCem));
 
-    const result = await diffCem('my-button', 'main', makeConfig());
+    const result = await diffCem('my-button', 'main', makeConfig(), FIXTURE_CEM);
     const eventRemoved = result.breaking.find(
       (b) => b.includes('my-legacy-event') && b.toLowerCase().includes('event'),
     );
@@ -455,7 +469,7 @@ describe('diffCem', () => {
 
     mockGitShowImpl(async () => JSON.stringify(baseCem));
 
-    const result = await diffCem('my-button', 'main', makeConfig());
+    const result = await diffCem('my-button', 'main', makeConfig(), FIXTURE_CEM);
     expect(result.isNew).toBe(false);
     expect(result.breaking).toHaveLength(0);
     // disabled, loading, size were added
@@ -490,17 +504,19 @@ describe('diffCem', () => {
 
     mockGitShowImpl(async () => JSON.stringify(baseCem));
 
-    const result = await diffCem('my-button', 'main', makeConfig());
+    const result = await diffCem('my-button', 'main', makeConfig(), FIXTURE_CEM);
     expect(result.breaking).toHaveLength(0);
     const hasClickAddition = result.additions.some((a) => a.includes('my-click'));
     expect(hasClickAddition).toBe(true);
   });
 
   it('throws MCPError NOT_FOUND when the component does not exist on the current branch', async () => {
-    // gitShow won't even be called — parseCem throws first
+    // parseCem throws synchronously before gitShow is called
     mockGitShowImpl(async () => JSON.stringify({ schemaVersion: '1.0.0', modules: [] }));
 
-    const err = await diffCem('no-such-component', 'main', makeConfig()).catch((e) => e);
+    const err = await diffCem('no-such-component', 'main', makeConfig(), FIXTURE_CEM).catch(
+      (e) => e,
+    );
     expect(err).toBeInstanceOf(MCPError);
     expect((err as MCPError).category).toBe(ErrorCategory.NOT_FOUND);
   });

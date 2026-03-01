@@ -1,10 +1,10 @@
 # CodeRabbit Configuration
 # https://docs.coderabbit.ai/getting-started/configure-coderabbit
 
-version: "2"
+version: '2'
 
 reviews:
-  profile: "assertive"
+  profile: 'assertive'
   request_changes_workflow: true
   high_level_summary: true
   poem: false
@@ -25,4 +25,4 @@ chat:
 
 code_generation:
   docstrings:
-    language: "en-US"
+    language: 'en-US'

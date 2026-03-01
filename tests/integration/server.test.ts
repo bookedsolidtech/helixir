@@ -9,6 +9,10 @@ import { dirname } from 'node:path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const SERVER_PATH = resolve(__dirname, '../../build/index.js');
+const FIXTURE_CEM = resolve(__dirname, '../__fixtures__/custom-elements.json');
+const FIXTURE_TOKENS = resolve(__dirname, '../__fixtures__/tokens.json');
+
+const SERVER_AVAILABLE = existsSync(SERVER_PATH);
 
 let child: ChildProcess;
 const messageQueue: Record<string, unknown>[] = [];
@@ -18,6 +22,11 @@ let requestId = 0;
 function setupServer(): void {
   child = spawn('node', [SERVER_PATH], {
     stdio: ['pipe', 'pipe', 'pipe'],
+    env: {
+      ...process.env,
+      MCP_WC_CEM_PATH: FIXTURE_CEM,
+      MCP_WC_TOKENS_PATH: FIXTURE_TOKENS,
+    },
   });
 
   const rl = createInterface({ input: child.stdout! });
@@ -75,11 +84,8 @@ function recv(timeoutMs = 5000): Promise<Record<string, unknown>> {
   });
 }
 
-describe('MCP server integration', () => {
+describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath configured)', () => {
   beforeAll(() => {
-    if (!existsSync(SERVER_PATH)) {
-      throw new Error(`Server binary not found at ${SERVER_PATH}. Run 'npm run build' first.`);
-    }
     setupServer();
   });
 
@@ -134,12 +140,47 @@ describe('MCP server integration', () => {
       });
     });
 
-    it('returns an empty tools array when no tools are registered', async () => {
+    it('returns all expected tool names (20 core + 2 token when configured)', async () => {
       sendRequest('tools/list', {});
       const response = await recv();
 
-      const result = response.result as { tools: unknown[] };
-      expect(result.tools).toHaveLength(0);
+      const result = response.result as { tools: Array<{ name: string }> };
+      const toolNames = result.tools.map((t) => t.name);
+
+      const coreTools = [
+        // discovery
+        'list_components',
+        'find_component',
+        'get_library_summary',
+        'list_events',
+        'list_slots',
+        'list_css_parts',
+        // component
+        'get_component',
+        'validate_cem',
+        'suggest_usage',
+        'generate_import',
+        'get_component_narrative',
+        // safety
+        'diff_cem',
+        'check_breaking_changes',
+        // health
+        'score_component',
+        'score_all_components',
+        'get_health_trend',
+        'get_health_diff',
+        'analyze_accessibility',
+        // typescript
+        'get_file_diagnostics',
+        'get_project_diagnostics',
+      ];
+      const tokenTools = ['get_design_tokens', 'find_token'];
+      const expectedTools = [...coreTools, ...tokenTools];
+
+      for (const name of expectedTools) {
+        expect(toolNames, `expected tool "${name}" to be present`).toContain(name);
+      }
+      expect(result.tools).toHaveLength(expectedTools.length);
     });
   });
 
@@ -165,10 +206,28 @@ describe('MCP server integration', () => {
       expect(hasRpcError || hasToolError).toBe(true);
     });
 
-    it('returns an error for a tool call with fixture-shaped arguments', async () => {
+    it('returns a successful result for list_components with fixture CEM', async () => {
       const id = sendRequest('tools/call', {
-        name: 'get_component_api',
-        arguments: { tagName: 'my-button' },
+        name: 'list_components',
+        arguments: {},
+      });
+
+      const response = await recv();
+
+      expect(response).toMatchObject({ jsonrpc: '2.0', id });
+
+      const result = response.result as Record<string, unknown>;
+      expect(result.isError).not.toBe(true);
+      expect(Array.isArray(result.content)).toBe(true);
+      const text = (result.content as Array<{ text?: string }>).map((c) => c.text ?? '').join('');
+      // The fixture CEM has my-button among its components
+      expect(text).toContain('my-button');
+    });
+
+    it('returns a validation error for find_component called without required query argument', async () => {
+      const id = sendRequest('tools/call', {
+        name: 'find_component',
+        arguments: {},
       });
 
       const response = await recv();
@@ -176,12 +235,155 @@ describe('MCP server integration', () => {
       expect(response).toMatchObject({ jsonrpc: '2.0', id });
 
       const hasRpcError = 'error' in response;
-      const hasToolError =
-        typeof response.result === 'object' &&
-        response.result !== null &&
-        (response.result as Record<string, unknown>).isError === true;
+      const toolResult =
+        typeof response.result === 'object' && response.result !== null
+          ? (response.result as Record<string, unknown>)
+          : null;
+      const hasToolError = toolResult?.isError === true;
 
       expect(hasRpcError || hasToolError).toBe(true);
+    });
+  });
+});
+
+describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (without tokensPath configured)', () => {
+  let noTokensChild: ChildProcess;
+  const noTokensQueue: Record<string, unknown>[] = [];
+  const noTokensResolvers: Array<(msg: Record<string, unknown>) => void> = [];
+  let noTokensRequestId = 0;
+
+  function sendNoTokensRequest(method: string, params?: object): number {
+    const id = ++noTokensRequestId;
+    const msg: Record<string, unknown> = { jsonrpc: '2.0', id, method };
+    if (params !== undefined) msg.params = params;
+    noTokensChild.stdin!.write(JSON.stringify(msg) + '\n');
+    return id;
+  }
+
+  function recvNoTokens(timeoutMs = 5000): Promise<Record<string, unknown>> {
+    if (noTokensQueue.length > 0) {
+      return Promise.resolve(noTokensQueue.shift()!);
+    }
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        const idx = noTokensResolvers.indexOf(resolve);
+        if (idx !== -1) noTokensResolvers.splice(idx, 1);
+        reject(new Error(`Timeout: no response after ${timeoutMs}ms`));
+      }, timeoutMs);
+
+      noTokensResolvers.push((msg) => {
+        clearTimeout(timeout);
+        resolve(msg);
+      });
+    });
+  }
+
+  beforeAll(async () => {
+    noTokensChild = spawn('node', [SERVER_PATH], {
+      stdio: ['pipe', 'pipe', 'pipe'],
+      env: {
+        ...process.env,
+        MCP_WC_CEM_PATH: FIXTURE_CEM,
+        // Deliberately omit MCP_WC_TOKENS_PATH
+      },
+    });
+
+    const rl = createInterface({ input: noTokensChild.stdout! });
+    rl.on('line', (line) => {
+      const trimmed = line.trim();
+      if (!trimmed) return;
+      try {
+        const msg = JSON.parse(trimmed) as Record<string, unknown>;
+        if (noTokensResolvers.length > 0) {
+          const resolve = noTokensResolvers.shift()!;
+          resolve(msg);
+        } else {
+          noTokensQueue.push(msg);
+        }
+      } catch {
+        // ignore non-JSON output
+      }
+    });
+
+    // Initialize the server before tests run
+    sendNoTokensRequest('initialize', {
+      protocolVersion: '2024-11-05',
+      capabilities: {},
+      clientInfo: { name: 'test-client', version: '0.0.1' },
+    });
+    await recvNoTokens();
+  });
+
+  afterAll(() => {
+    noTokensChild?.kill('SIGTERM');
+  });
+
+  describe('tools/list without tokensPath', () => {
+    it('does NOT include token tools when tokensPath is not configured', async () => {
+      const id = sendNoTokensRequest('tools/list', {});
+      const response = await recvNoTokens();
+
+      expect(response).toMatchObject({ jsonrpc: '2.0', id });
+      const result = response.result as { tools: Array<{ name: string }> };
+      const toolNames = result.tools.map((t) => t.name);
+
+      expect(toolNames).not.toContain('get_design_tokens');
+      expect(toolNames).not.toContain('find_token');
+    });
+  });
+
+  describe('tools/call without tokensPath', () => {
+    it('returns a clear error when get_design_tokens is called without tokensPath', async () => {
+      const id = sendNoTokensRequest('tools/call', {
+        name: 'get_design_tokens',
+        arguments: {},
+      });
+      const response = await recvNoTokens();
+
+      expect(response).toMatchObject({ jsonrpc: '2.0', id });
+
+      // The error may surface as a JSON-RPC error or a tool result with isError: true
+      const hasRpcError = 'error' in response;
+      const toolResult =
+        typeof response.result === 'object' && response.result !== null
+          ? (response.result as Record<string, unknown>)
+          : null;
+      const hasToolError = toolResult?.isError === true;
+
+      expect(hasRpcError || hasToolError).toBe(true);
+
+      if (hasToolError && Array.isArray(toolResult?.content)) {
+        const text = (toolResult.content as Array<{ text?: string }>)
+          .map((c) => c.text ?? '')
+          .join('');
+        expect(text).toMatch(/tokensPath/);
+      }
+    });
+
+    it('returns a clear error when find_token is called without tokensPath', async () => {
+      const id = sendNoTokensRequest('tools/call', {
+        name: 'find_token',
+        arguments: { query: 'color' },
+      });
+      const response = await recvNoTokens();
+
+      expect(response).toMatchObject({ jsonrpc: '2.0', id });
+
+      const hasRpcError = 'error' in response;
+      const toolResult =
+        typeof response.result === 'object' && response.result !== null
+          ? (response.result as Record<string, unknown>)
+          : null;
+      const hasToolError = toolResult?.isError === true;
+
+      expect(hasRpcError || hasToolError).toBe(true);
+
+      if (hasToolError && Array.isArray(toolResult?.content)) {
+        const text = (toolResult.content as Array<{ text?: string }>)
+          .map((c) => c.text ?? '')
+          .join('');
+        expect(text).toMatch(/tokensPath/);
+      }
     });
   });
 });

@@ -1,44 +1,9 @@
-import { readdirSync, existsSync } from 'node:fs';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import { z } from 'zod';
 import { GitOperations } from '../shared/git.js';
 import type { McpWcConfig } from '../config.js';
-
-// ─── CEM types used for fallback scoring ────────────────────────────────────
-
-export interface CemMember {
-  kind: string;
-  name: string;
-  description?: string;
-  type?: { text: string };
-}
-
-export interface CemEvent {
-  name: string;
-  type?: { text: string };
-  description?: string;
-}
-
-export interface CemSlot {
-  name: string;
-  description?: string;
-}
-
-export interface CemCssPart {
-  name: string;
-  description?: string;
-}
-
-export interface CemDeclaration {
-  tagName: string;
-  description?: string;
-  members?: CemMember[];
-  events?: CemEvent[];
-  slots?: CemSlot[];
-  cssParts?: CemCssPart[];
-  cssProperties?: Array<{ name: string; description?: string }>;
-}
+import type { Cem, CemDeclaration } from './cem.js';
 
 // ─── Return types ────────────────────────────────────────────────────────────
 
@@ -160,12 +125,16 @@ async function readLatestHistoryFile(
   tagName: string,
 ): Promise<HistoryFileRaw | null> {
   const dir = componentHistoryDir(config, tagName);
-  if (!existsSync(dir)) return null;
 
-  const files = readdirSync(dir)
-    .filter((f) => f.endsWith('.json'))
-    .sort()
-    .reverse();
+  let files: string[];
+  try {
+    files = (await readdir(dir))
+      .filter((f) => f.endsWith('.json'))
+      .sort()
+      .reverse();
+  } catch {
+    return null;
+  }
 
   if (files.length === 0) return null;
 
@@ -248,7 +217,7 @@ export function scoreCemFallback(decl: CemDeclaration): ComponentHealth {
   score += dimensions.slotsDocumented;
 
   return {
-    tagName: decl.tagName,
+    tagName: decl.tagName ?? '',
     score,
     grade: computeGrade(score),
     dimensions,
@@ -287,7 +256,8 @@ export async function scoreAllComponents(
   config: McpWcConfig,
   cemDeclarations: CemDeclaration[],
 ): Promise<ComponentHealth[]> {
-  return Promise.all(cemDeclarations.map((decl) => scoreComponent(config, decl.tagName, decl)));
+  const withTag = cemDeclarations.filter((decl) => decl.tagName !== undefined);
+  return Promise.all(withTag.map((decl) => scoreComponent(config, decl.tagName as string, decl)));
 }
 
 /**
@@ -301,13 +271,13 @@ export async function getHealthTrend(
   days: number = 7,
 ): Promise<HealthTrend> {
   const dir = componentHistoryDir(config, tagName);
-  if (!existsSync(dir)) {
+
+  let allFiles: string[];
+  try {
+    allFiles = (await readdir(dir)).filter((f) => f.endsWith('.json')).sort(); // ASC by date (ISO filenames sort correctly)
+  } catch {
     throw new Error(`No health history found for '${tagName}'`);
   }
-
-  const allFiles = readdirSync(dir)
-    .filter((f) => f.endsWith('.json'))
-    .sort(); // ASC by date (ISO filenames sort correctly)
 
   // Take the most recent `days` files, preserve chronological order
   const selectedFiles = allFiles.slice(-days);
@@ -351,10 +321,7 @@ export async function getHealthTrend(
   };
 }
 
-// Minimal type for parsing a raw CEM file when deriving base-branch health.
-interface CemFile {
-  modules: Array<{ declarations?: CemDeclaration[] }>;
-}
+// Use the shared Cem type from cem.ts for parsing raw CEM files.
 
 /**
  * Compares component health between the current branch and a base branch.
@@ -375,8 +342,10 @@ export async function getHealthDiff(
   let base: ComponentHealth;
   try {
     const cemContent = await git.gitShow(baseBranch, config.cemPath);
-    const cem = JSON.parse(cemContent) as CemFile;
-    const baseDecl = cem.modules.flatMap((m) => m.declarations ?? []).find((d) => d.tagName === tagName);
+    const cem = JSON.parse(cemContent) as Cem;
+    const baseDecl = cem.modules
+      .flatMap((m) => m.declarations ?? [])
+      .find((d) => d.tagName === tagName);
     if (baseDecl) {
       base = scoreCemFallback(baseDecl);
     } else {

@@ -1,0 +1,453 @@
+# wc-mcp
+
+> Give AI agents full situational awareness of any web component library.
+
+[![npm version](https://img.shields.io/npm/v/wc-mcp)](https://www.npmjs.com/package/wc-mcp)
+[![npm downloads](https://img.shields.io/npm/dw/wc-mcp)](https://www.npmjs.com/package/wc-mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node 20+](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
+[![CI](https://img.shields.io/github/actions/workflow/status/your-org/wc-mcp/ci.yml?branch=main&label=tests)](https://github.com/your-org/wc-mcp/actions)
+
+<!-- HUMAN TASK: Record an animated demo (Asciinema or GIF) showing wc-mcp in action with Claude.
+     Suggested flow: open Claude Desktop → ask "what props does sl-button accept?" → show the
+     accurate response powered by wc-mcp. Place the recording here before publishing. -->
+
+---
+
+## Quick Start
+
+**Under 60 seconds from zero to a component-aware AI agent.**
+
+```bash
+# 1. Install globally (or use npx — no install required)
+npm install -g wc-mcp
+
+# 2. Generate a starter config in your component library
+npx wc-mcp init
+# → writes mcpwc.config.json to the current directory
+```
+
+Edit `mcpwc.config.json` to point at your library:
+
+```json
+{
+  "cemPath": "custom-elements.json",
+  "projectRoot": "/absolute/path/to/your/component-library",
+  "componentPrefix": "sl-",
+  "tokensPath": "dist/tokens/tokens.json"
+}
+```
+
+Add wc-mcp to your Claude Desktop config (see [AI Tool Configs](#ai-tool-configs) for other editors):
+
+```json
+{
+  "mcpServers": {
+    "wc-mcp": {
+      "command": "npx",
+      "args": ["wc-mcp"],
+      "env": {
+        "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
+      }
+    }
+  }
+}
+```
+
+Restart Claude Desktop. Done — your AI agent now knows every property, event, slot, CSS part, and design token in your library.
+
+---
+
+## What You Get
+
+### Without wc-mcp
+
+> **You:** How do I use sl-button?
+>
+> **Claude:** You can use `<sl-button>` like this:
+>
+> ```html
+> <sl-button type="primary" color="blue" rounded>Click me</sl-button>
+> ```
+>
+> It supports `type`, `color`, `rounded`, `icon`, and `label` attributes.
+
+**All of that is hallucinated.** `type`, `color`, `rounded`, `icon`, and `label` are not real attributes on `sl-button`. The correct attribute for the visual style is `variant`, and `rounded` doesn't exist at all.
+
+---
+
+### With wc-mcp
+
+> **You:** How do I use sl-button?
+>
+> **Claude:** _(calls `get_component` → `sl-button`)_ Here's the accurate API for `<sl-button>`:
+>
+> **Attributes:**
+>
+> - `variant` — `'default' | 'primary' | 'success' | 'neutral' | 'warning' | 'danger' | 'text'` (default: `'default'`)
+> - `size` — `'small' | 'medium' | 'large'` (default: `'medium'`)
+> - `disabled` — `boolean` (default: `false`)
+> - `loading` — `boolean` — Draws the button in a loading state
+> - `outline` — `boolean` — Draws an outlined button
+> - `pill` — `boolean` — Draws a pill-style button with rounded edges
+> - `href` — `string | undefined` — Renders as `<a>` when set
+>
+> **Slots:** default (button label), `prefix` (before label), `suffix` (after label)
+>
+> **Events:** `sl-blur`, `sl-focus`, `sl-invalid`
+>
+> **Example:**
+>
+> ```html
+> <sl-button variant="primary" size="medium">Save changes</sl-button>
+> ```
+
+**Every property, event, slot, CSS part, and design token — sourced directly from your Custom Elements Manifest. No hallucinations.**
+
+---
+
+## Framework Setup
+
+wc-mcp works with any toolchain that produces a [`custom-elements.json`](https://github.com/webcomponents/custom-elements-manifest) (CEM). Below are quick-start setups for the most common frameworks.
+
+### Shoelace
+
+Shoelace ships `custom-elements.json` inside its npm package. No build step needed.
+
+```bash
+npm install @shoelace-style/shoelace
+```
+
+```json
+{
+  "cemPath": "node_modules/@shoelace-style/shoelace/dist/custom-elements.json",
+  "componentPrefix": "sl-"
+}
+```
+
+### Lit
+
+Use the official CEM analyzer with the Lit plugin:
+
+```bash
+npm install -D @custom-elements-manifest/analyzer
+```
+
+```json
+// package.json scripts
+"analyze": "cem analyze --litelement --globs 'src/**/*.ts'"
+```
+
+```json
+{
+  "cemPath": "custom-elements.json",
+  "componentPrefix": "my-"
+}
+```
+
+Run `npm run analyze` after each build to keep the CEM current.
+
+### Stencil
+
+Enable CEM output in `stencil.config.ts`:
+
+```ts
+// stencil.config.ts
+import { Config } from '@stencil/core';
+
+export const config: Config = {
+  outputTargets: [{ type: 'docs-custom' }, { type: 'dist-custom-elements' }],
+};
+```
+
+Stencil emits `custom-elements.json` to your `dist/` folder:
+
+```json
+{
+  "cemPath": "dist/custom-elements/custom-elements.json",
+  "componentPrefix": "my-"
+}
+```
+
+### FAST
+
+FAST components ship with CEM support via the `@custom-elements-manifest/analyzer`:
+
+```bash
+npm install -D @custom-elements-manifest/analyzer
+```
+
+```json
+// package.json scripts
+"analyze": "cem analyze --globs 'src/**/*.ts'"
+```
+
+```json
+{
+  "cemPath": "custom-elements.json",
+  "componentPrefix": "fluent-"
+}
+```
+
+### Adobe Spectrum Web Components
+
+Spectrum Web Components use Stencil under the hood and ship their CEM in the package:
+
+```bash
+npm install @spectrum-web-components/bundle
+```
+
+```json
+{
+  "cemPath": "node_modules/@spectrum-web-components/bundle/custom-elements.json",
+  "componentPrefix": "sp-"
+}
+```
+
+### Polymer / Generic Web Components
+
+Any project can add CEM generation with the analyzer:
+
+```bash
+npm install -D @custom-elements-manifest/analyzer
+```
+
+```json
+// package.json scripts
+"analyze": "cem analyze --globs 'src/**/*.js'"
+```
+
+```json
+{
+  "cemPath": "custom-elements.json"
+}
+```
+
+---
+
+## Tools Reference
+
+All tools are exposed over the [Model Context Protocol](https://modelcontextprotocol.io). Your AI agent can call any of these tools by name.
+
+### Discovery
+
+| Tool                  | Description                                                                          | Required Args          |
+| --------------------- | ------------------------------------------------------------------------------------ | ---------------------- |
+| `list_components`     | List all custom elements registered in the CEM                                       | —                      |
+| `find_component`      | Semantic search for components by name, description, or member names (top 3 matches) | `query`                |
+| `get_library_summary` | Overview of the library: component count, average health score, grade distribution   | —                      |
+| `list_events`         | List all events across the library, optionally filtered by component                 | `tagName` _(optional)_ |
+| `list_slots`          | List all slots across the library, optionally filtered by component                  | `tagName` _(optional)_ |
+| `list_css_parts`      | List all CSS `::part()` targets across the library, optionally filtered by component | `tagName` _(optional)_ |
+
+### Component
+
+| Tool                      | Description                                                                             | Required Args |
+| ------------------------- | --------------------------------------------------------------------------------------- | ------------- |
+| `get_component`           | Full metadata for a component: members, events, slots, CSS parts, CSS properties        | `tagName`     |
+| `validate_cem`            | Validate CEM documentation completeness; returns score (0–100) and issues list          | `tagName`     |
+| `suggest_usage`           | Generate an HTML snippet showing key attributes with their defaults and variant options | `tagName`     |
+| `generate_import`         | Generate side-effect and named import statements from CEM exports                       | `tagName`     |
+| `get_component_narrative` | 3–5 paragraph markdown prose description of a component optimized for LLM comprehension | `tagName`     |
+
+### Health
+
+| Tool                    | Description                                                                         | Required Args          |
+| ----------------------- | ----------------------------------------------------------------------------------- | ---------------------- |
+| `score_component`       | Latest health score for a component: grade (A–F), dimension scores, and issues      | `tag_name`             |
+| `score_all_components`  | Health scores for every component in the library                                    | —                      |
+| `get_health_trend`      | Health trend for a component over the last N days with trend direction              | `tag_name`             |
+| `get_health_diff`       | Before/after health comparison between current branch and a base branch             | `tag_name`             |
+| `analyze_accessibility` | Accessibility profile: ARIA roles, keyboard events, focus management, label support | `tagName` _(optional)_ |
+
+### Safety
+
+| Tool                     | Description                                                                        | Required Args           |
+| ------------------------ | ---------------------------------------------------------------------------------- | ----------------------- |
+| `diff_cem`               | Per-component CEM diff between branches; highlights breaking changes and additions | `tagName`, `baseBranch` |
+| `check_breaking_changes` | Breaking-change scan across all components vs. a base branch with summary report   | `baseBranch`            |
+
+### TypeScript
+
+| Tool                      | Description                                               | Required Args |
+| ------------------------- | --------------------------------------------------------- | ------------- |
+| `get_file_diagnostics`    | TypeScript diagnostics for a single file                  | `filePath`    |
+| `get_project_diagnostics` | Full TypeScript diagnostic pass across the entire project | —             |
+
+### Tokens
+
+| Tool                | Description                                                                           | Required Args |
+| ------------------- | ------------------------------------------------------------------------------------- | ------------- |
+| `get_design_tokens` | List all design tokens, optionally filtered by category (e.g. `"color"`, `"spacing"`) | —             |
+| `find_token`        | Search for a design token by name or value (case-insensitive substring match)         | `query`       |
+
+---
+
+## Configuration
+
+Configuration is resolved in priority order: **environment variables > `mcpwc.config.json` > defaults**.
+
+### `mcpwc.config.json`
+
+Place this file at the root of your component library project (or wherever `MCP_WC_PROJECT_ROOT` points).
+
+| Key                | Type             | Default                  | Description                                                                                  |
+| ------------------ | ---------------- | ------------------------ | -------------------------------------------------------------------------------------------- |
+| `cemPath`          | `string`         | `"custom-elements.json"` | Path to the Custom Elements Manifest, relative to `projectRoot`. Auto-discovered if omitted. |
+| `projectRoot`      | `string`         | `process.cwd()`          | Absolute path to the component library project root.                                         |
+| `componentPrefix`  | `string`         | `""`                     | Optional tag-name prefix (e.g. `"sl-"`) to scope component discovery.                        |
+| `healthHistoryDir` | `string`         | `".mcp-wc/health"`       | Directory where health snapshots are stored, relative to `projectRoot`.                      |
+| `tsconfigPath`     | `string`         | `"tsconfig.json"`        | Path to the project's `tsconfig.json`, relative to `projectRoot`.                            |
+| `tokensPath`       | `string \| null` | `null`                   | Path to a design tokens JSON file. Set to `null` to disable token tools.                     |
+| `cdnBase`          | `string \| null` | `null`                   | CDN base URL used to resolve component asset URLs. Set to `null` to disable.                 |
+
+**Full example:**
+
+```json
+{
+  "cemPath": "dist/custom-elements.json",
+  "projectRoot": "/home/user/my-design-system",
+  "componentPrefix": "ds-",
+  "healthHistoryDir": ".mcp-wc/health",
+  "tsconfigPath": "tsconfig.build.json",
+  "tokensPath": "dist/tokens/tokens.json",
+  "cdnBase": null
+}
+```
+
+### Environment Variables
+
+Environment variables override all config file values. Useful for CI or when pointing the same server at different libraries.
+
+| Variable                    | Overrides          |
+| --------------------------- | ------------------ |
+| `MCP_WC_PROJECT_ROOT`       | `projectRoot`      |
+| `MCP_WC_CEM_PATH`           | `cemPath`          |
+| `MCP_WC_COMPONENT_PREFIX`   | `componentPrefix`  |
+| `MCP_WC_HEALTH_HISTORY_DIR` | `healthHistoryDir` |
+| `MCP_WC_TSCONFIG_PATH`      | `tsconfigPath`     |
+| `MCP_WC_TOKENS_PATH`        | `tokensPath`       |
+| `MCP_WC_CDN_BASE`           | `cdnBase`          |
+
+Set `MCP_WC_TOKENS_PATH=null` (the string `"null"`) to explicitly disable token tools via env var.
+
+See [`mcpwc.config.json.example`](./mcpwc.config.json.example) for a ready-to-copy template.
+
+---
+
+## AI Tool Configs
+
+### Claude Desktop
+
+Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
+
+```json
+{
+  "mcpServers": {
+    "wc-mcp": {
+      "command": "npx",
+      "args": ["wc-mcp"],
+      "env": {
+        "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
+      }
+    }
+  }
+}
+```
+
+Restart Claude Desktop after saving.
+
+### Cursor
+
+Add to `.cursor/mcp.json` in your project root (or `~/.cursor/mcp.json` for global):
+
+```json
+{
+  "mcpServers": {
+    "wc-mcp": {
+      "command": "npx",
+      "args": ["wc-mcp"],
+      "env": {
+        "MCP_WC_PROJECT_ROOT": "${workspaceFolder}"
+      }
+    }
+  }
+}
+```
+
+### VS Code (Cline / Continue)
+
+**Cline** — add to `.vscode/cline_mcp_settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "wc-mcp": {
+      "command": "npx",
+      "args": ["wc-mcp"],
+      "env": {
+        "MCP_WC_PROJECT_ROOT": "${workspaceFolder}"
+      }
+    }
+  }
+}
+```
+
+**Continue** — add to `~/.continue/config.json` under `mcpServers`:
+
+```json
+{
+  "mcpServers": [
+    {
+      "name": "wc-mcp",
+      "command": "npx wc-mcp",
+      "env": {
+        "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
+      }
+    }
+  ]
+}
+```
+
+### Zed
+
+Add to your Zed settings (`~/.config/zed/settings.json`):
+
+```json
+{
+  "context_servers": {
+    "wc-mcp": {
+      "command": {
+        "path": "npx",
+        "args": ["wc-mcp"],
+        "env": {
+          "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+Quick steps:
+
+1. Fork the repo and create a feature branch.
+2. Run `pnpm install` to install dependencies.
+3. Make your changes in `src/`.
+4. Run `pnpm test` to ensure all tests pass.
+5. Run `pnpm run lint && pnpm run format:check` before submitting.
+6. Open a pull request with a clear description of the change.
+
+Issues and feature requests are welcome on GitHub.
+
+---
+
+## License
+
+MIT © Jake Strawn

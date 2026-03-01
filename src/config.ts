@@ -1,5 +1,6 @@
 import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
+import { discoverCemPath, FRIENDLY_CEM_ERROR } from './shared/discovery.js';
 
 export interface McpWcConfig {
   cemPath: string;
@@ -8,6 +9,8 @@ export interface McpWcConfig {
   healthHistoryDir: string;
   tsconfigPath: string;
   tokensPath: string | null;
+  cdnBase: string | null;
+  watch: boolean;
 }
 
 const defaults: McpWcConfig = {
@@ -17,6 +20,8 @@ const defaults: McpWcConfig = {
   healthHistoryDir: '.mcp-wc/health',
   tsconfigPath: 'tsconfig.json',
   tokensPath: null,
+  cdnBase: null,
+  watch: false,
 };
 
 function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
@@ -26,6 +31,7 @@ function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
     const raw = readFileSync(configPath, 'utf-8');
     return JSON.parse(raw) as Partial<McpWcConfig>;
   } catch {
+    process.stderr.write(`[wc-mcp] Warning: mcpwc.config.json is malformed. Using defaults.\n`);
     return {};
   }
 }
@@ -40,6 +46,19 @@ export function loadConfig(): McpWcConfig {
   // Merge config file values (override defaults, lower priority than env vars)
   const fileConfig = readConfigFile(effectiveRoot);
   Object.assign(config, fileConfig);
+
+  // Auto-discover cemPath if not explicitly configured via env var or config file
+  const cemPathExplicit =
+    process.env['MCP_WC_CEM_PATH'] !== undefined || fileConfig.cemPath !== undefined;
+
+  if (!cemPathExplicit) {
+    const discovered = discoverCemPath(effectiveRoot);
+    if (discovered !== null) {
+      config.cemPath = discovered;
+    } else {
+      process.stderr.write(FRIENDLY_CEM_ERROR);
+    }
+  }
 
   // Apply env vars (highest priority)
   if (process.env['MCP_WC_CEM_PATH'] !== undefined) {
@@ -60,6 +79,10 @@ export function loadConfig(): McpWcConfig {
   if (process.env['MCP_WC_TOKENS_PATH'] !== undefined) {
     const val = process.env['MCP_WC_TOKENS_PATH'];
     config.tokensPath = val === 'null' ? null : val;
+  }
+  if (process.env['MCP_WC_CDN_BASE'] !== undefined) {
+    const val = process.env['MCP_WC_CDN_BASE'];
+    config.cdnBase = val === 'null' ? null : val;
   }
 
   return config;

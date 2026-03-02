@@ -29,23 +29,23 @@ const baseConfig: McpWcConfig = {
 
 describe('tool dispatch error handling', () => {
   describe('handleTokenCall', () => {
-    it('includes error category prefix in response for NOT_FOUND errors', () => {
+    it('includes error category prefix in response for NOT_FOUND errors', async () => {
       vi.mocked(getDesignTokens).mockImplementation(() => {
         throw new MCPError('tokens.json not found', ErrorCategory.NOT_FOUND);
       });
 
-      const result = handleTokenCall('get_design_tokens', {}, baseConfig);
+      const result = await handleTokenCall('get_design_tokens', {}, baseConfig);
 
       expect(result.isError).toBe(true);
       expect(result.content[0].text).toBe('[NOT_FOUND] tokens.json not found');
     });
 
-    it('includes UNKNOWN category prefix for generic errors', () => {
+    it('includes UNKNOWN category prefix for generic errors', async () => {
       vi.mocked(getDesignTokens).mockImplementation(() => {
         throw new Error('some unexpected error');
       });
 
-      const result = handleTokenCall('get_design_tokens', {}, baseConfig);
+      const result = await handleTokenCall('get_design_tokens', {}, baseConfig);
 
       expect(result.isError).toBe(true);
       expect(result.content[0].text).toBe('[UNKNOWN] some unexpected error');

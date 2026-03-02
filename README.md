@@ -6,11 +6,7 @@
 [![npm downloads](https://img.shields.io/npm/dw/wc-mcp)](https://www.npmjs.com/package/wc-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node 20+](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
-[![CI](https://img.shields.io/github/actions/workflow/status/your-org/wc-mcp/ci.yml?branch=main&label=tests)](https://github.com/your-org/wc-mcp/actions)
-
-<!-- HUMAN TASK: Record an animated demo (Asciinema or GIF) showing wc-mcp in action with Claude.
-     Suggested flow: open Claude Desktop → ask "what props does sl-button accept?" → show the
-     accurate response powered by wc-mcp. Place the recording here before publishing. -->
+[![CI](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/wc-mcp/ci.yml?branch=main&label=tests)](https://github.com/bookedsolidtech/wc-mcp/actions)
 
 ---
 
@@ -329,15 +325,16 @@ Configuration is resolved in priority order: **environment variables > `mcpwc.co
 
 Place this file at the root of your component library project (or wherever `MCP_WC_PROJECT_ROOT` points).
 
-| Key                | Type             | Default                  | Description                                                                                  |
-| ------------------ | ---------------- | ------------------------ | -------------------------------------------------------------------------------------------- |
-| `cemPath`          | `string`         | `"custom-elements.json"` | Path to the Custom Elements Manifest, relative to `projectRoot`. Auto-discovered if omitted. |
-| `projectRoot`      | `string`         | `process.cwd()`          | Absolute path to the component library project root.                                         |
-| `componentPrefix`  | `string`         | `""`                     | Optional tag-name prefix (e.g. `"sl-"`) to scope component discovery.                        |
-| `healthHistoryDir` | `string`         | `".mcp-wc/health"`       | Directory where health snapshots are stored, relative to `projectRoot`.                      |
-| `tsconfigPath`     | `string`         | `"tsconfig.json"`        | Path to the project's `tsconfig.json`, relative to `projectRoot`.                            |
-| `tokensPath`       | `string \| null` | `null`                   | Path to a design tokens JSON file. Set to `null` to disable token tools.                     |
-| `cdnBase`          | `string \| null` | `null`                   | CDN base URL used to resolve component asset URLs. Set to `null` to disable.                 |
+| Key                | Type             | Default                  | Description                                                                                                                                          |
+| ------------------ | ---------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cemPath`          | `string`         | `"custom-elements.json"` | Path to the Custom Elements Manifest, relative to `projectRoot`. Auto-discovered if omitted.                                                         |
+| `projectRoot`      | `string`         | `process.cwd()`          | Absolute path to the component library project root.                                                                                                 |
+| `componentPrefix`  | `string`         | `""`                     | Optional tag-name prefix (e.g. `"sl-"`) to scope component discovery.                                                                                |
+| `healthHistoryDir` | `string`         | `".mcp-wc/health"`       | Directory where health snapshots are stored, relative to `projectRoot`.                                                                              |
+| `tsconfigPath`     | `string`         | `"tsconfig.json"`        | Path to the project's `tsconfig.json`, relative to `projectRoot`.                                                                                    |
+| `tokensPath`       | `string \| null` | `null`                   | Path to a design tokens JSON file. Set to `null` to disable token tools.                                                                             |
+| `cdnBase`          | `string \| null` | `null`                   | Base URL for CDN import snippets in `suggest_usage` output (e.g. for Shoelace via CDN). Does not affect `resolve_cdn_cem`. Set to `null` to disable. |
+| `watch`            | `boolean`        | `false`                  | When `true`, wc-mcp automatically reloads the CEM on file changes.                                                                                   |
 
 **Full example:**
 

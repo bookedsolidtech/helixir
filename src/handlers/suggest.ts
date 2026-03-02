@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 import { z } from 'zod';
@@ -93,12 +94,12 @@ function buildAngularSnippet(
   return `<!-- Remember: add CUSTOM_ELEMENTS_SCHEMA to your module -->\n${tagOpen}${inner}</${tagName}>`;
 }
 
-function loadCemFromConfig(config: McpWcConfig): Cem {
+async function loadCemFromConfig(config: McpWcConfig): Promise<Cem> {
   const cemPath = resolve(config.projectRoot, config.cemPath);
   if (!existsSync(cemPath)) {
     throw new MCPError(`CEM file not found: ${cemPath}`, ErrorCategory.FILESYSTEM);
   }
-  return CemSchema.parse(JSON.parse(readFileSync(cemPath, 'utf-8')));
+  return CemSchema.parse(JSON.parse(await readFile(cemPath, 'utf-8')));
 }
 
 // ─── Return types ─────────────────────────────────────────────────────────────
@@ -169,7 +170,7 @@ export async function suggestUsage(
   cem?: Cem,
   options?: { framework?: FrontendFramework },
 ): Promise<SuggestUsageResult> {
-  const resolvedCem = cem ?? loadCemFromConfig(config);
+  const resolvedCem = cem ?? (await loadCemFromConfig(config));
   const meta = parseCem(tagName, resolvedCem);
   const fields = meta.members.filter((m) => m.kind === 'field');
 
@@ -295,7 +296,7 @@ export async function generateImport(
   cem?: Cem,
 ): Promise<GenerateImportResult> {
   const fileOps = new SafeFileOperations();
-  const resolvedCem = cem ?? loadCemFromConfig(config);
+  const resolvedCem = cem ?? (await loadCemFromConfig(config));
 
   // Find the module path for this component in the cached CEM
   let modulePath: string | null = null;

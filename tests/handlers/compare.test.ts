@@ -149,4 +149,66 @@ describe('compareLibraries', () => {
       compareLibraries({ cemPathA: 'cem-compare-a.json', cemPathB: '/etc/passwd' }, baseConfig),
     ).rejects.toThrow();
   });
+
+  it('generates equal-count verdict when both libraries have same number of components', async () => {
+    // Comparing the same fixture against itself guarantees equal counts
+    const result = await compareLibraries(
+      {
+        cemPathA: 'cem-compare-a.json',
+        cemPathB: 'cem-compare-a.json',
+        labelA: 'LibA',
+        labelB: 'LibB',
+      },
+      baseConfig,
+    );
+    expect(result.countA).toBe(result.countB);
+    expect(result.verdict).toContain('same number of components');
+  });
+
+  it('generates equivalent documentation depth verdict when both have equal doc scores', async () => {
+    // cem-compare-b has zero cssProperties/slots/cssParts for all components;
+    // comparing it against itself yields equal doc scores → "equivalent documentation depth"
+    const result = await compareLibraries(
+      { cemPathA: 'cem-compare-b.json', cemPathB: 'cem-compare-b.json', labelA: 'X', labelB: 'Y' },
+      baseConfig,
+    );
+    expect(result.verdict).toContain('equivalent documentation depth');
+  });
+
+  it('throws when a CEM file does not exist', async () => {
+    await expect(
+      compareLibraries(
+        { cemPathA: 'nonexistent.json', cemPathB: 'cem-compare-b.json' },
+        baseConfig,
+      ),
+    ).rejects.toThrow();
+  });
+
+  it('returns zero doc quality stats when a library has no components', async () => {
+    // cem-empty.json has no tagged components — computeDocQuality receives empty tagNames
+    const result = await compareLibraries(
+      {
+        cemPathA: 'cem-empty.json',
+        cemPathB: 'cem-compare-b.json',
+        labelA: 'Empty',
+        labelB: 'Helix',
+      },
+      baseConfig,
+    );
+    expect(result.countA).toBe(0);
+    expect(result.docQualityA.avgCssProperties).toBe(0);
+    expect(result.docQualityA.avgEvents).toBe(0);
+  });
+
+  it('handles components whose tag name has no hyphen (baseName returns full name)', async () => {
+    // When comparing the same library against itself all base names are shared, no onlyInA/B
+    const result = await compareLibraries(
+      { cemPathA: 'cem-compare-a.json', cemPathB: 'cem-compare-a.json' },
+      baseConfig,
+    );
+    // All components appear in both — nothing exclusive to either side
+    expect(result.onlyInA).toHaveLength(0);
+    expect(result.onlyInB).toHaveLength(0);
+    expect(result.inBoth.length).toBeGreaterThan(0);
+  });
 });

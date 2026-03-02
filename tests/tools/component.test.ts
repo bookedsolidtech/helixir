@@ -9,12 +9,31 @@ import type { McpWcConfig } from '../../src/config.js';
 vi.mock('../../src/handlers/cem.js', () => ({
   parseCem: vi.fn(),
   validateCompleteness: vi.fn(),
+  findComponentsByToken: vi.fn(),
 }));
 
 // Mock suggest handler
 vi.mock('../../src/handlers/suggest.js', () => ({
   suggestUsage: vi.fn(),
   generateImport: vi.fn(),
+}));
+
+// Mock component handler
+vi.mock('../../src/handlers/component.js', () => ({
+  formatPropConstraints: vi.fn(),
+}));
+
+// Mock dependencies handler
+vi.mock('../../src/handlers/dependencies.js', () => ({
+  getComponentDependencies: vi.fn(),
+}));
+
+// Mock tokens handler (find-components-using-token path)
+vi.mock('../../src/handlers/tokens.js', () => ({
+  parseTokens: vi.fn(),
+  getDesignTokens: vi.fn(),
+  findToken: vi.fn(),
+  findComponentsUsingToken: vi.fn(),
 }));
 
 // Mock narrative handler (only for handleComponentCall tests)
@@ -27,6 +46,10 @@ vi.mock('../../src/handlers/narrative.js', async (importOriginal) => {
 });
 
 import { getComponentNarrative } from '../../src/handlers/narrative.js';
+import { formatPropConstraints } from '../../src/handlers/component.js';
+import { getComponentDependencies } from '../../src/handlers/dependencies.js';
+import { findComponentsUsingToken } from '../../src/handlers/tokens.js';
+import { parseCem, findComponentsByToken } from '../../src/handlers/cem.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = resolve(__dirname, '../__fixtures__');
@@ -225,6 +248,148 @@ describe('handleComponentCall — get_component_narrative', () => {
       { tagName: 'unknown-tag' },
       makeConfig(),
     );
+    expect(result.isError).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// handleComponentCall — get_prop_constraints
+// ---------------------------------------------------------------------------
+
+describe('handleComponentCall — get_prop_constraints', () => {
+  it('returns formatted constraints for a known attribute', async () => {
+    vi.mocked(parseCem).mockReturnValue({
+      tagName: 'my-button',
+      name: 'MyButton',
+      description: '',
+      members: [{ name: 'variant', kind: 'field', type: "'primary' | 'neutral'" }],
+      events: [],
+      slots: [],
+      cssProperties: [],
+      cssParts: [],
+    });
+    vi.mocked(formatPropConstraints).mockReturnValue({
+      type: 'enum',
+      values: ['primary', 'neutral'],
+    });
+
+    const result = await handleComponentCall(
+      'get_prop_constraints',
+      { tagName: 'my-button', attributeName: 'variant' },
+      makeConfig(),
+    );
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text).toContain('primary');
+  });
+
+  it('returns error when attribute is not found on component', async () => {
+    vi.mocked(parseCem).mockReturnValue({
+      tagName: 'my-button',
+      name: 'MyButton',
+      description: '',
+      members: [{ name: 'variant', kind: 'field', type: "'primary'" }],
+      events: [],
+      slots: [],
+      cssProperties: [],
+      cssParts: [],
+    });
+
+    const result = await handleComponentCall(
+      'get_prop_constraints',
+      { tagName: 'my-button', attributeName: 'nonexistent' },
+      makeConfig(),
+    );
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('nonexistent');
+  });
+
+  it('returns error for missing required args', async () => {
+    const result = await handleComponentCall(
+      'get_prop_constraints',
+      { tagName: 'my-button' },
+      makeConfig(),
+    );
+    expect(result.isError).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// handleComponentCall — find_components_by_token
+// ---------------------------------------------------------------------------
+
+describe('handleComponentCall — find_components_by_token', () => {
+  it('returns components that use the given CSS token', async () => {
+    vi.mocked(findComponentsByToken).mockReturnValue(['my-button', 'my-card']);
+
+    const result = await handleComponentCall(
+      'find_components_by_token',
+      { tokenName: '--my-color', partialMatch: false },
+      makeConfig(),
+    );
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text).toContain('my-button');
+  });
+
+  it('returns error when tokenName does not start with --', async () => {
+    const result = await handleComponentCall(
+      'find_components_by_token',
+      { tokenName: 'my-color' },
+      makeConfig(),
+    );
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('--');
+  });
+
+  it('returns error for missing tokenName', async () => {
+    const result = await handleComponentCall('find_components_by_token', {}, makeConfig());
+    expect(result.isError).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// handleComponentCall — get_component_dependencies
+// ---------------------------------------------------------------------------
+
+describe('handleComponentCall — get_component_dependencies', () => {
+  it('returns component dependencies', async () => {
+    vi.mocked(getComponentDependencies).mockReturnValue({ direct: ['my-icon'], transitive: [] });
+
+    const result = await handleComponentCall(
+      'get_component_dependencies',
+      { tagName: 'my-button', includeTransitive: false },
+      makeConfig(),
+    );
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text).toContain('my-icon');
+  });
+
+  it('returns error for missing tagName', async () => {
+    const result = await handleComponentCall('get_component_dependencies', {}, makeConfig());
+    expect(result.isError).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// handleComponentCall — find_components_using_token
+// ---------------------------------------------------------------------------
+
+describe('handleComponentCall — find_components_using_token', () => {
+  it('returns components using the given token', async () => {
+    vi.mocked(findComponentsUsingToken).mockReturnValue([
+      { tagName: 'my-button', tokenName: '--my-color', context: 'background' },
+    ]);
+
+    const result = await handleComponentCall(
+      'find_components_using_token',
+      { tokenName: '--my-color', fuzzy: false },
+      makeConfig(),
+    );
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text).toContain('my-button');
+  });
+
+  it('returns error for missing tokenName', async () => {
+    const result = await handleComponentCall('find_components_using_token', {}, makeConfig());
     expect(result.isError).toBe(true);
   });
 });

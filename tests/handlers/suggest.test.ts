@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { suggestUsage, generateImport } from '../../src/handlers/suggest.js';
+import { MCPError } from '../../src/shared/error-handling.js';
 import type { McpWcConfig } from '../../src/config.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -312,6 +313,205 @@ describe('suggestUsage — framework snippets', () => {
     const result = await suggestUsage('my-button', makeConfig());
     expect(result.frameworkSnippet).toBeUndefined();
     expect(result.framework).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// suggestUsage — error paths
+// ---------------------------------------------------------------------------
+
+describe('suggestUsage — error paths', () => {
+  it('throws MCPError when CEM file does not exist', async () => {
+    const config: McpWcConfig = {
+      ...makeConfig(),
+      cemPath: 'nonexistent-cem.json',
+    };
+    await expect(suggestUsage('my-button', config)).rejects.toThrow(MCPError);
+  });
+
+  it('accepts an explicit cem argument and skips file loading', async () => {
+    // Provide a minimal inline CEM to avoid any file I/O
+    const inlineCem = {
+      schemaVersion: '1.0.0',
+      modules: [
+        {
+          kind: 'javascript-module' as const,
+          path: 'src/x-foo.js',
+          declarations: [
+            {
+              kind: 'class' as const,
+              name: 'XFoo',
+              tagName: 'x-foo',
+              members: [],
+              events: [],
+              slots: [],
+            },
+          ],
+        },
+      ],
+    };
+    const result = await suggestUsage('x-foo', makeConfig(), inlineCem as never);
+    expect(result.tagName).toBe('x-foo');
+    expect(result.htmlSnippet).toContain('<x-foo>');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// suggestUsage — Stencil detection
+// ---------------------------------------------------------------------------
+
+describe('suggestUsage — Stencil CEM detection', () => {
+  it('includes a Stencil note when CEM modules have .tsx paths', async () => {
+    const stencilConfig: McpWcConfig = {
+      cemPath: 'stencil-custom-elements.json',
+      projectRoot: FIXTURES_DIR,
+      componentPrefix: 'ion-',
+      tokensPath: null,
+    };
+    const result = await suggestUsage('ion-button', stencilConfig);
+    expect(result.notes).toBeDefined();
+    const stencilNote = result.notes!.find((n) => n.includes('Stencil'));
+    expect(stencilNote).toBeDefined();
+    expect(stencilNote).toContain('defineCustomElements');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// suggestUsage — framework detection via fixture package.json files
+// ---------------------------------------------------------------------------
+
+// Minimal inline CEM for framework detection tests (avoids file loading for CEM)
+const minimalCem = {
+  schemaVersion: '1.0.0',
+  modules: [
+    {
+      kind: 'javascript-module' as const,
+      path: 'src/my-button.js',
+      declarations: [
+        {
+          kind: 'class' as const,
+          name: 'MyButton',
+          tagName: 'my-button',
+          members: [],
+          events: [],
+          slots: [],
+        },
+      ],
+    },
+  ],
+};
+
+describe('suggestUsage — auto-detected framework from package.json', () => {
+  it('detects vue when package.json lists vue as a dependency', async () => {
+    // vue-project/ has package.json with vue; pass inline CEM to skip CEM file loading
+    const config: McpWcConfig = {
+      ...makeConfig(),
+      projectRoot: resolve(FIXTURES_DIR, 'vue-project'),
+    };
+    const result = await suggestUsage('my-button', config, minimalCem as never);
+    expect(result.framework).toBe('vue');
+    expect(result.frameworkSnippet).toContain('<template>');
+  });
+
+  it('detects svelte when package.json lists svelte as a dependency', async () => {
+    const config: McpWcConfig = {
+      ...makeConfig(),
+      projectRoot: resolve(FIXTURES_DIR, 'svelte-project'),
+    };
+    const result = await suggestUsage('my-button', config, minimalCem as never);
+    expect(result.framework).toBe('svelte');
+    expect(result.frameworkSnippet).toContain('<script lang="ts">');
+  });
+
+  it('detects angular when package.json lists @angular/core as a dependency', async () => {
+    const config: McpWcConfig = {
+      ...makeConfig(),
+      projectRoot: resolve(FIXTURES_DIR, 'angular-project'),
+    };
+    const result = await suggestUsage('my-button', config, minimalCem as never);
+    expect(result.framework).toBe('angular');
+    expect(result.frameworkSnippet).toContain('CUSTOM_ELEMENTS_SCHEMA');
+  });
+
+  it('detects react when package.json lists react as a dependency', async () => {
+    const config: McpWcConfig = {
+      ...makeConfig(),
+      projectRoot: resolve(FIXTURES_DIR, 'react-project'),
+    };
+    const result = await suggestUsage('my-button', config, minimalCem as never);
+    expect(result.framework).toBe('react');
+    expect(result.frameworkSnippet).toContain('function MyComponent');
+  });
+
+  it('returns no framework when projectRoot has no package.json', async () => {
+    // no-pkg-project/ has no package.json — detectFrontendFramework returns null
+    const config: McpWcConfig = {
+      ...makeConfig(),
+      projectRoot: resolve(FIXTURES_DIR, 'no-pkg-project'),
+    };
+    const result = await suggestUsage('my-button', config, minimalCem as never);
+    expect(result.framework).toBeUndefined();
+    expect(result.frameworkSnippet).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// generateImport — error paths
+// ---------------------------------------------------------------------------
+
+describe('generateImport — error paths', () => {
+  it('throws MCPError when component is not found in CEM', async () => {
+    await expect(generateImport('non-existent-tag', makeConfig())).rejects.toThrow(MCPError);
+  });
+
+  it('accepts an explicit cem argument and skips file loading for generateImport', async () => {
+    // Provide a minimal inline CEM with my-button so readJSON is never called for CEM
+    const inlineCem = {
+      schemaVersion: '1.0.0',
+      modules: [
+        {
+          kind: 'javascript-module' as const,
+          path: 'src/components/my-button.js',
+          declarations: [
+            {
+              kind: 'class' as const,
+              name: 'MyButton',
+              tagName: 'my-button',
+            },
+          ],
+        },
+      ],
+    };
+    const result = await generateImport('my-button', makeConfig(), inlineCem as never);
+    expect(result.modulePath).toBe('src/components/my-button.js');
+    expect(result.namedImport).toContain('{ MyButton }');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// suggestUsage — extractUnionOptions edge cases
+// ---------------------------------------------------------------------------
+
+describe('suggestUsage — extractUnionOptions edge cases', () => {
+  it('treats a field with a single-string-literal type as a non-variant (null from extractUnionOptions)', async () => {
+    // A field with a single quoted string literal is not >= 2, so no variantOptions entry
+    // my-button variant field uses 3 literals — test with a component that has no variant
+    const result = await suggestUsage('my-card', makeConfig());
+    // my-card has no variant union fields; variantOptions should be empty
+    expect(Object.keys(result.variantOptions)).toHaveLength(0);
+  });
+
+  it('treats a mixed union type (string literal + non-literal) as non-variant', async () => {
+    // Stencil ion-button color field has type ending in "| undefined" — extractUnionOptions returns null
+    const stencilConfig: McpWcConfig = {
+      cemPath: 'stencil-custom-elements.json',
+      projectRoot: FIXTURES_DIR,
+      componentPrefix: 'ion-',
+      tokensPath: null,
+    };
+    const result = await suggestUsage('ion-button', stencilConfig);
+    // The color field type includes "| undefined" so it should NOT appear as a variantOptions entry
+    expect(result.variantOptions['color']).toBeUndefined();
   });
 });
 

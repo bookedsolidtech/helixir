@@ -29,7 +29,14 @@ export const BUNDLE_TOOL_DEFINITIONS = [
           type: 'string',
           description:
             'Optional: explicit npm package name (e.g. "@shoelace-style/shoelace"). ' +
-            'If omitted, the package is derived from componentPrefix in your config.',
+            'If omitted, the package is derived from componentPrefix in your config using a ' +
+            'built-in prefix→package map (e.g. "sl"→"@shoelace-style/shoelace", ' +
+            '"fluent-"→"@fluentui/web-components", "mwc-"→"@material/web", ' +
+            '"ion-"→"@ionic/core", "vaadin-"→"@vaadin/components", ' +
+            '"lion-"→"@lion/ui", "pf-"→"@patternfly/elements", ' +
+            '"carbon-"→"@carbon/web-components"). ' +
+            'If your prefix is not in this list, you must provide the package explicitly — ' +
+            'omitting it will return a VALIDATION error.',
         },
         version: {
           type: 'string',

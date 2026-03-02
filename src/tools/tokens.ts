@@ -54,21 +54,21 @@ export const TOKEN_TOOL_DEFINITIONS = [
  * Dispatches a token tool call by name and returns an MCPToolResult.
  * Called by the server's consolidated CallToolRequestSchema handler.
  */
-export function handleTokenCall(
+export async function handleTokenCall(
   name: string,
   args: Record<string, unknown>,
   config: McpWcConfig,
-): MCPToolResult {
+): Promise<MCPToolResult> {
   try {
     if (name === 'get_design_tokens') {
       const { category } = GetDesignTokensArgsSchema.parse(args);
-      const tokens = getDesignTokens(config, category);
+      const tokens = await getDesignTokens(config, category);
       return createSuccessResponse(JSON.stringify(tokens, null, 2));
     }
 
     if (name === 'find_token') {
       const { query } = FindTokenArgsSchema.parse(args);
-      const tokens = findToken(config, query);
+      const tokens = await findToken(config, query);
       return createSuccessResponse(JSON.stringify(tokens, null, 2));
     }
 

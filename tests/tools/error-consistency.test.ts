@@ -288,21 +288,21 @@ describe('Component tools: error response format', () => {
 // ---------------------------------------------------------------------------
 
 describe('Token tools: error response format', () => {
-  it('unknown tool returns structured error', () => {
-    const result = handleTokenCall('nonexistent_token_tool', {}, makeConfig());
+  it('unknown tool returns structured error', async () => {
+    const result = await handleTokenCall('nonexistent_token_tool', {}, makeConfig());
     assertErrorResponse(result);
   });
 
-  it('find_token without query returns structured error', () => {
-    const result = handleTokenCall('find_token', {}, makeConfig());
+  it('find_token without query returns structured error', async () => {
+    const result = await handleTokenCall('find_token', {}, makeConfig());
     assertErrorResponse(result);
   });
 
-  it('get_design_tokens handler error returns structured error', () => {
+  it('get_design_tokens handler error returns structured error', async () => {
     vi.mocked(getDesignTokens).mockImplementation(() => {
       throw new Error('file missing');
     });
-    const result = handleTokenCall('get_design_tokens', {}, makeConfig());
+    const result = await handleTokenCall('get_design_tokens', {}, makeConfig());
     assertErrorResponse(result);
   });
 });

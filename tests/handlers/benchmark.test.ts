@@ -83,4 +83,82 @@ describe('benchmarkLibraries', () => {
       ),
     ).rejects.toThrow(MCPError);
   });
+
+  it('returns zero scores for a library with no tagged components (n===0 branch)', async () => {
+    const result = await benchmarkLibraries(
+      [
+        { label: 'Empty', cemPath: 'cem-empty.json' },
+        { label: 'Shoelace', cemPath: 'cem-compare-a.json' },
+      ],
+      baseConfig,
+    );
+    const empty = result.scores.find((s) => s.label === 'Empty')!;
+    expect(empty).toBeDefined();
+    expect(empty.componentCount).toBe(0);
+    expect(empty.avgProperties).toBe(0);
+    expect(empty.avgEvents).toBe(0);
+    expect(empty.avgSlots).toBe(0);
+    expect(empty.avgCssProps).toBe(0);
+    expect(empty.docQualityPct).toBe(0);
+  });
+
+  it('handles libraries where all metrics are zero (0.001 floor in normalizeAndScore)', async () => {
+    // Two empty-component libraries → all raw metrics are 0 → normalizeAndScore uses 0.001 floor
+    const result = await benchmarkLibraries(
+      [
+        { label: 'EmptyA', cemPath: 'cem-empty.json' },
+        { label: 'EmptyB', cemPath: 'cem-empty.json' },
+      ],
+      baseConfig,
+    );
+    expect(result.scores).toHaveLength(2);
+    // Both should score 0 (0/0.001 * weight = 0 for all)
+    for (const s of result.scores) {
+      expect(s.score).toBe(0);
+    }
+  });
+
+  it('counts only field-kind members toward avgProperties (methods excluded)', async () => {
+    // custom-elements.json my-button has both field and method members;
+    // only fields should count toward avgProperties
+    const result = await benchmarkLibraries(
+      [
+        { label: 'MyLib', cemPath: 'custom-elements.json' },
+        { label: 'Helix', cemPath: 'cem-compare-b.json' },
+      ],
+      { ...baseConfig, cemPath: 'custom-elements.json' },
+    );
+    const myLib = result.scores.find((s) => s.label === 'MyLib')!;
+    expect(myLib).toBeDefined();
+    // my-button has 4 fields and 2 methods — avgProperties should reflect only fields
+    expect(myLib.avgProperties).toBeGreaterThan(0);
+  });
+
+  it('formatted output includes Category Winners section', async () => {
+    const result = await benchmarkLibraries(
+      [
+        { label: 'Shoelace', cemPath: 'cem-compare-a.json' },
+        { label: 'Helix', cemPath: 'cem-compare-b.json' },
+      ],
+      baseConfig,
+    );
+    expect(result.formatted).toContain('## Category Winners');
+    expect(result.formatted).toContain('Overall Winner');
+    expect(result.formatted).toContain('Best Property Coverage');
+  });
+
+  it('handles members with empty description string (docQualityPct stays 0 for undescribed members)', async () => {
+    // cem-compare-b has minimal components with no member descriptions
+    const result = await benchmarkLibraries(
+      [
+        { label: 'Sparse', cemPath: 'cem-compare-b.json' },
+        { label: 'Shoelace', cemPath: 'cem-compare-a.json' },
+      ],
+      baseConfig,
+    );
+    const sparse = result.scores.find((s) => s.label === 'Sparse')!;
+    expect(sparse).toBeDefined();
+    // cem-compare-b members (if any) have no descriptions → docQualityPct = 0
+    expect(sparse.docQualityPct).toBe(0);
+  });
 });

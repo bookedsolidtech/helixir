@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/utils.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "UtilClass"
+        }
+      ]
+    }
+  ]
+}

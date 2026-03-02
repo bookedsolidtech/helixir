@@ -1,4 +1,5 @@
-import { existsSync, readFileSync } from 'fs';
+import { existsSync } from 'fs';
+import { readFile } from 'node:fs/promises';
 import { resolve } from 'path';
 import type { McpWcConfig } from '../config.js';
 
@@ -58,11 +59,11 @@ const CEM_ANALYZER_CONFIG_FILES = [
   'custom-elements.config.js',
 ];
 
-function readPackageJsonDeps(projectRoot: string): Record<string, string> | null {
+async function readPackageJsonDeps(projectRoot: string): Promise<Record<string, string> | null> {
   const pkgPath = resolve(projectRoot, 'package.json');
   if (!existsSync(pkgPath)) return null;
   try {
-    const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8')) as Record<string, unknown>;
+    const pkg = JSON.parse(await readFile(pkgPath, 'utf-8')) as Record<string, unknown>;
     return {
       ...((pkg['dependencies'] as Record<string, string>) ?? {}),
       ...((pkg['devDependencies'] as Record<string, string>) ?? {}),
@@ -83,13 +84,13 @@ function formatResult(r: Omit<FrameworkDetectionResult, 'formatted'>): string {
   return lines.join('\n');
 }
 
-export function detectFramework(config: McpWcConfig): FrameworkDetectionResult {
+export async function detectFramework(config: McpWcConfig): Promise<FrameworkDetectionResult> {
   let framework: string | null = null;
   let version: string | null = null;
   let cemGenerator: string | null = null;
 
   // 1. Check package.json dependencies
-  const deps = readPackageJsonDeps(config.projectRoot);
+  const deps = await readPackageJsonDeps(config.projectRoot);
   if (deps !== null) {
     for (const def of FRAMEWORK_DEFS) {
       if (def.packages.some((p) => p in deps)) {
@@ -106,7 +107,7 @@ export function detectFramework(config: McpWcConfig): FrameworkDetectionResult {
   const cemAbsPath = resolve(config.projectRoot, config.cemPath);
   if (existsSync(cemAbsPath)) {
     try {
-      const raw = JSON.parse(readFileSync(cemAbsPath, 'utf-8')) as Record<string, unknown>;
+      const raw = JSON.parse(await readFile(cemAbsPath, 'utf-8')) as Record<string, unknown>;
       if (typeof raw['generator'] === 'string') {
         cemGenerator = raw['generator'];
       }

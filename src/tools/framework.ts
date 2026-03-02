@@ -20,14 +20,14 @@ export const FRAMEWORK_TOOL_DEFINITIONS = [
 /**
  * Dispatches a framework tool call by name and returns an MCPToolResult.
  */
-export function handleFrameworkCall(
+export async function handleFrameworkCall(
   name: string,
   _args: Record<string, unknown>,
   config: McpWcConfig,
-): MCPToolResult {
+): Promise<MCPToolResult> {
   try {
     if (name === 'detect_framework') {
-      const result = detectFramework(config);
+      const result = await detectFramework(config);
       return createSuccessResponse(result.formatted);
     }
     return createErrorResponse(`Unknown framework tool: ${name}`);

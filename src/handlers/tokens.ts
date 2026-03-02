@@ -1,5 +1,7 @@
-import { existsSync, readFileSync } from 'fs';
+import { access, readFile } from 'node:fs/promises';
 import { resolve } from 'path';
+
+import { z } from 'zod';
 
 import type { McpWcConfig } from '../config.js';
 import type { Cem } from './cem.js';
@@ -17,6 +19,15 @@ type DtcgNode = {
   $type?: string;
   [key: string]: DtcgNode | unknown;
 };
+
+/**
+ * The top-level token file must be a plain JSON object (not an array or primitive).
+ */
+const TokenFileSchema = z
+  .record(z.string(), z.unknown())
+  .refine((val) => typeof val === 'object' && val !== null && !Array.isArray(val), {
+    message: 'Token file must be a JSON object at the top level',
+  });
 
 function flattenNode(
   node: DtcgNode,
@@ -44,13 +55,29 @@ function flattenNode(
  * Reads a W3C DTCG-format tokens.json file and returns a flat array of tokens.
  * Throws if the file does not exist or cannot be parsed.
  */
-export function parseTokens(filePath: string): DesignToken[] {
-  if (!existsSync(filePath)) {
+export async function parseTokens(filePath: string): Promise<DesignToken[]> {
+  try {
+    await access(filePath);
+  } catch {
     throw new Error(`Tokens file not found: ${filePath}`);
   }
 
-  const raw = readFileSync(filePath, 'utf-8');
-  const data = JSON.parse(raw) as DtcgNode;
+  const raw = await readFile(filePath, 'utf-8');
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    throw new Error(`Tokens file is not valid JSON: ${filePath} — ${(err as Error).message}`);
+  }
+
+  const validated = TokenFileSchema.safeParse(parsed);
+  if (!validated.success) {
+    const issues = validated.error.issues.map((i) => i.message).join('; ');
+    throw new Error(`Tokens file has invalid structure: ${filePath} — ${issues}`);
+  }
+
+  const data = validated.data as DtcgNode;
   const result: DesignToken[] = [];
 
   for (const key of Object.keys(data)) {
@@ -65,10 +92,13 @@ export function parseTokens(filePath: string): DesignToken[] {
  * Returns all design tokens, optionally filtered by category (top-level group name).
  * Category matching is case-insensitive.
  */
-export function getDesignTokens(config: McpWcConfig, category?: string): DesignToken[] {
+export async function getDesignTokens(
+  config: McpWcConfig,
+  category?: string,
+): Promise<DesignToken[]> {
   if (!config.tokensPath) throw new Error('Token tools are disabled: tokensPath is not configured');
   const filePath = resolve(config.projectRoot, config.tokensPath);
-  const tokens = parseTokens(filePath);
+  const tokens = await parseTokens(filePath);
 
   if (!category) {
     return tokens;
@@ -82,10 +112,10 @@ export function getDesignTokens(config: McpWcConfig, category?: string): DesignT
  * Finds tokens whose name or value (as string) contains the query as a
  * case-insensitive substring.
  */
-export function findToken(config: McpWcConfig, query: string): DesignToken[] {
+export async function findToken(config: McpWcConfig, query: string): Promise<DesignToken[]> {
   if (!config.tokensPath) throw new Error('Token tools are disabled: tokensPath is not configured');
   const filePath = resolve(config.projectRoot, config.tokensPath);
-  const tokens = parseTokens(filePath);
+  const tokens = await parseTokens(filePath);
 
   const lowerQuery = query.toLowerCase();
   return tokens.filter(

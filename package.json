@@ -9,6 +9,7 @@
   "main": "./build/index.js",
   "files": [
     "build",
+    "!build/**/*.map",
     "README.md",
     "CHANGELOG.md"
   ],

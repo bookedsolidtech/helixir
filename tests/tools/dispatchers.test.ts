@@ -74,14 +74,14 @@ describe('isFrameworkTool', () => {
 });
 
 describe('handleFrameworkCall', () => {
-  it('returns success for detect_framework', () => {
-    const result = handleFrameworkCall('detect_framework', {}, FAKE_CONFIG);
+  it('returns success for detect_framework', async () => {
+    const result = await handleFrameworkCall('detect_framework', {}, FAKE_CONFIG);
     expect(result.isError).toBeFalsy();
     expect(result.content[0].text).toContain('Lit');
   });
 
-  it('returns error for unknown tool name', () => {
-    const result = handleFrameworkCall('nonexistent', {}, FAKE_CONFIG);
+  it('returns error for unknown tool name', async () => {
+    const result = await handleFrameworkCall('nonexistent', {}, FAKE_CONFIG);
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain('Unknown framework tool');
   });

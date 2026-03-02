@@ -23,60 +23,60 @@ function makeConfig(overrides: Partial<McpWcConfig> = {}): McpWcConfig {
 
 describe('detectFramework', () => {
   describe('framework detection from package.json fixtures', () => {
-    it('detects Lit when "lit" is in dependencies', () => {
+    it('detects Lit when "lit" is in dependencies', async () => {
       const config = makeConfig({ projectRoot: resolve(FIXTURES_DIR, 'lit-project') });
-      const result = detectFramework(config);
+      const result = await detectFramework(config);
       expect(result.framework).toBe('Lit');
     });
 
-    it('detects Stencil when "@stencil/core" is in dependencies', () => {
+    it('detects Stencil when "@stencil/core" is in dependencies', async () => {
       const config = makeConfig({ projectRoot: resolve(FIXTURES_DIR, 'stencil-project') });
-      const result = detectFramework(config);
+      const result = await detectFramework(config);
       expect(result.framework).toBe('Stencil');
     });
 
-    it('returns null framework for unknown project (no framework deps)', () => {
+    it('returns null framework for unknown project (no framework deps)', async () => {
       const config = makeConfig();
-      const result = detectFramework(config);
+      const result = await detectFramework(config);
       // The default fixture package.json has no framework deps
       expect(result.framework).toBeNull();
     });
 
-    it('returns null framework when projectRoot has no package.json', () => {
+    it('returns null framework when projectRoot has no package.json', async () => {
       const config = makeConfig({ projectRoot: '/tmp/nonexistent-project-xyz' });
-      const result = detectFramework(config);
+      const result = await detectFramework(config);
       expect(result.framework).toBeNull();
     });
   });
 
   describe('output format', () => {
-    it('formatted output always includes CEM Path', () => {
+    it('formatted output always includes CEM Path', async () => {
       const config = makeConfig();
-      const result = detectFramework(config);
+      const result = await detectFramework(config);
       expect(result.formatted).toContain('CEM Path:');
       expect(result.formatted).toContain('custom-elements.json');
     });
 
-    it('formatted output includes Framework line', () => {
+    it('formatted output includes Framework line', async () => {
       const config = makeConfig();
-      const result = detectFramework(config);
+      const result = await detectFramework(config);
       expect(result.formatted).toMatch(/^Framework:/m);
     });
 
-    it('returns correct cemPath from config', () => {
+    it('returns correct cemPath from config', async () => {
       const config = makeConfig({ cemPath: 'dist/custom-elements.json' });
-      const result = detectFramework(config);
+      const result = await detectFramework(config);
       expect(result.cemPath).toBe('dist/custom-elements.json');
       expect(result.formatted).toContain('dist/custom-elements.json');
     });
   });
 
   describe('CEM generator detection', () => {
-    it('reads generator from CEM file when present', () => {
+    it('reads generator from CEM file when present', async () => {
       // The shoelace fixture CEM has a generator field if we add one, but for
       // robustness we test with the default fixtures (no generator field expected)
       const config = makeConfig();
-      const result = detectFramework(config);
+      const result = await detectFramework(config);
       // No generator in fixture → null
       expect(result.cemGenerator).toBeNull();
     });

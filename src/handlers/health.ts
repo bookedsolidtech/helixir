@@ -5,6 +5,7 @@ import { GitOperations } from '../shared/git.js';
 import type { McpWcConfig } from '../config.js';
 import { CemSchema } from './cem.js';
 import type { CemDeclaration } from './cem.js';
+import { MCPError, ErrorCategory } from '../shared/error-handling.js';
 
 // ─── Return types ────────────────────────────────────────────────────────────
 
@@ -285,7 +286,7 @@ export async function getHealthTrend(
   try {
     allFiles = (await readdir(dir)).filter((f) => f.endsWith('.json')).sort(); // ASC by date (ISO filenames sort correctly)
   } catch {
-    throw new Error(`No health history found for '${tagName}'`);
+    throw new MCPError(`No health history found for '${tagName}'`, ErrorCategory.NOT_FOUND);
   }
 
   // Take the most recent `days` files, preserve chronological order

@@ -140,7 +140,7 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
       });
     });
 
-    it('returns all expected tool names (29 core + 2 token when configured)', async () => {
+    it('returns all expected tool names (31 core + 2 token when configured)', async () => {
       sendRequest('tools/list', {});
       const response = await recv();
 
@@ -155,6 +155,7 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
         'list_events',
         'list_slots',
         'list_css_parts',
+        'list_components_by_category',
         // component
         'get_component',
         'validate_cem',
@@ -163,6 +164,7 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
         'get_component_narrative',
         'get_prop_constraints',
         'find_components_by_token',
+        'find_components_using_token',
         // composition
         'get_composition_example',
         // safety

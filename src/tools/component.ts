@@ -6,6 +6,8 @@ import { suggestUsage, generateImport } from '../handlers/suggest.js';
 import { getComponentNarrative } from '../handlers/narrative.js';
 import { formatPropConstraints } from '../handlers/component.js';
 import { getComponentDependencies } from '../handlers/dependencies.js';
+import { findComponentsUsingToken } from '../handlers/tokens.js';
+import { analyzeAccessibility } from '../handlers/accessibility.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -20,6 +22,12 @@ const ValidateCemArgsSchema = z.object({
 
 const SuggestUsageArgsSchema = z.object({
   tagName: z.string(),
+  framework: z.enum(['react', 'vue', 'svelte', 'angular', 'html']).optional(),
+});
+
+const FindComponentsUsingTokenArgsSchema = z.object({
+  tokenName: z.string(),
+  fuzzy: z.boolean().optional().default(false),
 });
 
 const GenerateImportArgsSchema = z.object({
@@ -88,6 +96,12 @@ export const COMPONENT_TOOL_DEFINITIONS = [
         tagName: {
           type: 'string',
           description: 'The custom element tag name (e.g. "my-button").',
+        },
+        framework: {
+          type: 'string',
+          enum: ['react', 'vue', 'svelte', 'angular', 'html'],
+          description:
+            'Target framework for usage snippet. Auto-detected from package.json if omitted. Use "html" for plain HTML output.',
         },
       },
       required: ['tagName'],
@@ -187,7 +201,64 @@ export const COMPONENT_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'find_components_using_token',
+    description:
+      'Find all components that reference a given CSS custom property token in their cssProperties array. Useful for impact analysis before renaming or removing a design token. Works without tokensPath configured.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        tokenName: {
+          type: 'string',
+          description: 'CSS custom property token name to search for (e.g. "--color-primary-500").',
+        },
+        fuzzy: {
+          type: 'boolean',
+          description: 'When true, supports wildcard (*) and substring matching (default: false).',
+        },
+      },
+      required: ['tokenName'],
+      additionalProperties: false,
+    },
+  },
 ];
+
+function buildA11ySummary(
+  tagName: string,
+  cem: Cem,
+): { role: string; ariaAttributes: string[]; summary: string } | null {
+  try {
+    let decl: import('../handlers/cem.js').CemDeclaration | undefined;
+    for (const mod of cem.modules) {
+      for (const d of mod.declarations ?? []) {
+        if (d.tagName === tagName) {
+          decl = d;
+          break;
+        }
+      }
+      if (decl) break;
+    }
+    if (!decl) return null;
+
+    const score = analyzeAccessibility(decl);
+    if (score.score === 0) return null;
+
+    const roleMatch = /\brole[=\s"']+(\w+)/i.exec(decl.description ?? '');
+    const role = roleMatch?.[1] ?? (score.score > 0 ? 'documented' : 'none');
+
+    // Gather aria attributes from members
+    const meta = parseCem(tagName, cem);
+    const ariaAttributes = meta.members
+      .filter((m) => m.name.startsWith('aria-') || m.name === 'role')
+      .map((m) => m.name);
+
+    const summary = `${score.score >= 60 ? 'Accessible' : 'Partial a11y'}. Score: ${score.score}/100.`;
+
+    return { role, ariaAttributes, summary };
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Dispatches a component tool call by name and returns an MCPToolResult.
@@ -203,7 +274,8 @@ export async function handleComponentCall(
     if (name === 'get_component') {
       const { tagName } = GetComponentArgsSchema.parse(args);
       const meta = parseCem(tagName, cem);
-      return createSuccessResponse(JSON.stringify(meta, null, 2));
+      const accessibility = buildA11ySummary(tagName, cem);
+      return createSuccessResponse(JSON.stringify({ ...meta, accessibility }, null, 2));
     }
 
     if (name === 'validate_cem') {
@@ -219,8 +291,13 @@ export async function handleComponentCall(
     }
 
     if (name === 'suggest_usage') {
-      const { tagName } = SuggestUsageArgsSchema.parse(args);
-      const result = await suggestUsage(tagName, config, cem);
+      const { tagName, framework } = SuggestUsageArgsSchema.parse(args);
+      const result = await suggestUsage(
+        tagName,
+        config,
+        cem,
+        framework ? { framework } : undefined,
+      );
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 
@@ -268,6 +345,12 @@ export async function handleComponentCall(
     if (name === 'get_component_dependencies') {
       const { tagName, includeTransitive } = GetComponentDependenciesArgsSchema.parse(args);
       const result = getComponentDependencies(cem, tagName, includeTransitive);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'find_components_using_token') {
+      const { tokenName, fuzzy } = FindComponentsUsingTokenArgsSchema.parse(args);
+      const result = findComponentsUsingToken(cem, tokenName, { fuzzy });
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

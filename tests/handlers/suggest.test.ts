@@ -256,6 +256,65 @@ describe('suggestUsage — Shoelace sl-icon awareness', () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// suggestUsage — framework snippets
+// ---------------------------------------------------------------------------
+
+describe('suggestUsage — framework snippets', () => {
+  it('returns frameworkSnippet when framework="react" is explicitly set', async () => {
+    const result = await suggestUsage('my-button', makeConfig(), undefined, { framework: 'react' });
+    expect(result.framework).toBe('react');
+    expect(result.frameworkSnippet).toBeDefined();
+    expect(result.frameworkSnippet).toContain('function MyComponent');
+    expect(result.frameworkSnippet).toContain('my-button');
+  });
+
+  it('react snippet converts HTML comments to JSX comments', async () => {
+    const result = await suggestUsage('my-card', makeConfig(), undefined, { framework: 'react' });
+    expect(result.frameworkSnippet).toContain('{/* ');
+    expect(result.frameworkSnippet).not.toContain('<!-- ');
+  });
+
+  it('returns frameworkSnippet when framework="vue" is explicitly set', async () => {
+    const result = await suggestUsage('my-button', makeConfig(), undefined, { framework: 'vue' });
+    expect(result.framework).toBe('vue');
+    expect(result.frameworkSnippet).toBeDefined();
+    expect(result.frameworkSnippet).toContain('<template>');
+    expect(result.frameworkSnippet).toContain('my-button');
+  });
+
+  it('returns frameworkSnippet when framework="svelte" is explicitly set', async () => {
+    const result = await suggestUsage('my-button', makeConfig(), undefined, {
+      framework: 'svelte',
+    });
+    expect(result.framework).toBe('svelte');
+    expect(result.frameworkSnippet).toBeDefined();
+    expect(result.frameworkSnippet).toContain('<script lang="ts">');
+  });
+
+  it('returns frameworkSnippet when framework="angular" is explicitly set', async () => {
+    const result = await suggestUsage('my-button', makeConfig(), undefined, {
+      framework: 'angular',
+    });
+    expect(result.framework).toBe('angular');
+    expect(result.frameworkSnippet).toBeDefined();
+    expect(result.frameworkSnippet).toContain('CUSTOM_ELEMENTS_SCHEMA');
+  });
+
+  it('returns no frameworkSnippet when framework="html"', async () => {
+    const result = await suggestUsage('my-button', makeConfig(), undefined, { framework: 'html' });
+    expect(result.framework).toBe('html');
+    expect(result.frameworkSnippet).toBeUndefined();
+  });
+
+  it('returns no frameworkSnippet when no framework option and project has no framework deps', async () => {
+    // The fixtures dir package.json has no framework deps
+    const result = await suggestUsage('my-button', makeConfig());
+    expect(result.frameworkSnippet).toBeUndefined();
+    expect(result.framework).toBeUndefined();
+  });
+});
+
 describe('generateImport — CDN mode via cdnBase', () => {
   it('returns mode cdn when cdnBase is set', async () => {
     const config = makeShoelaceConfig({

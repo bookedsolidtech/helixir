@@ -4,10 +4,13 @@ import { fileURLToPath } from 'url';
 import {
   tokenize,
   scoreComponent,
+  levenshtein,
+  classifyByHeuristic,
   isDiscoveryTool,
   handleDiscoveryCall,
 } from '../../src/tools/discovery.js';
 import type { McpWcConfig } from '../../src/config.js';
+import type { Cem } from '../../src/handlers/cem.js';
 
 // Mock the CEM handler to avoid real file system reads in unit tests
 vi.mock('../../src/handlers/cem.js', () => ({
@@ -561,5 +564,300 @@ describe('isDiscoveryTool — new tools', () => {
 
   it('returns true for list_css_parts', () => {
     expect(isDiscoveryTool('list_css_parts')).toBe(true);
+  });
+
+  it('returns true for list_components_by_category', () => {
+    expect(isDiscoveryTool('list_components_by_category')).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// levenshtein
+// ---------------------------------------------------------------------------
+
+describe('levenshtein', () => {
+  it('returns 0 for identical strings', () => {
+    expect(levenshtein('button', 'button')).toBe(0);
+  });
+
+  it('returns 1 for single insertion', () => {
+    expect(levenshtein('buton', 'button')).toBe(1);
+  });
+
+  it('returns 1 for single deletion', () => {
+    expect(levenshtein('buttons', 'button')).toBe(1);
+  });
+
+  it('returns 1 for single substitution', () => {
+    expect(levenshtein('butten', 'button')).toBe(1);
+  });
+
+  it('returns 0 for two empty strings', () => {
+    expect(levenshtein('', '')).toBe(0);
+  });
+
+  it('returns length of b when a is empty', () => {
+    expect(levenshtein('', 'abc')).toBe(3);
+  });
+
+  it('returns length of a when b is empty', () => {
+    expect(levenshtein('abc', '')).toBe(3);
+  });
+
+  it('returns correct distance for common typos', () => {
+    // 'dialg' → 'dialog': 1 insertion
+    expect(levenshtein('dialg', 'dialog')).toBe(1);
+    // 'selct' → 'select': 1 insertion
+    expect(levenshtein('selct', 'select')).toBe(1);
+  });
+
+  it('returns distance > 1 for unrelated short strings', () => {
+    expect(levenshtein('cat', 'dog')).toBe(3);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// scoreComponent — enhanced with events/slots/cssParts and fuzzy
+// ---------------------------------------------------------------------------
+
+describe('scoreComponent — enhanced parameters', () => {
+  it('scores event name match at x1', () => {
+    // 'click' matches event name
+    const score = scoreComponent('my-foo', 'A generic component', [], ['click'], ['click'], [], []);
+    expect(score).toBe(1);
+  });
+
+  it('scores slot name match at x1', () => {
+    const score = scoreComponent('my-foo', 'A component', [], ['prefix'], [], ['prefix'], []);
+    expect(score).toBe(1);
+  });
+
+  it('scores css-part name match at x1', () => {
+    const score = scoreComponent('my-foo', 'A component', [], ['base'], [], [], ['base']);
+    expect(score).toBe(1);
+  });
+
+  it('fuzzy fallback adds +1 when query token is 1 edit away from a tag token', () => {
+    // 'buton' is 1 edit from 'button' (in tag 'my-button')
+    const score = scoreComponent('my-button', 'A component', [], ['buton'], [], [], []);
+    expect(score).toBe(1);
+  });
+
+  it('fuzzy fallback does not trigger when exact match found', () => {
+    // 'button' matches exactly in tag → score 3, no fuzzy bonus
+    const score = scoreComponent('my-button', 'A component', [], ['button'], [], [], []);
+    expect(score).toBe(3);
+  });
+
+  it('fuzzy fallback returns 0 when edit distance > 1', () => {
+    // 'xyz' is not within 1 edit of 'button'
+    const score = scoreComponent('my-button', 'A component', [], ['xyz'], [], [], []);
+    expect(score).toBe(0);
+  });
+
+  it('backward compatible: works with 4 parameters (no events/slots/parts)', () => {
+    const score = scoreComponent('my-button', 'A button component', ['variant'], ['button']);
+    expect(score).toBe(5); // tag(3) + desc(2)
+  });
+});
+
+// ---------------------------------------------------------------------------
+// classifyByHeuristic
+// ---------------------------------------------------------------------------
+
+describe('classifyByHeuristic', () => {
+  it('classifies my-input as form', () => {
+    expect(classifyByHeuristic('my-input')).toBe('form');
+  });
+
+  it('classifies my-select as form', () => {
+    expect(classifyByHeuristic('my-select')).toBe('form');
+  });
+
+  it('classifies my-nav as navigation', () => {
+    expect(classifyByHeuristic('my-nav')).toBe('navigation');
+  });
+
+  it('classifies my-menu as navigation', () => {
+    expect(classifyByHeuristic('my-menu')).toBe('navigation');
+  });
+
+  it('classifies my-alert as feedback', () => {
+    expect(classifyByHeuristic('my-alert')).toBe('feedback');
+  });
+
+  it('classifies my-card as layout', () => {
+    expect(classifyByHeuristic('my-card')).toBe('layout');
+  });
+
+  it('classifies my-dialog as overlay', () => {
+    expect(classifyByHeuristic('my-dialog')).toBe('overlay');
+  });
+
+  it('classifies my-table as data-display', () => {
+    expect(classifyByHeuristic('my-table')).toBe('data-display');
+  });
+
+  it('classifies my-icon as media', () => {
+    expect(classifyByHeuristic('my-icon')).toBe('media');
+  });
+
+  it('returns uncategorized for unknown tags', () => {
+    expect(classifyByHeuristic('my-foo')).toBe('uncategorized');
+    expect(classifyByHeuristic('my-widget')).toBe('uncategorized');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// handleDiscoveryCall — list_components_by_category
+// ---------------------------------------------------------------------------
+
+describe('handleDiscoveryCall — list_components_by_category', () => {
+  function makeCemWithComponents(): Cem {
+    return {
+      schemaVersion: '1.0.0',
+      modules: [
+        {
+          kind: 'javascript-module',
+          path: 'src/button.js',
+          declarations: [{ kind: 'class', name: 'MyButton', tagName: 'my-button' }],
+        },
+        {
+          kind: 'javascript-module',
+          path: 'src/input.js',
+          declarations: [{ kind: 'class', name: 'MyInput', tagName: 'my-input' }],
+        },
+        {
+          kind: 'javascript-module',
+          path: 'src/dialog.js',
+          declarations: [{ kind: 'class', name: 'MyDialog', tagName: 'my-dialog' }],
+        },
+        {
+          kind: 'javascript-module',
+          path: 'src/foo.js',
+          declarations: [{ kind: 'class', name: 'MyFoo', tagName: 'my-foo' }],
+        },
+      ],
+    };
+  }
+
+  it('groups components by heuristic category', async () => {
+    const cem = makeCemWithComponents();
+    const result = await handleDiscoveryCall('list_components_by_category', {}, makeConfig(), cem);
+    expect(result.isError).toBeFalsy();
+    const data = JSON.parse(result.content[0].text) as {
+      categories: Record<string, string[]>;
+      total: number;
+    };
+    expect(data.categories['overlay']).toContain('my-dialog');
+    expect(data.categories['form']).toContain('my-input');
+    expect(data.total).toBe(4);
+  });
+
+  it('filters by category when category param provided', async () => {
+    const cem = makeCemWithComponents();
+    const result = await handleDiscoveryCall(
+      'list_components_by_category',
+      { category: 'overlay' },
+      makeConfig(),
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+    const data = JSON.parse(result.content[0].text) as {
+      categories: Record<string, string[]>;
+      total: number;
+    };
+    expect(data.categories['overlay']).toContain('my-dialog');
+    expect(data.total).toBe(1);
+  });
+
+  it('excludes uncategorized components by default', async () => {
+    const cem = makeCemWithComponents();
+    const result = await handleDiscoveryCall('list_components_by_category', {}, makeConfig(), cem);
+    const data = JSON.parse(result.content[0].text) as {
+      uncategorized: string[];
+    };
+    // uncategorized key exists but is empty array by default
+    expect(data.uncategorized).toEqual([]);
+  });
+
+  it('includes uncategorized when includeUncategorized=true', async () => {
+    const cem = makeCemWithComponents();
+    const result = await handleDiscoveryCall(
+      'list_components_by_category',
+      { includeUncategorized: true },
+      makeConfig(),
+      cem,
+    );
+    const data = JSON.parse(result.content[0].text) as {
+      uncategorized: string[];
+    };
+    expect(data.uncategorized).toContain('my-foo');
+  });
+
+  it('uses @category jsdocTag when present', async () => {
+    const cem: Cem = {
+      schemaVersion: '1.0.0',
+      modules: [
+        {
+          kind: 'javascript-module',
+          path: 'src/special.js',
+          declarations: [
+            {
+              kind: 'class',
+              name: 'MySpecial',
+              tagName: 'my-special',
+              jsdocTags: [{ name: 'category', description: 'data-display' }],
+            },
+          ],
+        },
+      ],
+    };
+    const result = await handleDiscoveryCall('list_components_by_category', {}, makeConfig(), cem);
+    const data = JSON.parse(result.content[0].text) as {
+      categories: Record<string, string[]>;
+    };
+    expect(data.categories['data-display']).toContain('my-special');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// handleDiscoveryCall — find_component with matchReason
+// ---------------------------------------------------------------------------
+
+describe('handleDiscoveryCall — find_component with matchReason', () => {
+  it('includes matchReason in output for matching component', async () => {
+    vi.mocked(listAllComponents).mockReturnValue(['my-button']);
+    vi.mocked(parseCem).mockReturnValue({
+      tagName: 'my-button',
+      name: 'my-button',
+      description: 'A button component',
+      members: [],
+      events: [],
+      slots: [],
+      cssProperties: [],
+      cssParts: [],
+    });
+    const result = await handleDiscoveryCall('find_component', { query: 'button' }, makeConfig());
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text).toContain('matched tag name: button');
+  });
+
+  it('shows fuzzy match reason when query has a typo', async () => {
+    vi.mocked(listAllComponents).mockReturnValue(['my-dialog']);
+    vi.mocked(parseCem).mockReturnValue({
+      tagName: 'my-dialog',
+      name: 'my-dialog',
+      description: 'A dialog component',
+      members: [],
+      events: [],
+      slots: [],
+      cssProperties: [],
+      cssParts: [],
+    });
+    // 'dialg' is 1 edit from 'dialog'
+    const result = await handleDiscoveryCall('find_component', { query: 'dialg' }, makeConfig());
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text).toContain('fuzzy matched');
   });
 });

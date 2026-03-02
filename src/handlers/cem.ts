@@ -44,6 +44,11 @@ const CemReferenceSchema = z.object({
   module: z.string().optional(),
 });
 
+const CemJsdocTagSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+});
+
 const CemDeclarationSchema = z.object({
   kind: z.string(),
   name: z.string(),
@@ -56,6 +61,7 @@ const CemDeclarationSchema = z.object({
   cssProperties: z.array(CemCssPropertySchema).optional(),
   references: z.array(CemReferenceSchema).optional(),
   packageName: z.string().optional(),
+  jsdocTags: z.array(CemJsdocTagSchema).optional(),
 });
 
 const CemModuleSchema = z.object({
@@ -76,6 +82,7 @@ export type CemEvent = z.infer<typeof CemEventSchema>;
 export type CemSlot = z.infer<typeof CemSlotSchema>;
 export type CemCssPart = z.infer<typeof CemCssPartSchema>;
 export type CemDeclaration = z.infer<typeof CemDeclarationSchema>;
+export type CemJsdocTag = z.infer<typeof CemJsdocTagSchema>;
 
 // --- Public types ---
 

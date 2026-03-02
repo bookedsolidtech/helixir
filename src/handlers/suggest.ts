@@ -7,6 +7,92 @@ import { parseCem, CemSchema } from './cem.js';
 import type { Cem } from './cem.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
 
+export type FrontendFramework = 'react' | 'vue' | 'svelte' | 'angular' | 'html';
+
+function detectFrontendFramework(projectRoot: string): FrontendFramework | null {
+  const pkgPath = resolve(projectRoot, 'package.json');
+  if (!existsSync(pkgPath)) return null;
+  try {
+    const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8')) as Record<string, unknown>;
+    const deps = {
+      ...((pkg['dependencies'] as Record<string, string>) ?? {}),
+      ...((pkg['devDependencies'] as Record<string, string>) ?? {}),
+    };
+    if ('react' in deps || 'react-dom' in deps) return 'react';
+    if ('vue' in deps) return 'vue';
+    if ('svelte' in deps) return 'svelte';
+    if ('@angular/core' in deps) return 'angular';
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
+function buildReactSnippet(
+  tagName: string,
+  attrParts: string[],
+  slotLines: string[],
+  booleanFields: string[],
+): string {
+  const jsxAttrs = attrParts.map((a) => a.trim());
+  const boolAttrs = booleanFields.map((b) => `  ${b}`);
+  const allAttrs = [...jsxAttrs, ...boolAttrs];
+  // Convert <!-- ... --> to {/* ... */}
+  const jsxSlots = slotLines.map((s) => s.replace(/<!--\s*(.*?)\s*-->/g, '{/* $1 */}'));
+  const tagOpen = allAttrs.length > 0 ? `<${tagName}\n${allAttrs.join('\n')}\n>` : `<${tagName}>`;
+  const inner = jsxSlots.length > 0 ? `\n${jsxSlots.join('\n')}\n` : '';
+  return `function MyComponent() {\n  return (\n    ${tagOpen}${inner}</${tagName}>\n  );\n}`;
+}
+
+function buildVueSnippet(
+  tagName: string,
+  attrParts: string[],
+  slotLines: string[],
+  eventNames: string[],
+): string {
+  const attrs = attrParts.map((a) => a.trim());
+  const events = eventNames.map(
+    (e) => `  @${e}="handle${e.replace(/(^|-)(\w)/g, (_, __, c: string) => c.toUpperCase())}"`,
+  );
+  const allAttrs = [...attrs, ...events];
+  const tagOpen = allAttrs.length > 0 ? `<${tagName}\n${allAttrs.join('\n')}\n>` : `<${tagName}>`;
+  const inner = slotLines.length > 0 ? `\n${slotLines.join('\n')}\n` : '';
+  return `<template>\n  ${tagOpen}${inner}</${tagName}>\n</template>`;
+}
+
+function buildSvelteSnippet(
+  tagName: string,
+  attrParts: string[],
+  slotLines: string[],
+  eventNames: string[],
+): string {
+  const attrs = attrParts.map((a) => a.trim());
+  const events = eventNames.map(
+    (e) => `  on:${e}={handle${e.replace(/(^|-)(\w)/g, (_, __, c: string) => c.toUpperCase())}}`,
+  );
+  const allAttrs = [...attrs, ...events];
+  const tagOpen = allAttrs.length > 0 ? `<${tagName}\n${allAttrs.join('\n')}\n>` : `<${tagName}>`;
+  const inner = slotLines.length > 0 ? `\n${slotLines.join('\n')}\n` : '';
+  return `<script lang="ts">\n  // Note: augment HTMLElementTagNameMap for TypeScript support\n</script>\n\n${tagOpen}${inner}</${tagName}>`;
+}
+
+function buildAngularSnippet(
+  tagName: string,
+  attrParts: string[],
+  slotLines: string[],
+  eventNames: string[],
+): string {
+  const attrs = attrParts.map((a) => a.trim());
+  const events = eventNames.map((e) => {
+    const handler = e.replace(/(^|-)(\w)/g, (_, __, c: string) => c.toUpperCase());
+    return `  (${handler.charAt(0).toLowerCase() + handler.slice(1)})="handle${handler}($event)"`;
+  });
+  const allAttrs = [...attrs, ...events];
+  const tagOpen = allAttrs.length > 0 ? `<${tagName}\n${allAttrs.join('\n')}\n>` : `<${tagName}>`;
+  const inner = slotLines.length > 0 ? `\n${slotLines.join('\n')}\n` : '';
+  return `<!-- Remember: add CUSTOM_ELEMENTS_SCHEMA to your module -->\n${tagOpen}${inner}</${tagName}>`;
+}
+
 function loadCemFromConfig(config: McpWcConfig): Cem {
   const cemPath = resolve(config.projectRoot, config.cemPath);
   if (!existsSync(cemPath)) {
@@ -25,6 +111,8 @@ export interface SuggestUsageResult {
   variantOptions: Record<string, string[]>;
   slots: Array<{ name: string; description: string }>;
   notes?: string[];
+  framework?: FrontendFramework;
+  frameworkSnippet?: string;
 }
 
 export interface GenerateImportResult {
@@ -79,6 +167,7 @@ export async function suggestUsage(
   tagName: string,
   config: McpWcConfig,
   cem?: Cem,
+  options?: { framework?: FrontendFramework },
 ): Promise<SuggestUsageResult> {
   const resolvedCem = cem ?? loadCemFromConfig(config);
   const meta = parseCem(tagName, resolvedCem);
@@ -88,16 +177,17 @@ export async function suggestUsage(
   const optionalAttributes: string[] = [];
   const variantOptions: Record<string, string[]> = {};
   const attrParts: string[] = [];
+  const booleanFields: string[] = [];
 
   for (const field of fields) {
     const typeText = field.type ?? '';
-    const options = typeText ? extractUnionOptions(typeText) : null;
+    const fieldOptions = typeText ? extractUnionOptions(typeText) : null;
 
-    if (options) {
-      variantOptions[field.name] = options;
+    if (fieldOptions) {
+      variantOptions[field.name] = fieldOptions;
     }
 
-    const isOptional = !typeText || isOptionalType(typeText) || options !== null;
+    const isOptional = !typeText || isOptionalType(typeText) || fieldOptions !== null;
     if (isOptional) {
       optionalAttributes.push(field.name);
     } else {
@@ -107,8 +197,9 @@ export async function suggestUsage(
     // Build attribute snippet
     if (typeText === 'boolean' || typeText.startsWith('boolean ')) {
       // Boolean attrs: omit from default snippet (defaults to false/absent)
-    } else if (options && options.length > 0) {
-      attrParts.push(`  ${field.name}="${options[0]}"`);
+      booleanFields.push(field.name);
+    } else if (fieldOptions && fieldOptions.length > 0) {
+      attrParts.push(`  ${field.name}="${fieldOptions[0]}"`);
     } else if (!isOptionalType(typeText) && typeText) {
       // Required non-boolean, non-variant field — show placeholder
       attrParts.push(`  ${field.name}=""`);
@@ -150,6 +241,35 @@ export async function suggestUsage(
     );
   }
 
+  // A11y note
+  const ariaMembers = meta.members.filter((m) => m.name.startsWith('aria-') || m.name === 'role');
+  const supportsAriaLabel = meta.members.some((m) => m.name === 'aria-label');
+  if (ariaMembers.length > 0 || supportsAriaLabel) {
+    const ariaList = ariaMembers.map((m) => m.name).join(', ');
+    notes.push(
+      `Accessibility: ${tagName} supports ${ariaList || 'aria-label'}. Always provide visible text or aria-label for icon-only usage.`,
+    );
+  }
+
+  // Detect events for framework snippets
+  const eventNamesArr = meta.events.map((e) => e.name);
+
+  // Framework snippet
+  const detectedFramework =
+    options?.framework ?? detectFrontendFramework(config.projectRoot) ?? undefined;
+  let frameworkSnippet: string | undefined;
+  if (detectedFramework && detectedFramework !== 'html') {
+    if (detectedFramework === 'react') {
+      frameworkSnippet = buildReactSnippet(tagName, attrParts, slotLines, booleanFields);
+    } else if (detectedFramework === 'vue') {
+      frameworkSnippet = buildVueSnippet(tagName, attrParts, slotLines, eventNamesArr);
+    } else if (detectedFramework === 'svelte') {
+      frameworkSnippet = buildSvelteSnippet(tagName, attrParts, slotLines, eventNamesArr);
+    } else if (detectedFramework === 'angular') {
+      frameworkSnippet = buildAngularSnippet(tagName, attrParts, slotLines, eventNamesArr);
+    }
+  }
+
   return {
     tagName,
     htmlSnippet,
@@ -158,6 +278,8 @@ export async function suggestUsage(
     variantOptions,
     slots,
     ...(notes.length > 0 ? { notes } : {}),
+    ...(detectedFramework ? { framework: detectedFramework } : {}),
+    ...(frameworkSnippet ? { frameworkSnippet } : {}),
   };
 }
 

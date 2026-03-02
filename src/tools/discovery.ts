@@ -25,6 +25,11 @@ const TagNameFilterSchema = z.object({
   tagName: z.string().optional(),
 });
 
+const ListByCategoryArgsSchema = z.object({
+  category: z.string().optional(),
+  includeUncategorized: z.boolean().optional().default(false),
+});
+
 // --- Tool definitions ---
 
 export const DISCOVERY_TOOL_DEFINITIONS = [
@@ -109,6 +114,27 @@ export const DISCOVERY_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'list_components_by_category',
+    description:
+      'Group components by functional category (form, navigation, feedback, layout, data-display, media, overlay). Uses @category JSDoc tag when present, falls back to heuristic tag-name pattern matching.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        category: {
+          type: 'string',
+          description:
+            'Optional category to filter to (e.g. "form", "navigation"). If omitted, returns all categories.',
+        },
+        includeUncategorized: {
+          type: 'boolean',
+          description:
+            'When true, includes components that could not be categorized (default: false).',
+        },
+      },
+      additionalProperties: false,
+    },
+  },
 ];
 
 // --- Pure scoring logic (exported for testing) ---
@@ -131,31 +157,191 @@ export interface ComponentScore {
 }
 
 /**
+ * Computes Levenshtein edit distance between two strings using a two-row rolling array.
+ * Uses `as number` casts to satisfy noUncheckedIndexedAccess without non-null assertions.
+ */
+export function levenshtein(a: string, b: string): number {
+  const m = a.length,
+    n = b.length;
+  let prev = Array.from({ length: n + 1 }, (_, i) => i);
+  for (let i = 1; i <= m; i++) {
+    const curr: number[] = [i];
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      curr.push(
+        Math.min(
+          (prev[j] as number) + 1,
+          (curr[j - 1] as number) + 1,
+          (prev[j - 1] as number) + cost,
+        ),
+      );
+    }
+    prev = curr;
+  }
+  return prev[n] as number;
+}
+
+/**
  * Scores a component against query tokens using token-overlap scoring:
  * - tag name token matches × 3
  * - description token matches × 2
  * - member name token matches × 1
+ * - event/slot/cssPart name matches × 1 each
+ * - fuzzy fallback: Levenshtein ≤ 1 when no exact match found anywhere (+1 per token)
  */
 export function scoreComponent(
   tagName: string,
   description: string,
   memberNames: string[],
   queryTokens: string[],
+  eventNames?: string[],
+  slotNames?: string[],
+  cssPartNames?: string[],
 ): number {
   if (queryTokens.length === 0) return 0;
 
   const tagTokens = new Set(tokenize(tagName));
   const descTokens = new Set(tokenize(description));
   const memberTokens = new Set(memberNames.flatMap((m) => tokenize(m)));
+  const eventTokens = new Set((eventNames ?? []).flatMap((e) => tokenize(e)));
+  const slotTokens = new Set((slotNames ?? []).flatMap((s) => tokenize(s)));
+  const partTokens = new Set((cssPartNames ?? []).flatMap((p) => tokenize(p)));
+
+  const allCandidates = [
+    ...tagTokens,
+    ...descTokens,
+    ...memberTokens,
+    ...eventTokens,
+    ...slotTokens,
+    ...partTokens,
+  ];
 
   let score = 0;
   for (const qt of queryTokens) {
-    if (tagTokens.has(qt)) score += 3;
-    if (descTokens.has(qt)) score += 2;
-    if (memberTokens.has(qt)) score += 1;
+    let exactMatched = false;
+    if (tagTokens.has(qt)) {
+      score += 3;
+      exactMatched = true;
+    }
+    if (descTokens.has(qt)) {
+      score += 2;
+      exactMatched = true;
+    }
+    if (memberTokens.has(qt)) {
+      score += 1;
+      exactMatched = true;
+    }
+    if (eventTokens.has(qt)) {
+      score += 1;
+      exactMatched = true;
+    }
+    if (slotTokens.has(qt)) {
+      score += 1;
+      exactMatched = true;
+    }
+    if (partTokens.has(qt)) {
+      score += 1;
+      exactMatched = true;
+    }
+
+    if (!exactMatched) {
+      const fuzzyMatch = allCandidates.some((c) => levenshtein(qt, c) <= 1);
+      if (fuzzyMatch) score += 1;
+    }
   }
 
   return score;
+}
+
+function buildMatchReason(
+  tagName: string,
+  description: string,
+  memberNames: string[],
+  queryTokens: string[],
+  eventNames?: string[],
+  slotNames?: string[],
+  cssPartNames?: string[],
+): string {
+  const tagTokens = new Set(tokenize(tagName));
+  const descTokens = new Set(tokenize(description));
+  const memberTokens = new Set(memberNames.flatMap((m) => tokenize(m)));
+  const eventTokens = new Set((eventNames ?? []).flatMap((e) => tokenize(e)));
+  const slotTokens = new Set((slotNames ?? []).flatMap((s) => tokenize(s)));
+  const partTokens = new Set((cssPartNames ?? []).flatMap((p) => tokenize(p)));
+
+  const allCandidates = [
+    ...tagTokens,
+    ...descTokens,
+    ...memberTokens,
+    ...eventTokens,
+    ...slotTokens,
+    ...partTokens,
+  ];
+
+  const reasons: string[] = [];
+  for (const qt of queryTokens) {
+    if (tagTokens.has(qt)) {
+      reasons.push(`matched tag name: ${qt}`);
+      continue;
+    }
+    if (descTokens.has(qt)) {
+      reasons.push(`matched description: ${qt}`);
+      continue;
+    }
+    if (memberTokens.has(qt)) {
+      reasons.push(`matched member: ${qt}`);
+      continue;
+    }
+    if (eventTokens.has(qt)) {
+      reasons.push(`matched event: ${qt}`);
+      continue;
+    }
+    if (slotTokens.has(qt)) {
+      reasons.push(`matched slot: ${qt}`);
+      continue;
+    }
+    if (partTokens.has(qt)) {
+      reasons.push(`matched css-part: ${qt}`);
+      continue;
+    }
+    const fuzzyTarget = allCandidates.find((c) => levenshtein(qt, c) <= 1);
+    if (fuzzyTarget) reasons.push(`fuzzy matched "${qt}" → "${fuzzyTarget}"`);
+  }
+  return reasons.length > 0 ? reasons.join(', ') : 'unknown match';
+}
+
+const CATEGORY_PATTERNS: Record<string, string[]> = {
+  form: [
+    'input',
+    'select',
+    'checkbox',
+    'radio',
+    'textarea',
+    'form',
+    'field',
+    'slider',
+    'switch',
+    'toggle',
+  ],
+  navigation: ['nav', 'menu', 'tab', 'breadcrumb', 'pagination', 'sidebar', 'drawer'],
+  feedback: ['alert', 'toast', 'notification', 'snackbar', 'banner', 'badge', 'chip', 'tag'],
+  layout: ['grid', 'stack', 'flex', 'container', 'divider', 'spacer', 'card'],
+  'data-display': ['table', 'list', 'tree', 'accordion', 'timeline', 'stat'],
+  media: ['avatar', 'image', 'icon', 'video'],
+  overlay: ['dialog', 'modal', 'popover', 'tooltip', 'dropdown'],
+};
+
+/**
+ * Classifies a component tag name into a functional category using heuristic
+ * token matching against known category patterns. Returns 'uncategorized' when
+ * no pattern matches.
+ */
+export function classifyByHeuristic(tagName: string): string {
+  const tokens = tokenize(tagName);
+  for (const [cat, patterns] of Object.entries(CATEGORY_PATTERNS)) {
+    if (tokens.some((t) => patterns.includes(t))) return cat;
+  }
+  return 'uncategorized';
 }
 
 // --- Grade helper ---
@@ -198,13 +384,33 @@ export async function handleDiscoveryCall(
       const queryTokens = tokenize(query);
       const tags = listAllComponents(resolvedCem);
 
-      const scored: ComponentScore[] = [];
+      const scored: Array<ComponentScore & { matchReason: string }> = [];
       for (const tagName of tags) {
         const meta = parseCem(tagName, resolvedCem);
         const memberNames = meta.members.map((m) => m.name);
-        const score = scoreComponent(tagName, meta.description, memberNames, queryTokens);
+        const eventNames = meta.events.map((e) => e.name);
+        const slotNames = meta.slots.map((s) => s.name);
+        const cssPartNames = meta.cssParts.map((p) => p.name);
+        const score = scoreComponent(
+          tagName,
+          meta.description,
+          memberNames,
+          queryTokens,
+          eventNames,
+          slotNames,
+          cssPartNames,
+        );
         if (score > 0) {
-          scored.push({ tagName, score });
+          const matchReason = buildMatchReason(
+            tagName,
+            meta.description,
+            memberNames,
+            queryTokens,
+            eventNames,
+            slotNames,
+            cssPartNames,
+          );
+          scored.push({ tagName, score, matchReason });
         }
       }
 
@@ -215,7 +421,7 @@ export async function handleDiscoveryCall(
         return createSuccessResponse(`No components found matching "${query}".`);
       }
 
-      const lines = top3.map((r) => `${r.tagName} (score: ${r.score})`);
+      const lines = top3.map((r) => `${r.tagName} (score: ${r.score}) — ${r.matchReason}`);
       return createSuccessResponse(lines.join('\n'));
     }
 
@@ -312,6 +518,53 @@ export async function handleDiscoveryCall(
       const header = 'part name\tcomponent\tdescription';
       const lines = rows.map((r) => `${r.partName}\t${r.tagName}\t${r.description}`);
       return createSuccessResponse([header, ...lines].join('\n'));
+    }
+
+    if (name === 'list_components_by_category') {
+      const { category, includeUncategorized } = ListByCategoryArgsSchema.parse(args);
+      const categories: Record<string, string[]> = {};
+      const uncategorized: string[] = [];
+      let total = 0;
+
+      for (const mod of resolvedCem.modules) {
+        for (const decl of mod.declarations ?? []) {
+          if (!decl.tagName) continue;
+          total++;
+          // Check @category JSDoc tag first
+          const jsdocCategory = decl.jsdocTags?.find((t) => t.name === 'category')?.description;
+          const cat = jsdocCategory ?? classifyByHeuristic(decl.tagName);
+
+          if (cat === 'uncategorized') {
+            uncategorized.push(decl.tagName);
+          } else {
+            if (!categories[cat]) categories[cat] = [];
+            categories[cat].push(decl.tagName);
+          }
+        }
+      }
+
+      if (category) {
+        const lowerCat = category.toLowerCase();
+        const filtered = categories[lowerCat] ?? [];
+        return createSuccessResponse(
+          JSON.stringify(
+            { categories: { [lowerCat]: filtered }, total: filtered.length, uncategorized: [] },
+            null,
+            2,
+          ),
+        );
+      }
+
+      const result: Record<string, unknown> = {
+        categories,
+        total,
+      };
+      if (includeUncategorized) {
+        result['uncategorized'] = uncategorized;
+      } else {
+        result['uncategorized'] = [];
+      }
+      return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 
     return createErrorResponse(`Unknown discovery tool: ${name}`);

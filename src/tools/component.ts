@@ -1,9 +1,10 @@
 import { z } from 'zod';
 import type { McpWcConfig } from '../config.js';
-import { parseCem, validateCompleteness } from '../handlers/cem.js';
-import type { Cem } from '../handlers/cem.js';
+import { parseCem, validateCompleteness, findComponentsByToken } from '../handlers/cem.js';
+import type { Cem, CemMember } from '../handlers/cem.js';
 import { suggestUsage, generateImport } from '../handlers/suggest.js';
 import { getComponentNarrative } from '../handlers/narrative.js';
+import { formatPropConstraints } from '../handlers/component.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -26,6 +27,16 @@ const GenerateImportArgsSchema = z.object({
 
 const GetComponentNarrativeArgsSchema = z.object({
   tagName: z.string(),
+});
+
+const GetPropConstraintsArgsSchema = z.object({
+  tagName: z.string(),
+  attributeName: z.string(),
+});
+
+const FindComponentsByTokenArgsSchema = z.object({
+  tokenName: z.string(),
+  partialMatch: z.boolean().optional().default(true),
 });
 
 export const COMPONENT_TOOL_DEFINITIONS = [
@@ -109,6 +120,47 @@ export const COMPONENT_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'get_prop_constraints',
+    description:
+      'Returns a structured constraint table for a component attribute. Union type attributes include all valid values with descriptions. Non-union types return simple type info.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        tagName: {
+          type: 'string',
+          description: 'The custom element tag name (e.g. "sl-button").',
+        },
+        attributeName: {
+          type: 'string',
+          description: 'The attribute or property name to inspect (e.g. "variant").',
+        },
+      },
+      required: ['tagName', 'attributeName'],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'find_components_by_token',
+    description:
+      'Find all components that expose or use a given CSS custom property token. Returns tagName, token description, and default value for each match.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        tokenName: {
+          type: 'string',
+          description:
+            'CSS custom property name (must start with "--", e.g. "--sl-color-primary-600")',
+        },
+        partialMatch: {
+          type: 'boolean',
+          description: 'If true (default), match any token containing tokenName as a substring.',
+        },
+      },
+      required: ['tokenName'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -156,6 +208,35 @@ export async function handleComponentCall(
       const { tagName } = GetComponentNarrativeArgsSchema.parse(args);
       const narrative = await getComponentNarrative(tagName, cem);
       return createSuccessResponse(narrative);
+    }
+
+    if (name === 'get_prop_constraints') {
+      const { tagName, attributeName } = GetPropConstraintsArgsSchema.parse(args);
+      const meta = parseCem(tagName, cem);
+      const member = meta.members.find((m) => m.name === attributeName);
+      if (!member) {
+        return createErrorResponse(
+          `Attribute "${attributeName}" not found on component "${tagName}".`,
+        );
+      }
+      const cemMember: CemMember = {
+        name: member.name,
+        kind: member.kind,
+        type: member.type ? { text: member.type } : undefined,
+      };
+      const result = formatPropConstraints(cemMember);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'find_components_by_token') {
+      const { tokenName, partialMatch } = FindComponentsByTokenArgsSchema.parse(args);
+      if (!tokenName.startsWith('--')) {
+        return createErrorResponse(
+          `CSS custom property name must start with "--". Got: "${tokenName}"`,
+        );
+      }
+      const result = findComponentsByToken(tokenName, partialMatch, cem);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 
     return createErrorResponse(`Unknown component tool: ${name}`);

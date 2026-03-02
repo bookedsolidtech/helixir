@@ -32,6 +32,13 @@ import {
   isFrameworkTool,
 } from './tools/framework.js';
 import { VALIDATE_TOOL_DEFINITIONS, handleValidateCall, isValidateTool } from './tools/validate.js';
+import {
+  COMPOSITION_TOOL_DEFINITIONS,
+  handleCompositionCall,
+  isCompositionTool,
+} from './tools/composition.js';
+import { BUNDLE_TOOL_DEFINITIONS, handleBundleCall, isBundleTool } from './tools/bundle.js';
+import { CDN_TOOL_DEFINITIONS, handleCdnCall, isCdnTool } from './tools/cdn.js';
 import { createErrorResponse } from './shared/mcp-helpers.js';
 import type { MCPToolResult } from './shared/mcp-helpers.js';
 
@@ -111,10 +118,13 @@ async function main(): Promise<void> {
   const coreTools = [
     ...DISCOVERY_TOOL_DEFINITIONS,
     ...COMPONENT_TOOL_DEFINITIONS,
+    ...COMPOSITION_TOOL_DEFINITIONS,
     ...SAFETY_TOOL_DEFINITIONS,
     ...HEALTH_TOOL_DEFINITIONS,
     ...FRAMEWORK_TOOL_DEFINITIONS,
     ...VALIDATE_TOOL_DEFINITIONS,
+    ...BUNDLE_TOOL_DEFINITIONS,
+    ...CDN_TOOL_DEFINITIONS,
     ...tsTools,
   ];
 
@@ -155,6 +165,15 @@ async function main(): Promise<void> {
         }
         return handleTypeScriptCall(name, typedArgs, config);
       }
+      if (isCompositionTool(name)) {
+        if (cemCache === null)
+          return createErrorResponse(
+            'CEM not yet loaded — server is still initializing. Please retry.',
+          );
+        return handleCompositionCall(name, typedArgs, cemCache);
+      }
+      if (isBundleTool(name)) return handleBundleCall(name, typedArgs, config);
+      if (isCdnTool(name)) return handleCdnCall(name, typedArgs, config);
       if (isFrameworkTool(name)) return handleFrameworkCall(name, typedArgs, config);
       if (isValidateTool(name)) {
         if (cemCache === null)

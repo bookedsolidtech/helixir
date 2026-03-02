@@ -9,6 +9,9 @@ import { isFrameworkTool, handleFrameworkCall } from '../../src/tools/framework.
 import { isValidateTool, handleValidateCall } from '../../src/tools/validate.js';
 import { isTokenTool } from '../../src/tools/tokens.js';
 import { isTypeScriptTool } from '../../src/tools/typescript.js';
+import { isBundleTool, handleBundleCall } from '../../src/tools/bundle.js';
+import { isCompositionTool, handleCompositionCall } from '../../src/tools/composition.js';
+import { isStoryTool, handleStoryCall } from '../../src/tools/story.js';
 import type { McpWcConfig } from '../../src/config.js';
 import type { Cem } from '../../src/handlers/cem.js';
 
@@ -157,5 +160,165 @@ describe('isTypeScriptTool', () => {
   it('returns false for unknown tool', () => {
     expect(isTypeScriptTool('list_components')).toBe(false);
     expect(isTypeScriptTool('')).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Bundle tool dispatcher
+// ---------------------------------------------------------------------------
+
+vi.mock('../../src/handlers/bundle.js', () => ({
+  estimateBundleSize: vi.fn(async () => ({
+    tagName: 'sl-button',
+    package: '@shoelace-style/shoelace',
+    version: '2.0.0',
+    estimates: { component: { gzip: 5000, minified: 12000 }, full_package: null },
+    formatted: 'Estimated bundle size: 5 kB gzip',
+  })),
+}));
+
+describe('isBundleTool', () => {
+  it('returns true for estimate_bundle_size', () => {
+    expect(isBundleTool('estimate_bundle_size')).toBe(true);
+  });
+
+  it('returns false for unknown tool', () => {
+    expect(isBundleTool('resolve_cdn_cem')).toBe(false);
+    expect(isBundleTool('')).toBe(false);
+  });
+});
+
+describe('handleBundleCall', () => {
+  it('returns success for estimate_bundle_size', async () => {
+    const result = await handleBundleCall(
+      'estimate_bundle_size',
+      { tagName: 'sl-button' },
+      FAKE_CONFIG,
+    );
+    expect(result.isError).toBeFalsy();
+  });
+
+  it('returns error for unknown tool name', async () => {
+    const result = await handleBundleCall('nonexistent_tool', {}, FAKE_CONFIG);
+    expect(result.isError).toBe(true);
+    expect(result.content[0]!.text).toContain('Unknown bundle tool');
+  });
+
+  it('returns error for missing required args', async () => {
+    const result = await handleBundleCall('estimate_bundle_size', {}, FAKE_CONFIG);
+    expect(result.isError).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Composition tool dispatcher
+// ---------------------------------------------------------------------------
+
+vi.mock('../../src/handlers/composition.js', () => ({
+  getCompositionExample: vi.fn(() => ({
+    components: ['my-card', 'my-button'],
+    html: '<my-card><my-button slot="footer">Submit</my-button></my-card>',
+  })),
+}));
+
+describe('isCompositionTool', () => {
+  it('returns true for get_composition_example', () => {
+    expect(isCompositionTool('get_composition_example')).toBe(true);
+  });
+
+  it('returns false for unknown tool', () => {
+    expect(isCompositionTool('list_components')).toBe(false);
+    expect(isCompositionTool('')).toBe(false);
+  });
+});
+
+describe('handleCompositionCall', () => {
+  it('returns success for get_composition_example', () => {
+    const result = handleCompositionCall(
+      'get_composition_example',
+      { tagNames: ['my-card', 'my-button'] },
+      FAKE_CEM,
+    );
+    expect(result.isError).toBeFalsy();
+  });
+
+  it('returns error for unknown tool name', () => {
+    const result = handleCompositionCall('nonexistent_tool', {}, FAKE_CEM);
+    expect(result.isError).toBe(true);
+    expect(result.content[0]!.text).toContain('Unknown composition tool');
+  });
+
+  it('returns error for missing required args', () => {
+    const result = handleCompositionCall('get_composition_example', {}, FAKE_CEM);
+    expect(result.isError).toBe(true);
+  });
+
+  it('returns error for empty tag_names array', () => {
+    const result = handleCompositionCall('get_composition_example', { tagNames: [] }, FAKE_CEM);
+    expect(result.isError).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Story tool dispatcher
+// ---------------------------------------------------------------------------
+
+vi.mock('../../src/handlers/story.js', () => ({
+  generateStory: vi.fn(() => "import type { Meta, StoryObj } from '@storybook/web-components';"),
+}));
+
+const FAKE_CEM_WITH_COMPONENT: Cem = {
+  schemaVersion: '1.0.0',
+  modules: [
+    {
+      kind: 'javascript-module',
+      path: 'src/my-button.js',
+      declarations: [
+        {
+          kind: 'class',
+          name: 'MyButton',
+          tagName: 'my-button',
+        },
+      ],
+    },
+  ],
+};
+
+describe('isStoryTool', () => {
+  it('returns true for generate_story', () => {
+    expect(isStoryTool('generate_story')).toBe(true);
+  });
+
+  it('returns false for unknown tool', () => {
+    expect(isStoryTool('list_components')).toBe(false);
+    expect(isStoryTool('')).toBe(false);
+  });
+});
+
+describe('handleStoryCall', () => {
+  it('returns success for generate_story with known component', async () => {
+    const result = await handleStoryCall(
+      'generate_story',
+      { tagName: 'my-button' },
+      FAKE_CEM_WITH_COMPONENT,
+    );
+    expect(result.isError).toBeFalsy();
+  });
+
+  it('returns error when component is not in CEM', async () => {
+    const result = await handleStoryCall('generate_story', { tagName: 'unknown-tag' }, FAKE_CEM);
+    expect(result.isError).toBe(true);
+    expect(result.content[0]!.text).toContain('not found in CEM');
+  });
+
+  it('returns error for unknown tool name', async () => {
+    const result = await handleStoryCall('nonexistent_tool', {}, FAKE_CEM);
+    expect(result.isError).toBe(true);
+    expect(result.content[0]!.text).toContain('Unknown story tool');
+  });
+
+  it('returns error for missing required args', async () => {
+    const result = await handleStoryCall('generate_story', {}, FAKE_CEM);
+    expect(result.isError).toBe(true);
   });
 });

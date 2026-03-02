@@ -19,19 +19,19 @@ import { handleToolError } from '../shared/error-handling.js';
 // ─── Arg schemas ──────────────────────────────────────────────────────────────
 
 const ScoreComponentArgsSchema = z.object({
-  tag_name: z.string(),
+  tagName: z.string(),
 });
 
 const ScoreAllComponentsArgsSchema = z.object({});
 
 const GetHealthTrendArgsSchema = z.object({
-  tag_name: z.string(),
+  tagName: z.string(),
   days: z.number().int().positive().optional(),
 });
 
 const GetHealthDiffArgsSchema = z.object({
-  tag_name: z.string(),
-  base_branch: z.string().optional(),
+  tagName: z.string(),
+  baseBranch: z.string().optional(),
 });
 
 const AnalyzeAccessibilityArgsSchema = z.object({
@@ -48,12 +48,12 @@ export const HEALTH_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
-        tag_name: {
+        tagName: {
           type: 'string',
           description: 'The tag name of the component to score (e.g. "my-button").',
         },
       },
-      required: ['tag_name'],
+      required: ['tagName'],
       additionalProperties: false,
     },
   },
@@ -74,7 +74,7 @@ export const HEALTH_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
-        tag_name: {
+        tagName: {
           type: 'string',
           description: 'The tag name of the component (e.g. "my-button").',
         },
@@ -83,7 +83,7 @@ export const HEALTH_TOOL_DEFINITIONS = [
           description: 'Number of days to look back (default: 7).',
         },
       },
-      required: ['tag_name'],
+      required: ['tagName'],
       additionalProperties: false,
     },
   },
@@ -94,16 +94,16 @@ export const HEALTH_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
-        tag_name: {
+        tagName: {
           type: 'string',
           description: 'The tag name of the component (e.g. "my-button").',
         },
-        base_branch: {
+        baseBranch: {
           type: 'string',
           description: 'The base branch to compare against (default: "main").',
         },
       },
-      required: ['tag_name'],
+      required: ['tagName'],
       additionalProperties: false,
     },
   },
@@ -145,11 +145,11 @@ export async function handleHealthCall(
 ): Promise<MCPToolResult> {
   try {
     if (name === 'score_component') {
-      const { tag_name } = ScoreComponentArgsSchema.parse(args);
+      const { tagName } = ScoreComponentArgsSchema.parse(args);
       // Pass the CEM declaration so scoreComponent can fall back to CEM-derived scoring
       // when no pre-computed history files exist for this component.
-      const cemDecl = cem ? getAllDeclarations(cem).find((d) => d.tagName === tag_name) : undefined;
-      const result = await scoreComponent(config, tag_name, cemDecl);
+      const cemDecl = cem ? getAllDeclarations(cem).find((d) => d.tagName === tagName) : undefined;
+      const result = await scoreComponent(config, tagName, cemDecl);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 
@@ -168,14 +168,14 @@ export async function handleHealthCall(
     }
 
     if (name === 'get_health_trend') {
-      const { tag_name, days } = GetHealthTrendArgsSchema.parse(args);
-      const result = await getHealthTrend(config, tag_name, days);
+      const { tagName, days } = GetHealthTrendArgsSchema.parse(args);
+      const result = await getHealthTrend(config, tagName, days);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 
     if (name === 'get_health_diff') {
-      const { tag_name, base_branch } = GetHealthDiffArgsSchema.parse(args);
-      const result = await getHealthDiff(config, tag_name, base_branch);
+      const { tagName, baseBranch } = GetHealthDiffArgsSchema.parse(args);
+      const result = await getHealthDiff(config, tagName, baseBranch);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

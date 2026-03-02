@@ -7,7 +7,7 @@ import { handleToolError } from '../shared/error-handling.js';
 import type { Cem } from '../handlers/cem.js';
 
 const GetCompositionExampleArgsSchema = z.object({
-  tag_names: z.array(z.string()).min(1).max(4),
+  tagNames: z.array(z.string()).min(1).max(4),
 });
 
 export const COMPOSITION_TOOL_DEFINITIONS = [
@@ -18,7 +18,7 @@ export const COMPOSITION_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
-        tag_names: {
+        tagNames: {
           type: 'array',
           items: { type: 'string' },
           minItems: 1,
@@ -27,7 +27,7 @@ export const COMPOSITION_TOOL_DEFINITIONS = [
             'Array of 1–4 custom element tag names to compose (e.g. ["my-card", "my-button"]).',
         },
       },
-      required: ['tag_names'],
+      required: ['tagNames'],
       additionalProperties: false,
     },
   },
@@ -43,8 +43,8 @@ export function handleCompositionCall(
 ): MCPToolResult {
   try {
     if (name === 'get_composition_example') {
-      const { tag_names } = GetCompositionExampleArgsSchema.parse(args);
-      const result = getCompositionExample(cem, tag_names);
+      const { tagNames } = GetCompositionExampleArgsSchema.parse(args);
+      const result = getCompositionExample(cem, tagNames);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

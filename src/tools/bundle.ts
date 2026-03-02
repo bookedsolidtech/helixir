@@ -6,7 +6,7 @@ import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
 
 const EstimateBundleSizeArgsSchema = z.object({
-  tag_name: z.string(),
+  tagName: z.string(),
   package: z.string().optional(),
   version: z.string().optional().default('latest'),
   include_full_package: z.boolean().optional().default(true),
@@ -21,7 +21,7 @@ export const BUNDLE_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
-        tag_name: {
+        tagName: {
           type: 'string',
           description: 'The custom element tag name, e.g. "sl-button".',
         },
@@ -41,7 +41,7 @@ export const BUNDLE_TOOL_DEFINITIONS = [
             'When false, suppresses the full_package size from the result. Defaults to true.',
         },
       },
-      required: ['tag_name'],
+      required: ['tagName'],
       additionalProperties: false,
     },
   },
@@ -58,13 +58,13 @@ export async function handleBundleCall(
   try {
     if (name === 'estimate_bundle_size') {
       const {
-        tag_name,
+        tagName,
         package: pkg,
         version,
         include_full_package,
       } = EstimateBundleSizeArgsSchema.parse(args);
 
-      const result = await estimateBundleSize(tag_name, config, pkg, version);
+      const result = await estimateBundleSize(tagName, config, pkg, version);
 
       // Suppress full_package if caller opted out
       if (!include_full_package) {

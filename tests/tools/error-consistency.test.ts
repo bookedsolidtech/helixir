@@ -175,7 +175,7 @@ describe('Health tools: error response format', () => {
     vi.mocked(scoreComponent).mockRejectedValue(new Error('handler boom'));
     const result = await handleHealthCall(
       'score_component',
-      { tag_name: 'my-button' },
+      { tagName: 'my-button' },
       makeConfig(),
       FAKE_CEM,
     );

@@ -260,7 +260,7 @@ describe('E2E acceptance — real WC fixture (my-button, my-card, my-select)', (
 
   describe('Criterion 4 — score_component returns a health score for my-button', () => {
     it('returns a score object with a numeric score and grade', async () => {
-      const result = await callTool('score_component', { tag_name: 'my-button' });
+      const result = await callTool('score_component', { tagName: 'my-button' });
       expect(result.isError).toBeFalsy();
 
       const text = result.content[0]?.text ?? '';

@@ -260,16 +260,16 @@ All tools are exposed over the [Model Context Protocol](https://modelcontextprot
 
 | Tool                      | Description                                                                                      | Required Args |
 | ------------------------- | ------------------------------------------------------------------------------------------------ | ------------- |
-| `get_composition_example` | Realistic HTML snippet showing how to compose 1–4 components together using their slot structure | `tag_names`   |
+| `get_composition_example` | Realistic HTML snippet showing how to compose 1–4 components together using their slot structure | `tagNames`    |
 
 ### Health
 
 | Tool                    | Description                                                                         | Required Args          |
 | ----------------------- | ----------------------------------------------------------------------------------- | ---------------------- |
-| `score_component`       | Latest health score for a component: grade (A–F), dimension scores, and issues      | `tag_name`             |
+| `score_component`       | Latest health score for a component: grade (A–F), dimension scores, and issues      | `tagName`              |
 | `score_all_components`  | Health scores for every component in the library                                    | —                      |
-| `get_health_trend`      | Health trend for a component over the last N days with trend direction              | `tag_name`             |
-| `get_health_diff`       | Before/after health comparison between current branch and a base branch             | `tag_name`             |
+| `get_health_trend`      | Health trend for a component over the last N days with trend direction              | `tagName`              |
+| `get_health_diff`       | Before/after health comparison between current branch and a base branch             | `tagName`              |
 | `analyze_accessibility` | Accessibility profile: ARIA roles, keyboard events, focus management, label support | `tagName` _(optional)_ |
 
 ### Safety
@@ -302,7 +302,7 @@ All tools are exposed over the [Model Context Protocol](https://modelcontextprot
 
 | Tool                   | Description                                                                                 | Required Args |
 | ---------------------- | ------------------------------------------------------------------------------------------- | ------------- |
-| `estimate_bundle_size` | Estimates minified + gzipped bundle size for a component's npm package via bundlephobia/npm | `tag_name`    |
+| `estimate_bundle_size` | Estimates minified + gzipped bundle size for a component's npm package via bundlephobia/npm | `tagName`     |
 
 ### CDN
 

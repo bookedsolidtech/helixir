@@ -157,7 +157,7 @@ describe('handleHealthCall — score_component', () => {
 
     const result = await handleHealthCall(
       'score_component',
-      { tag_name: 'my-button' },
+      { tagName: 'my-button' },
       makeConfig(),
     );
     expect(result.isError).toBeFalsy();
@@ -174,7 +174,7 @@ describe('handleHealthCall — score_component', () => {
     vi.mocked(scoreComponent).mockResolvedValue(makeComponentHealth({ tagName: 'my-card' }));
 
     // The dispatcher passes (config, tag_name, cemDecl?) — cemDecl is undefined when no cem is given.
-    await handleHealthCall('score_component', { tag_name: 'my-card' }, makeConfig());
+    await handleHealthCall('score_component', { tagName: 'my-card' }, makeConfig());
     expect(scoreComponent).toHaveBeenCalledWith(expect.anything(), 'my-card', undefined);
   });
 
@@ -186,7 +186,7 @@ describe('handleHealthCall — score_component', () => {
   it('returns error when handler throws', async () => {
     vi.mocked(scoreComponent).mockRejectedValue(new Error('No history available'));
 
-    const result = await handleHealthCall('score_component', { tag_name: 'missing' }, makeConfig());
+    const result = await handleHealthCall('score_component', { tagName: 'missing' }, makeConfig());
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain('No history available');
   });
@@ -215,7 +215,7 @@ describe('grade calculation (A=90+, B=80+, C=70+, D=60+, F=below 60)', () => {
 
       const result = await handleHealthCall(
         'score_component',
-        { tag_name: 'my-button' },
+        { tagName: 'my-button' },
         makeConfig(),
       );
       const data = JSON.parse(result.content[0].text) as ComponentHealth;
@@ -282,7 +282,7 @@ describe('handleHealthCall — get_health_trend', () => {
 
     const result = await handleHealthCall(
       'get_health_trend',
-      { tag_name: 'my-button' },
+      { tagName: 'my-button' },
       makeConfig(),
     );
     expect(result.isError).toBeFalsy();
@@ -303,7 +303,7 @@ describe('handleHealthCall — get_health_trend', () => {
     };
     vi.mocked(getHealthTrend).mockResolvedValue(trend);
 
-    await handleHealthCall('get_health_trend', { tag_name: 'my-button', days: 14 }, makeConfig());
+    await handleHealthCall('get_health_trend', { tagName: 'my-button', days: 14 }, makeConfig());
     expect(getHealthTrend).toHaveBeenCalledWith(expect.anything(), 'my-button', 14);
   });
 
@@ -319,7 +319,7 @@ describe('handleHealthCall — get_health_trend', () => {
 
     const result = await handleHealthCall(
       'get_health_trend',
-      { tag_name: 'my-button' },
+      { tagName: 'my-button' },
       makeConfig(),
     );
     const data = JSON.parse(result.content[0].text) as HealthTrend;
@@ -342,7 +342,7 @@ describe('handleHealthCall — get_health_trend', () => {
 
     const result = await handleHealthCall(
       'get_health_trend',
-      { tag_name: 'my-button' },
+      { tagName: 'my-button' },
       makeConfig(),
     );
     const data = JSON.parse(result.content[0].text) as HealthTrend;
@@ -358,11 +358,7 @@ describe('handleHealthCall — get_health_trend', () => {
   it('returns error when handler throws', async () => {
     vi.mocked(getHealthTrend).mockRejectedValue(new Error('No health history found'));
 
-    const result = await handleHealthCall(
-      'get_health_trend',
-      { tag_name: 'missing' },
-      makeConfig(),
-    );
+    const result = await handleHealthCall('get_health_trend', { tagName: 'missing' }, makeConfig());
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain('No health history found');
   });
@@ -385,7 +381,7 @@ describe('handleHealthCall — get_health_diff', () => {
 
     const result = await handleHealthCall(
       'get_health_diff',
-      { tag_name: 'my-button' },
+      { tagName: 'my-button' },
       makeConfig(),
     );
     expect(result.isError).toBeFalsy();
@@ -412,7 +408,7 @@ describe('handleHealthCall — get_health_diff', () => {
 
     const result = await handleHealthCall(
       'get_health_diff',
-      { tag_name: 'my-button' },
+      { tagName: 'my-button' },
       makeConfig(),
     );
     const data = JSON.parse(result.content[0].text) as HealthDiff;
@@ -435,7 +431,7 @@ describe('handleHealthCall — get_health_diff', () => {
 
     await handleHealthCall(
       'get_health_diff',
-      { tag_name: 'my-button', base_branch: 'develop' },
+      { tagName: 'my-button', baseBranch: 'develop' },
       makeConfig(),
     );
     expect(getHealthDiff).toHaveBeenCalledWith(expect.anything(), 'my-button', 'develop');
@@ -451,7 +447,7 @@ describe('handleHealthCall — get_health_diff', () => {
 
     const result = await handleHealthCall(
       'get_health_diff',
-      { tag_name: 'my-button' },
+      { tagName: 'my-button' },
       makeConfig(),
     );
     expect(result.isError).toBe(true);

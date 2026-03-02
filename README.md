@@ -231,24 +231,36 @@ All tools are exposed over the [Model Context Protocol](https://modelcontextprot
 
 ### Discovery
 
-| Tool                  | Description                                                                          | Required Args          |
-| --------------------- | ------------------------------------------------------------------------------------ | ---------------------- |
-| `list_components`     | List all custom elements registered in the CEM                                       | —                      |
-| `find_component`      | Semantic search for components by name, description, or member names (top 3 matches) | `query`                |
-| `get_library_summary` | Overview of the library: component count, average health score, grade distribution   | —                      |
-| `list_events`         | List all events across the library, optionally filtered by component                 | `tagName` _(optional)_ |
-| `list_slots`          | List all slots across the library, optionally filtered by component                  | `tagName` _(optional)_ |
-| `list_css_parts`      | List all CSS `::part()` targets across the library, optionally filtered by component | `tagName` _(optional)_ |
+| Tool                          | Description                                                                          | Required Args          |
+| ----------------------------- | ------------------------------------------------------------------------------------ | ---------------------- |
+| `list_components`             | List all custom elements registered in the CEM                                       | —                      |
+| `find_component`              | Semantic search for components by name, description, or member names (top 3 matches) | `query`                |
+| `get_library_summary`         | Overview of the library: component count, average health score, grade distribution   | —                      |
+| `list_events`                 | List all events across the library, optionally filtered by component                 | `tagName` _(optional)_ |
+| `list_slots`                  | List all slots across the library, optionally filtered by component                  | `tagName` _(optional)_ |
+| `list_css_parts`              | List all CSS `::part()` targets across the library, optionally filtered by component | `tagName` _(optional)_ |
+| `list_components_by_category` | Group components by functional category (form, navigation, feedback, layout, etc.)   | —                      |
 
 ### Component
 
-| Tool                      | Description                                                                             | Required Args |
-| ------------------------- | --------------------------------------------------------------------------------------- | ------------- |
-| `get_component`           | Full metadata for a component: members, events, slots, CSS parts, CSS properties        | `tagName`     |
-| `validate_cem`            | Validate CEM documentation completeness; returns score (0–100) and issues list          | `tagName`     |
-| `suggest_usage`           | Generate an HTML snippet showing key attributes with their defaults and variant options | `tagName`     |
-| `generate_import`         | Generate side-effect and named import statements from CEM exports                       | `tagName`     |
-| `get_component_narrative` | 3–5 paragraph markdown prose description of a component optimized for LLM comprehension | `tagName`     |
+| Tool                          | Description                                                                                           | Required Args              |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------- |
+| `get_component`               | Full metadata for a component: members, events, slots, CSS parts, CSS properties                      | `tagName`                  |
+| `validate_cem`                | Validate CEM documentation completeness; returns score (0–100) and issues list                        | `tagName`                  |
+| `suggest_usage`               | Generate an HTML snippet showing key attributes with their defaults and variant options               | `tagName`                  |
+| `generate_import`             | Generate side-effect and named import statements from CEM exports                                     | `tagName`                  |
+| `get_component_narrative`     | 3–5 paragraph markdown prose description of a component optimized for LLM comprehension               | `tagName`                  |
+| `get_prop_constraints`        | Structured constraint table for an attribute: union values with descriptions, or simple type info     | `tagName`, `attributeName` |
+| `find_components_by_token`    | Find all components that expose a given CSS custom property token                                     | `tokenName`                |
+| `find_components_using_token` | Find all components referencing a token in their `cssProperties` (works without `tokensPath`)         | `tokenName`                |
+| `get_component_dependencies`  | Dependency graph for a component: direct and transitive dependencies from CEM reference data          | `tagName`                  |
+| `validate_usage`              | Validate a proposed HTML snippet against the CEM spec: unknown attrs, bad slot names, enum mismatches | `tagName`, `html`          |
+
+### Composition
+
+| Tool                      | Description                                                                                      | Required Args |
+| ------------------------- | ------------------------------------------------------------------------------------------------ | ------------- |
+| `get_composition_example` | Realistic HTML snippet showing how to compose 1–4 components together using their slot structure | `tag_names`   |
 
 ### Health
 
@@ -267,6 +279,12 @@ All tools are exposed over the [Model Context Protocol](https://modelcontextprot
 | `diff_cem`               | Per-component CEM diff between branches; highlights breaking changes and additions | `tagName`, `baseBranch` |
 | `check_breaking_changes` | Breaking-change scan across all components vs. a base branch with summary report   | `baseBranch`            |
 
+### Framework
+
+| Tool               | Description                                                                               | Required Args |
+| ------------------ | ----------------------------------------------------------------------------------------- | ------------- |
+| `detect_framework` | Identifies the web component framework in use from package.json, CEM metadata, and config | —             |
+
 ### TypeScript
 
 | Tool                      | Description                                               | Required Args |
@@ -274,7 +292,27 @@ All tools are exposed over the [Model Context Protocol](https://modelcontextprot
 | `get_file_diagnostics`    | TypeScript diagnostics for a single file                  | `filePath`    |
 | `get_project_diagnostics` | Full TypeScript diagnostic pass across the entire project | —             |
 
+### Story
+
+| Tool             | Description                                                                        | Required Args |
+| ---------------- | ---------------------------------------------------------------------------------- | ------------- |
+| `generate_story` | Generates a Storybook CSF3 story file for a component based on its CEM declaration | `tagName`     |
+
+### Bundle
+
+| Tool                   | Description                                                                                 | Required Args |
+| ---------------------- | ------------------------------------------------------------------------------------------- | ------------- |
+| `estimate_bundle_size` | Estimates minified + gzipped bundle size for a component's npm package via bundlephobia/npm | `tag_name`    |
+
+### CDN
+
+| Tool              | Description                                                                                           | Required Args |
+| ----------------- | ----------------------------------------------------------------------------------------------------- | ------------- |
+| `resolve_cdn_cem` | Fetch and cache a library's CEM from jsDelivr or UNPKG by npm package name (for CDN-loaded libraries) | `package`     |
+
 ### Tokens
+
+_(Requires `tokensPath` to be configured)_
 
 | Tool                | Description                                                                           | Required Args |
 | ------------------- | ------------------------------------------------------------------------------------- | ------------- |

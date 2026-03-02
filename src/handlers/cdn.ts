@@ -13,6 +13,21 @@ function sanitizePackageName(pkg: string): string {
 }
 
 /**
+ * Sanitizes a version string for use in file paths and CDN URLs.
+ * Allows semver characters (digits, dots, hyphens, plus, tilde, caret, alphanumeric)
+ * and "latest". Rejects anything else to prevent path traversal and URL manipulation.
+ */
+function sanitizeVersion(version: string): string {
+  if (!/^[a-zA-Z0-9._\-+~^]+$/.test(version)) {
+    throw new MCPError(
+      `Invalid version string: "${version}". Only semver-compatible characters are allowed.`,
+      ErrorCategory.VALIDATION,
+    );
+  }
+  return version;
+}
+
+/**
  * Fetches and caches a library's Custom Elements Manifest from a CDN registry.
  */
 export async function resolveCdnCem(
@@ -22,11 +37,13 @@ export async function resolveCdnCem(
   config: McpWcConfig,
 ): Promise<{ cachePath: string; componentCount: number; formatted: string }> {
   const sanitized = sanitizePackageName(pkg);
+  const safeVersion = sanitizeVersion(version);
 
-  // Build URL from parts — no raw protocol+hostname literals
+  // Build URL using percent-encoded package name and version to prevent URL injection.
   const protocol = 'https';
   const host = registry === 'jsdelivr' ? 'cdn.jsdelivr.net' : 'unpkg.com';
-  const url = `${protocol}://${host}/npm/${pkg}@${version}/custom-elements.json`;
+  const encodedPkg = encodeURIComponent(pkg).replace('%40', '@').replace('%2F', '/');
+  const url = `${protocol}://${host}/npm/${encodedPkg}@${encodeURIComponent(safeVersion)}/custom-elements.json`;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 10_000);
@@ -67,7 +84,8 @@ export async function resolveCdnCem(
 
   const cacheDir = join(config.projectRoot, '.mcp-wc', 'cdn-cache');
   mkdirSync(cacheDir, { recursive: true });
-  const cachePath = join(cacheDir, `${sanitized}@${version}.json`);
+  // Use safeVersion (validated, no path separators) to prevent cache path traversal.
+  const cachePath = join(cacheDir, `${sanitized}@${safeVersion}.json`);
   writeFileSync(cachePath, JSON.stringify(cem, null, 2), 'utf-8');
 
   const componentCount = cem.modules

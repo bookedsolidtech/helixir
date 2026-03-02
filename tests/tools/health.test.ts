@@ -173,8 +173,9 @@ describe('handleHealthCall — score_component', () => {
   it('passes tag_name to scoreComponent', async () => {
     vi.mocked(scoreComponent).mockResolvedValue(makeComponentHealth({ tagName: 'my-card' }));
 
+    // The dispatcher passes (config, tag_name, cemDecl?) — cemDecl is undefined when no cem is given.
     await handleHealthCall('score_component', { tag_name: 'my-card' }, makeConfig());
-    expect(scoreComponent).toHaveBeenCalledWith(expect.anything(), 'my-card');
+    expect(scoreComponent).toHaveBeenCalledWith(expect.anything(), 'my-card', undefined);
   });
 
   it('returns error when tag_name is missing', async () => {

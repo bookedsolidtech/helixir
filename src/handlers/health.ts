@@ -101,6 +101,14 @@ function historyToHealth(file: HistoryFileRaw): ComponentHealth {
 }
 
 function componentHistoryDir(config: McpWcConfig, tagName: string): string {
+  // Reject tag names that contain path separators or traversal sequences.
+  // Custom element tag names are restricted to [a-z0-9-] by the HTML spec, but
+  // some monorepo CEMs use "pkg:tag" notation — we allow that subset and nothing else.
+  if (tagName.includes('..') || tagName.includes('/') || tagName.includes('\\')) {
+    throw new Error(
+      `Invalid tag name for health history lookup: "${tagName}". Tag names must not contain path separators.`,
+    );
+  }
   return resolve(config.projectRoot, config.healthHistoryDir, tagName);
 }
 

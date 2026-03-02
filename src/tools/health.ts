@@ -146,15 +146,22 @@ export async function handleHealthCall(
   try {
     if (name === 'score_component') {
       const { tag_name } = ScoreComponentArgsSchema.parse(args);
-      const result = await scoreComponent(config, tag_name);
+      // Pass the CEM declaration so scoreComponent can fall back to CEM-derived scoring
+      // when no pre-computed history files exist for this component.
+      const cemDecl = cem ? getAllDeclarations(cem).find((d) => d.tagName === tag_name) : undefined;
+      const result = await scoreComponent(config, tag_name, cemDecl);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 
     if (name === 'score_all_components') {
       ScoreAllComponentsArgsSchema.parse(args);
-      const cemPath = resolve(config.projectRoot, config.cemPath);
-      const raw = await readFile(cemPath, 'utf-8');
-      const cemData = CemSchema.parse(JSON.parse(String(raw)));
+      // Use the in-memory CEM cache when available to avoid unnecessary disk reads
+      // and ensure consistency with the validated CEM loaded at startup.
+      const cemData =
+        cem ??
+        CemSchema.parse(
+          JSON.parse(String(await readFile(resolve(config.projectRoot, config.cemPath), 'utf-8'))),
+        );
       const declarations = cemData.modules.flatMap((m) => m.declarations ?? []);
       const results = await scoreAllComponents(config, declarations);
       return createSuccessResponse(JSON.stringify(results, null, 2));

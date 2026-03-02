@@ -199,7 +199,7 @@ async function main(): Promise<void> {
         }
         return handleTokenCall(name, typedArgs, config);
       }
-      throw new Error(`Unknown tool: ${name}`);
+      return createErrorResponse(`Unknown tool: ${name}`);
     })();
 
     // MCPToolResult matches the MCP protocol CallToolResult shape at runtime.

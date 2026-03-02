@@ -9,7 +9,6 @@ import {
   getHealthTrend,
   getHealthDiff,
   type CemDeclaration,
-  type ComponentHealth,
 } from '../../src/handlers/health.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -33,6 +32,8 @@ function makeConfig(healthHistoryDir: string = HEALTH_HISTORY_DIR): McpWcConfig 
 // ─── CEM fixture declarations (derived from tests/__fixtures__/custom-elements.json) ───
 
 const MY_BUTTON_DECL: CemDeclaration = {
+  kind: 'class',
+  name: 'MyButton',
   tagName: 'my-button',
   description: 'A generic button component with various style variants and states.',
   members: [

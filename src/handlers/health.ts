@@ -3,7 +3,8 @@ import { resolve, join } from 'node:path';
 import { z } from 'zod';
 import { GitOperations } from '../shared/git.js';
 import type { McpWcConfig } from '../config.js';
-import type { Cem, CemDeclaration } from './cem.js';
+import { CemSchema } from './cem.js';
+import type { CemDeclaration } from './cem.js';
 
 // ─── Return types ────────────────────────────────────────────────────────────
 
@@ -350,7 +351,7 @@ export async function getHealthDiff(
   let base: ComponentHealth;
   try {
     const cemContent = await git.gitShow(baseBranch, config.cemPath);
-    const cem = JSON.parse(cemContent) as Cem;
+    const cem = CemSchema.parse(JSON.parse(cemContent));
     const baseDecl = cem.modules
       .flatMap((m) => m.declarations ?? [])
       .find((d) => d.tagName === tagName);

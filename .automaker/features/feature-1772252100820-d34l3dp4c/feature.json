@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "The critical path. Implement src/handlers/cem.ts per the specifications in planning.md. parseCem(tagName, config): reads CEM from config.cemPath via SafeFileOperations, resolves the component by tag name, returns typed metadata (members, events, slots, cssProperties, cssParts). Throws MCPError NOT_FOUND if component missing. validateCompleteness(tagName, config): checks CEM coverage, returns score 0-100 with issues list. listAllComponents(config): reads CEM, returns all component tag names. diffCem(tagName, baseBranch, config): uses GitOperations.withBranch to read CEM on base branch, compares against current branch — removed properties, changed types, removed events are BREAKING. Component that exists only on current branch (new): flag as NEW, not breaking. TDD: write tests/handlers/cem.test.ts FIRST using fixture custom-elements.json. Cover: happy path, missing component, incomplete docs, breaking removal, new component. Target 100% coverage.",
   "title": "CEM handler — parseCem, validateCompleteness, listAllComponents, diffCem",
-  "status": "in_progress",
+  "status": "blocked",
   "dependencies": [
     "feature-1772252089963-q8o5bskqw",
     "feature-1772252078168-36ly43daj"
@@ -235,6 +235,11 @@
       "from": "backlog",
       "to": "in_progress",
       "timestamp": "2026-03-02T05:56:01.965Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-02T05:58:41.049Z"
     }
   ],
   "featureType": "code"

@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Install husky and lint-staged as devDependencies. Run pnpm exec husky init. Configure .husky/pre-commit to run pnpm exec lint-staged. Configure lint-staged in package.json to run eslint --fix and prettier --write on *.ts/*.js files, and prettier --write on *.json/*.md files. Committing files with lint errors must be blocked.",
   "title": "Add Husky pre-commit hooks with lint-staged",
-  "status": "blocked",
+  "status": "backlog",
   "epicId": "feature-1772251713621-8rwdhp0qc",
   "complexity": "small",
   "priority": 2,
@@ -41,6 +41,11 @@
       "from": "backlog",
       "to": "blocked",
       "timestamp": "2026-03-02T05:53:31.506Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-02T05:57:47.465Z"
     }
   ],
   "featureType": "code",

@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Problem\n`pnpm run format:check` currently FAILS:\n```\n[warn] .coderabbit.yaml\n[warn] Code style issues found in the above file.\n```\nThis blocks the format:check from passing in CI (once CI is properly expanded per the companion ticket). \n\n## Fix\nRun `pnpm run format` to auto-fix the file, then commit the result. Verify `pnpm run format:check` passes cleanly on all files.\n\n## Acceptance Criteria\n- `pnpm run format:check` exits 0 with no warnings\n- `.coderabbit.yaml` is committed with correct Prettier formatting",
   "title": "Fix Prettier format violation on .coderabbit.yaml",
-  "status": "blocked",
+  "status": "backlog",
   "epicId": "feature-1772251713621-8rwdhp0qc",
   "complexity": "small",
   "priority": 2,
@@ -31,6 +31,11 @@
       "from": "backlog",
       "to": "blocked",
       "timestamp": "2026-03-02T05:51:14.559Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-02T05:57:48.574Z"
     }
   ],
   "featureType": "code"

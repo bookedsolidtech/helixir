@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Implement src/handlers/health.ts per planning.md. Make healthHistoryDir fully configurable via config. Critical fallback: when no health-history directory exists, compute a CEM-derived documentation score from 6 dimensions — description present (+15), all properties have descriptions (+25), all events have type annotations (+20), all events have descriptions (+15), CSS parts documented (+15), slots documented (+10). Full 17-dimension score requires pre-computed history files in healthHistoryDir. getHealthTrend: reads history JSON files sorted by date, computes trend direction (improving/declining/stable) and changePercent — single data point = stable. getHealthDiff: uses GitOperations.withBranch to compare current vs base branch score. Write tests/handlers/health.test.ts FIRST using fixture health-history/ files. Cover: CEM fallback scoring, trend with multiple data points, trend with single point (stable), diff improving vs declining.",
   "title": "Health handler — scoreComponent, scoreAllComponents, getHealthTrend, getHealthDiff",
-  "status": "in_progress",
+  "status": "blocked",
   "dependencies": [
     "feature-1772252089963-q8o5bskqw",
     "feature-1772252078168-36ly43daj"
@@ -120,6 +120,11 @@
       "from": "backlog",
       "to": "in_progress",
       "timestamp": "2026-03-02T05:55:59.127Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-02T05:58:18.434Z"
     }
   ],
   "featureType": "code"

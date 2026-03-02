@@ -140,7 +140,7 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
       });
     });
 
-    it('returns all expected tool names (27 core + 2 token when configured)', async () => {
+    it('returns all expected tool names (29 core + 2 token when configured)', async () => {
       sendRequest('tools/list', {});
       const response = await recv();
 
@@ -182,6 +182,10 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
         'estimate_bundle_size',
         // cdn
         'resolve_cdn_cem',
+        // story
+        'generate_story',
+        // component (dependency graph)
+        'get_component_dependencies',
         // typescript
         'get_file_diagnostics',
         'get_project_diagnostics',

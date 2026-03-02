@@ -39,6 +39,7 @@ import {
 } from './tools/composition.js';
 import { BUNDLE_TOOL_DEFINITIONS, handleBundleCall, isBundleTool } from './tools/bundle.js';
 import { CDN_TOOL_DEFINITIONS, handleCdnCall, isCdnTool } from './tools/cdn.js';
+import { STORY_TOOL_DEFINITIONS, handleStoryCall, isStoryTool } from './tools/story.js';
 import { createErrorResponse } from './shared/mcp-helpers.js';
 import type { MCPToolResult } from './shared/mcp-helpers.js';
 
@@ -125,6 +126,7 @@ async function main(): Promise<void> {
     ...VALIDATE_TOOL_DEFINITIONS,
     ...BUNDLE_TOOL_DEFINITIONS,
     ...CDN_TOOL_DEFINITIONS,
+    ...STORY_TOOL_DEFINITIONS,
     ...tsTools,
   ];
 
@@ -174,6 +176,13 @@ async function main(): Promise<void> {
       }
       if (isBundleTool(name)) return handleBundleCall(name, typedArgs, config);
       if (isCdnTool(name)) return handleCdnCall(name, typedArgs, config);
+      if (isStoryTool(name)) {
+        if (cemCache === null)
+          return createErrorResponse(
+            'CEM not yet loaded — server is still initializing. Please retry.',
+          );
+        return handleStoryCall(name, typedArgs, cemCache);
+      }
       if (isFrameworkTool(name)) return handleFrameworkCall(name, typedArgs, config);
       if (isValidateTool(name)) {
         if (cemCache === null)

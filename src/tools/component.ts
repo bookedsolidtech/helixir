@@ -5,6 +5,7 @@ import type { Cem, CemMember } from '../handlers/cem.js';
 import { suggestUsage, generateImport } from '../handlers/suggest.js';
 import { getComponentNarrative } from '../handlers/narrative.js';
 import { formatPropConstraints } from '../handlers/component.js';
+import { getComponentDependencies } from '../handlers/dependencies.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -37,6 +38,11 @@ const GetPropConstraintsArgsSchema = z.object({
 const FindComponentsByTokenArgsSchema = z.object({
   tokenName: z.string(),
   partialMatch: z.boolean().optional().default(true),
+});
+
+const GetComponentDependenciesArgsSchema = z.object({
+  tagName: z.string(),
+  includeTransitive: z.boolean().optional().default(true),
 });
 
 export const COMPONENT_TOOL_DEFINITIONS = [
@@ -161,6 +167,26 @@ export const COMPONENT_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'get_component_dependencies',
+    description:
+      'Returns the dependency graph for a component — direct dependencies (components it renders) and transitive dependencies (full tree). Requires a CEM built with dependency reference data.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        tagName: {
+          type: 'string',
+          description: 'The custom element tag name to inspect (e.g. "my-dialog").',
+        },
+        includeTransitive: {
+          type: 'boolean',
+          description: 'When true (default), resolves the full transitive dependency tree.',
+        },
+      },
+      required: ['tagName'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -236,6 +262,12 @@ export async function handleComponentCall(
         );
       }
       const result = findComponentsByToken(tokenName, partialMatch, cem);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'get_component_dependencies') {
+      const { tagName, includeTransitive } = GetComponentDependenciesArgsSchema.parse(args);
+      const result = getComponentDependencies(cem, tagName, includeTransitive);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

@@ -1,10 +1,10 @@
-# wc-mcp Developer Experience Review
+# wc-tools Developer Experience Review
 
 Generated: 2026-03-02
 
 ## Summary
 
-This review audits wc-mcp from the perspective of a skeptical first-time user: install from npm, point at a CEM, call every tool. Two HIGH findings were fixed inline: a missing MIT LICENSE file (npm publish would silently ship without one) and a pervasive snake_case parameter naming inconsistency (`tag_name`, `tag_names`, `base_branch`) across health, bundle, and composition tools while all other tools use camelCase (`tagName`, etc.). Both fixes were committed before this document. Four MEDIUM and three LOW issues were filed as board features for follow-up.
+This review audits wc-tools from the perspective of a skeptical first-time user: install from npm, point at a CEM, call every tool. Two HIGH findings were fixed inline: a missing MIT LICENSE file (npm publish would silently ship without one) and a pervasive snake_case parameter naming inconsistency (`tag_name`, `tag_names`, `base_branch`) across health, bundle, and composition tools while all other tools use camelCase (`tagName`, etc.). Both fixes were committed before this document. Four MEDIUM and three LOW issues were filed as board features for follow-up.
 
 ---
 
@@ -117,7 +117,7 @@ README, tests, and source files all updated. Committed in `fix: add LICENSE file
 | -------- | ---------------------------- | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | MEDIUM   | `src/handlers/health.ts:240` | `No health history found for '${tagName}'` (plain Error → [UNKNOWN])       | `MCPError(NOT_FOUND)`: "No health history found for '${tagName}'. Run a health snapshot first or use score_component which falls back to CEM data." |
 | MEDIUM   | `src/handlers/health.ts:249` | `No health history files found for '${tagName}'` (plain Error → [UNKNOWN]) | Same fix: use `MCPError(NOT_FOUND)`                                                                                                                 |
-| LOW      | `src/config.ts:34`           | `[wc-mcp] Warning: mcpwc.config.json is malformed. Using defaults.`        | Include the parse error: `...is malformed (${err}). Using defaults.`                                                                                |
+| LOW      | `src/config.ts:34`           | `[wc-tools] Warning: mcpwc.config.json is malformed. Using defaults.`      | Include the parse error: `...is malformed (${err}). Using defaults.`                                                                                |
 | LOW      | `src/handlers/health.ts`     | `No health history for '${tagName}' and no CEM data provided for fallback` | More actionable: add "Pass a CEM declaration or ensure the component exists in the loaded CEM."                                                     |
 
 ---

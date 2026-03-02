@@ -1,4 +1,4 @@
-# wc-mcp v0.1.0 Audit Summary
+# wc-tools v0.1.0 Audit Summary
 
 Generated: 2026-03-02T10:00:00Z
 

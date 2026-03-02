@@ -1,8 +1,8 @@
-# wc-mcp + Lit
+# wc-tools + Lit
 
-This example configures wc-mcp to work with a [Lit](https://lit.dev/) component library.
+This example configures wc-tools to work with a [Lit](https://lit.dev/) component library.
 
-Unlike Shoelace, Lit itself does not ship a pre-built Custom Elements Manifest. You must run the CEM analyzer against your source files before starting wc-mcp.
+Unlike Shoelace, Lit itself does not ship a pre-built Custom Elements Manifest. You must run the CEM analyzer against your source files before starting wc-tools.
 
 ## Prerequisites
 
@@ -58,9 +58,9 @@ Add to your `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "wc-mcp": {
+    "wc-tools": {
       "command": "npx",
-      "args": ["wc-mcp"],
+      "args": ["wc-tools"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/path/to/your/lit-project"
       }
@@ -69,11 +69,11 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-## Example: Claude Using wc-mcp with Lit
+## Example: Claude Using wc-tools with Lit
 
 **Prompt:** "Show me how to use my-card component with a header slot and action buttons."
 
-**Claude's response (powered by wc-mcp):**
+**Claude's response (powered by wc-tools):**
 
 > The `my-card` component uses named slots for composing content. Here's a complete example:
 >

@@ -1,10 +1,10 @@
 {
-  "name": "wc-mcp",
+  "name": "wc-tools",
   "version": "0.1.0",
   "description": "MCP server that gives AI agents full situational awareness of any web component library",
   "type": "module",
   "bin": {
-    "wc-mcp": "./build/index.js"
+    "wc-tools": "./build/index.js"
   },
   "main": "./build/index.js",
   "files": [

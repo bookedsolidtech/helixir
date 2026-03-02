@@ -1,12 +1,12 @@
-# wc-mcp
+# wc-tools
 
 > Give AI agents full situational awareness of any web component library.
 
-[![npm version](https://img.shields.io/npm/v/wc-mcp)](https://www.npmjs.com/package/wc-mcp)
-[![npm downloads](https://img.shields.io/npm/dw/wc-mcp)](https://www.npmjs.com/package/wc-mcp)
+[![npm version](https://img.shields.io/npm/v/wc-tools)](https://www.npmjs.com/package/wc-tools)
+[![npm downloads](https://img.shields.io/npm/dw/wc-tools)](https://www.npmjs.com/package/wc-tools)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node 20+](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
-[![CI](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/wc-mcp/ci.yml?branch=main&label=tests)](https://github.com/bookedsolidtech/wc-mcp/actions)
+[![CI](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/wc-tools/ci.yml?branch=main&label=tests)](https://github.com/bookedsolidtech/wc-tools/actions)
 
 ---
 
@@ -16,10 +16,10 @@
 
 ```bash
 # 1. Install globally (or use npx — no install required)
-npm install -g wc-mcp
+npm install -g wc-tools
 
 # 2. Generate a starter config in your component library
-npx wc-mcp init
+npx wc-tools init
 # → writes mcpwc.config.json to the current directory
 ```
 
@@ -34,14 +34,14 @@ Edit `mcpwc.config.json` to point at your library:
 }
 ```
 
-Add wc-mcp to your Claude Desktop config (see [AI Tool Configs](#ai-tool-configs) for other editors):
+Add wc-tools to your Claude Desktop config (see [AI Tool Configs](#ai-tool-configs) for other editors):
 
 ```json
 {
   "mcpServers": {
-    "wc-mcp": {
+    "wc-tools": {
       "command": "npx",
-      "args": ["wc-mcp"],
+      "args": ["wc-tools"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
       }
@@ -56,7 +56,7 @@ Restart Claude Desktop. Done — your AI agent now knows every property, event, 
 
 ## What You Get
 
-### Without wc-mcp
+### Without wc-tools
 
 > **You:** How do I use sl-button?
 >
@@ -72,7 +72,7 @@ Restart Claude Desktop. Done — your AI agent now knows every property, event, 
 
 ---
 
-### With wc-mcp
+### With wc-tools
 
 > **You:** How do I use sl-button?
 >
@@ -104,7 +104,7 @@ Restart Claude Desktop. Done — your AI agent now knows every property, event, 
 
 ## Framework Setup
 
-wc-mcp works with any toolchain that produces a [`custom-elements.json`](https://github.com/webcomponents/custom-elements-manifest) (CEM). Below are quick-start setups for the most common frameworks.
+wc-tools works with any toolchain that produces a [`custom-elements.json`](https://github.com/webcomponents/custom-elements-manifest) (CEM). Below are quick-start setups for the most common frameworks.
 
 ### Shoelace
 
@@ -334,7 +334,7 @@ Place this file at the root of your component library project (or wherever `MCP_
 | `tsconfigPath`     | `string`         | `"tsconfig.json"`        | Path to the project's `tsconfig.json`, relative to `projectRoot`.                                                                                    |
 | `tokensPath`       | `string \| null` | `null`                   | Path to a design tokens JSON file. Set to `null` to disable token tools.                                                                             |
 | `cdnBase`          | `string \| null` | `null`                   | Base URL for CDN import snippets in `suggest_usage` output (e.g. for Shoelace via CDN). Does not affect `resolve_cdn_cem`. Set to `null` to disable. |
-| `watch`            | `boolean`        | `false`                  | When `true`, wc-mcp automatically reloads the CEM on file changes.                                                                                   |
+| `watch`            | `boolean`        | `false`                  | When `true`, wc-tools automatically reloads the CEM on file changes.                                                                                 |
 
 **Full example:**
 
@@ -379,9 +379,9 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) o
 ```json
 {
   "mcpServers": {
-    "wc-mcp": {
+    "wc-tools": {
       "command": "npx",
-      "args": ["wc-mcp"],
+      "args": ["wc-tools"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
       }
@@ -399,9 +399,9 @@ Add to `.cursor/mcp.json` in your project root (or `~/.cursor/mcp.json` for glob
 ```json
 {
   "mcpServers": {
-    "wc-mcp": {
+    "wc-tools": {
       "command": "npx",
-      "args": ["wc-mcp"],
+      "args": ["wc-tools"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "${workspaceFolder}"
       }
@@ -417,9 +417,9 @@ Add to `.cursor/mcp.json` in your project root (or `~/.cursor/mcp.json` for glob
 ```json
 {
   "mcpServers": {
-    "wc-mcp": {
+    "wc-tools": {
       "command": "npx",
-      "args": ["wc-mcp"],
+      "args": ["wc-tools"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "${workspaceFolder}"
       }
@@ -434,8 +434,8 @@ Add to `.cursor/mcp.json` in your project root (or `~/.cursor/mcp.json` for glob
 {
   "mcpServers": [
     {
-      "name": "wc-mcp",
-      "command": "npx wc-mcp",
+      "name": "wc-tools",
+      "command": "npx wc-tools",
       "env": {
         "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
       }
@@ -451,10 +451,10 @@ Add to your Zed settings (`~/.config/zed/settings.json`):
 ```json
 {
   "context_servers": {
-    "wc-mcp": {
+    "wc-tools": {
       "command": {
         "path": "npx",
-        "args": ["wc-mcp"],
+        "args": ["wc-tools"],
         "env": {
           "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
         }

@@ -37,7 +37,7 @@ function requireTs(): typeof TSType {
     throw new Error(
       'TypeScript diagnostics require TypeScript to be installed.\n' +
         'Run: npm install typescript --save-dev\n' +
-        'Then restart wc-mcp.',
+        'Then restart wc-tools.',
     );
   }
   return ts;

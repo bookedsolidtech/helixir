@@ -1,6 +1,6 @@
 # Local Development Guide
 
-This document covers how to set up and run `wc-mcp` locally for development and contribution.
+This document covers how to set up and run `wc-tools` locally for development and contribution.
 
 ## Prerequisites
 
@@ -68,9 +68,9 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 ```json
 {
   "mcpServers": {
-    "wc-mcp": {
+    "wc-tools": {
       "command": "node",
-      "args": ["/absolute/path/to/wc-mcp/build/index.js"],
+      "args": ["/absolute/path/to/wc-tools/build/index.js"],
       "env": {
         "MCP_WC_CEM_PATH": "/path/to/your/custom-elements.json"
       }
@@ -113,7 +113,7 @@ Place `mcpwc.config.json` at your project root to configure the server without e
 }
 ```
 
-Run `wc-mcp init` to generate this file interactively.
+Run `wc-tools init` to generate this file interactively.
 
 ## Project Structure
 

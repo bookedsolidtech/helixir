@@ -10,9 +10,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const SERVER_PATH = resolve(__dirname, '../build/index.js');
 
-describe('wc-mcp init', () => {
+describe('wc-tools init', () => {
   it('writes mcpwc.config.json and prints snippets when CEM is found', () => {
-    const tmpDir = mkdtempSync(join(tmpdir(), 'wc-mcp-init-'));
+    const tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-init-'));
     try {
       // Create a package.json with lit to trigger framework detection
       writeFileSync(
@@ -41,7 +41,7 @@ describe('wc-mcp init', () => {
       expect(result.stdout).toContain('Found CEM: custom-elements.json');
       expect(result.stdout).toContain('Written: mcpwc.config.json');
       expect(result.stdout).toContain('claude_desktop_config.json');
-      expect(result.stdout).toContain('"wc-mcp"');
+      expect(result.stdout).toContain('"wc-tools"');
 
       // Verify config file was written
       const configPath = join(tmpDir, 'mcpwc.config.json');
@@ -55,7 +55,7 @@ describe('wc-mcp init', () => {
   });
 
   it('uses custom CEM path when user declines auto-discovered CEM', () => {
-    const tmpDir = mkdtempSync(join(tmpdir(), 'wc-mcp-init-'));
+    const tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-init-'));
     try {
       writeFileSync(
         join(tmpDir, 'custom-elements.json'),
@@ -85,7 +85,7 @@ describe('wc-mcp init', () => {
   });
 
   it('records tokensPath when user provides one', () => {
-    const tmpDir = mkdtempSync(join(tmpdir(), 'wc-mcp-init-'));
+    const tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-init-'));
     try {
       writeFileSync(
         join(tmpDir, 'custom-elements.json'),
@@ -115,7 +115,7 @@ describe('wc-mcp init', () => {
   });
 
   it('falls back to default CEM path when none is auto-detected and user skips', () => {
-    const tmpDir = mkdtempSync(join(tmpdir(), 'wc-mcp-init-'));
+    const tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-init-'));
     try {
       // No CEM file present, no package.json
       // Simulate: press Enter for CEM path (use default), skip tokens

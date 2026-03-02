@@ -1,6 +1,6 @@
-# wc-mcp + FAST (Fluent UI Web Components)
+# wc-tools + FAST (Fluent UI Web Components)
 
-This example configures wc-mcp to work with [FAST Fluent UI](https://www.fast.design/) — Microsoft's web component implementation of the Fluent design system, built on the FAST foundation.
+This example configures wc-tools to work with [FAST Fluent UI](https://www.fast.design/) — Microsoft's web component implementation of the Fluent design system, built on the FAST foundation.
 
 ## Prerequisites
 
@@ -36,9 +36,9 @@ Add to your `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "wc-mcp": {
+    "wc-tools": {
       "command": "npx",
-      "args": ["wc-mcp"],
+      "args": ["wc-tools"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/path/to/your/fast-project"
       }
@@ -47,11 +47,11 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-## Example: Claude Using wc-mcp with FAST Fluent UI
+## Example: Claude Using wc-tools with FAST Fluent UI
 
 **Prompt:** "I need a data grid that supports sorting. Which Fluent UI component should I use and how do I set it up?"
 
-**Claude's response (powered by wc-mcp):**
+**Claude's response (powered by wc-tools):**
 
 > Use `fluent-data-grid` with `fluent-data-grid-row` and `fluent-data-grid-cell` for full sorting support:
 >

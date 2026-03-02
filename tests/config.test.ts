@@ -9,7 +9,7 @@ describe('loadConfig', () => {
 
   beforeEach(() => {
     vi.unstubAllEnvs();
-    tmpDir = mkdtempSync(join(tmpdir(), 'wc-mcp-test-'));
+    tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-test-'));
   });
 
   afterEach(() => {
@@ -106,7 +106,7 @@ describe('loadConfig', () => {
       try {
         expect(() => loadConfig()).not.toThrow();
         expect(stderrSpy).toHaveBeenCalledWith(
-          '[wc-mcp] Warning: mcpwc.config.json is malformed. Using defaults.\n',
+          '[wc-tools] Warning: mcpwc.config.json is malformed. Using defaults.\n',
         );
       } finally {
         stderrSpy.mockRestore();
@@ -231,7 +231,7 @@ describe('loadConfig', () => {
         }),
       );
 
-      const envRoot = mkdtempSync(join(tmpdir(), 'wc-mcp-test-env-'));
+      const envRoot = mkdtempSync(join(tmpdir(), 'wc-tools-test-env-'));
       try {
         vi.stubEnv('MCP_WC_PROJECT_ROOT', envRoot);
         vi.stubEnv('MCP_WC_CEM_PATH', 'env-cem.json');

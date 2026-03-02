@@ -1,6 +1,6 @@
-# wc-mcp + Stencil
+# wc-tools + Stencil
 
-This example configures wc-mcp to work with a [Stencil](https://stenciljs.com/) component library.
+This example configures wc-tools to work with a [Stencil](https://stenciljs.com/) component library.
 
 ## Prerequisites
 
@@ -56,9 +56,9 @@ Add to your `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "wc-mcp": {
+    "wc-tools": {
       "command": "npx",
-      "args": ["wc-mcp"],
+      "args": ["wc-tools"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/path/to/your/stencil-project"
       }
@@ -67,11 +67,11 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-## Example: Claude Using wc-mcp with Stencil
+## Example: Claude Using wc-tools with Stencil
 
 **Prompt:** "What props does my-button accept and what are the valid values for its `variant` attribute?"
 
-**Claude's response (powered by wc-mcp):**
+**Claude's response (powered by wc-tools):**
 
 > The `my-button` component accepts the following props:
 >

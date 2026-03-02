@@ -1,12 +1,12 @@
-# Contributing to wc-mcp
+# Contributing to wc-tools
 
 Thank you for your interest in contributing! This guide covers everything you need to get started.
 
 ## Development Setup
 
 ```bash
-git clone https://github.com/your-org/wc-mcp.git
-cd wc-mcp
+git clone https://github.com/your-org/wc-tools.git
+cd wc-tools
 pnpm install
 pnpm test
 pnpm run build
@@ -20,7 +20,7 @@ pnpm run build
 ## Project Structure
 
 ```
-wc-mcp/
+wc-tools/
 ├── src/
 │   ├── index.ts              # Server entry point, tool dispatch
 │   ├── config.ts             # Config loading (env vars → file → defaults)

@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        wc-mcp aims to support any library that ships a Custom Elements Manifest. Use this template to request first-class support or report compatibility issues with a specific framework.
+        wc-tools aims to support any library that ships a Custom Elements Manifest. Use this template to request first-class support or report compatibility issues with a specific framework.
 
   - type: input
     id: framework-name

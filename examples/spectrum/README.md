@@ -1,6 +1,6 @@
-# wc-mcp + Adobe Spectrum Web Components
+# wc-tools + Adobe Spectrum Web Components
 
-This example configures wc-mcp to work with [Adobe Spectrum Web Components](https://opensource.adobe.com/spectrum-web-components/) — Adobe's design system implementation as web components.
+This example configures wc-tools to work with [Adobe Spectrum Web Components](https://opensource.adobe.com/spectrum-web-components/) — Adobe's design system implementation as web components.
 
 Spectrum is a **multi-package monorepo** where each component is published separately (e.g., `@spectrum-web-components/button`, `@spectrum-web-components/dialog`). The `@spectrum-web-components/bundle` package re-exports everything and ships a combined CEM file, making it the easiest starting point.
 
@@ -62,9 +62,9 @@ Add to your `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "wc-mcp": {
+    "wc-tools": {
       "command": "npx",
-      "args": ["wc-mcp"],
+      "args": ["wc-tools"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/path/to/your/spectrum-project"
       }
@@ -73,11 +73,11 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-## Example: Claude Using wc-mcp with Spectrum
+## Example: Claude Using wc-tools with Spectrum
 
 **Prompt:** "How do I build an accessible modal dialog with Spectrum Web Components?"
 
-**Claude's response (powered by wc-mcp):**
+**Claude's response (powered by wc-tools):**
 
 > Use `sp-dialog-wrapper` (handles the overlay + dismiss behavior) or the lower-level `sp-dialog` inside `sp-overlay`:
 >

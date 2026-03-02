@@ -6,7 +6,7 @@ import { discoverCemPath, FRIENDLY_CEM_ERROR } from '../src/shared/discovery.js'
 import { loadConfig } from '../src/config.js';
 
 function createTmpDir(): string {
-  return mkdtempSync(join(tmpdir(), 'wc-mcp-discovery-test-'));
+  return mkdtempSync(join(tmpdir(), 'wc-tools-discovery-test-'));
 }
 
 function createCemFile(dir: string, relativePath: string): void {
@@ -101,7 +101,7 @@ describe('discoverCemPath', () => {
       discoverCemPath(tmpDir);
       expect(stderrSpy).toHaveBeenCalledOnce();
       const message = String(stderrSpy.mock.calls[0][0]);
-      expect(message).toContain('[wc-mcp] Warning: Multiple custom-elements.json files found');
+      expect(message).toContain('[wc-tools] Warning: Multiple custom-elements.json files found');
       expect(message).toContain('custom-elements.json');
       expect(message).toContain('dist/custom-elements.json');
     } finally {

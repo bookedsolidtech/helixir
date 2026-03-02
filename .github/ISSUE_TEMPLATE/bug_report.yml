@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a bug or unexpected behavior in wc-mcp
+description: Report a bug or unexpected behavior in wc-tools
 labels: ['bug']
 body:
   - type: markdown
@@ -8,10 +8,10 @@ body:
         Thanks for taking the time to report a bug. Please fill out the fields below to help us diagnose the issue quickly.
 
   - type: input
-    id: wc-mcp-version
+    id: wc-tools-version
     attributes:
-      label: wc-mcp version
-      description: Run `wc-mcp --version` or check your package.json
+      label: wc-tools version
+      description: Run `wc-tools --version` or check your package.json
       placeholder: '0.1.0'
     validations:
       required: true

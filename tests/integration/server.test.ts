@@ -108,7 +108,7 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
         id,
         result: {
           protocolVersion: expect.any(String),
-          serverInfo: { name: 'wc-mcp', version: '0.1.0' },
+          serverInfo: { name: 'wc-tools', version: '0.1.0' },
           capabilities: expect.any(Object),
         },
       });

@@ -73,17 +73,17 @@ function startCemWatcher(cemAbsPath: string): void {
       try {
         const { componentCount } = loadCem(cemAbsPath);
         process.stderr.write(
-          `[wc-mcp] CEM reloaded: ${componentCount} components (was ${prevCount})\n`,
+          `[wc-tools] CEM reloaded: ${componentCount} components (was ${prevCount})\n`,
         );
         prevCount = componentCount;
       } catch (err) {
-        process.stderr.write(`[wc-mcp] CEM reload failed: ${String(err)}\n`);
+        process.stderr.write(`[wc-tools] CEM reload failed: ${String(err)}\n`);
       }
     }, 100);
   });
 }
 
-const server = new Server({ name: 'wc-mcp', version: '0.1.0' }, { capabilities: { tools: {} } });
+const server = new Server({ name: 'wc-tools', version: '0.1.0' }, { capabilities: { tools: {} } });
 
 async function main(): Promise<void> {
   const config = loadConfig();
@@ -162,7 +162,7 @@ async function main(): Promise<void> {
           return createErrorResponse(
             'TypeScript diagnostics require TypeScript to be installed.\n' +
               'Run: npm install typescript --save-dev\n' +
-              'Then restart wc-mcp.',
+              'Then restart wc-tools.',
           );
         }
         return handleTypeScriptCall(name, typedArgs, config);

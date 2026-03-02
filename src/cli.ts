@@ -145,9 +145,9 @@ export async function runInit(projectRoot: string = process.cwd()): Promise<void
     // Step 5: Print copy-paste snippets
     const snippet = {
       mcpServers: {
-        'wc-mcp': {
+        'wc-tools': {
           command: 'npx',
-          args: ['wc-mcp'],
+          args: ['wc-tools'],
           cwd: projectRoot,
         },
       },

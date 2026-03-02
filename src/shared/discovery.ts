@@ -55,7 +55,7 @@ export function discoverCemPath(projectRoot: string): string | null {
 
   if (found.length > 1) {
     process.stderr.write(
-      `[wc-mcp] Warning: Multiple custom-elements.json files found. Using first: ${found[0]}\n` +
+      `[wc-tools] Warning: Multiple custom-elements.json files found. Using first: ${found[0]}\n` +
         `  Candidates: ${found.join(', ')}\n` +
         `  Set cemPath in mcpwc.config.json to suppress this warning.\n`,
     );

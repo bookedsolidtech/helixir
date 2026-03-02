@@ -1,5 +1,5 @@
 name: Feature Request
-description: Propose a new tool or capability for wc-mcp
+description: Propose a new tool or capability for wc-tools
 labels: ['enhancement']
 body:
   - type: markdown

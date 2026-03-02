@@ -1,4 +1,4 @@
-# wc-mcp v0.1.0 Launch Readiness Report
+# wc-tools v0.1.0 Launch Readiness Report
 
 Generated: 2026-03-02T04:00:00Z
 Status: READY

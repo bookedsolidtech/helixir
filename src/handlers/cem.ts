@@ -38,6 +38,12 @@ const CemCssPropertySchema = z.object({
   description: z.string().optional(),
 });
 
+const CemReferenceSchema = z.object({
+  name: z.string(),
+  package: z.string().optional(),
+  module: z.string().optional(),
+});
+
 const CemDeclarationSchema = z.object({
   kind: z.string(),
   name: z.string(),
@@ -48,12 +54,14 @@ const CemDeclarationSchema = z.object({
   slots: z.array(CemSlotSchema).optional(),
   cssParts: z.array(CemCssPartSchema).optional(),
   cssProperties: z.array(CemCssPropertySchema).optional(),
+  references: z.array(CemReferenceSchema).optional(),
 });
 
 const CemModuleSchema = z.object({
   kind: z.string(),
   path: z.string(),
   declarations: z.array(CemDeclarationSchema).optional(),
+  references: z.array(CemReferenceSchema).optional(),
 });
 
 export const CemSchema = z.object({

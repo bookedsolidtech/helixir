@@ -3,9 +3,7 @@
   "description": "TDD starts here — fixtures before handlers. Create tests/__fixtures__/ with synthetic JSON files that exercise all code paths. Do NOT copy from any specific project — write fixtures that represent any generic web component library. Required: custom-elements.json with 3 components (e.g. my-button, my-card, my-select) covering: members with descriptions, members without descriptions (for validateCompleteness), events with type annotations, events without (edge case), slots, CSS parts, CSS custom properties. tokens.json in W3C DTCG format with color, spacing, and typography categories. health-history/ with JSON score files for 2 components across multiple dates (for trend and diff tests). These fixtures define what the handlers must produce — write them first.",
   "title": "Create test fixtures (CEM, tokens, health history)",
   "status": "done",
-  "dependencies": [
-    "feature-1772252040574-z91y08glf"
-  ],
+  "dependencies": [],
   "epicId": "feature-1772252025617-0gjkoppe7",
   "complexity": "small",
   "priority": 1,

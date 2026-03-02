@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "The critical path. Implement src/handlers/cem.ts per the specifications in planning.md. parseCem(tagName, config): reads CEM from config.cemPath via SafeFileOperations, resolves the component by tag name, returns typed metadata (members, events, slots, cssProperties, cssParts). Throws MCPError NOT_FOUND if component missing. validateCompleteness(tagName, config): checks CEM coverage, returns score 0-100 with issues list. listAllComponents(config): reads CEM, returns all component tag names. diffCem(tagName, baseBranch, config): uses GitOperations.withBranch to read CEM on base branch, compares against current branch — removed properties, changed types, removed events are BREAKING. Component that exists only on current branch (new): flag as NEW, not breaking. TDD: write tests/handlers/cem.test.ts FIRST using fixture custom-elements.json. Cover: happy path, missing component, incomplete docs, breaking removal, new component. Target 100% coverage.",
   "title": "CEM handler — parseCem, validateCompleteness, listAllComponents, diffCem",
-  "status": "blocked",
+  "status": "in_progress",
   "dependencies": [
     "feature-1772252089963-q8o5bskqw",
     "feature-1772252078168-36ly43daj"
@@ -110,6 +110,131 @@
       "from": "in_progress",
       "to": "blocked",
       "timestamp": "2026-03-01T07:32:40.436Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-02T05:48:18.584Z"
+    },
+    {
+      "from": "backlog",
+      "to": "blocked",
+      "timestamp": "2026-03-02T05:50:46.139Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-02T05:50:47.248Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-02T05:50:47.263Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-02T05:51:32.770Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-02T05:51:48.859Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-02T05:51:48.872Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-02T05:51:55.974Z"
+    },
+    {
+      "from": "backlog",
+      "to": "blocked",
+      "timestamp": "2026-03-02T05:52:51.262Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-02T05:52:54.665Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-02T05:52:54.683Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-02T05:54:26.984Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-02T05:54:29.824Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-02T05:54:29.832Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-02T05:54:34.553Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-02T05:54:37.694Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-02T05:54:37.709Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-02T05:55:18.777Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-02T05:55:38.405Z"
+    },
+    {
+      "from": "backlog",
+      "to": "blocked",
+      "timestamp": "2026-03-02T05:55:52.126Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-02T05:55:56.320Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-02T05:55:56.329Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-02T05:55:59.243Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-02T05:56:01.956Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-02T05:56:01.965Z"
     }
   ],
   "featureType": "code"

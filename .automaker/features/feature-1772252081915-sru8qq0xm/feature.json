@@ -3,9 +3,7 @@
   "description": "Implement 5 utility modules in src/shared/ per the specs in CLAUDE.md. git.ts: GitOperations class with withBranch(branch, fn) that stashes, checks out, runs fn, restores — used by diff tools. file-ops.ts: SafeFileOperations with readJSON using Zod schema validation and fileExists. error-handling.ts: MCPError extending Error with category field, ErrorCategory enum (VALIDATION, NOT_FOUND, GIT, FILESYSTEM, UNKNOWN), handleToolError wrapper. mcp-helpers.ts: createSuccessResponse and createErrorResponse matching MCP SDK content format. validation.ts: TagNameSchema factory function accepting componentPrefix config (empty string accepts any tag name), FilePathSchema using Zod that rejects path traversal (..) and absolute paths. Write tests for validation.ts FIRST — TagNameSchema with custom prefix, empty prefix, invalid tag; FilePathSchema rejecting traversal and absolute paths. Path security tests are critical.",
   "title": "Implement shared utilities (src/shared/)",
   "status": "done",
-  "dependencies": [
-    "feature-1772252040574-z91y08glf"
-  ],
+  "dependencies": [],
   "epicId": "feature-1772252025617-0gjkoppe7",
   "complexity": "medium",
   "priority": 1,

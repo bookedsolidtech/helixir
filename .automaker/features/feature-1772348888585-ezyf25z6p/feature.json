@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Problem\n`src/handlers/health.ts` defines its own loose interface types for CEM entities (lines 11-41): `CemMember`, `CemEvent`, `CemSlot`, `CemCssPart`, `CemDeclaration`. These are SEPARATE from the Zod-validated types in `src/handlers/cem.ts`. Two different type systems for the same domain objects.\n\nWhen `cem.ts` types evolve (adding a new CEM field), `health.ts` won't see the change. Additionally, `CemDeclaration` in `health.ts` has `tagName: string` (required) while the Zod schema in `cem.ts` has `tagName: z.string().optional()` — these are inconsistent.\n\n## Fix\n1. Extract CEM types to `src/types/cem.ts` (or export inferred Zod types from `cem.ts`)\n2. Replace the manually-defined interfaces in `health.ts` with imports from the shared location\n3. Decide whether `tagName` is required or optional and enforce consistently\n4. Ensure `scoreCemFallback` and `scoreComponent` use the same `CemDeclaration` type the CEM handler produces\n\n## Acceptance Criteria\n- No duplicate type definitions for CEM entities across the codebase\n- Types derived from a single source of truth (Zod inference preferred)\n- All 131 existing tests still pass\n- TypeScript type-check passes clean",
   "title": "Eliminate duplicate CEM type definitions across cem.ts and health.ts",
-  "status": "backlog",
+  "status": "done",
   "epicId": "feature-1772252025617-0gjkoppe7",
   "complexity": "small",
   "priority": 2,
@@ -27,5 +27,23 @@
       "timestamp": "2026-03-01T07:08:08.585Z",
       "reason": "Feature created"
     }
-  ]
+  ],
+  "updatedAt": "2026-03-02T05:55:52.711Z",
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 0.6007082500000002,
+  "lastSessionId": "6156132e-c1e7-4e80-8bc0-0923a40024f2",
+  "executionHistory": [
+    {
+      "id": "c5ac1f83-484d-4453-8497-c1fb84a31014",
+      "startedAt": "2026-03-02T05:53:51.534Z",
+      "completedAt": "2026-03-02T05:55:52.723Z",
+      "durationMs": 121189,
+      "costUsd": 0.6007082500000002,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Eliminate duplicate CEM type definitions across cem.ts and health.ts\n\n### Changes Implemented\n- No code changes were required — the feature was already fully implemented in the initial project commit.\n\n### Files Modified\n- None (already complete)\n\n### Verification Results\n- **Build**: `pnpm run build` exits 0, TypeScript compiles clean\n- **Tests**: `health.test.ts` (29 tests) + `cem.test.ts` (36 tests) = 65/65 passing\n- **Git diff**: `src/handlers/cem.ts` shows only the addition of `CemReferenceSchema` and `references` fields (unrelated to this feature's scope)\n\n### Current State Matches All Acceptance Criteria\n1. ✅ `health.ts` imports `CemDeclaration` from `cem.ts` (line 6: `import type { Cem, CemDeclaration } from './cem.js'`)\n2. ✅ `cem.ts` exports Zod-inferred types: `CemMember`, `CemEvent`, `CemSlot`, `CemCssPart`, `CemDeclaration`\n3. ✅ No duplicate CEM entity interface definitions anywhere — single source of truth\n4. ✅ `tagName` is consistently optional (Zod schema + `?? ''` fallback in `scoreCemFallback`)\n5. ✅ `scoreCemFallback` and `scoreComponent` both use the shared `CemDeclaration` type\n\n### Risks/Blockers Encountered\n- None\n\n### Learnings\n- The 118 failing tests in the broader suite are pre-existing failures in unrelated new handler files (`adversarial`, `cdn`, `cem-monorepo`, `find-components-by-token`, etc.) — not caused by this feature\n\n### Notes for Developer\n- The feature board item can be marked `done` — all acceptance criteria were satisfied in the initial commit (`9d89401`)\n- The 118 failing tests are in new handler files added after the initial commit and represent unimplemented functionality tracked in separate features\n\n### Verification Status\n- Playwright not applicable — this is a server-side TypeScript library with no browser UI\n- Verified via TypeScript build (`tsc`) and Vitest unit tests for the directly relevant test files"
 }

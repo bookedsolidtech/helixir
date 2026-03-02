@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Implement src/handlers/tokens.ts and src/tools/tokens.ts. Token tools are only registered when config.tokensPath is set — if null, the tool group is skipped entirely (as shown in planning.md index.ts sketch). Handler reads tokens.json in W3C DTCG format, parses the nested token structure into flat array of {name, value, category, description}. get_design_tokens: optionally filter by category (color, spacing, typography, border-radius etc). find_token: query by value or name pattern using case-insensitive substring match. Write tests/handlers/tokens.test.ts FIRST using fixture tokens.json — test category filtering, find by value substring, find by name pattern, empty results, and graceful error when tokensPath file does not exist.",
   "title": "Token handler and tools — get_design_tokens, find_token",
-  "status": "backlog",
+  "status": "done",
   "dependencies": [
     "feature-1772252089963-q8o5bskqw",
     "feature-1772252078168-36ly43daj"
@@ -31,5 +31,23 @@
       "timestamp": "2026-02-28T04:15:45.147Z",
       "reason": "Feature created"
     }
-  ]
+  ],
+  "updatedAt": "2026-03-02T05:49:31.363Z",
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 0.38722425000000005,
+  "lastSessionId": "dd0800a9-febe-4fef-a2f5-4deeb5e35364",
+  "executionHistory": [
+    {
+      "id": "780fc900-4c54-42f9-b8a4-9f1acac9a35c",
+      "startedAt": "2026-03-02T05:48:21.834Z",
+      "completedAt": "2026-03-02T05:49:31.371Z",
+      "durationMs": 69537,
+      "costUsd": 0.38722425000000005,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Implement src/handlers/tokens.ts and src/tools/tokens.ts\n\n### Changes Implemented\n- No code changes were needed — the implementation was already complete\n\n### Files Modified\n- None (implementation was pre-existing)\n\n### Status\n- `src/handlers/tokens.ts`: Fully implemented — `parseTokens`, `getDesignTokens`, `findToken` with W3C DTCG format parsing, flat array output, category filtering (case-insensitive), and value/name substring matching\n- `src/tools/tokens.ts`: Fully implemented — `TOKEN_TOOL_DEFINITIONS`, `handleTokenCall`, `isTokenTool` with Zod schema validation and proper error handling\n- `tests/handlers/tokens.test.ts`: 22 tests covering all acceptance criteria\n- `tests/__fixtures__/tokens.json`: Fixture with color, spacing, and typography tokens in DTCG format\n\n### Verification Output\n```\n RUN  v3.2.4 /Volumes/Development/booked/wc-mcp\n\n ✓ tests/handlers/tokens.test.ts (22 tests) 6ms\n\n Test Files  1 passed (1)\n      Tests  22 passed (22)\n   Start at  00:48:59\n   Duration  191ms\n```\n\n### Risks/Blockers Encountered\n- Full `pnpm run build` fails due to pre-existing errors in `src/handlers/cdn.ts` (missing `ErrorCategory.NETWORK_ERROR`) and `src/handlers/dependencies.ts` (missing `.references` property). These are unrelated to this feature and were present before this session.\n\n### Learnings\n- The tokens implementation was already complete from a prior session. The `parseTokens` function handles nested DTCG token structures by recursively flattening them using dot-notation paths, with the top-level key as the category.\n- Token tools gated behind `config.tokensPath` — if null, throws a clear error; the feature description's conditional registration (skipping the group entirely) is handled at the server dispatcher level (a separate feature).\n\n### Notes for Developer\n- The `additionalProperties: false` constraint is already included in both tool schemas in `src/tools/tokens.ts` (addresses bug ticket `feature-1772348938604` for these tools)\n- Build failures in `cdn.ts` and `dependencies.ts` need to be resolved by their respective feature implementations\n\n### Verification Status\n- Playwright verification not applicable — this is a pure TypeScript library with no browser/UI component. Verification performed via Vitest (22/22 tests passing)."
 }

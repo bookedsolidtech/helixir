@@ -3,7 +3,9 @@
   "description": "Set up GitHub branch protection on main AFTER the CI workflow is green on at least one PR.\n\n## Rules to apply (via gh CLI or GitHub rulesets API)\n- Require PRs before merging (no direct pushes to main)\n- Squash merge only\n- Required status checks: build, test, format, audit (these match the job names in .github/workflows/ci.yml)\n- Dismiss stale reviews on new commits\n- Require conversation resolution before merge\n- Admin bypass: YES — admins can bypass during early bootstrap. Remove this once CI is reliably green.\n\n## Timing\nThis feature must run AFTER tsconfig.json exists and pnpm run build succeeds on CI. The Automaker dependency chain will handle this — do not start until all Foundation and Scaffold features are done.\n\n## Acceptance Criteria\n- Direct push to main is rejected for non-admins\n- PRs require all 4 checks (build, test, format, audit) to pass\n- Squash is the only merge strategy",
   "title": "Configure branch protection on main",
   "status": "backlog",
-  "dependencies": ["feature-1772251747413-zpuxjcddl", "feature-1772252040574-z91y08glf"],
+  "dependencies": [
+    "feature-1772251747413-zpuxjcddl"
+  ],
   "epicId": "feature-1772251713621-8rwdhp0qc",
   "complexity": "small",
   "priority": 1,

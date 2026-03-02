@@ -157,7 +157,7 @@ describe('handleSafetyCall - check_breaking_changes (aggregation)', () => {
   });
 
   it('aggregates a mix of breaking, non-breaking, and new components', async () => {
-    vi.mocked(listAllComponents).mockResolvedValue(['my-button', 'my-input', 'my-badge']);
+    vi.mocked(listAllComponents).mockReturnValue(['my-button', 'my-input', 'my-badge']);
     vi.mocked(diffCem)
       .mockResolvedValueOnce({ isNew: false, breaking: ['Property removed: size'], additions: [] }) // breaking
       .mockResolvedValueOnce({ isNew: false, breaking: [], additions: ['Property added: label'] }) // non-breaking additions
@@ -185,7 +185,7 @@ describe('handleSafetyCall - check_breaking_changes (aggregation)', () => {
   });
 
   it('shows clean status when no components have breaking changes', async () => {
-    vi.mocked(listAllComponents).mockResolvedValue(['my-button', 'my-input']);
+    vi.mocked(listAllComponents).mockReturnValue(['my-button', 'my-input']);
     vi.mocked(diffCem)
       .mockResolvedValueOnce({ isNew: false, breaking: [], additions: [] })
       .mockResolvedValueOnce({ isNew: false, breaking: [], additions: [] });
@@ -202,7 +202,7 @@ describe('handleSafetyCall - check_breaking_changes (aggregation)', () => {
   });
 
   it('shows a summary count of breaking components', async () => {
-    vi.mocked(listAllComponents).mockResolvedValue(['a', 'b', 'c']);
+    vi.mocked(listAllComponents).mockReturnValue(['a', 'b', 'c']);
     vi.mocked(diffCem)
       .mockResolvedValueOnce({ isNew: false, breaking: ['Property removed: x'], additions: [] })
       .mockResolvedValueOnce({ isNew: false, breaking: ['Event removed: y'], additions: [] })
@@ -221,7 +221,7 @@ describe('handleSafetyCall - check_breaking_changes (aggregation)', () => {
   });
 
   it('handles empty component list gracefully', async () => {
-    vi.mocked(listAllComponents).mockResolvedValue([]);
+    vi.mocked(listAllComponents).mockReturnValue([]);
 
     const result = await handleSafetyCall(
       'check_breaking_changes',

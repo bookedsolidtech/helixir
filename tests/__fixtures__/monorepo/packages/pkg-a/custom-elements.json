@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.0.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/my-button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MyButton",
+          "tagName": "my-button",
+          "description": "A button component from pkg-a"
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/my-input.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MyInput",
+          "tagName": "my-input",
+          "description": "An input component from pkg-a"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "1.0.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "HxButton",
+          "tagName": "hx-button",
+          "description": "A button component.",
+          "members": [],
+          "events": [],
+          "slots": [],
+          "cssParts": [],
+          "cssProperties": []
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/select.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "HxSelect",
+          "tagName": "hx-select",
+          "description": "A select component.",
+          "members": [],
+          "events": [
+            {
+              "name": "hx-change",
+              "type": { "text": "CustomEvent" },
+              "description": "Fired on change."
+            }
+          ],
+          "slots": [],
+          "cssParts": [],
+          "cssProperties": []
+        }
+      ]
+    }
+  ]
+}

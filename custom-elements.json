@@ -1,0 +1,4358 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "build/cli.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "runInit",
+          "parameters": [
+            {
+              "name": "projectRoot",
+              "default": "process.cwd()"
+            }
+          ]
+        },
+        {
+          "kind": "variable",
+          "name": "cemPath"
+        },
+        {
+          "kind": "variable",
+          "name": "tokensPath"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "runInit",
+          "declaration": {
+            "name": "runInit",
+            "module": "build/cli.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/config.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "loadConfig"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "loadConfig",
+          "declaration": {
+            "name": "loadConfig",
+            "module": "build/config.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/index.js",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/cli.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "runInit",
+          "return": {
+            "type": {
+              "text": "Promise<void>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "projectRoot",
+              "default": "process.cwd()",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "variable",
+          "name": "cemPath",
+          "type": {
+            "text": "string"
+          }
+        },
+        {
+          "kind": "variable",
+          "name": "tokensPath"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "runInit",
+          "declaration": {
+            "name": "runInit",
+            "module": "src/cli.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/config.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "loadConfig",
+          "return": {
+            "type": {
+              "text": "McpWcConfig"
+            }
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "loadConfig",
+          "declaration": {
+            "name": "loadConfig",
+            "module": "src/config.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/handlers/accessibility.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "analyzeAccessibility",
+          "parameters": [
+            {
+              "name": "decl"
+            }
+          ],
+          "description": "Analyzes accessibility profile of a single CEM component declaration.\n\nScoring weights (total: 100):\n  hasAriaRole:             20 — ARIA role in cssProperties or description\n  hasAriaAttributes:       15 — properties named aria-*\n  hasFormAssociation:      10 — formAssociated field or internals property\n  hasKeyboardEvents:       10 — keydown/keyup/keypress events listed\n  hasFocusMethod:          15 — exposes focus() method\n  hasDisabled:             15 — has disabled property\n  hasLabelSupport:         10 — slot named \"label\" or property named \"label\"\n  accessibilityDescription: 5 — description mentions accessibility terms"
+        },
+        {
+          "kind": "function",
+          "name": "analyzeAllAccessibility",
+          "parameters": [
+            {
+              "name": "decls"
+            }
+          ],
+          "description": "Analyzes accessibility for all components in a list of CEM declarations.\nSkips declarations without a tagName."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "analyzeAccessibility",
+          "declaration": {
+            "name": "analyzeAccessibility",
+            "module": "build/handlers/accessibility.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "analyzeAllAccessibility",
+          "declaration": {
+            "name": "analyzeAllAccessibility",
+            "module": "build/handlers/accessibility.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/handlers/benchmark.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "BenchmarkLibrariesArgsSchema"
+        },
+        {
+          "kind": "function",
+          "name": "benchmarkLibraries",
+          "parameters": [
+            {
+              "name": "libraries"
+            },
+            {
+              "name": "config"
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "BenchmarkLibrariesArgsSchema",
+          "declaration": {
+            "name": "BenchmarkLibrariesArgsSchema",
+            "module": "build/handlers/benchmark.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "benchmarkLibraries",
+          "declaration": {
+            "name": "benchmarkLibraries",
+            "module": "build/handlers/benchmark.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/handlers/cdn.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "resolveCdnCem",
+          "parameters": [
+            {
+              "name": "pkg"
+            },
+            {
+              "name": "version"
+            },
+            {
+              "name": "registry"
+            },
+            {
+              "name": "config"
+            }
+          ],
+          "description": "Fetches and caches a library's Custom Elements Manifest from a CDN registry."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "resolveCdnCem",
+          "declaration": {
+            "name": "resolveCdnCem",
+            "module": "build/handlers/cdn.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/handlers/cem.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "CemSchema"
+        },
+        {
+          "kind": "function",
+          "name": "parseCem",
+          "parameters": [
+            {
+              "name": "tagName"
+            },
+            {
+              "name": "cem"
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "validateCompleteness",
+          "parameters": [
+            {
+              "name": "tagName"
+            },
+            {
+              "name": "cem"
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "mergeCems",
+          "parameters": [
+            {
+              "name": "cems"
+            }
+          ],
+          "description": "Merge multiple CEMs (one per package) into a single unified Cem.\nIf two packages define the same tagName, both are kept with the tagName\nprefixed as `packageName:tagName` to avoid collisions."
+        },
+        {
+          "kind": "function",
+          "name": "listAllEvents",
+          "parameters": [
+            {
+              "name": "cem"
+            },
+            {
+              "name": "tagName"
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "listAllSlots",
+          "parameters": [
+            {
+              "name": "cem"
+            },
+            {
+              "name": "tagName"
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "listAllCssParts",
+          "parameters": [
+            {
+              "name": "cem"
+            },
+            {
+              "name": "tagName"
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "listAllComponents",
+          "parameters": [
+            {
+              "name": "cem"
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "diffCem",
+          "parameters": [
+            {
+              "name": "tagName"
+            },
+            {
+              "name": "baseBranch"
+            },
+            {
+              "name": "config"
+            },
+            {
+              "name": "cem"
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CemSchema",
+          "declaration": {
+            "name": "CemSchema",
+            "module": "build/handlers/cem.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "parseCem",
+          "declaration": {
+            "name": "parseCem",
+            "module": "build/handlers/cem.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "validateCompleteness",
+          "declaration": {
+            "name": "validateCompleteness",
+            "module": "build/handlers/cem.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "mergeCems",
+          "declaration": {
+            "name": "mergeCems",
+            "module": "build/handlers/cem.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "listAllEvents",
+          "declaration": {
+            "name": "listAllEvents",
+            "module": "build/handlers/cem.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "listAllSlots",
+          "declaration": {
+            "name": "listAllSlots",
+            "module": "build/handlers/cem.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "listAllCssParts",
+          "declaration": {
+            "name": "listAllCssParts",
+            "module": "build/handlers/cem.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "listAllComponents",
+          "declaration": {
+            "name": "listAllComponents",
+            "module": "build/handlers/cem.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "diffCem",
+          "declaration": {
+            "name": "diffCem",
+            "module": "build/handlers/cem.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/handlers/compare.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "CompareLibrariesArgsSchema"
+        },
+        {
+          "kind": "function",
+          "name": "compareLibraries",
+          "parameters": [
+            {
+              "name": "args"
+            },
+            {
+              "name": "config"
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CompareLibrariesArgsSchema",
+          "declaration": {
+            "name": "CompareLibrariesArgsSchema",
+            "module": "build/handlers/compare.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "compareLibraries",
+          "declaration": {
+            "name": "compareLibraries",
+            "module": "build/handlers/compare.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/handlers/framework.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "detectFramework",
+          "parameters": [
+            {
+              "name": "config"
+            }
+          ]
+        },
+        {
+          "kind": "variable",
+          "name": "framework",
+          "type": {
+            "text": "null"
+          },
+          "default": "null"
+        },
+        {
+          "kind": "variable",
+          "name": "version",
+          "type": {
+            "text": "null"
+          },
+          "default": "null"
+        },
+        {
+          "kind": "variable",
+          "name": "cemGenerator",
+          "type": {
+            "text": "null"
+          },
+          "default": "null"
+        },
+        {
+          "kind": "variable",
+          "name": "notes"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "detectFramework",
+          "declaration": {
+            "name": "detectFramework",
+            "module": "build/handlers/framework.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/handlers/health.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "scoreCemFallback",
+          "parameters": [
+            {
+              "name": "decl"
+            }
+          ],
+          "description": "Computes a CEM-derived documentation health score from 6 dimensions.\nUsed as a fallback when no pre-computed history files are available.\n\nMax score: 100\n  - description present:              +15\n  - all properties have descriptions: +25\n  - all events have type annotations: +20\n  - all events have descriptions:     +15\n  - CSS parts documented:             +15\n  - slots documented:                 +10"
+        },
+        {
+          "kind": "function",
+          "name": "scoreComponent",
+          "parameters": [
+            {
+              "name": "config"
+            },
+            {
+              "name": "tagName"
+            },
+            {
+              "name": "cemDecl"
+            }
+          ],
+          "description": "Returns the latest health score for a component.\nReads from pre-computed history files in healthHistoryDir/{tagName}/.\nFalls back to CEM-derived scoring when no history exists."
+        },
+        {
+          "kind": "function",
+          "name": "scoreAllComponents",
+          "parameters": [
+            {
+              "name": "config"
+            },
+            {
+              "name": "cemDeclarations"
+            }
+          ],
+          "description": "Scores every component in the provided CEM declarations.\nUses history files when available; falls back to CEM-derived scoring."
+        },
+        {
+          "kind": "function",
+          "name": "getHealthTrend",
+          "parameters": [
+            {
+              "name": "config"
+            },
+            {
+              "name": "tagName"
+            },
+            {
+              "name": "days",
+              "default": "7"
+            }
+          ],
+          "description": "Returns the health trend for a component over the last N days.\nReads per-component history files sorted by date.\nSingle data point always reports as 'stable'."
+        },
+        {
+          "kind": "function",
+          "name": "getHealthDiff",
+          "parameters": [
+            {
+              "name": "config"
+            },
+            {
+              "name": "tagName"
+            },
+            {
+              "name": "baseBranch",
+              "default": "'main'"
+            },
+            {
+              "name": "cemDecl"
+            },
+            {
+              "name": "gitOps"
+            }
+          ],
+          "description": "Compares component health between the current branch and a base branch.\nReads the base branch CEM via `git show` — no stash, no checkout, no working-tree mutation.\nBase health is derived by running scoreCemFallback against the base branch's CEM declaration."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "scoreCemFallback",
+          "declaration": {
+            "name": "scoreCemFallback",
+            "module": "build/handlers/health.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "scoreComponent",
+          "declaration": {
+            "name": "scoreComponent",
+            "module": "build/handlers/health.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "scoreAllComponents",
+          "declaration": {
+            "name": "scoreAllComponents",
+            "module": "build/handlers/health.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getHealthTrend",
+          "declaration": {
+            "name": "getHealthTrend",
+            "module": "build/handlers/health.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getHealthDiff",
+          "declaration": {
+            "name": "getHealthDiff",
+            "module": "build/handlers/health.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/handlers/migration.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "generateMigrationGuide",
+          "parameters": [
+            {
+              "name": "tagName"
+            },
+            {
+              "name": "baseBranch"
+            },
+            {
+              "name": "config"
+            },
+            {
+              "name": "cem"
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "generateMigrationGuide",
+          "declaration": {
+            "name": "generateMigrationGuide",
+            "module": "build/handlers/migration.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/handlers/narrative.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "buildNarrative",
+          "parameters": [
+            {
+              "name": "meta"
+            }
+          ],
+          "description": "Synthesizes a human-readable narrative prose description from a CEM declaration.\nReturns 3-5 paragraph markdown suitable for LLM consumption."
+        },
+        {
+          "kind": "function",
+          "name": "getComponentNarrative",
+          "parameters": [
+            {
+              "name": "tagName"
+            },
+            {
+              "name": "cem"
+            }
+          ],
+          "description": "Fetches a component's CEM metadata and returns a narrative prose description."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "buildNarrative",
+          "declaration": {
+            "name": "buildNarrative",
+            "module": "build/handlers/narrative.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getComponentNarrative",
+          "declaration": {
+            "name": "getComponentNarrative",
+            "module": "build/handlers/narrative.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/handlers/story.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "generateStory",
+          "parameters": [
+            {
+              "name": "decl"
+            },
+            {
+              "name": "format",
+              "default": "'csf3'"
+            }
+          ],
+          "description": "Generates a complete Storybook CSF3 story file for a web component based on its CEM declaration.\nReturns a string of TypeScript source ready to paste into a .stories.ts file."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "generateStory",
+          "declaration": {
+            "name": "generateStory",
+            "module": "build/handlers/story.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/handlers/suggest.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "suggestUsage",
+          "parameters": [
+            {
+              "name": "tagName"
+            },
+            {
+              "name": "config"
+            },
+            {
+              "name": "cem"
+            }
+          ],
+          "description": "Synthesizes a usage HTML snippet from a component's CEM member list.\nAttributes with union types show the first option as the default value.\nBoolean attributes are listed as optional and omitted from the snippet by default.\nFields without defaults and with concrete non-boolean types are listed as required."
+        },
+        {
+          "kind": "function",
+          "name": "generateImport",
+          "parameters": [
+            {
+              "name": "tagName"
+            },
+            {
+              "name": "config"
+            },
+            {
+              "name": "cem"
+            }
+          ],
+          "description": "Generates import statements for a component by reading the CEM exports field\nand the project's package.json.\n\nReturns both a side-effect import and a named import."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "suggestUsage",
+          "declaration": {
+            "name": "suggestUsage",
+            "module": "build/handlers/suggest.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "generateImport",
+          "declaration": {
+            "name": "generateImport",
+            "module": "build/handlers/suggest.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/handlers/tokens.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "parseTokens",
+          "parameters": [
+            {
+              "name": "filePath"
+            }
+          ],
+          "description": "Reads a W3C DTCG-format tokens.json file and returns a flat array of tokens.\nThrows if the file does not exist or cannot be parsed."
+        },
+        {
+          "kind": "function",
+          "name": "getDesignTokens",
+          "parameters": [
+            {
+              "name": "config"
+            },
+            {
+              "name": "category"
+            }
+          ],
+          "description": "Returns all design tokens, optionally filtered by category (top-level group name).\nCategory matching is case-insensitive."
+        },
+        {
+          "kind": "function",
+          "name": "findToken",
+          "parameters": [
+            {
+              "name": "config"
+            },
+            {
+              "name": "query"
+            }
+          ],
+          "description": "Finds tokens whose name or value (as string) contains the query as a\ncase-insensitive substring."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "parseTokens",
+          "declaration": {
+            "name": "parseTokens",
+            "module": "build/handlers/tokens.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getDesignTokens",
+          "declaration": {
+            "name": "getDesignTokens",
+            "module": "build/handlers/tokens.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "findToken",
+          "declaration": {
+            "name": "findToken",
+            "module": "build/handlers/tokens.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/handlers/typescript.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "isTypescriptAvailable"
+        },
+        {
+          "kind": "function",
+          "name": "getFileDiagnostics",
+          "parameters": [
+            {
+              "name": "config"
+            },
+            {
+              "name": "filePath"
+            }
+          ],
+          "description": "Run TypeScript diagnostics on a single file.\nfilePath must pass FilePathSchema validation (no path traversal, no absolute paths)."
+        },
+        {
+          "kind": "function",
+          "name": "getProjectDiagnostics",
+          "parameters": [
+            {
+              "name": "config"
+            }
+          ],
+          "description": "Run a full TypeScript diagnostic pass on the entire project.\nReturns error and warning counts along with the full diagnostic arrays."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "isTypescriptAvailable",
+          "declaration": {
+            "name": "isTypescriptAvailable",
+            "module": "build/handlers/typescript.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getFileDiagnostics",
+          "declaration": {
+            "name": "getFileDiagnostics",
+            "module": "build/handlers/typescript.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getProjectDiagnostics",
+          "declaration": {
+            "name": "getProjectDiagnostics",
+            "module": "build/handlers/typescript.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/handlers/validate.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "validateUsage",
+          "parameters": [
+            {
+              "name": "tagName"
+            },
+            {
+              "name": "html"
+            },
+            {
+              "name": "cem"
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "validateUsage",
+          "declaration": {
+            "name": "validateUsage",
+            "module": "build/handlers/validate.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/shared/discovery.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "discoverCemPath",
+          "parameters": [
+            {
+              "name": "projectRoot"
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "resolveGlobCemPaths",
+          "parameters": [
+            {
+              "name": "patterns"
+            },
+            {
+              "name": "projectRoot"
+            }
+          ],
+          "description": "Resolve one or more glob patterns (supporting single `*` wildcard) relative\nto `projectRoot` and return all matching CEM file paths (relative to root)."
+        },
+        {
+          "kind": "variable",
+          "name": "FRIENDLY_CEM_ERROR"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "discoverCemPath",
+          "declaration": {
+            "name": "discoverCemPath",
+            "module": "build/shared/discovery.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "resolveGlobCemPaths",
+          "declaration": {
+            "name": "resolveGlobCemPaths",
+            "module": "build/shared/discovery.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FRIENDLY_CEM_ERROR",
+          "declaration": {
+            "name": "FRIENDLY_CEM_ERROR",
+            "module": "build/shared/discovery.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/shared/error-handling.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "ErrorCategory"
+        },
+        {
+          "kind": "class",
+          "description": "",
+          "name": "MCPError",
+          "members": [
+            {
+              "kind": "field",
+              "name": "category",
+              "default": "category"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "'MCPError'"
+            }
+          ],
+          "superclass": {
+            "name": "Error",
+            "module": "build/shared/error-handling.js"
+          }
+        },
+        {
+          "kind": "function",
+          "name": "handleToolError",
+          "parameters": [
+            {
+              "name": "error"
+            }
+          ],
+          "description": "Wraps an unknown thrown value into an MCPError with an appropriate category."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "ErrorCategory",
+          "declaration": {
+            "name": "ErrorCategory",
+            "module": "build/shared/error-handling.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "MCPError",
+          "declaration": {
+            "name": "MCPError",
+            "module": "build/shared/error-handling.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleToolError",
+          "declaration": {
+            "name": "handleToolError",
+            "module": "build/shared/error-handling.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/shared/file-ops.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "SafeFileOperations",
+          "members": [
+            {
+              "kind": "method",
+              "name": "readJSON",
+              "parameters": [
+                {
+                  "name": "filePath"
+                },
+                {
+                  "name": "schema"
+                }
+              ],
+              "description": "Reads and parses a JSON file, then validates it against the provided Zod schema."
+            },
+            {
+              "kind": "method",
+              "name": "fileExists",
+              "parameters": [
+                {
+                  "name": "filePath"
+                }
+              ],
+              "description": "Returns true if the file exists and is accessible, false otherwise."
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "SafeFileOperations",
+          "declaration": {
+            "name": "SafeFileOperations",
+            "module": "build/shared/file-ops.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/shared/git.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "GitOperations",
+          "members": [
+            {
+              "kind": "method",
+              "name": "gitShow",
+              "parameters": [
+                {
+                  "name": "ref"
+                },
+                {
+                  "name": "filePath"
+                }
+              ],
+              "description": "Reads file content at a specific git ref without modifying the working tree.\nUses `git show <ref>:<filePath>` to read content from another branch/commit.\nThe filePath must be relative to the git repository root."
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "GitOperations",
+          "declaration": {
+            "name": "GitOperations",
+            "module": "build/shared/git.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/shared/mcp-helpers.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "createSuccessResponse",
+          "parameters": [
+            {
+              "name": "text"
+            }
+          ],
+          "description": "Creates a successful MCP tool response with text content."
+        },
+        {
+          "kind": "function",
+          "name": "createErrorResponse",
+          "parameters": [
+            {
+              "name": "text"
+            }
+          ],
+          "description": "Creates an error MCP tool response with text content."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "createSuccessResponse",
+          "declaration": {
+            "name": "createSuccessResponse",
+            "module": "build/shared/mcp-helpers.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "createErrorResponse",
+          "declaration": {
+            "name": "createErrorResponse",
+            "module": "build/shared/mcp-helpers.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/shared/validation.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "TagNameSchema",
+          "parameters": [
+            {
+              "name": "componentPrefix",
+              "description": "Required tag name prefix (e.g. \"my-\" requires \"my-button\").\nPass an empty string to accept any valid custom element tag name."
+            }
+          ],
+          "description": "Creates a Zod schema for validating custom element tag names."
+        },
+        {
+          "kind": "variable",
+          "name": "FilePathSchema",
+          "description": "Zod schema for file paths that rejects path traversal and absolute paths."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TagNameSchema",
+          "declaration": {
+            "name": "TagNameSchema",
+            "module": "build/shared/validation.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FilePathSchema",
+          "declaration": {
+            "name": "FilePathSchema",
+            "module": "build/shared/validation.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/tools/cdn.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "CDN_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'resolve_cdn_cem', description: \"Fetch and cache a web component library's Custom Elements Manifest (CEM) from a CDN registry (jsDelivr or UNPKG) by npm package name. Useful when the library is loaded via CDN without a local npm install.\", inputSchema: { type: 'object', properties: { package: { type: 'string', description: 'npm package name, e.g. \"@shoelace-style/shoelace\"', }, version: { type: 'string', description: 'Package version, e.g. \"2.15.0\". Defaults to \"latest\".', }, registry: { type: 'string', enum: ['jsdelivr', 'unpkg'], description: 'Which CDN to use. Default: \"jsdelivr\".', }, }, required: ['package'], additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleCdnCall",
+          "parameters": [
+            {
+              "name": "name"
+            },
+            {
+              "name": "args"
+            },
+            {
+              "name": "config"
+            }
+          ],
+          "description": "Dispatches a CDN tool call by name and returns an MCPToolResult."
+        },
+        {
+          "kind": "function",
+          "name": "isCdnTool",
+          "parameters": [
+            {
+              "name": "name"
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the CDN tool group."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CDN_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "CDN_TOOL_DEFINITIONS",
+            "module": "build/tools/cdn.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleCdnCall",
+          "declaration": {
+            "name": "handleCdnCall",
+            "module": "build/tools/cdn.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isCdnTool",
+          "declaration": {
+            "name": "isCdnTool",
+            "module": "build/tools/cdn.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/tools/component.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "COMPONENT_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'get_component', description: 'Get full metadata for a web component by tag name, including members, events, slots, CSS parts, and CSS properties.', inputSchema: { type: 'object', properties: { tagName: { type: 'string', description: 'The custom element tag name (e.g. \"my-button\").', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'validate_cem', description: 'Validates the documentation completeness of a component in the Custom Elements Manifest. Returns a pass/fail result with a score and list of issues.', inputSchema: { type: 'object', properties: { tagName: { type: 'string', description: 'The custom element tag name to validate.', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'suggest_usage', description: 'Generates an HTML usage snippet for a component, showing key attributes with their default values. Lists required vs optional attributes and variant options from union types.', inputSchema: { type: 'object', properties: { tagName: { type: 'string', description: 'The custom element tag name (e.g. \"my-button\").', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'generate_import', description: 'Generates import statements for a component based on the CEM exports and package.json. Returns both a side-effect import and a named import.', inputSchema: { type: 'object', properties: { tagName: { type: 'string', description: 'The custom element tag name (e.g. \"my-button\").', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'get_component_narrative', description: 'Returns a 3-5 paragraph markdown prose description of a component — what it is, when to use it, how to customize it, its slots, and its events. Optimized for LLM comprehension.', inputSchema: { type: 'object', properties: { tagName: { type: 'string', description: 'The custom element tag name (e.g. \"my-button\").', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'generate_story', description: 'Generates a complete Storybook CSF3 story file for a web component. Derives argTypes from CEM members, maps property types to Storybook controls, generates named story exports for each variant value, and uses correct Lit html template binding syntax.', inputSchema: { type: 'object', properties: { tagName: { type: 'string', description: 'The custom element tag name (e.g. \"my-button\").', }, format: { type: 'string', enum: ['csf3', 'csf2'], description: 'Story format to generate. Defaults to \"csf3\".', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'compare_libraries', description: 'Compares two Custom Elements Manifest (CEM) files and reports coverage differences. Shows component counts, which components are unique to each library, a feature matrix, documentation quality metrics, and an overall verdict. Useful for evaluating \"Shoelace vs our library\" or measuring coverage gaps.', inputSchema: { type: 'object', properties: { cemPathA: { type: 'string', description: 'Relative path (from project root) to the first CEM JSON file. No path traversal allowed.', }, cemPathB: { type: 'string', description: 'Relative path (from project root) to the second CEM JSON file. No path traversal allowed.', }, labelA: { type: 'string', description: 'Optional display name for the first library (defaults to cemPathA).', }, labelB: { type: 'string', description: 'Optional display name for the second library (defaults to cemPathB).', }, }, required: ['cemPathA', 'cemPathB'], additionalProperties: false, }, }, { name: 'benchmark_libraries', description: 'Runs standardized quality scoring across multiple CEM files and outputs a ranked markdown report. Scores libraries on property coverage, event coverage, slot coverage, CSS theming surface, and documentation quality. No network calls — reads local CEM files only.', inputSchema: { type: 'object', properties: { libraries: { type: 'array', description: 'Array of 2–10 libraries to benchmark.', minItems: 2, maxItems: 10, items: { type: 'object', properties: { label: { type: 'string', description: 'Display name for this library.', }, cemPath: { type: 'string', description: 'Relative path (from project root) to the CEM JSON file. No path traversal allowed.', }, }, required: ['label', 'cemPath'], additionalProperties: false, }, }, }, required: ['libraries'], additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleComponentCall",
+          "parameters": [
+            {
+              "name": "name"
+            },
+            {
+              "name": "args"
+            },
+            {
+              "name": "config"
+            },
+            {
+              "name": "cem"
+            }
+          ],
+          "description": "Dispatches a component tool call by name and returns an MCPToolResult.\nCalled by the server's consolidated CallToolRequestSchema handler."
+        },
+        {
+          "kind": "function",
+          "name": "isComponentTool",
+          "parameters": [
+            {
+              "name": "name"
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the component tool group.\nUsed by the consolidated CallToolRequestSchema handler to dispatch correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "COMPONENT_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "COMPONENT_TOOL_DEFINITIONS",
+            "module": "build/tools/component.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleComponentCall",
+          "declaration": {
+            "name": "handleComponentCall",
+            "module": "build/tools/component.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isComponentTool",
+          "declaration": {
+            "name": "isComponentTool",
+            "module": "build/tools/component.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/tools/discovery.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "DISCOVERY_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'list_components', description: 'List all custom element components registered in the Custom Elements Manifest.', inputSchema: { type: 'object', properties: {}, additionalProperties: false, }, }, { name: 'find_component', description: 'Semantically search for components by name, description, or member names using token-overlap scoring. Returns the top 3 matches with scores above zero.', inputSchema: { type: 'object', properties: { query: { type: 'string', description: 'Search query to match against component tag names, descriptions, and member names.', }, }, required: ['query'], additionalProperties: false, }, }, { name: 'get_library_summary', description: 'Get an overview of the component library: component count, average health score, grade distribution, and last health check timestamp.', inputSchema: { type: 'object', properties: {}, additionalProperties: false, }, }, { name: 'list_events', description: 'List all events across all components in the library. Optionally filter by component tag name. Returns event name, component tag, description, and detail type.', inputSchema: { type: 'object', properties: { tagName: { type: 'string', description: 'Optional component tag name to filter events (e.g. \"my-button\").', }, }, additionalProperties: false, }, }, { name: 'list_slots', description: 'List all slots across all components in the library. Optionally filter by component tag name. Returns slot name, component tag, description, and whether the slot is named or default.', inputSchema: { type: 'object', properties: { tagName: { type: 'string', description: 'Optional component tag name to filter slots (e.g. \"my-button\").', }, }, additionalProperties: false, }, }, { name: 'list_css_parts', description: 'List all CSS parts (::part()) across all components in the library. Optionally filter by component tag name. Returns part name, component tag, and description.', inputSchema: { type: 'object', properties: { tagName: { type: 'string', description: 'Optional component tag name to filter CSS parts (e.g. \"my-button\").', }, }, additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "tokenize",
+          "parameters": [
+            {
+              "name": "text"
+            }
+          ],
+          "description": "Tokenizes a string into lowercase words, splitting on whitespace,\nhyphens, underscores, and camelCase boundaries."
+        },
+        {
+          "kind": "function",
+          "name": "scoreComponent",
+          "parameters": [
+            {
+              "name": "tagName"
+            },
+            {
+              "name": "description"
+            },
+            {
+              "name": "memberNames"
+            },
+            {
+              "name": "queryTokens"
+            }
+          ],
+          "description": "Scores a component against query tokens using token-overlap scoring:\n- tag name token matches × 3\n- description token matches × 2\n- member name token matches × 1"
+        },
+        {
+          "kind": "function",
+          "name": "handleDiscoveryCall",
+          "parameters": [
+            {
+              "name": "name"
+            },
+            {
+              "name": "args"
+            },
+            {
+              "name": "config"
+            },
+            {
+              "name": "cem"
+            },
+            {
+              "name": "cemLoadedAt"
+            }
+          ],
+          "description": "Dispatches a discovery tool call by name and returns an MCPToolResult.\nCalled by the server's consolidated CallToolRequestSchema handler."
+        },
+        {
+          "kind": "variable",
+          "name": "componentCount"
+        },
+        {
+          "kind": "function",
+          "name": "isDiscoveryTool",
+          "parameters": [
+            {
+              "name": "name"
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the discovery tool group.\nUsed by the consolidated CallToolRequestSchema handler to dispatch correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DISCOVERY_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "DISCOVERY_TOOL_DEFINITIONS",
+            "module": "build/tools/discovery.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "tokenize",
+          "declaration": {
+            "name": "tokenize",
+            "module": "build/tools/discovery.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "scoreComponent",
+          "declaration": {
+            "name": "scoreComponent",
+            "module": "build/tools/discovery.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleDiscoveryCall",
+          "declaration": {
+            "name": "handleDiscoveryCall",
+            "module": "build/tools/discovery.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isDiscoveryTool",
+          "declaration": {
+            "name": "isDiscoveryTool",
+            "module": "build/tools/discovery.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/tools/framework.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "FRAMEWORK_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'detect_framework', description: 'Identifies which web component framework the project uses by inspecting package.json dependencies, CEM metadata, and config files. Returns the framework name, version, CEM generator, and regeneration notes.', inputSchema: { type: 'object', properties: {}, additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleFrameworkCall",
+          "parameters": [
+            {
+              "name": "name"
+            },
+            {
+              "name": "_args"
+            },
+            {
+              "name": "config"
+            }
+          ],
+          "description": "Dispatches a framework tool call by name and returns an MCPToolResult."
+        },
+        {
+          "kind": "function",
+          "name": "isFrameworkTool",
+          "parameters": [
+            {
+              "name": "name"
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the framework tool group."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FRAMEWORK_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "FRAMEWORK_TOOL_DEFINITIONS",
+            "module": "build/tools/framework.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleFrameworkCall",
+          "declaration": {
+            "name": "handleFrameworkCall",
+            "module": "build/tools/framework.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isFrameworkTool",
+          "declaration": {
+            "name": "isFrameworkTool",
+            "module": "build/tools/framework.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/tools/health.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "HEALTH_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'score_component', description: 'Returns the latest health score for a single web component, including grade, dimension scores, and issues.', inputSchema: { type: 'object', properties: { tag_name: { type: 'string', description: 'The tag name of the component to score (e.g. \"my-button\").', }, }, required: ['tag_name'], additionalProperties: false, }, }, { name: 'score_all_components', description: 'Returns health scores for all components in the library. Maps over all CEM declarations.', inputSchema: { type: 'object', properties: {}, additionalProperties: false, }, }, { name: 'get_health_trend', description: 'Returns the health trend for a component over the last N days, including data points, trend direction, and change percent.', inputSchema: { type: 'object', properties: { tag_name: { type: 'string', description: 'The tag name of the component (e.g. \"my-button\").', }, days: { type: 'number', description: 'Number of days to look back (default: 7).', }, }, required: ['tag_name'], additionalProperties: false, }, }, { name: 'get_health_diff', description: 'Compares health between the current branch and a base branch, returning before/after scores with improvement or regression verdict.', inputSchema: { type: 'object', properties: { tag_name: { type: 'string', description: 'The tag name of the component (e.g. \"my-button\").', }, base_branch: { type: 'string', description: 'The base branch to compare against (default: \"main\").', }, }, required: ['tag_name'], additionalProperties: false, }, }, { name: 'analyze_accessibility', description: 'Analyzes the accessibility profile of one or all web components from CEM data. Checks for ARIA roles, aria-* attributes, form association, keyboard events, focus management, disabled state, label support, and accessibility documentation.', inputSchema: { type: 'object', properties: { tagName: { type: 'string', description: 'The tag name of the component to analyze (e.g. \"my-button\"). Omit to analyze all components.', }, }, additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleHealthCall",
+          "parameters": [
+            {
+              "name": "name"
+            },
+            {
+              "name": "args"
+            },
+            {
+              "name": "config"
+            },
+            {
+              "name": "cem"
+            }
+          ],
+          "description": "Dispatches a health tool call by name and returns an MCPToolResult.\nCalled by the server's consolidated CallToolRequestSchema handler."
+        },
+        {
+          "kind": "function",
+          "name": "isHealthTool",
+          "parameters": [
+            {
+              "name": "name"
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the health tool group.\nUsed by the consolidated CallToolRequestSchema handler to dispatch correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HEALTH_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "HEALTH_TOOL_DEFINITIONS",
+            "module": "build/tools/health.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleHealthCall",
+          "declaration": {
+            "name": "handleHealthCall",
+            "module": "build/tools/health.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isHealthTool",
+          "declaration": {
+            "name": "isHealthTool",
+            "module": "build/tools/health.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/tools/safety.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "SAFETY_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'diff_cem', description: \"Compare a component's CEM metadata between the current branch and a base branch, reporting breaking changes (removals, type changes) and non-breaking additions.\", inputSchema: { type: 'object', properties: { tagName: { type: 'string', description: 'The HTML tag name of the component to diff (e.g. \"my-button\").', }, baseBranch: { type: 'string', description: 'The git branch or ref to compare against (e.g. \"main\").', }, }, required: ['tagName', 'baseBranch'], additionalProperties: false, }, }, { name: 'check_breaking_changes', description: 'Run a breaking-change scan across ALL components in the CEM, comparing the current branch against a base branch. Returns a per-component summary with emoji status indicators.', inputSchema: { type: 'object', properties: { baseBranch: { type: 'string', description: 'The git branch or ref to compare against (e.g. \"main\").', }, }, required: ['baseBranch'], additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleSafetyCall",
+          "parameters": [
+            {
+              "name": "name"
+            },
+            {
+              "name": "args"
+            },
+            {
+              "name": "config"
+            },
+            {
+              "name": "cem"
+            }
+          ],
+          "description": "Dispatches a safety tool call by name and returns an MCPToolResult.\nCalled by the server's consolidated CallToolRequestSchema handler."
+        },
+        {
+          "kind": "function",
+          "name": "isSafetyTool",
+          "parameters": [
+            {
+              "name": "name"
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the safety tool group.\nUsed by the consolidated CallToolRequestSchema handler to dispatch correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "SAFETY_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "SAFETY_TOOL_DEFINITIONS",
+            "module": "build/tools/safety.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleSafetyCall",
+          "declaration": {
+            "name": "handleSafetyCall",
+            "module": "build/tools/safety.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isSafetyTool",
+          "declaration": {
+            "name": "isSafetyTool",
+            "module": "build/tools/safety.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/tools/tokens.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "TOKEN_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'get_design_tokens', description: 'List all design tokens from the configured tokens file, optionally filtered by category (e.g. \"color\", \"spacing\", \"typography\"). Requires tokensPath to be set in mcpwc.config.json or MCP_WC_TOKENS_PATH.', inputSchema: { type: 'object', properties: { category: { type: 'string', description: 'Optional category to filter by (e.g. \"color\", \"spacing\", \"typography\"). Case-insensitive.', }, }, additionalProperties: false, }, }, { name: 'find_token', description: 'Find design tokens by name pattern or value using a case-insensitive substring match. Requires tokensPath to be set in mcpwc.config.json or MCP_WC_TOKENS_PATH.', inputSchema: { type: 'object', properties: { query: { type: 'string', description: 'The search string to match against token names and values (case-insensitive substring match).', }, }, required: ['query'], additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleTokenCall",
+          "parameters": [
+            {
+              "name": "name"
+            },
+            {
+              "name": "args"
+            },
+            {
+              "name": "config"
+            }
+          ],
+          "description": "Dispatches a token tool call by name and returns an MCPToolResult.\nCalled by the server's consolidated CallToolRequestSchema handler."
+        },
+        {
+          "kind": "function",
+          "name": "isTokenTool",
+          "parameters": [
+            {
+              "name": "name"
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the tokens tool group.\nUsed by the consolidated CallToolRequestSchema handler to dispatch correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TOKEN_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "TOKEN_TOOL_DEFINITIONS",
+            "module": "build/tools/tokens.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleTokenCall",
+          "declaration": {
+            "name": "handleTokenCall",
+            "module": "build/tools/tokens.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isTokenTool",
+          "declaration": {
+            "name": "isTokenTool",
+            "module": "build/tools/tokens.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/tools/typescript.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "TYPESCRIPT_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'get_file_diagnostics', description: 'Run TypeScript diagnostics on a single file and return any type errors or warnings.', inputSchema: { type: 'object', properties: { filePath: { type: 'string', description: 'Relative path to the TypeScript file (no path traversal or absolute paths allowed).', }, }, required: ['filePath'], additionalProperties: false, }, }, { name: 'get_project_diagnostics', description: 'Run a full TypeScript diagnostic pass on the entire project and return error and warning counts.', inputSchema: { type: 'object', properties: {}, additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleTypeScriptCall",
+          "parameters": [
+            {
+              "name": "name"
+            },
+            {
+              "name": "args"
+            },
+            {
+              "name": "config"
+            }
+          ],
+          "description": "Dispatches a TypeScript tool call by name and returns an MCPToolResult.\nCalled by the server's consolidated CallToolRequestSchema handler."
+        },
+        {
+          "kind": "function",
+          "name": "isTypeScriptTool",
+          "parameters": [
+            {
+              "name": "name"
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the TypeScript tool group.\nUsed by the consolidated CallToolRequestSchema handler to dispatch correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TYPESCRIPT_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "TYPESCRIPT_TOOL_DEFINITIONS",
+            "module": "build/tools/typescript.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleTypeScriptCall",
+          "declaration": {
+            "name": "handleTypeScriptCall",
+            "module": "build/tools/typescript.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isTypeScriptTool",
+          "declaration": {
+            "name": "isTypeScriptTool",
+            "module": "build/tools/typescript.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "build/tools/validate.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "VALIDATE_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'validate_usage', description: 'Validates proposed HTML usage of a web component against its CEM spec. Checks for unknown attributes, deprecated properties, invalid slot names, and enum type mismatches. Returns a pass/fail result with specific issues and \"did you mean?\" suggestions for typos.', inputSchema: { type: 'object', properties: { tagName: { type: 'string', description: 'The custom element tag name (e.g. \"my-button\").', }, html: { type: 'string', description: 'The HTML snippet to validate (e.g. \"<my-button variant=\\\\\"primary\\\\\">Click</my-button>\").', }, }, required: ['tagName', 'html'], additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleValidateCall",
+          "parameters": [
+            {
+              "name": "name"
+            },
+            {
+              "name": "args"
+            },
+            {
+              "name": "cem"
+            }
+          ],
+          "description": "Dispatches a validate tool call by name and returns an MCPToolResult."
+        },
+        {
+          "kind": "function",
+          "name": "isValidateTool",
+          "parameters": [
+            {
+              "name": "name"
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the validate tool group."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "VALIDATE_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "VALIDATE_TOOL_DEFINITIONS",
+            "module": "build/tools/validate.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleValidateCall",
+          "declaration": {
+            "name": "handleValidateCall",
+            "module": "build/tools/validate.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isValidateTool",
+          "declaration": {
+            "name": "isValidateTool",
+            "module": "build/tools/validate.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/shared/discovery.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "discoverCemPath",
+          "return": {
+            "type": {
+              "text": "string | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "projectRoot",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "variable",
+          "name": "FRIENDLY_CEM_ERROR"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "discoverCemPath",
+          "declaration": {
+            "name": "discoverCemPath",
+            "module": "src/shared/discovery.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FRIENDLY_CEM_ERROR",
+          "declaration": {
+            "name": "FRIENDLY_CEM_ERROR",
+            "module": "src/shared/discovery.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/shared/error-handling.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "MCPError",
+          "members": [
+            {
+              "kind": "field",
+              "name": "category",
+              "type": {
+                "text": "ErrorCategory"
+              },
+              "readonly": true,
+              "default": "category"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "'MCPError'"
+            }
+          ],
+          "superclass": {
+            "name": "Error",
+            "module": "src/shared/error-handling.ts"
+          }
+        },
+        {
+          "kind": "function",
+          "name": "handleToolError",
+          "return": {
+            "type": {
+              "text": "MCPError"
+            }
+          },
+          "parameters": [
+            {
+              "name": "error",
+              "type": {
+                "text": "unknown"
+              }
+            }
+          ],
+          "description": "Wraps an unknown thrown value into an MCPError with an appropriate category."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "MCPError",
+          "declaration": {
+            "name": "MCPError",
+            "module": "src/shared/error-handling.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleToolError",
+          "declaration": {
+            "name": "handleToolError",
+            "module": "src/shared/error-handling.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/shared/file-ops.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "SafeFileOperations",
+          "members": [
+            {
+              "kind": "method",
+              "name": "readJSON",
+              "return": {
+                "type": {
+                  "text": "Promise<T>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "filePath",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "schema",
+                  "type": {
+                    "text": "z.ZodType<T>"
+                  }
+                }
+              ],
+              "description": "Reads and parses a JSON file, then validates it against the provided Zod schema."
+            },
+            {
+              "kind": "method",
+              "name": "fileExists",
+              "return": {
+                "type": {
+                  "text": "Promise<boolean>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "filePath",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Returns true if the file exists and is accessible, false otherwise."
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "SafeFileOperations",
+          "declaration": {
+            "name": "SafeFileOperations",
+            "module": "src/shared/file-ops.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/shared/git.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "GitOperations",
+          "members": [
+            {
+              "kind": "method",
+              "name": "gitShow",
+              "return": {
+                "type": {
+                  "text": "Promise<string>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "ref",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "filePath",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Reads file content at a specific git ref without modifying the working tree.\nUses `git show <ref>:<filePath>` to read content from another branch/commit.\nThe filePath must be relative to the git repository root."
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "GitOperations",
+          "declaration": {
+            "name": "GitOperations",
+            "module": "src/shared/git.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/shared/mcp-helpers.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "createSuccessResponse",
+          "return": {
+            "type": {
+              "text": "MCPToolResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "text",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Creates a successful MCP tool response with text content."
+        },
+        {
+          "kind": "function",
+          "name": "createErrorResponse",
+          "return": {
+            "type": {
+              "text": "MCPToolResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "text",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Creates an error MCP tool response with text content."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "createSuccessResponse",
+          "declaration": {
+            "name": "createSuccessResponse",
+            "module": "src/shared/mcp-helpers.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "createErrorResponse",
+          "declaration": {
+            "name": "createErrorResponse",
+            "module": "src/shared/mcp-helpers.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/shared/validation.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "TagNameSchema",
+          "return": {
+            "type": {
+              "text": "z.ZodString"
+            }
+          },
+          "parameters": [
+            {
+              "name": "componentPrefix",
+              "type": {
+                "text": "string"
+              },
+              "description": "Required tag name prefix (e.g. \"my-\" requires \"my-button\").\nPass an empty string to accept any valid custom element tag name."
+            }
+          ],
+          "description": "Creates a Zod schema for validating custom element tag names."
+        },
+        {
+          "kind": "variable",
+          "name": "FilePathSchema",
+          "description": "Zod schema for file paths that rejects path traversal and absolute paths."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TagNameSchema",
+          "declaration": {
+            "name": "TagNameSchema",
+            "module": "src/shared/validation.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FilePathSchema",
+          "declaration": {
+            "name": "FilePathSchema",
+            "module": "src/shared/validation.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/handlers/accessibility.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "analyzeAccessibility",
+          "return": {
+            "type": {
+              "text": "AccessibilityProfile"
+            }
+          },
+          "parameters": [
+            {
+              "name": "decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            }
+          ],
+          "description": "Analyzes accessibility profile of a single CEM component declaration.\n\nScoring weights (total: 100):\n  hasAriaRole:             20 — ARIA role in cssProperties or description\n  hasAriaAttributes:       15 — properties named aria-*\n  hasFormAssociation:      10 — formAssociated field or internals property\n  hasKeyboardEvents:       10 — keydown/keyup/keypress events listed\n  hasFocusMethod:          15 — exposes focus() method\n  hasDisabled:             15 — has disabled property\n  hasLabelSupport:         10 — slot named \"label\" or property named \"label\"\n  accessibilityDescription: 5 — description mentions accessibility terms"
+        },
+        {
+          "kind": "function",
+          "name": "analyzeAllAccessibility",
+          "return": {
+            "type": {
+              "text": "AccessibilityProfile[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "decls",
+              "type": {
+                "text": "CemDeclaration[]"
+              }
+            }
+          ],
+          "description": "Analyzes accessibility for all components in a list of CEM declarations.\nSkips declarations without a tagName."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "analyzeAccessibility",
+          "declaration": {
+            "name": "analyzeAccessibility",
+            "module": "src/handlers/accessibility.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "analyzeAllAccessibility",
+          "declaration": {
+            "name": "analyzeAllAccessibility",
+            "module": "src/handlers/accessibility.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/handlers/benchmark.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "BenchmarkLibrariesArgsSchema"
+        },
+        {
+          "kind": "function",
+          "name": "benchmarkLibraries",
+          "return": {
+            "type": {
+              "text": "Promise<{ scores: LibraryScore[]; formatted: string }>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "libraries",
+              "type": {
+                "text": "Array<{ label: string; cemPath: string }>"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "BenchmarkLibrariesArgsSchema",
+          "declaration": {
+            "name": "BenchmarkLibrariesArgsSchema",
+            "module": "src/handlers/benchmark.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "benchmarkLibraries",
+          "declaration": {
+            "name": "benchmarkLibraries",
+            "module": "src/handlers/benchmark.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/handlers/cdn.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "resolveCdnCem",
+          "return": {
+            "type": {
+              "text": "Promise<{ cachePath: string; componentCount: number; formatted: string }>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "pkg",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "version",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "registry",
+              "type": {
+                "text": "'jsdelivr' | 'unpkg'"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            }
+          ],
+          "description": "Fetches and caches a library's Custom Elements Manifest from a CDN registry."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "resolveCdnCem",
+          "declaration": {
+            "name": "resolveCdnCem",
+            "module": "src/handlers/cdn.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/handlers/cem.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "CemSchema"
+        },
+        {
+          "kind": "function",
+          "name": "parseCem",
+          "return": {
+            "type": {
+              "text": "ComponentMetadata"
+            }
+          },
+          "parameters": [
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "validateCompleteness",
+          "return": {
+            "type": {
+              "text": "CompletenessResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "listAllEvents",
+          "return": {
+            "type": {
+              "text": "EventRow[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            },
+            {
+              "name": "tagName",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "listAllSlots",
+          "return": {
+            "type": {
+              "text": "SlotRow[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            },
+            {
+              "name": "tagName",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "listAllCssParts",
+          "return": {
+            "type": {
+              "text": "CssPartRow[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            },
+            {
+              "name": "tagName",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "listAllComponents",
+          "return": {
+            "type": {
+              "text": "string[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "diffCem",
+          "return": {
+            "type": {
+              "text": "Promise<DiffResult>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "baseBranch",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CemSchema",
+          "declaration": {
+            "name": "CemSchema",
+            "module": "src/handlers/cem.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "parseCem",
+          "declaration": {
+            "name": "parseCem",
+            "module": "src/handlers/cem.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "validateCompleteness",
+          "declaration": {
+            "name": "validateCompleteness",
+            "module": "src/handlers/cem.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "listAllEvents",
+          "declaration": {
+            "name": "listAllEvents",
+            "module": "src/handlers/cem.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "listAllSlots",
+          "declaration": {
+            "name": "listAllSlots",
+            "module": "src/handlers/cem.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "listAllCssParts",
+          "declaration": {
+            "name": "listAllCssParts",
+            "module": "src/handlers/cem.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "listAllComponents",
+          "declaration": {
+            "name": "listAllComponents",
+            "module": "src/handlers/cem.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "diffCem",
+          "declaration": {
+            "name": "diffCem",
+            "module": "src/handlers/cem.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/handlers/compare.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "CompareLibrariesArgsSchema"
+        },
+        {
+          "kind": "function",
+          "name": "compareLibraries",
+          "return": {
+            "type": {
+              "text": "Promise<LibraryComparisonResult>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "args",
+              "type": {
+                "text": "CompareLibrariesArgs"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CompareLibrariesArgsSchema",
+          "declaration": {
+            "name": "CompareLibrariesArgsSchema",
+            "module": "src/handlers/compare.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "compareLibraries",
+          "declaration": {
+            "name": "compareLibraries",
+            "module": "src/handlers/compare.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/handlers/framework.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "detectFramework",
+          "return": {
+            "type": {
+              "text": "FrameworkDetectionResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "variable",
+          "name": "framework",
+          "type": {
+            "text": "string | null"
+          },
+          "default": "null"
+        },
+        {
+          "kind": "variable",
+          "name": "version",
+          "type": {
+            "text": "string | null"
+          },
+          "default": "null"
+        },
+        {
+          "kind": "variable",
+          "name": "cemGenerator",
+          "type": {
+            "text": "string | null"
+          },
+          "default": "null"
+        },
+        {
+          "kind": "variable",
+          "name": "notes"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "detectFramework",
+          "declaration": {
+            "name": "detectFramework",
+            "module": "src/handlers/framework.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/handlers/health.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "scoreCemFallback",
+          "return": {
+            "type": {
+              "text": "ComponentHealth"
+            }
+          },
+          "parameters": [
+            {
+              "name": "decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            }
+          ],
+          "description": "Computes a CEM-derived documentation health score from 6 dimensions.\nUsed as a fallback when no pre-computed history files are available.\n\nMax score: 100\n  - description present:              +15\n  - all properties have descriptions: +25\n  - all events have type annotations: +20\n  - all events have descriptions:     +15\n  - CSS parts documented:             +15\n  - slots documented:                 +10"
+        },
+        {
+          "kind": "function",
+          "name": "scoreComponent",
+          "return": {
+            "type": {
+              "text": "Promise<ComponentHealth>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "cemDecl",
+              "optional": true,
+              "type": {
+                "text": "CemDeclaration"
+              }
+            }
+          ],
+          "description": "Returns the latest health score for a component.\nReads from pre-computed history files in healthHistoryDir/{tagName}/.\nFalls back to CEM-derived scoring when no history exists."
+        },
+        {
+          "kind": "function",
+          "name": "scoreAllComponents",
+          "return": {
+            "type": {
+              "text": "Promise<ComponentHealth[]>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "cemDeclarations",
+              "type": {
+                "text": "CemDeclaration[]"
+              }
+            }
+          ],
+          "description": "Scores every component in the provided CEM declarations.\nUses history files when available; falls back to CEM-derived scoring."
+        },
+        {
+          "kind": "function",
+          "name": "getHealthTrend",
+          "return": {
+            "type": {
+              "text": "Promise<HealthTrend>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "days",
+              "default": "7",
+              "type": {
+                "text": "number"
+              }
+            }
+          ],
+          "description": "Returns the health trend for a component over the last N days.\nReads per-component history files sorted by date.\nSingle data point always reports as 'stable'."
+        },
+        {
+          "kind": "function",
+          "name": "getHealthDiff",
+          "return": {
+            "type": {
+              "text": "Promise<HealthDiff>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "baseBranch",
+              "default": "'main'",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "cemDecl",
+              "optional": true,
+              "type": {
+                "text": "CemDeclaration"
+              }
+            },
+            {
+              "name": "gitOps",
+              "optional": true,
+              "type": {
+                "text": "GitOperations"
+              }
+            }
+          ],
+          "description": "Compares component health between the current branch and a base branch.\nReads the base branch CEM via `git show` — no stash, no checkout, no working-tree mutation.\nBase health is derived by running scoreCemFallback against the base branch's CEM declaration."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "scoreCemFallback",
+          "declaration": {
+            "name": "scoreCemFallback",
+            "module": "src/handlers/health.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "scoreComponent",
+          "declaration": {
+            "name": "scoreComponent",
+            "module": "src/handlers/health.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "scoreAllComponents",
+          "declaration": {
+            "name": "scoreAllComponents",
+            "module": "src/handlers/health.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getHealthTrend",
+          "declaration": {
+            "name": "getHealthTrend",
+            "module": "src/handlers/health.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getHealthDiff",
+          "declaration": {
+            "name": "getHealthDiff",
+            "module": "src/handlers/health.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/handlers/migration.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "generateMigrationGuide",
+          "return": {
+            "type": {
+              "text": "Promise<MigrationGuide>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "baseBranch",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "generateMigrationGuide",
+          "declaration": {
+            "name": "generateMigrationGuide",
+            "module": "src/handlers/migration.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/handlers/narrative.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "buildNarrative",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "meta",
+              "type": {
+                "text": "ComponentMetadata"
+              }
+            }
+          ],
+          "description": "Synthesizes a human-readable narrative prose description from a CEM declaration.\nReturns 3-5 paragraph markdown suitable for LLM consumption."
+        },
+        {
+          "kind": "function",
+          "name": "getComponentNarrative",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ],
+          "description": "Fetches a component's CEM metadata and returns a narrative prose description."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "buildNarrative",
+          "declaration": {
+            "name": "buildNarrative",
+            "module": "src/handlers/narrative.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getComponentNarrative",
+          "declaration": {
+            "name": "getComponentNarrative",
+            "module": "src/handlers/narrative.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/handlers/story.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "generateStory",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            },
+            {
+              "name": "format",
+              "default": "'csf3'",
+              "type": {
+                "text": "'csf3' | 'csf2'"
+              }
+            }
+          ],
+          "description": "Generates a complete Storybook CSF3 story file for a web component based on its CEM declaration.\nReturns a string of TypeScript source ready to paste into a .stories.ts file."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "generateStory",
+          "declaration": {
+            "name": "generateStory",
+            "module": "src/handlers/story.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/handlers/suggest.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "suggestUsage",
+          "return": {
+            "type": {
+              "text": "Promise<SuggestUsageResult>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ],
+          "description": "Synthesizes a usage HTML snippet from a component's CEM member list.\nAttributes with union types show the first option as the default value.\nBoolean attributes are listed as optional and omitted from the snippet by default.\nFields without defaults and with concrete non-boolean types are listed as required."
+        },
+        {
+          "kind": "function",
+          "name": "generateImport",
+          "return": {
+            "type": {
+              "text": "Promise<GenerateImportResult>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ],
+          "description": "Generates import statements for a component by reading the CEM exports field\nand the project's package.json.\n\nReturns both a side-effect import and a named import."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "suggestUsage",
+          "declaration": {
+            "name": "suggestUsage",
+            "module": "src/handlers/suggest.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "generateImport",
+          "declaration": {
+            "name": "generateImport",
+            "module": "src/handlers/suggest.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/handlers/tokens.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "parseTokens",
+          "return": {
+            "type": {
+              "text": "DesignToken[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "filePath",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Reads a W3C DTCG-format tokens.json file and returns a flat array of tokens.\nThrows if the file does not exist or cannot be parsed."
+        },
+        {
+          "kind": "function",
+          "name": "getDesignTokens",
+          "return": {
+            "type": {
+              "text": "DesignToken[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "category",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns all design tokens, optionally filtered by category (top-level group name).\nCategory matching is case-insensitive."
+        },
+        {
+          "kind": "function",
+          "name": "findToken",
+          "return": {
+            "type": {
+              "text": "DesignToken[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "query",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Finds tokens whose name or value (as string) contains the query as a\ncase-insensitive substring."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "parseTokens",
+          "declaration": {
+            "name": "parseTokens",
+            "module": "src/handlers/tokens.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getDesignTokens",
+          "declaration": {
+            "name": "getDesignTokens",
+            "module": "src/handlers/tokens.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "findToken",
+          "declaration": {
+            "name": "findToken",
+            "module": "src/handlers/tokens.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/handlers/typescript.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "isTypescriptAvailable",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          }
+        },
+        {
+          "kind": "function",
+          "name": "getFileDiagnostics",
+          "return": {
+            "type": {
+              "text": "DiagnosticResult[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "filePath",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Run TypeScript diagnostics on a single file.\nfilePath must pass FilePathSchema validation (no path traversal, no absolute paths)."
+        },
+        {
+          "kind": "function",
+          "name": "getProjectDiagnostics",
+          "return": {
+            "type": {
+              "text": "ProjectDiagnosticsResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            }
+          ],
+          "description": "Run a full TypeScript diagnostic pass on the entire project.\nReturns error and warning counts along with the full diagnostic arrays."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "isTypescriptAvailable",
+          "declaration": {
+            "name": "isTypescriptAvailable",
+            "module": "src/handlers/typescript.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getFileDiagnostics",
+          "declaration": {
+            "name": "getFileDiagnostics",
+            "module": "src/handlers/typescript.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getProjectDiagnostics",
+          "declaration": {
+            "name": "getProjectDiagnostics",
+            "module": "src/handlers/typescript.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/handlers/validate.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "validateUsage",
+          "return": {
+            "type": {
+              "text": "ValidationResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "html",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "validateUsage",
+          "declaration": {
+            "name": "validateUsage",
+            "module": "src/handlers/validate.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tools/cdn.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "CDN_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'resolve_cdn_cem', description: \"Fetch and cache a web component library's Custom Elements Manifest (CEM) from a CDN registry (jsDelivr or UNPKG) by npm package name. Useful when the library is loaded via CDN without a local npm install.\", inputSchema: { type: 'object' as const, properties: { package: { type: 'string', description: 'npm package name, e.g. \"@shoelace-style/shoelace\"', }, version: { type: 'string', description: 'Package version, e.g. \"2.15.0\". Defaults to \"latest\".', }, registry: { type: 'string', enum: ['jsdelivr', 'unpkg'], description: 'Which CDN to use. Default: \"jsdelivr\".', }, }, required: ['package'], additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleCdnCall",
+          "return": {
+            "type": {
+              "text": "Promise<MCPToolResult>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "Record<string, unknown>"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            }
+          ],
+          "description": "Dispatches a CDN tool call by name and returns an MCPToolResult."
+        },
+        {
+          "kind": "function",
+          "name": "isCdnTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the CDN tool group."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CDN_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "CDN_TOOL_DEFINITIONS",
+            "module": "src/tools/cdn.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleCdnCall",
+          "declaration": {
+            "name": "handleCdnCall",
+            "module": "src/tools/cdn.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isCdnTool",
+          "declaration": {
+            "name": "isCdnTool",
+            "module": "src/tools/cdn.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tools/component.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "COMPONENT_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'get_component', description: 'Get full metadata for a web component by tag name, including members, events, slots, CSS parts, and CSS properties.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'The custom element tag name (e.g. \"my-button\").', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'validate_cem', description: 'Validates the documentation completeness of a component in the Custom Elements Manifest. Returns a pass/fail result with a score and list of issues.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'The custom element tag name to validate.', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'suggest_usage', description: 'Generates an HTML usage snippet for a component, showing key attributes with their default values. Lists required vs optional attributes and variant options from union types.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'The custom element tag name (e.g. \"my-button\").', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'generate_import', description: 'Generates import statements for a component based on the CEM exports and package.json. Returns both a side-effect import and a named import.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'The custom element tag name (e.g. \"my-button\").', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'get_component_narrative', description: 'Returns a 3-5 paragraph markdown prose description of a component — what it is, when to use it, how to customize it, its slots, and its events. Optimized for LLM comprehension.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'The custom element tag name (e.g. \"my-button\").', }, }, required: ['tagName'], additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleComponentCall",
+          "return": {
+            "type": {
+              "text": "Promise<MCPToolResult>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "Record<string, unknown>"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ],
+          "description": "Dispatches a component tool call by name and returns an MCPToolResult.\nCalled by the server's consolidated CallToolRequestSchema handler."
+        },
+        {
+          "kind": "function",
+          "name": "isComponentTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the component tool group.\nUsed by the consolidated CallToolRequestSchema handler to dispatch correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "COMPONENT_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "COMPONENT_TOOL_DEFINITIONS",
+            "module": "src/tools/component.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleComponentCall",
+          "declaration": {
+            "name": "handleComponentCall",
+            "module": "src/tools/component.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isComponentTool",
+          "declaration": {
+            "name": "isComponentTool",
+            "module": "src/tools/component.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tools/discovery.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "DISCOVERY_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'list_components', description: 'List all custom element components registered in the Custom Elements Manifest.', inputSchema: { type: 'object' as const, properties: {}, additionalProperties: false, }, }, { name: 'find_component', description: 'Semantically search for components by name, description, or member names using token-overlap scoring. Returns the top 3 matches with scores above zero.', inputSchema: { type: 'object' as const, properties: { query: { type: 'string', description: 'Search query to match against component tag names, descriptions, and member names.', }, }, required: ['query'], additionalProperties: false, }, }, { name: 'get_library_summary', description: 'Get an overview of the component library: component count, average health score, grade distribution, and last health check timestamp.', inputSchema: { type: 'object' as const, properties: {}, additionalProperties: false, }, }, { name: 'list_events', description: 'List all events across all components in the library. Optionally filter by component tag name. Returns event name, component tag, description, and detail type.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'Optional component tag name to filter events (e.g. \"my-button\").', }, }, additionalProperties: false, }, }, { name: 'list_slots', description: 'List all slots across all components in the library. Optionally filter by component tag name. Returns slot name, component tag, description, and whether the slot is named or default.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'Optional component tag name to filter slots (e.g. \"my-button\").', }, }, additionalProperties: false, }, }, { name: 'list_css_parts', description: 'List all CSS parts (::part()) across all components in the library. Optionally filter by component tag name. Returns part name, component tag, and description.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'Optional component tag name to filter CSS parts (e.g. \"my-button\").', }, }, additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "tokenize",
+          "return": {
+            "type": {
+              "text": "string[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "text",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Tokenizes a string into lowercase words, splitting on whitespace,\nhyphens, underscores, and camelCase boundaries."
+        },
+        {
+          "kind": "function",
+          "name": "scoreComponent",
+          "return": {
+            "type": {
+              "text": "number"
+            }
+          },
+          "parameters": [
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "description",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "memberNames",
+              "type": {
+                "text": "string[]"
+              }
+            },
+            {
+              "name": "queryTokens",
+              "type": {
+                "text": "string[]"
+              }
+            }
+          ],
+          "description": "Scores a component against query tokens using token-overlap scoring:\n- tag name token matches × 3\n- description token matches × 2\n- member name token matches × 1"
+        },
+        {
+          "kind": "function",
+          "name": "handleDiscoveryCall",
+          "return": {
+            "type": {
+              "text": "Promise<MCPToolResult>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "Record<string, unknown>"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            },
+            {
+              "name": "cemLoadedAt",
+              "optional": true,
+              "type": {
+                "text": "Date | null"
+              }
+            }
+          ],
+          "description": "Dispatches a discovery tool call by name and returns an MCPToolResult.\nCalled by the server's consolidated CallToolRequestSchema handler."
+        },
+        {
+          "kind": "variable",
+          "name": "componentCount"
+        },
+        {
+          "kind": "function",
+          "name": "isDiscoveryTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the discovery tool group.\nUsed by the consolidated CallToolRequestSchema handler to dispatch correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DISCOVERY_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "DISCOVERY_TOOL_DEFINITIONS",
+            "module": "src/tools/discovery.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "tokenize",
+          "declaration": {
+            "name": "tokenize",
+            "module": "src/tools/discovery.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "scoreComponent",
+          "declaration": {
+            "name": "scoreComponent",
+            "module": "src/tools/discovery.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleDiscoveryCall",
+          "declaration": {
+            "name": "handleDiscoveryCall",
+            "module": "src/tools/discovery.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isDiscoveryTool",
+          "declaration": {
+            "name": "isDiscoveryTool",
+            "module": "src/tools/discovery.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tools/framework.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "FRAMEWORK_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'detect_framework', description: 'Identifies which web component framework the project uses by inspecting package.json dependencies, CEM metadata, and config files. Returns the framework name, version, CEM generator, and regeneration notes.', inputSchema: { type: 'object' as const, properties: {}, additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleFrameworkCall",
+          "return": {
+            "type": {
+              "text": "MCPToolResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "_args",
+              "type": {
+                "text": "Record<string, unknown>"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            }
+          ],
+          "description": "Dispatches a framework tool call by name and returns an MCPToolResult."
+        },
+        {
+          "kind": "function",
+          "name": "isFrameworkTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the framework tool group."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FRAMEWORK_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "FRAMEWORK_TOOL_DEFINITIONS",
+            "module": "src/tools/framework.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleFrameworkCall",
+          "declaration": {
+            "name": "handleFrameworkCall",
+            "module": "src/tools/framework.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isFrameworkTool",
+          "declaration": {
+            "name": "isFrameworkTool",
+            "module": "src/tools/framework.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tools/health.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "HEALTH_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'score_component', description: 'Returns the latest health score for a single web component, including grade, dimension scores, and issues.', inputSchema: { type: 'object' as const, properties: { tag_name: { type: 'string', description: 'The tag name of the component to score (e.g. \"my-button\").', }, }, required: ['tag_name'], additionalProperties: false, }, }, { name: 'score_all_components', description: 'Returns health scores for all components in the library. Maps over all CEM declarations.', inputSchema: { type: 'object' as const, properties: {}, additionalProperties: false, }, }, { name: 'get_health_trend', description: 'Returns the health trend for a component over the last N days, including data points, trend direction, and change percent.', inputSchema: { type: 'object' as const, properties: { tag_name: { type: 'string', description: 'The tag name of the component (e.g. \"my-button\").', }, days: { type: 'number', description: 'Number of days to look back (default: 7).', }, }, required: ['tag_name'], additionalProperties: false, }, }, { name: 'get_health_diff', description: 'Compares health between the current branch and a base branch, returning before/after scores with improvement or regression verdict.', inputSchema: { type: 'object' as const, properties: { tag_name: { type: 'string', description: 'The tag name of the component (e.g. \"my-button\").', }, base_branch: { type: 'string', description: 'The base branch to compare against (default: \"main\").', }, }, required: ['tag_name'], additionalProperties: false, }, }, { name: 'analyze_accessibility', description: 'Analyzes the accessibility profile of one or all web components from CEM data. Checks for ARIA roles, aria-* attributes, form association, keyboard events, focus management, disabled state, label support, and accessibility documentation.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'The tag name of the component to analyze (e.g. \"my-button\"). Omit to analyze all components.', }, }, additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleHealthCall",
+          "return": {
+            "type": {
+              "text": "Promise<MCPToolResult>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "Record<string, unknown>"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ],
+          "description": "Dispatches a health tool call by name and returns an MCPToolResult.\nCalled by the server's consolidated CallToolRequestSchema handler."
+        },
+        {
+          "kind": "function",
+          "name": "isHealthTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the health tool group.\nUsed by the consolidated CallToolRequestSchema handler to dispatch correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HEALTH_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "HEALTH_TOOL_DEFINITIONS",
+            "module": "src/tools/health.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleHealthCall",
+          "declaration": {
+            "name": "handleHealthCall",
+            "module": "src/tools/health.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isHealthTool",
+          "declaration": {
+            "name": "isHealthTool",
+            "module": "src/tools/health.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tools/safety.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "SAFETY_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'diff_cem', description: \"Compare a component's CEM metadata between the current branch and a base branch, reporting breaking changes (removals, type changes) and non-breaking additions.\", inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'The HTML tag name of the component to diff (e.g. \"my-button\").', }, baseBranch: { type: 'string', description: 'The git branch or ref to compare against (e.g. \"main\").', }, }, required: ['tagName', 'baseBranch'], additionalProperties: false, }, }, { name: 'check_breaking_changes', description: 'Run a breaking-change scan across ALL components in the CEM, comparing the current branch against a base branch. Returns a per-component summary with emoji status indicators.', inputSchema: { type: 'object' as const, properties: { baseBranch: { type: 'string', description: 'The git branch or ref to compare against (e.g. \"main\").', }, }, required: ['baseBranch'], additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleSafetyCall",
+          "return": {
+            "type": {
+              "text": "Promise<MCPToolResult>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "Record<string, unknown>"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ],
+          "description": "Dispatches a safety tool call by name and returns an MCPToolResult.\nCalled by the server's consolidated CallToolRequestSchema handler."
+        },
+        {
+          "kind": "function",
+          "name": "isSafetyTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the safety tool group.\nUsed by the consolidated CallToolRequestSchema handler to dispatch correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "SAFETY_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "SAFETY_TOOL_DEFINITIONS",
+            "module": "src/tools/safety.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleSafetyCall",
+          "declaration": {
+            "name": "handleSafetyCall",
+            "module": "src/tools/safety.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isSafetyTool",
+          "declaration": {
+            "name": "isSafetyTool",
+            "module": "src/tools/safety.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tools/tokens.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "TOKEN_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'get_design_tokens', description: 'List all design tokens from the configured tokens file, optionally filtered by category (e.g. \"color\", \"spacing\", \"typography\"). Requires tokensPath to be set in mcpwc.config.json or MCP_WC_TOKENS_PATH.', inputSchema: { type: 'object' as const, properties: { category: { type: 'string', description: 'Optional category to filter by (e.g. \"color\", \"spacing\", \"typography\"). Case-insensitive.', }, }, additionalProperties: false, }, }, { name: 'find_token', description: 'Find design tokens by name pattern or value using a case-insensitive substring match. Requires tokensPath to be set in mcpwc.config.json or MCP_WC_TOKENS_PATH.', inputSchema: { type: 'object' as const, properties: { query: { type: 'string', description: 'The search string to match against token names and values (case-insensitive substring match).', }, }, required: ['query'], additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleTokenCall",
+          "return": {
+            "type": {
+              "text": "MCPToolResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "Record<string, unknown>"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            }
+          ],
+          "description": "Dispatches a token tool call by name and returns an MCPToolResult.\nCalled by the server's consolidated CallToolRequestSchema handler."
+        },
+        {
+          "kind": "function",
+          "name": "isTokenTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the tokens tool group.\nUsed by the consolidated CallToolRequestSchema handler to dispatch correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TOKEN_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "TOKEN_TOOL_DEFINITIONS",
+            "module": "src/tools/tokens.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleTokenCall",
+          "declaration": {
+            "name": "handleTokenCall",
+            "module": "src/tools/tokens.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isTokenTool",
+          "declaration": {
+            "name": "isTokenTool",
+            "module": "src/tools/tokens.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tools/typescript.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "TYPESCRIPT_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'get_file_diagnostics', description: 'Run TypeScript diagnostics on a single file and return any type errors or warnings.', inputSchema: { type: 'object' as const, properties: { filePath: { type: 'string', description: 'Relative path to the TypeScript file (no path traversal or absolute paths allowed).', }, }, required: ['filePath'], additionalProperties: false, }, }, { name: 'get_project_diagnostics', description: 'Run a full TypeScript diagnostic pass on the entire project and return error and warning counts.', inputSchema: { type: 'object' as const, properties: {}, additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleTypeScriptCall",
+          "return": {
+            "type": {
+              "text": "MCPToolResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "Record<string, unknown>"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            }
+          ],
+          "description": "Dispatches a TypeScript tool call by name and returns an MCPToolResult.\nCalled by the server's consolidated CallToolRequestSchema handler."
+        },
+        {
+          "kind": "function",
+          "name": "isTypeScriptTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the TypeScript tool group.\nUsed by the consolidated CallToolRequestSchema handler to dispatch correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TYPESCRIPT_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "TYPESCRIPT_TOOL_DEFINITIONS",
+            "module": "src/tools/typescript.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleTypeScriptCall",
+          "declaration": {
+            "name": "handleTypeScriptCall",
+            "module": "src/tools/typescript.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isTypeScriptTool",
+          "declaration": {
+            "name": "isTypeScriptTool",
+            "module": "src/tools/typescript.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tools/validate.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "VALIDATE_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'validate_usage', description: 'Validates proposed HTML usage of a web component against its CEM spec. Checks for unknown attributes, deprecated properties, invalid slot names, and enum type mismatches. Returns a pass/fail result with specific issues and \"did you mean?\" suggestions for typos.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'The custom element tag name (e.g. \"my-button\").', }, html: { type: 'string', description: 'The HTML snippet to validate (e.g. \"<my-button variant=\\\\\"primary\\\\\">Click</my-button>\").', }, }, required: ['tagName', 'html'], additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleValidateCall",
+          "return": {
+            "type": {
+              "text": "MCPToolResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "Record<string, unknown>"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ],
+          "description": "Dispatches a validate tool call by name and returns an MCPToolResult."
+        },
+        {
+          "kind": "function",
+          "name": "isValidateTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the validate tool group."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "VALIDATE_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "VALIDATE_TOOL_DEFINITIONS",
+            "module": "src/tools/validate.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleValidateCall",
+          "declaration": {
+            "name": "handleValidateCall",
+            "module": "src/tools/validate.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isValidateTool",
+          "declaration": {
+            "name": "isValidateTool",
+            "module": "src/tools/validate.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

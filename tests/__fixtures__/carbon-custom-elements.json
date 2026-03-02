@@ -1,0 +1,350 @@
+{
+  "schemaVersion": "1.0.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "es/components/button/button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "CDSButton",
+          "tagName": "cds-button",
+          "description": "Carbon Design System button component.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "disabled",
+              "attribute": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Specify whether the Button should be disabled, or not."
+            },
+            {
+              "kind": "field",
+              "name": "kind",
+              "attribute": "kind",
+              "type": { "text": "'primary' | 'secondary' | 'danger' | 'ghost' | 'tertiary'" },
+              "default": "'primary'",
+              "description": "Specify the kind of Button you want to create."
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "attribute": "size",
+              "type": { "text": "'sm' | 'md' | 'lg' | 'xl' | '2xl'" },
+              "default": "'md'",
+              "description": "Specify the size of the button, from a list of available sizes."
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "attribute": "href",
+              "type": { "text": "string" },
+              "description": "Optionally specify an href for your Button to become an <a> element."
+            },
+            {
+              "kind": "field",
+              "name": "isExpressive",
+              "attribute": "is-expressive",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Specify whether the Button is an expressive size variant."
+            }
+          ],
+          "events": [
+            {
+              "name": "click",
+              "type": { "text": "MouseEvent" },
+              "description": "Fired when the button is clicked."
+            }
+          ],
+          "slots": [
+            { "name": "", "description": "Default slot for button label text." },
+            { "name": "icon", "description": "Slot for an icon to display in the button." }
+          ],
+          "cssParts": [],
+          "cssProperties": [
+            {
+              "name": "--cds-interactive",
+              "description": "The primary interactive color used for the button background."
+            },
+            {
+              "name": "--cds-button-primary",
+              "description": "The primary button background color."
+            },
+            {
+              "name": "--cds-button-primary-hover",
+              "description": "The primary button background color on hover."
+            },
+            {
+              "name": "--cds-button-primary-active",
+              "description": "The primary button background color when active."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "es/components/modal/modal.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "CDSModal",
+          "tagName": "cds-modal",
+          "description": "Carbon Design System modal dialog component.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "open",
+              "attribute": "open",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Specify whether the Modal is currently open."
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "attribute": "size",
+              "type": { "text": "'xs' | 'sm' | 'md' | 'lg'" },
+              "default": "'md'",
+              "description": "Specify the size of the Modal."
+            },
+            {
+              "kind": "field",
+              "name": "preventCloseOnClickOutside",
+              "attribute": "prevent-close-on-click-outside",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Prevent the modal from closing when the user clicks outside."
+            },
+            {
+              "kind": "field",
+              "name": "fullWidth",
+              "attribute": "full-width",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Specify whether the Modal should use full-width layout."
+            }
+          ],
+          "events": [
+            {
+              "name": "cds-modal-beingclosed",
+              "type": { "text": "CustomEvent<{ triggeredBy: HTMLElement }>" },
+              "description": "The custom event fired before the modal is closed."
+            },
+            {
+              "name": "cds-modal-closed",
+              "type": { "text": "CustomEvent" },
+              "description": "The custom event fired after the modal is closed."
+            }
+          ],
+          "slots": [
+            { "name": "", "description": "Default slot for modal body content." },
+            { "name": "label", "description": "Slot for the modal label (optional)." },
+            { "name": "heading", "description": "Slot for the modal heading." },
+            { "name": "description", "description": "Slot for the modal description." },
+            { "name": "footer", "description": "Slot for the modal footer (actions)." }
+          ],
+          "cssParts": [],
+          "cssProperties": [
+            {
+              "name": "--cds-layer",
+              "description": "The layer background color used in the modal."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "es/components/text-input/text-input.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "CDSTextInput",
+          "tagName": "cds-text-input",
+          "description": "Carbon Design System text input component.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "attribute": "label",
+              "type": { "text": "string" },
+              "description": "The label text."
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "attribute": "value",
+              "type": { "text": "string" },
+              "description": "The input value."
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "attribute": "placeholder",
+              "type": { "text": "string" },
+              "description": "Placeholder text for the input."
+            },
+            {
+              "kind": "field",
+              "name": "invalid",
+              "attribute": "invalid",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Specify whether the control is currently invalid."
+            },
+            {
+              "kind": "field",
+              "name": "invalidText",
+              "attribute": "invalid-text",
+              "type": { "text": "string" },
+              "description": "Provide the text that is displayed when the control is in an invalid state."
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "attribute": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Specify whether the control is disabled."
+            },
+            {
+              "kind": "field",
+              "name": "readonly",
+              "attribute": "readonly",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Specify whether the control is read-only."
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "attribute": "size",
+              "type": { "text": "'sm' | 'md' | 'lg'" },
+              "default": "'md'",
+              "description": "Specify the size of the input."
+            }
+          ],
+          "events": [
+            {
+              "name": "cds-text-input-input",
+              "type": { "text": "CustomEvent<{ value: string }>" },
+              "description": "The custom event fired on user input."
+            },
+            {
+              "name": "change",
+              "type": { "text": "Event" },
+              "description": "Fired when the input value changes."
+            }
+          ],
+          "slots": [
+            { "name": "", "description": "Default slot." },
+            { "name": "label-text", "description": "Slot for the label text." },
+            { "name": "helper-text", "description": "Slot for helper text." },
+            { "name": "invalid-text", "description": "Slot for invalid state text." },
+            { "name": "warn-text", "description": "Slot for warn state text." }
+          ],
+          "cssParts": [],
+          "cssProperties": [
+            {
+              "name": "--cds-field",
+              "description": "The field background color."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "es/components/dropdown/dropdown.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "CDSDropdown",
+          "tagName": "cds-dropdown",
+          "description": "Carbon Design System dropdown component.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "attribute": "value",
+              "type": { "text": "string" },
+              "description": "The value of the selected item."
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "attribute": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Specify whether the dropdown should be disabled."
+            },
+            {
+              "kind": "field",
+              "name": "open",
+              "attribute": "open",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Specify whether the dropdown is currently open."
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "attribute": "size",
+              "type": { "text": "'sm' | 'md' | 'lg'" },
+              "default": "'md'",
+              "description": "Specify the size of the dropdown."
+            },
+            {
+              "kind": "field",
+              "name": "helperText",
+              "attribute": "helper-text",
+              "type": { "text": "string" },
+              "description": "Helper text that is used alongside the control label."
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "attribute": "label",
+              "type": { "text": "string" },
+              "description": "The label of the dropdown."
+            },
+            {
+              "kind": "field",
+              "name": "titleText",
+              "attribute": "title-text",
+              "type": { "text": "string" },
+              "description": "The title text for the dropdown."
+            }
+          ],
+          "events": [
+            {
+              "name": "cds-dropdown-selected",
+              "type": { "text": "CustomEvent<{ item: HTMLElement }>" },
+              "description": "The custom event fired after a dropdown item is selected."
+            },
+            {
+              "name": "cds-dropdown-beingselected",
+              "type": { "text": "CustomEvent<{ item: HTMLElement }>" },
+              "description": "The custom event fired before a dropdown item is selected."
+            }
+          ],
+          "slots": [{ "name": "", "description": "Default slot for dropdown items." }],
+          "cssParts": [],
+          "cssProperties": [
+            {
+              "name": "--cds-field",
+              "description": "The field background color."
+            },
+            {
+              "name": "--cds-border-strong",
+              "description": "The border color for the dropdown."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

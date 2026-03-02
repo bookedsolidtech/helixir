@@ -1,0 +1,253 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "https://github.com/microsoft/fluentui/tree/master/packages/web-components",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/button/button.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A Button implementation built on FAST Element following the Fluent design system.",
+          "name": "FluentButton",
+          "tagName": "fluent-button",
+          "members": [
+            {
+              "kind": "field",
+              "name": "appearance",
+              "type": { "text": "'accent' | 'lightweight' | 'neutral' | 'outline' | 'stealth'" },
+              "description": "The visual appearance of the button.",
+              "attribute": "appearance"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "description": "The disabled state of the button.",
+              "attribute": "disabled",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "iconPosition",
+              "type": { "text": "'before' | 'after'" },
+              "description": "Indicates the position of an icon relative to button content.",
+              "attribute": "icon-position"
+            }
+          ],
+          "events": [
+            {
+              "name": "click",
+              "type": { "text": "MouseEvent" },
+              "description": "Fires when the button is clicked."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "The default slot for button content."
+            },
+            {
+              "name": "start",
+              "description": "Content which can be provided before the button content."
+            },
+            {
+              "name": "end",
+              "description": "Content which can be provided after the button content."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--fluent-color-brand-background",
+              "description": "Brand background color token."
+            },
+            {
+              "name": "--fluent-color-neutral-background-1",
+              "description": "Neutral background color layer 1."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/text-field/text-field.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A Text Field implementation built on FAST Element.",
+          "name": "FluentTextField",
+          "tagName": "fluent-text-field",
+          "members": [
+            {
+              "kind": "field",
+              "name": "appearance",
+              "type": { "text": "'filled' | 'outline'" },
+              "description": "The visual appearance of the text field.",
+              "attribute": "appearance"
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": { "text": "string | undefined" },
+              "description": "Sets the placeholder value of the element.",
+              "attribute": "placeholder"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": { "text": "string" },
+              "description": "The value of the element.",
+              "attribute": "value",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "description": "Sets the element's disabled state.",
+              "attribute": "disabled",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "readOnly",
+              "type": { "text": "boolean" },
+              "description": "When true, the control will be immutable by user interaction.",
+              "attribute": "read-only",
+              "default": "false",
+              "reflects": true
+            }
+          ],
+          "events": [
+            {
+              "name": "change",
+              "type": { "text": "Event" },
+              "description": "Fires a custom 'change' event when the value has changed."
+            },
+            {
+              "name": "input",
+              "type": { "text": "InputEvent" },
+              "description": "Fires a custom 'input' event when the value changes."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "The default slot."
+            },
+            {
+              "name": "label",
+              "description": "The slot for the label."
+            },
+            {
+              "name": "start",
+              "description": "Content which can be provided before the input."
+            },
+            {
+              "name": "end",
+              "description": "Content which can be provided after the input."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/dialog/dialog.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A Dialog implementation built on FAST Element.",
+          "name": "FluentDialog",
+          "tagName": "fluent-dialog",
+          "members": [
+            {
+              "kind": "field",
+              "name": "open",
+              "type": { "text": "boolean" },
+              "description": "Indicates the dialog is open.",
+              "attribute": "open",
+              "default": "false",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "trapFocus",
+              "type": { "text": "boolean" },
+              "description": "Indicates that the dialog should trap focus.",
+              "attribute": "trap-focus",
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "noFocusTrap",
+              "type": { "text": "boolean" },
+              "description": "Disables focus trapping.",
+              "attribute": "no-focus-trap",
+              "default": "false"
+            }
+          ],
+          "events": [
+            {
+              "name": "dismiss",
+              "type": { "text": "CustomEvent" },
+              "description": "Fires when the dialog is dismissed."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "The default slot for dialog content."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/badge/badge.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A Badge implementation built on FAST Element.",
+          "name": "FluentBadge",
+          "tagName": "fluent-badge",
+          "members": [
+            {
+              "kind": "field",
+              "name": "appearance",
+              "type": { "text": "'accent' | 'filled' | 'ghost' | 'outline' | 'tint'" },
+              "description": "The visual appearance of the badge.",
+              "attribute": "appearance"
+            },
+            {
+              "kind": "field",
+              "name": "color",
+              "type": {
+                "text": "'brand' | 'danger' | 'important' | 'informative' | 'severe' | 'subtle' | 'success' | 'warning'"
+              },
+              "description": "The color of the badge.",
+              "attribute": "color"
+            },
+            {
+              "kind": "field",
+              "name": "shape",
+              "type": { "text": "'circular' | 'rounded' | 'square'" },
+              "description": "The shape of the badge.",
+              "attribute": "shape"
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "The default slot for badge content."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

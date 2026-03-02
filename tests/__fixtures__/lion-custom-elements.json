@@ -1,0 +1,296 @@
+{
+  "schemaVersion": "1.0.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/lion-button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "LionButton",
+          "tagName": "lion-button",
+          "description": "A button component from ING Bank's Lion library, with deep accessibility support.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "description": "Disables the button, preventing user interaction.",
+              "attribute": "disabled",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": { "text": "'button' | 'submit' | 'reset'" },
+              "description": "The button type, maps to the native button type attribute.",
+              "attribute": "type",
+              "default": "'button'"
+            }
+          ],
+          "attributes": [
+            { "name": "role", "description": "ARIA role attribute (default: button)." },
+            {
+              "name": "aria-disabled",
+              "description": "Reflects the disabled state for assistive technologies."
+            },
+            {
+              "name": "aria-pressed",
+              "description": "Indicates whether the button is in a pressed state."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--lion-button-min-height",
+              "description": "Minimum height of the button.",
+              "default": "40px"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/lion-input.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "LionInput",
+          "tagName": "lion-input",
+          "description": "An accessible input field component from Lion, supporting validation, labels, and feedback.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": { "text": "string" },
+              "description": "The label text displayed above the input.",
+              "attribute": "label",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": { "text": "string" },
+              "description": "The current value of the input field.",
+              "attribute": "value",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": { "text": "string" },
+              "description": "Placeholder text shown when the input is empty.",
+              "attribute": "placeholder",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "description": "Disables the input field.",
+              "attribute": "disabled",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "readonly",
+              "type": { "text": "boolean" },
+              "description": "Makes the input field read-only.",
+              "attribute": "readonly",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": { "text": "string" },
+              "description": "The name attribute for form submission.",
+              "attribute": "name",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "modelValue",
+              "type": { "text": "string" },
+              "description": "The model value used internally by Lion's form system.",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "errorMessage",
+              "type": { "text": "string" },
+              "description": "Error message displayed when validation fails.",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "showsFeedbackFor",
+              "type": { "text": "object" },
+              "description": "Controls which feedback conditions (error, warning, info, success) are shown.",
+              "default": "{}"
+            }
+          ],
+          "slots": [
+            { "name": "label", "description": "Custom label content." },
+            { "name": "help-text", "description": "Help text displayed below the label." },
+            { "name": "feedback", "description": "Validation feedback messages." },
+            { "name": "prefix", "description": "Content placed before the input." },
+            { "name": "suffix", "description": "Content placed after the input." },
+            { "name": "input", "description": "The native input element slot." }
+          ],
+          "cssProperties": [
+            {
+              "name": "--lion-input-border-color",
+              "description": "Border color of the input field.",
+              "default": "#767676"
+            },
+            {
+              "name": "--lion-input-focus-border-color",
+              "description": "Border color of the input when focused.",
+              "default": "#005A9E"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/lion-dialog.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "LionDialog",
+          "tagName": "lion-dialog",
+          "description": "An accessible dialog/modal component from Lion, managing focus trapping and ARIA attributes.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "isOpened",
+              "type": { "text": "boolean" },
+              "description": "Whether the dialog is currently open.",
+              "attribute": "is-opened",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "hasBackdrop",
+              "type": { "text": "boolean" },
+              "description": "When true, renders a backdrop behind the dialog.",
+              "attribute": "has-backdrop",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "preventsScroll",
+              "type": { "text": "boolean" },
+              "description": "When true, prevents document scrolling while the dialog is open.",
+              "attribute": "prevents-scroll",
+              "default": "false"
+            }
+          ],
+          "events": [
+            {
+              "name": "before-opened",
+              "type": { "text": "CustomEvent" },
+              "description": "Fired before the dialog opens. Cancelable."
+            },
+            {
+              "name": "opened",
+              "type": { "text": "CustomEvent" },
+              "description": "Fired after the dialog has fully opened."
+            },
+            {
+              "name": "before-closed",
+              "type": { "text": "CustomEvent" },
+              "description": "Fired before the dialog closes. Cancelable."
+            },
+            {
+              "name": "closed",
+              "type": { "text": "CustomEvent" },
+              "description": "Fired after the dialog has fully closed."
+            }
+          ],
+          "slots": [
+            { "name": "", "description": "Default slot for dialog trigger content." },
+            {
+              "name": "invoker",
+              "description": "The element that triggers the dialog (e.g. a button)."
+            },
+            { "name": "content", "description": "The main content of the dialog." }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/lion-select-rich.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "LionSelectRich",
+          "tagName": "lion-select-rich",
+          "description": "An accessible rich select component from Lion, providing a custom dropdown with full keyboard and ARIA support.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": { "text": "string" },
+              "description": "The label text for the select.",
+              "attribute": "label",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "modelValue",
+              "type": { "text": "string" },
+              "description": "The currently selected value in Lion's model system.",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "description": "Disables the select component.",
+              "attribute": "disabled",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "multiple",
+              "type": { "text": "boolean" },
+              "description": "Allows multiple items to be selected.",
+              "attribute": "multiple",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "showAllOnEmpty",
+              "type": { "text": "boolean" },
+              "description": "When true, shows all options when no value is selected.",
+              "attribute": "show-all-on-empty",
+              "default": "false"
+            }
+          ],
+          "events": [
+            {
+              "name": "model-value-changed",
+              "type": { "text": "CustomEvent" },
+              "description": "Fired when the selected model value changes."
+            },
+            {
+              "name": "user-input-changed",
+              "type": { "text": "CustomEvent" },
+              "description": "Fired when the user directly changes the input value."
+            }
+          ],
+          "slots": [
+            { "name": "label", "description": "Custom label content." },
+            { "name": "help-text", "description": "Help text displayed below the select." },
+            { "name": "feedback", "description": "Validation feedback messages." },
+            { "name": "prefix", "description": "Content placed before the select." },
+            { "name": "suffix", "description": "Content placed after the select." }
+          ]
+        }
+      ]
+    }
+  ]
+}

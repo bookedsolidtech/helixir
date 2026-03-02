@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "1.0.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/my-button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MyButton",
+          "tagName": "my-button",
+          "description": "A generic button component — v1.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "type",
+              "type": { "text": "string" },
+              "default": "'button'",
+              "description": "The button type (removed in v2).",
+              "attribute": "type",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": { "text": "'sm' | 'md'" },
+              "default": "'md'",
+              "description": "The button size.",
+              "attribute": "size",
+              "reflects": true
+            }
+          ],
+          "events": [
+            {
+              "name": "my-click",
+              "type": { "text": "CustomEvent<{ originalEvent: MouseEvent }>" },
+              "description": "Fired when the button is clicked."
+            },
+            {
+              "name": "my-legacy-event",
+              "type": { "text": "CustomEvent" },
+              "description": "A legacy event removed in v2."
+            }
+          ],
+          "slots": [],
+          "cssParts": [],
+          "cssProperties": []
+        }
+      ]
+    }
+  ]
+}

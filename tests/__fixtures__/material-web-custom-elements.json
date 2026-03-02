@@ -1,0 +1,274 @@
+{
+  "schemaVersion": "1.0.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "button/filled-button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MdFilledButton",
+          "tagName": "md-filled-button",
+          "description": "Material Design 3 filled button component. Use for the primary, most important action on a screen.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "disabled",
+              "attribute": "disabled",
+              "type": { "text": "boolean" },
+              "description": "Whether or not the button is disabled.",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "attribute": "href",
+              "type": { "text": "string" },
+              "description": "The URL that the link button points to.",
+              "default": ""
+            },
+            {
+              "kind": "field",
+              "name": "trailingIcon",
+              "attribute": "trailing-icon",
+              "type": { "text": "boolean" },
+              "description": "Whether to place the icon after the label (trailing) instead of before it (leading).",
+              "default": "false"
+            }
+          ],
+          "events": [
+            {
+              "name": "click",
+              "type": { "text": "MouseEvent" },
+              "description": "Fired when the button is clicked."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "The button's label."
+            },
+            {
+              "name": "icon",
+              "description": "An optional icon to display in the button."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--md-filled-button-container-color",
+              "description": "The color of the button's container.",
+              "default": "#6750a4"
+            },
+            {
+              "name": "--md-filled-button-label-text-color",
+              "description": "The color of the button's label text.",
+              "default": "#ffffff"
+            },
+            {
+              "name": "--md-filled-button-container-shape",
+              "description": "The shape of the button's container.",
+              "default": "9999px"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "button/outlined-button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MdOutlinedButton",
+          "tagName": "md-outlined-button",
+          "description": "Material Design 3 outlined button component. Use for secondary actions or when the action requires less emphasis.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "disabled",
+              "attribute": "disabled",
+              "type": { "text": "boolean" },
+              "description": "Whether or not the button is disabled.",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "attribute": "href",
+              "type": { "text": "string" },
+              "description": "The URL that the link button points to.",
+              "default": ""
+            },
+            {
+              "kind": "field",
+              "name": "trailingIcon",
+              "attribute": "trailing-icon",
+              "type": { "text": "boolean" },
+              "description": "Whether to place the icon after the label (trailing) instead of before it (leading).",
+              "default": "false"
+            }
+          ],
+          "events": [
+            {
+              "name": "click",
+              "type": { "text": "MouseEvent" },
+              "description": "Fired when the button is clicked."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "The button's label."
+            },
+            {
+              "name": "icon",
+              "description": "An optional icon to display in the button."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--md-outlined-button-label-text-color",
+              "description": "The color of the button's label text.",
+              "default": "#6750a4"
+            },
+            {
+              "name": "--md-outlined-button-outline-color",
+              "description": "The color of the button's outline.",
+              "default": "#79747e"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "checkbox/checkbox.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MdCheckbox",
+          "tagName": "md-checkbox",
+          "description": "Material Design 3 checkbox component. Checkboxes allow users to select one or more items from a set.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "checked",
+              "attribute": "checked",
+              "type": { "text": "boolean" },
+              "description": "Whether or not the checkbox is selected.",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "indeterminate",
+              "attribute": "indeterminate",
+              "type": { "text": "boolean" },
+              "description": "Whether or not the checkbox is indeterminate.",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "attribute": "disabled",
+              "type": { "text": "boolean" },
+              "description": "Whether or not the checkbox is disabled.",
+              "default": "false"
+            }
+          ],
+          "events": [
+            {
+              "name": "change",
+              "type": { "text": "Event" },
+              "description": "Fired when the checkbox's checked state changes."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--md-checkbox-selected-container-color",
+              "description": "The color of the checkbox's container when selected.",
+              "default": "#6750a4"
+            },
+            {
+              "name": "--md-checkbox-selected-icon-color",
+              "description": "The color of the checkbox's icon when selected.",
+              "default": "#ffffff"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "dialog/dialog.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MdDialog",
+          "tagName": "md-dialog",
+          "description": "Material Design 3 dialog component. Dialogs provide important prompts in a user flow.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "open",
+              "attribute": "open",
+              "type": { "text": "boolean" },
+              "description": "Whether the dialog is open.",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "returnValue",
+              "attribute": "return-value",
+              "type": { "text": "string" },
+              "description": "Gets or sets the dialog's return value, usually to indicate which button a user pressed to close it.",
+              "default": ""
+            }
+          ],
+          "events": [
+            {
+              "name": "open",
+              "type": { "text": "Event" },
+              "description": "Fired when the dialog opens."
+            },
+            {
+              "name": "close",
+              "type": { "text": "Event" },
+              "description": "Fired when the dialog closes."
+            },
+            {
+              "name": "cancel",
+              "type": { "text": "Event" },
+              "description": "Fired when the dialog is cancelled."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "The dialog's content."
+            },
+            {
+              "name": "headline",
+              "description": "The dialog's headline."
+            },
+            {
+              "name": "actions",
+              "description": "The dialog's action buttons."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--md-dialog-container-color",
+              "description": "The color of the dialog's container.",
+              "default": "#fffbfe"
+            },
+            {
+              "name": "--md-dialog-headline-color",
+              "description": "The color of the dialog's headline text.",
+              "default": "#1c1b1f"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

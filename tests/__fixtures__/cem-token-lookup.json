@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "1.0.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MyButton",
+          "tagName": "my-button",
+          "description": "A button component.",
+          "members": [],
+          "events": [],
+          "slots": [],
+          "cssParts": [],
+          "cssProperties": [
+            {
+              "name": "--color-primary-500",
+              "description": "Controls the button's background color",
+              "default": "#0066cc"
+            },
+            {
+              "name": "--color-primary-600",
+              "description": "Darker shade for hover state",
+              "default": "#0052a3"
+            },
+            {
+              "name": "--spacing-md",
+              "description": "Internal padding",
+              "default": "8px"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/badge.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MyBadge",
+          "tagName": "my-badge",
+          "description": "A badge component.",
+          "members": [],
+          "events": [],
+          "slots": [],
+          "cssParts": [],
+          "cssProperties": [
+            {
+              "name": "--color-primary-500",
+              "description": "Badge background color",
+              "default": "#0066cc"
+            },
+            {
+              "name": "--color-neutral-100",
+              "description": "Badge text color on dark backgrounds",
+              "default": "#ffffff"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MyCard",
+          "tagName": "my-card",
+          "description": "A card component.",
+          "members": [],
+          "events": [],
+          "slots": [],
+          "cssParts": [],
+          "cssProperties": [
+            {
+              "name": "--spacing-md",
+              "description": "Card padding",
+              "default": "16px"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/icon.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MyIcon",
+          "tagName": "my-icon",
+          "description": "An icon component.",
+          "members": [],
+          "events": [],
+          "slots": [],
+          "cssParts": [],
+          "cssProperties": []
+        }
+      ]
+    }
+  ]
+}

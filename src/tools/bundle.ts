@@ -1,0 +1,88 @@
+import { z } from 'zod';
+import type { McpWcConfig } from '../config.js';
+import { estimateBundleSize } from '../handlers/bundle.js';
+import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
+import type { MCPToolResult } from '../shared/mcp-helpers.js';
+import { handleToolError } from '../shared/error-handling.js';
+
+const EstimateBundleSizeArgsSchema = z.object({
+  tag_name: z.string(),
+  package: z.string().optional(),
+  version: z.string().optional().default('latest'),
+  include_full_package: z.boolean().optional().default(true),
+});
+
+export const BUNDLE_TOOL_DEFINITIONS = [
+  {
+    name: 'estimate_bundle_size',
+    description:
+      'Estimate the bundle size (minified + gzipped) for a web component or its parent npm package. ' +
+      'Queries bundlephobia and the npm registry. Results are cached in memory for 24 hours.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        tag_name: {
+          type: 'string',
+          description: 'The custom element tag name, e.g. "sl-button".',
+        },
+        package: {
+          type: 'string',
+          description:
+            'Optional: explicit npm package name (e.g. "@shoelace-style/shoelace"). ' +
+            'If omitted, the package is derived from componentPrefix in your config.',
+        },
+        version: {
+          type: 'string',
+          description: 'Package version to look up. Defaults to "latest".',
+        },
+        include_full_package: {
+          type: 'boolean',
+          description:
+            'When false, suppresses the full_package size from the result. Defaults to true.',
+        },
+      },
+      required: ['tag_name'],
+      additionalProperties: false,
+    },
+  },
+];
+
+/**
+ * Dispatches a bundle tool call by name and returns an MCPToolResult.
+ */
+export async function handleBundleCall(
+  name: string,
+  args: Record<string, unknown>,
+  config: McpWcConfig,
+): Promise<MCPToolResult> {
+  try {
+    if (name === 'estimate_bundle_size') {
+      const {
+        tag_name,
+        package: pkg,
+        version,
+        include_full_package,
+      } = EstimateBundleSizeArgsSchema.parse(args);
+
+      const result = await estimateBundleSize(tag_name, config, pkg, version);
+
+      // Suppress full_package if caller opted out
+      if (!include_full_package) {
+        result.estimates.full_package = null;
+      }
+
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+    return createErrorResponse(`Unknown bundle tool: ${name}`);
+  } catch (err) {
+    const mcpErr = handleToolError(err);
+    return createErrorResponse(`[${mcpErr.category}] ${mcpErr.message}`);
+  }
+}
+
+/**
+ * Returns true if the given tool name belongs to the bundle tool group.
+ */
+export function isBundleTool(name: string): boolean {
+  return BUNDLE_TOOL_DEFINITIONS.some((t) => t.name === name);
+}

@@ -1,0 +1,275 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "https://patternfly.org",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/button/pf-button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "PatternFly button component.",
+          "name": "PfButton",
+          "tagName": "pf-button",
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'primary' | 'secondary' | 'tertiary' | 'danger' | 'warning' | 'link' | 'plain' | 'control'"
+              },
+              "default": "'primary'",
+              "description": "The button variant.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Disables the button.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "loading",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Shows a loading indicator.",
+              "attribute": "loading",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "plain",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Renders the button as plain.",
+              "attribute": "plain",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "block",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Renders the button as a block-level element.",
+              "attribute": "block",
+              "reflects": true
+            }
+          ],
+          "events": [
+            {
+              "name": "click",
+              "type": { "text": "MouseEvent" },
+              "description": "Fired when the button is clicked."
+            }
+          ],
+          "slots": [
+            { "name": "", "description": "Default slot — button label." },
+            { "name": "icon", "description": "Icon slot." }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pf-c-button--m-primary--BackgroundColor",
+              "description": "Background color for primary variant."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/modal/pf-modal.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "PatternFly modal dialog component.",
+          "name": "PfModal",
+          "tagName": "pf-modal",
+          "members": [
+            {
+              "kind": "field",
+              "name": "open",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Whether the modal is open.",
+              "attribute": "open",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": { "text": "'small' | 'medium' | 'large' | 'max'" },
+              "default": "'medium'",
+              "description": "The modal size variant.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "position",
+              "type": { "text": "'default' | 'top'" },
+              "default": "'default'",
+              "description": "The modal position.",
+              "attribute": "position",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "hasNoBodyWrapper",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Removes the default body wrapper.",
+              "attribute": "has-no-body-wrapper",
+              "reflects": true
+            }
+          ],
+          "events": [
+            {
+              "name": "open",
+              "type": { "text": "CustomEvent" },
+              "description": "Fired when the modal opens."
+            },
+            {
+              "name": "close",
+              "type": { "text": "CustomEvent" },
+              "description": "Fired when the modal closes."
+            }
+          ],
+          "slots": [
+            { "name": "", "description": "Default slot — modal body content." },
+            { "name": "header", "description": "Modal header slot." },
+            { "name": "footer", "description": "Modal footer slot." },
+            { "name": "description", "description": "Modal description slot." }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/text-input/pf-text-input.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "PatternFly text input component.",
+          "name": "PfTextInput",
+          "tagName": "pf-text-input",
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": { "text": "string" },
+              "default": "''",
+              "description": "The input value.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "'text' | 'email' | 'number' | 'password' | 'search' | 'tel' | 'url'"
+              },
+              "default": "'text'",
+              "description": "The input type.",
+              "attribute": "type",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Disables the input.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "readonly",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Makes the input read-only.",
+              "attribute": "readonly",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "validated",
+              "type": { "text": "'success' | 'warning' | 'error' | 'default'" },
+              "default": "'default'",
+              "description": "Validation state.",
+              "attribute": "validated",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": { "text": "string" },
+              "default": "''",
+              "description": "Placeholder text.",
+              "attribute": "placeholder"
+            }
+          ],
+          "events": [
+            {
+              "name": "change",
+              "type": { "text": "Event" },
+              "description": "Fired when value changes."
+            },
+            {
+              "name": "input",
+              "type": { "text": "Event" },
+              "description": "Fired on each keystroke."
+            }
+          ],
+          "slots": [{ "name": "", "description": "Default slot." }]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/badge/pf-badge.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "PatternFly badge component.",
+          "name": "PfBadge",
+          "tagName": "pf-badge",
+          "members": [
+            {
+              "kind": "field",
+              "name": "read",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Marks the badge as read.",
+              "attribute": "read",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "count",
+              "type": { "text": "number" },
+              "default": "0",
+              "description": "The badge count.",
+              "attribute": "count",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "threshold",
+              "type": { "text": "number" },
+              "default": "0",
+              "description": "Threshold above which count is displayed as threshold+.",
+              "attribute": "threshold",
+              "reflects": true
+            }
+          ],
+          "slots": [{ "name": "", "description": "Default slot." }]
+        }
+      ]
+    }
+  ]
+}

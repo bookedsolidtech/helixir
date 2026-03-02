@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/my-button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MyButton",
+          "tagName": "my-button",
+          "description": "A generic button component — v2.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": { "text": "'primary' | 'secondary' | 'danger'" },
+              "default": "'primary'",
+              "description": "The visual style variant (new in v2).",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": { "text": "'small' | 'medium' | 'large'" },
+              "default": "'medium'",
+              "description": "The button size — type changed in v2.",
+              "attribute": "size",
+              "reflects": true
+            }
+          ],
+          "events": [
+            {
+              "name": "my-click",
+              "type": { "text": "CustomEvent<{ originalEvent: MouseEvent }>" },
+              "description": "Fired when the button is clicked."
+            }
+          ],
+          "slots": [],
+          "cssParts": [],
+          "cssProperties": []
+        }
+      ]
+    }
+  ]
+}

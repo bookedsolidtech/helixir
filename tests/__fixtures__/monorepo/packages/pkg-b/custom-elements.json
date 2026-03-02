@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.0.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/my-card.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MyCard",
+          "tagName": "my-card",
+          "description": "A card component from pkg-b"
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/my-button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MyButton",
+          "tagName": "my-button",
+          "description": "A button component from pkg-b (collision with pkg-a)"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,276 @@
+{
+  "schemaVersion": "1.0.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/vaadin-button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "VaadinButton",
+          "tagName": "vaadin-button",
+          "description": "A button component from the Vaadin component suite.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "If true, the user cannot interact with this element.",
+              "attribute": "disabled"
+            },
+            {
+              "kind": "field",
+              "name": "autofocus",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Specify that this control should have input focus when the page loads.",
+              "attribute": "autofocus"
+            },
+            {
+              "kind": "field",
+              "name": "theme",
+              "type": { "text": "string" },
+              "description": "The theme variants to apply to the button, e.g. primary, error, contrast, small, large.",
+              "attribute": "theme"
+            }
+          ],
+          "events": [
+            {
+              "name": "click",
+              "type": { "text": "MouseEvent" },
+              "description": "Fired when the button is clicked."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "The label of the button."
+            },
+            {
+              "name": "prefix",
+              "description": "Content to render before the label (e.g. an icon)."
+            },
+            {
+              "name": "suffix",
+              "description": "Content to render after the label (e.g. an icon)."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--vaadin-button-background",
+              "description": "Background color of the button."
+            },
+            {
+              "name": "--vaadin-button-text-color",
+              "description": "Text color of the button."
+            }
+          ],
+          "cssParts": [],
+          "superclass": { "name": "LitElement" }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/vaadin-text-field.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "VaadinTextField",
+          "tagName": "vaadin-text-field",
+          "description": "A single-line text input component from the Vaadin component suite.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": { "text": "string" },
+              "description": "String used for the label element.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": { "text": "string" },
+              "default": "''",
+              "description": "Current value of the text field.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": { "text": "string" },
+              "description": "A hint to the user of what can be entered in the control.",
+              "attribute": "placeholder"
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Specifies that the user must fill in a value.",
+              "attribute": "required"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "If true, the user cannot interact with this element.",
+              "attribute": "disabled"
+            },
+            {
+              "kind": "field",
+              "name": "readonly",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "This attribute indicates that the user cannot modify the value of the control.",
+              "attribute": "readonly"
+            },
+            {
+              "kind": "field",
+              "name": "errorMessage",
+              "type": { "text": "string" },
+              "description": "Error to show when the input value is invalid.",
+              "attribute": "error-message"
+            },
+            {
+              "kind": "field",
+              "name": "invalid",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "This property is set to true when the control value is invalid.",
+              "attribute": "invalid"
+            }
+          ],
+          "events": [
+            {
+              "name": "value-changed",
+              "type": { "text": "CustomEvent<{ value: string }>" },
+              "description": "Fired when the value property changes."
+            },
+            {
+              "name": "change",
+              "type": { "text": "Event" },
+              "description": "Fired when an alteration to the element's value is committed by the user."
+            },
+            {
+              "name": "input",
+              "type": { "text": "Event" },
+              "description": "Fired when the value of the element changes."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "Default slot for input content."
+            },
+            {
+              "name": "prefix",
+              "description": "Content to render before the input."
+            },
+            {
+              "name": "suffix",
+              "description": "Content to render after the input."
+            },
+            {
+              "name": "helper",
+              "description": "Slot for helper text below the input."
+            },
+            {
+              "name": "error-message",
+              "description": "Slot for custom error message content."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--vaadin-text-field-background",
+              "description": "Background color of the text field."
+            },
+            {
+              "name": "--vaadin-text-field-border-color",
+              "description": "Border color of the text field."
+            }
+          ],
+          "cssParts": [],
+          "superclass": { "name": "LitElement" }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/vaadin-grid.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "VaadinGrid",
+          "tagName": "vaadin-grid",
+          "description": "A feature-rich data grid component from the Vaadin component suite.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "items",
+              "type": { "text": "object" },
+              "description": "An array containing the items which will be stamped as rows.",
+              "attribute": "items"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": { "text": "number" },
+              "description": "Total number of items.",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
+              "name": "multiSort",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "When true, all columns are sortable and clicking on a column header will sort multiple columns.",
+              "attribute": "multi-sort"
+            },
+            {
+              "kind": "field",
+              "name": "loading",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Indicates whether the grid is loading new items.",
+              "attribute": "loading"
+            }
+          ],
+          "events": [
+            {
+              "name": "active-item-changed",
+              "type": { "text": "CustomEvent<{ value: object | null }>" },
+              "description": "Fired when the active item changes."
+            },
+            {
+              "name": "selected-items-changed",
+              "type": { "text": "CustomEvent<{ value: object[] }>" },
+              "description": "Fired when the selected items change."
+            },
+            {
+              "name": "loading-changed",
+              "type": { "text": "CustomEvent<{ value: boolean }>" },
+              "description": "Fired when the loading property changes."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "Default slot for vaadin-grid-column elements."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--vaadin-grid-cell-background",
+              "description": "Background color of the grid cells."
+            }
+          ],
+          "cssParts": [],
+          "superclass": { "name": "LitElement" }
+        }
+      ]
+    }
+  ]
+}

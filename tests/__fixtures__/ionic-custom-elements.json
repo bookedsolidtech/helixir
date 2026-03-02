@@ -1,0 +1,359 @@
+{
+  "schemaVersion": "1.0.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/button/ion-button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "IonButton",
+          "tagName": "ion-button",
+          "description": "Buttons provide a clickable element, which can be used in forms, or anywhere that needs simple, standard button functionality.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "disabled",
+              "attribute": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "If true, the user cannot interact with the button."
+            },
+            {
+              "kind": "field",
+              "name": "expand",
+              "attribute": "expand",
+              "type": { "text": "'block' | 'full'" },
+              "description": "Set to 'block' for a full-width button or 'full' for a full-width button without left and right borders."
+            },
+            {
+              "kind": "field",
+              "name": "fill",
+              "attribute": "fill",
+              "type": { "text": "'clear' | 'default' | 'outline' | 'solid'" },
+              "default": "'default'",
+              "description": "Set to 'clear' for no container and no border, 'outline' for no container but has a border, and 'solid' (default) for container and border."
+            },
+            {
+              "kind": "field",
+              "name": "color",
+              "attribute": "color",
+              "type": { "text": "string" },
+              "description": "The color to use from your application's color palette."
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "attribute": "size",
+              "type": { "text": "'default' | 'large' | 'small'" },
+              "default": "'default'",
+              "description": "The button size."
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "attribute": "href",
+              "type": { "text": "string" },
+              "description": "Contains a URL or a URL fragment that the hyperlink points to."
+            },
+            {
+              "kind": "field",
+              "name": "routerDirection",
+              "attribute": "router-direction",
+              "type": { "text": "'back' | 'forward' | 'root'" },
+              "default": "'forward'",
+              "description": "When using a router, it specifies the transition direction when navigating to another page using href."
+            }
+          ],
+          "events": [
+            {
+              "name": "ionFocus",
+              "description": "Emitted when the button has focus."
+            },
+            {
+              "name": "ionBlur",
+              "description": "Emitted when the button loses focus."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "Content is placed between the named slots if provided without a slot."
+            },
+            {
+              "name": "icon-only",
+              "description": "Should be used on an icon in a button that has no text."
+            },
+            {
+              "name": "start",
+              "description": "Content is placed to the left of the button text in LTR, and to the right in RTL."
+            },
+            {
+              "name": "end",
+              "description": "Content is placed to the right of the button text in LTR, and to the left in RTL."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/modal/ion-modal.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "IonModal",
+          "tagName": "ion-modal",
+          "description": "A Modal is a dialog that appears on top of the app's content, and must be dismissed by the app before interaction can resume.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "isOpen",
+              "attribute": "is-open",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "If true, the modal will open. If false, the modal will close."
+            },
+            {
+              "kind": "field",
+              "name": "breakpoints",
+              "attribute": "breakpoints",
+              "type": { "text": "object" },
+              "description": "A decimal value between 0 and 1 that indicates the point after which the sheet modal will attempt to snap."
+            },
+            {
+              "kind": "field",
+              "name": "initialBreakpoint",
+              "attribute": "initial-breakpoint",
+              "type": { "text": "number" },
+              "description": "A decimal value between 0 and 1 that indicates the initial point the modal will open at."
+            },
+            {
+              "kind": "field",
+              "name": "backdropDismiss",
+              "attribute": "backdrop-dismiss",
+              "type": { "text": "boolean" },
+              "default": "true",
+              "description": "If true, the modal will be dismissed when the backdrop is clicked."
+            }
+          ],
+          "events": [
+            {
+              "name": "ionModalDidPresent",
+              "description": "Emitted after the modal has presented."
+            },
+            {
+              "name": "ionModalWillPresent",
+              "description": "Emitted before the modal has presented."
+            },
+            {
+              "name": "ionModalDidDismiss",
+              "description": "Emitted after the modal has dismissed."
+            },
+            {
+              "name": "ionModalWillDismiss",
+              "description": "Emitted before the modal has dismissed."
+            }
+          ],
+          "slots": [{ "name": "", "description": "Content is placed inside the modal." }]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/input/ion-input.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "IonInput",
+          "tagName": "ion-input",
+          "description": "The input component is a wrapper to the HTML input element with custom styling and additional functionality.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "attribute": "label",
+              "type": { "text": "string" },
+              "description": "The visible label associated with the input."
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "attribute": "value",
+              "type": { "text": "string" },
+              "description": "The value of the input."
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "attribute": "placeholder",
+              "type": { "text": "string" },
+              "description": "Instructional text that shows before the input has a value."
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "attribute": "type",
+              "type": { "text": "'text' | 'email' | 'number' | 'password' | 'tel' | 'url'" },
+              "default": "'text'",
+              "description": "The type of control to display."
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "attribute": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "If true, the user cannot interact with the input."
+            },
+            {
+              "kind": "field",
+              "name": "readonly",
+              "attribute": "readonly",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "If true, the element will have its spelling and grammar checked."
+            },
+            {
+              "kind": "field",
+              "name": "clearInput",
+              "attribute": "clear-input",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "If true, a clear icon will appear in the input when there is a value."
+            },
+            {
+              "kind": "field",
+              "name": "counter",
+              "attribute": "counter",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "If true, a character counter will display the ratio of characters used and the total character limit."
+            }
+          ],
+          "events": [
+            {
+              "name": "ionInput",
+              "description": "The ionInput event is fired each time the user modifies the input's value."
+            },
+            {
+              "name": "ionChange",
+              "description": "The ionChange event is fired when the user modifies the input's value."
+            },
+            {
+              "name": "ionFocus",
+              "description": "Emitted when the input has focus."
+            },
+            {
+              "name": "ionBlur",
+              "description": "Emitted when the input loses focus."
+            }
+          ],
+          "slots": [
+            {
+              "name": "start",
+              "description": "Content to display at the leading edge of the input."
+            },
+            {
+              "name": "end",
+              "description": "Content to display at the trailing edge of the input."
+            },
+            { "name": "label", "description": "The label text to associate with the input." }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/select/ion-select.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "IonSelect",
+          "tagName": "ion-select",
+          "description": "Selects are form controls to select an option, or options, from a set of options.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "attribute": "label",
+              "type": { "text": "string" },
+              "description": "The visible label associated with the select."
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "attribute": "value",
+              "type": { "text": "string" },
+              "description": "The value of the select."
+            },
+            {
+              "kind": "field",
+              "name": "multiple",
+              "attribute": "multiple",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "If true, the select can accept multiple values."
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "attribute": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "If true, the user cannot interact with the select."
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "attribute": "placeholder",
+              "type": { "text": "string" },
+              "description": "The text to display when the select is empty."
+            },
+            {
+              "kind": "field",
+              "name": "cancelText",
+              "attribute": "cancel-text",
+              "type": { "text": "string" },
+              "default": "'Cancel'",
+              "description": "The text to display on the cancel button."
+            },
+            {
+              "kind": "field",
+              "name": "okText",
+              "attribute": "ok-text",
+              "type": { "text": "string" },
+              "default": "'OK'",
+              "description": "The text to display on the ok button."
+            }
+          ],
+          "events": [
+            {
+              "name": "ionChange",
+              "description": "Emitted when the value has changed."
+            },
+            {
+              "name": "ionFocus",
+              "description": "Emitted when the select has focus."
+            },
+            {
+              "name": "ionBlur",
+              "description": "Emitted when the select loses focus."
+            },
+            {
+              "name": "ionCancel",
+              "description": "Emitted when the selection is cancelled."
+            },
+            {
+              "name": "ionDismiss",
+              "description": "Emitted when the overlay is dismissed."
+            }
+          ],
+          "slots": [
+            { "name": "", "description": "Content (ion-select-option elements) for the select." }
+          ]
+        }
+      ]
+    }
+  ]
+}

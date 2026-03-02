@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "1.0.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "SlButton",
+          "tagName": "sl-button",
+          "description": "A button component.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": { "text": "string" },
+              "description": "The variant."
+            }
+          ],
+          "events": [
+            {
+              "name": "sl-click",
+              "type": { "text": "CustomEvent" },
+              "description": "Fired on click."
+            }
+          ],
+          "slots": [{ "name": "", "description": "Default slot." }],
+          "cssParts": [{ "name": "base", "description": "The base wrapper." }],
+          "cssProperties": [
+            { "name": "--sl-color-primary", "description": "Primary color." },
+            { "name": "--sl-color-secondary", "description": "Secondary color." }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/dialog.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "SlDialog",
+          "tagName": "sl-dialog",
+          "description": "A dialog component.",
+          "members": [],
+          "events": [],
+          "slots": [],
+          "cssParts": [],
+          "cssProperties": []
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tooltip.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "SlTooltip",
+          "tagName": "sl-tooltip",
+          "description": "A tooltip component.",
+          "members": [],
+          "events": [],
+          "slots": [],
+          "cssParts": [],
+          "cssProperties": []
+        }
+      ]
+    }
+  ]
+}

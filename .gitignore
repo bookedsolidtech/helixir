@@ -9,6 +9,21 @@ coverage/
 .automaker/quarantine/
 .automaker/agents/
 .automaker/worktrees/
+.automaker/features/
+.automaker/active-branches.json
+.automaker/execution-state.json
+.automaker/actionable-items.json
+.automaker/categories.json
+.automaker/checkpoints/
+.automaker/context/context-metadata.json
+.automaker/knowledge*
+.automaker/ledger/
+.automaker/notifications.json
+.automaker/recovery/
+.automaker/self-review/
+.automaker/trajectory/
+.automaker/authority/
+.automaker/settings.json
 
 # Reports (generated artifacts)
 protoLabs.report.html

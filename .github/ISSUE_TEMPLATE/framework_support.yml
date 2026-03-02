@@ -1,6 +1,6 @@
 name: Framework Support Request
 description: Request support for a new web component framework or CEM variant
-labels: ["framework-support"]
+labels: ['framework-support']
 body:
   - type: markdown
     attributes:
@@ -12,7 +12,7 @@ body:
     attributes:
       label: Framework name
       description: The name and version of the web component framework
-      placeholder: "FAST Element 2.x"
+      placeholder: 'FAST Element 2.x'
     validations:
       required: true
 
@@ -21,7 +21,7 @@ body:
     attributes:
       label: GitHub repository
       description: Link to the framework's GitHub repository
-      placeholder: "https://github.com/microsoft/fast"
+      placeholder: 'https://github.com/microsoft/fast'
     validations:
       required: true
 

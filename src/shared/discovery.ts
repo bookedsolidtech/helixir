@@ -64,6 +64,23 @@ export function discoverCemPath(projectRoot: string): string | null {
   return found[0] ?? null;
 }
 
+/**
+ * Resolves an array of CEM path patterns (which may contain `*` wildcards) to
+ * concrete relative paths that exist on disk, relative to `projectRoot`.
+ * Static paths are returned as-is if they exist; glob patterns are expanded.
+ */
+export function resolveGlobCemPaths(patterns: string[], projectRoot: string): string[] {
+  const result: string[] = [];
+  for (const pattern of patterns) {
+    if (pattern.includes('*')) {
+      result.push(...expandGlobPattern(projectRoot, pattern));
+    } else if (existsSync(resolve(projectRoot, pattern))) {
+      result.push(pattern);
+    }
+  }
+  return result;
+}
+
 export const FRIENDLY_CEM_ERROR =
   `Error: No custom-elements.json found.\n` +
   `Tried: custom-elements.json, dist/custom-elements.json, src/custom-elements.json\n\n` +

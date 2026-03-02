@@ -1,7 +1,10 @@
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { z } from 'zod';
 
 import type { McpWcConfig } from '../config.js';
 import type { Cem, CemDeclaration } from '../handlers/cem.js';
+import { CemSchema } from '../handlers/cem.js';
 import {
   scoreComponent,
   scoreAllComponents,
@@ -138,20 +141,21 @@ export async function handleHealthCall(
   name: string,
   args: Record<string, unknown>,
   config: McpWcConfig,
-  cem: Cem,
+  cem?: Cem,
 ): Promise<MCPToolResult> {
   try {
     if (name === 'score_component') {
       const { tag_name } = ScoreComponentArgsSchema.parse(args);
-      const declarations = getAllDeclarations(cem);
-      const cemDecl = declarations.find((d) => d.tagName === tag_name);
-      const result = await scoreComponent(config, tag_name, cemDecl);
+      const result = await scoreComponent(config, tag_name);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 
     if (name === 'score_all_components') {
       ScoreAllComponentsArgsSchema.parse(args);
-      const declarations = getAllDeclarations(cem);
+      const cemPath = resolve(config.projectRoot, config.cemPath);
+      const raw = await readFile(cemPath, 'utf-8');
+      const cemData = CemSchema.parse(JSON.parse(String(raw)));
+      const declarations = cemData.modules.flatMap((m) => m.declarations ?? []);
       const results = await scoreAllComponents(config, declarations);
       return createSuccessResponse(JSON.stringify(results, null, 2));
     }
@@ -170,7 +174,7 @@ export async function handleHealthCall(
 
     if (name === 'analyze_accessibility') {
       const { tagName } = AnalyzeAccessibilityArgsSchema.parse(args);
-      const declarations = getAllDeclarations(cem);
+      const declarations = cem ? getAllDeclarations(cem) : [];
       if (tagName !== undefined) {
         const decl = declarations.find((d) => d.tagName === tagName);
         if (!decl) {

@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 
 import type { McpWcConfig } from '../config.js';
+import type { Cem } from './cem.js';
 
 export interface DesignToken {
   name: string;
@@ -92,4 +93,60 @@ export function findToken(config: McpWcConfig, query: string): DesignToken[] {
       t.name.toLowerCase().includes(lowerQuery) ||
       String(t.value).toLowerCase().includes(lowerQuery),
   );
+}
+
+// --- Token-to-component reverse lookup ---
+
+export interface TokenUsageEntry {
+  tagName: string;
+  usedIn: string;
+  description: string;
+}
+
+export interface FindComponentsUsingTokenResult {
+  token: string;
+  total: number;
+  components: TokenUsageEntry[];
+}
+
+/**
+ * Finds all components in the CEM that reference a given CSS custom property token.
+ * @param cem - The parsed Custom Elements Manifest
+ * @param token - The CSS custom property name to search for
+ * @param options.fuzzy - When true, supports wildcard (`*`) and substring matching
+ */
+export function findComponentsUsingToken(
+  cem: Cem,
+  token: string,
+  options: { fuzzy?: boolean } = {},
+): FindComponentsUsingTokenResult {
+  const { fuzzy = false } = options;
+
+  function matches(propName: string): boolean {
+    if (!fuzzy) return propName === token;
+    if (token.endsWith('*')) {
+      const prefix = token.slice(0, -1);
+      return propName.startsWith(prefix);
+    }
+    return propName.includes(token);
+  }
+
+  const components: TokenUsageEntry[] = [];
+
+  for (const mod of cem.modules) {
+    for (const decl of mod.declarations ?? []) {
+      if (!decl.tagName) continue;
+      for (const prop of decl.cssProperties ?? []) {
+        if (matches(prop.name)) {
+          components.push({
+            tagName: decl.tagName,
+            usedIn: prop.name,
+            description: prop.description ?? '',
+          });
+        }
+      }
+    }
+  }
+
+  return { token, total: components.length, components };
 }

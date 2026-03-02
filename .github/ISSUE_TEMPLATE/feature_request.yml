@@ -1,6 +1,6 @@
 name: Feature Request
 description: Propose a new tool or capability for wc-mcp
-labels: ["enhancement"]
+labels: ['enhancement']
 body:
   - type: markdown
     attributes:
@@ -12,7 +12,7 @@ body:
     attributes:
       label: Use case description
       description: Describe the problem you're trying to solve. What are you trying to do, and why is the current toolset insufficient?
-      placeholder: "When working with a large component library, I often need to..."
+      placeholder: 'When working with a large component library, I often need to...'
     validations:
       required: true
 
@@ -21,7 +21,7 @@ body:
     attributes:
       label: Proposed tool name
       description: Suggest a name following the snake_case convention (e.g. `get_component_slots`, `find_tokens_by_prefix`)
-      placeholder: "get_component_dependencies"
+      placeholder: 'get_component_dependencies'
     validations:
       required: false
 
@@ -57,6 +57,6 @@ body:
     attributes:
       label: Framework context
       description: Is this specific to a particular framework (Shoelace, Stencil, FAST, etc.) or general to all CEM-compliant libraries?
-      placeholder: "This would work for any CEM-compliant library, but I specifically need it for Stencil-generated manifests which include..."
+      placeholder: 'This would work for any CEM-compliant library, but I specifically need it for Stencil-generated manifests which include...'
     validations:
       required: false

@@ -174,16 +174,19 @@ function computeGrade(score: number): 'A' | 'B' | 'C' | 'D' | 'F' {
  * Dispatches a discovery tool call by name and returns an MCPToolResult.
  * Called by the server's consolidated CallToolRequestSchema handler.
  */
+const EMPTY_CEM: Cem = { schemaVersion: '1.0.0', modules: [] };
+
 export async function handleDiscoveryCall(
   name: string,
   args: Record<string, unknown>,
   config: McpWcConfig,
-  cem: Cem,
+  cem?: Cem,
   cemLoadedAt?: Date | null,
 ): Promise<MCPToolResult> {
+  const resolvedCem = cem ?? EMPTY_CEM;
   try {
     if (name === 'list_components') {
-      const tags = listAllComponents(cem);
+      const tags = listAllComponents(resolvedCem);
       if (tags.length === 0) {
         return createSuccessResponse('No components found in the Custom Elements Manifest.');
       }
@@ -193,11 +196,11 @@ export async function handleDiscoveryCall(
     if (name === 'find_component') {
       const { query } = FindComponentArgsSchema.parse(args);
       const queryTokens = tokenize(query);
-      const tags = listAllComponents(cem);
+      const tags = listAllComponents(resolvedCem);
 
       const scored: ComponentScore[] = [];
       for (const tagName of tags) {
-        const meta = parseCem(tagName, cem);
+        const meta = parseCem(tagName, resolvedCem);
         const memberNames = meta.members.map((m) => m.name);
         const score = scoreComponent(tagName, meta.description, memberNames, queryTokens);
         if (score > 0) {
@@ -217,7 +220,7 @@ export async function handleDiscoveryCall(
     }
 
     if (name === 'get_library_summary') {
-      const tags = listAllComponents(cem);
+      const tags = listAllComponents(resolvedCem);
       const componentCount = tags.length;
 
       let averageScore: number | undefined;
@@ -276,7 +279,7 @@ export async function handleDiscoveryCall(
 
     if (name === 'list_events') {
       const { tagName } = TagNameFilterSchema.parse(args);
-      const rows = listAllEvents(cem, tagName);
+      const rows = listAllEvents(resolvedCem, tagName);
       if (rows.length === 0) {
         return createSuccessResponse('No events found.');
       }
@@ -287,7 +290,7 @@ export async function handleDiscoveryCall(
 
     if (name === 'list_slots') {
       const { tagName } = TagNameFilterSchema.parse(args);
-      const rows = listAllSlots(cem, tagName);
+      const rows = listAllSlots(resolvedCem, tagName);
       if (rows.length === 0) {
         return createSuccessResponse('No slots found.');
       }
@@ -302,7 +305,7 @@ export async function handleDiscoveryCall(
 
     if (name === 'list_css_parts') {
       const { tagName } = TagNameFilterSchema.parse(args);
-      const rows = listAllCssParts(cem, tagName);
+      const rows = listAllCssParts(resolvedCem, tagName);
       if (rows.length === 0) {
         return createSuccessResponse('No CSS parts found.');
       }

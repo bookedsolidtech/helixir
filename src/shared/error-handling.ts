@@ -3,6 +3,7 @@ export enum ErrorCategory {
   NOT_FOUND = 'NOT_FOUND',
   GIT = 'GIT',
   FILESYSTEM = 'FILESYSTEM',
+  NETWORK_ERROR = 'NETWORK_ERROR',
   UNKNOWN = 'UNKNOWN',
 }
 

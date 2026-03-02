@@ -1,10 +1,19 @@
+import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 import { z } from 'zod';
 import type { McpWcConfig } from '../config.js';
 import { SafeFileOperations } from '../shared/file-ops.js';
-import { parseCem } from './cem.js';
+import { parseCem, CemSchema } from './cem.js';
 import type { Cem } from './cem.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
+
+function loadCemFromConfig(config: McpWcConfig): Cem {
+  const cemPath = resolve(config.projectRoot, config.cemPath);
+  if (!existsSync(cemPath)) {
+    throw new MCPError(`CEM file not found: ${cemPath}`, ErrorCategory.FILESYSTEM);
+  }
+  return CemSchema.parse(JSON.parse(readFileSync(cemPath, 'utf-8')));
+}
 
 // ─── Return types ─────────────────────────────────────────────────────────────
 
@@ -69,9 +78,10 @@ function extractUnionOptions(typeText: string): string[] | null {
 export async function suggestUsage(
   tagName: string,
   config: McpWcConfig,
-  cem: Cem,
+  cem?: Cem,
 ): Promise<SuggestUsageResult> {
-  const meta = parseCem(tagName, cem);
+  const resolvedCem = cem ?? loadCemFromConfig(config);
+  const meta = parseCem(tagName, resolvedCem);
   const fields = meta.members.filter((m) => m.kind === 'field');
 
   const requiredAttributes: string[] = [];
@@ -128,7 +138,7 @@ export async function suggestUsage(
   }
 
   // Detect Stencil CEM by checking if module source paths use .tsx extension
-  const isStencil = cem.modules.some((mod) => mod.path.endsWith('.tsx'));
+  const isStencil = resolvedCem.modules.some((mod) => mod.path.endsWith('.tsx'));
 
   if (isStencil) {
     notes.push(
@@ -160,15 +170,16 @@ export async function suggestUsage(
 export async function generateImport(
   tagName: string,
   config: McpWcConfig,
-  cem: Cem,
+  cem?: Cem,
 ): Promise<GenerateImportResult> {
   const fileOps = new SafeFileOperations();
+  const resolvedCem = cem ?? loadCemFromConfig(config);
 
   // Find the module path for this component in the cached CEM
   let modulePath: string | null = null;
   let className: string | null = null;
 
-  for (const mod of cem.modules) {
+  for (const mod of resolvedCem.modules) {
     for (const decl of mod.declarations ?? []) {
       if (decl.tagName === tagName) {
         modulePath = mod.path;

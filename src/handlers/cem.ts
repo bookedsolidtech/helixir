@@ -55,6 +55,7 @@ const CemDeclarationSchema = z.object({
   cssParts: z.array(CemCssPartSchema).optional(),
   cssProperties: z.array(CemCssPropertySchema).optional(),
   references: z.array(CemReferenceSchema).optional(),
+  packageName: z.string().optional(),
 });
 
 const CemModuleSchema = z.object({
@@ -389,4 +390,105 @@ export async function diffCem(
   }
 
   return { isNew: false, breaking, additions };
+}
+
+// --- Monorepo / multi-package support ---
+
+export interface PackagedCem {
+  cem: Cem;
+  packageName: string;
+}
+
+/**
+ * Merges multiple packaged CEMs into a single CEM.
+ * Tag names that collide across packages are namespaced as `packageName:tagName`.
+ * Sets `packageName` on every declaration for provenance tracking.
+ */
+export function mergeCems(packages: PackagedCem[]): Cem {
+  if (packages.length === 0) {
+    return { schemaVersion: '1.0.0', modules: [] };
+  }
+
+  // Count occurrences of each tagName across all packages
+  const tagCounts = new Map<string, number>();
+  for (const { cem } of packages) {
+    for (const mod of cem.modules) {
+      for (const decl of mod.declarations ?? []) {
+        if (decl.tagName) {
+          tagCounts.set(decl.tagName, (tagCounts.get(decl.tagName) ?? 0) + 1);
+        }
+      }
+    }
+  }
+
+  const mergedModules: Cem['modules'] = [];
+
+  for (const { cem, packageName } of packages) {
+    for (const mod of cem.modules) {
+      const newDecls = (mod.declarations ?? []).map((decl) => {
+        const collides = decl.tagName !== undefined && (tagCounts.get(decl.tagName) ?? 0) > 1;
+        return {
+          ...decl,
+          tagName: collides ? `${packageName}:${decl.tagName}` : decl.tagName,
+          packageName,
+        };
+      });
+      mergedModules.push({ ...mod, declarations: newDecls });
+    }
+  }
+
+  return {
+    schemaVersion: (packages[0] as PackagedCem).cem.schemaVersion,
+    modules: mergedModules,
+  };
+}
+
+// --- Token-component lookup ---
+
+export interface TokenComponentMatch {
+  tagName: string;
+  tokenDescription: string;
+  defaultValue: string;
+}
+
+export interface FindComponentsByTokenResult {
+  token: string;
+  totalMatches: number;
+  components: TokenComponentMatch[];
+}
+
+/**
+ * Finds all components that reference a given CSS custom property token.
+ * @param token - The CSS custom property name (must start with "--")
+ * @param partialMatch - When true, matches any token containing `token` as a substring
+ * @param cem - The parsed Custom Elements Manifest
+ */
+export function findComponentsByToken(
+  token: string,
+  partialMatch: boolean,
+  cem: Cem,
+): FindComponentsByTokenResult {
+  if (!token.startsWith('--')) {
+    throw new Error(`CSS custom property name must start with "--": "${token}"`);
+  }
+
+  const components: TokenComponentMatch[] = [];
+
+  for (const mod of cem.modules) {
+    for (const decl of mod.declarations ?? []) {
+      if (!decl.tagName) continue;
+      for (const prop of decl.cssProperties ?? []) {
+        const matches = partialMatch ? prop.name.includes(token) : prop.name === token;
+        if (matches) {
+          components.push({
+            tagName: decl.tagName,
+            tokenDescription: prop.description ?? '',
+            defaultValue: prop.default ?? '',
+          });
+        }
+      }
+    }
+  }
+
+  return { token, totalMatches: components.length, components };
 }

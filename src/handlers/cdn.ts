@@ -41,7 +41,7 @@ export async function resolveCdnCem(
   if (!response.ok) {
     throw new MCPError(
       `CDN fetch failed: HTTP ${response.status} for ${pkg}@${version} from ${registry}`,
-      ErrorCategory.UNKNOWN,
+      ErrorCategory.NETWORK_ERROR,
     );
   }
 

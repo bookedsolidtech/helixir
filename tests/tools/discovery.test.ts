@@ -196,7 +196,7 @@ describe('isDiscoveryTool', () => {
 
 describe('handleDiscoveryCall — list_components', () => {
   it('returns formatted list of components', async () => {
-    vi.mocked(listAllComponents).mockResolvedValue(['my-button', 'my-card', 'my-select']);
+    vi.mocked(listAllComponents).mockReturnValue(['my-button', 'my-card', 'my-select']);
     const result = await handleDiscoveryCall('list_components', {}, makeConfig());
     expect(result.isError).toBeFalsy();
     expect(result.content[0].text).toContain('my-button');
@@ -205,7 +205,7 @@ describe('handleDiscoveryCall — list_components', () => {
   });
 
   it('handles empty component list', async () => {
-    vi.mocked(listAllComponents).mockResolvedValue([]);
+    vi.mocked(listAllComponents).mockReturnValue([]);
     const result = await handleDiscoveryCall('list_components', {}, makeConfig());
     expect(result.isError).toBeFalsy();
     expect(result.content[0].text).toBeTruthy();
@@ -218,8 +218,8 @@ describe('handleDiscoveryCall — list_components', () => {
 
 describe('handleDiscoveryCall — find_component', () => {
   function mockComponents() {
-    vi.mocked(listAllComponents).mockResolvedValue(['my-button', 'my-card', 'my-select']);
-    vi.mocked(parseCem).mockImplementation(async (tagName: string) => {
+    vi.mocked(listAllComponents).mockReturnValue(['my-button', 'my-card', 'my-select']);
+    vi.mocked(parseCem).mockImplementation((tagName: string) => {
       const data: Record<
         string,
         {
@@ -329,7 +329,7 @@ describe('handleDiscoveryCall — find_component', () => {
 
 describe('handleDiscoveryCall — get_library_summary', () => {
   it('returns component count', async () => {
-    vi.mocked(listAllComponents).mockResolvedValue(['my-button', 'my-card', 'my-select']);
+    vi.mocked(listAllComponents).mockReturnValue(['my-button', 'my-card', 'my-select']);
     const result = await handleDiscoveryCall('get_library_summary', {}, makeConfig());
     expect(result.isError).toBeFalsy();
     const data = JSON.parse(result.content[0].text) as { componentCount: number };
@@ -337,7 +337,7 @@ describe('handleDiscoveryCall — get_library_summary', () => {
   });
 
   it('returns componentCount=0 when no components exist', async () => {
-    vi.mocked(listAllComponents).mockResolvedValue([]);
+    vi.mocked(listAllComponents).mockReturnValue([]);
     const result = await handleDiscoveryCall('get_library_summary', {}, makeConfig());
     expect(result.isError).toBeFalsy();
     const data = JSON.parse(result.content[0].text) as { componentCount: number };
@@ -345,7 +345,7 @@ describe('handleDiscoveryCall — get_library_summary', () => {
   });
 
   it('omits health fields when history dir does not exist', async () => {
-    vi.mocked(listAllComponents).mockResolvedValue(['my-button']);
+    vi.mocked(listAllComponents).mockReturnValue(['my-button']);
     const result = await handleDiscoveryCall('get_library_summary', {}, makeConfig());
     expect(result.isError).toBeFalsy();
     const data = JSON.parse(result.content[0].text) as Record<string, unknown>;
@@ -414,7 +414,7 @@ const MY_CARD_EVENTS = [
 
 describe('handleDiscoveryCall — list_events', () => {
   it('returns all events from all components', async () => {
-    vi.mocked(listAllEvents).mockResolvedValue([...MY_BUTTON_EVENTS, ...MY_CARD_EVENTS]);
+    vi.mocked(listAllEvents).mockReturnValue([...MY_BUTTON_EVENTS, ...MY_CARD_EVENTS]);
     const result = await handleDiscoveryCall('list_events', {}, makeConfig());
     expect(result.isError).toBeFalsy();
     expect(result.content[0].text).toContain('click');
@@ -424,7 +424,7 @@ describe('handleDiscoveryCall — list_events', () => {
   });
 
   it('returns 3 events for my-button fixture', async () => {
-    vi.mocked(listAllEvents).mockResolvedValue(MY_BUTTON_EVENTS);
+    vi.mocked(listAllEvents).mockReturnValue(MY_BUTTON_EVENTS);
     const result = await handleDiscoveryCall('list_events', { tagName: 'my-button' }, makeConfig());
     expect(result.isError).toBeFalsy();
     // header + 3 data rows
@@ -433,13 +433,13 @@ describe('handleDiscoveryCall — list_events', () => {
   });
 
   it('passes tagName filter arg to handler', async () => {
-    vi.mocked(listAllEvents).mockResolvedValue(MY_BUTTON_EVENTS);
+    vi.mocked(listAllEvents).mockReturnValue(MY_BUTTON_EVENTS);
     await handleDiscoveryCall('list_events', { tagName: 'my-button' }, makeConfig());
     expect(vi.mocked(listAllEvents)).toHaveBeenCalledWith(expect.anything(), 'my-button');
   });
 
   it('includes event name, component, description, and type in output', async () => {
-    vi.mocked(listAllEvents).mockResolvedValue(MY_BUTTON_EVENTS);
+    vi.mocked(listAllEvents).mockReturnValue(MY_BUTTON_EVENTS);
     const result = await handleDiscoveryCall('list_events', {}, makeConfig());
     expect(result.content[0].text).toContain('click');
     expect(result.content[0].text).toContain('my-button');
@@ -448,7 +448,7 @@ describe('handleDiscoveryCall — list_events', () => {
   });
 
   it('returns empty message when no events found', async () => {
-    vi.mocked(listAllEvents).mockResolvedValue([]);
+    vi.mocked(listAllEvents).mockReturnValue([]);
     const result = await handleDiscoveryCall('list_events', {}, makeConfig());
     expect(result.isError).toBeFalsy();
     expect(result.content[0].text).toContain('No events found');
@@ -461,7 +461,7 @@ describe('handleDiscoveryCall — list_events', () => {
 
 describe('handleDiscoveryCall — list_slots', () => {
   it('returns 3 slots for my-button fixture', async () => {
-    vi.mocked(listAllSlots).mockResolvedValue(MY_BUTTON_SLOTS);
+    vi.mocked(listAllSlots).mockReturnValue(MY_BUTTON_SLOTS);
     const result = await handleDiscoveryCall('list_slots', { tagName: 'my-button' }, makeConfig());
     expect(result.isError).toBeFalsy();
     // header + 3 data rows
@@ -470,27 +470,27 @@ describe('handleDiscoveryCall — list_slots', () => {
   });
 
   it('passes tagName filter arg to handler', async () => {
-    vi.mocked(listAllSlots).mockResolvedValue(MY_BUTTON_SLOTS);
+    vi.mocked(listAllSlots).mockReturnValue(MY_BUTTON_SLOTS);
     await handleDiscoveryCall('list_slots', { tagName: 'my-button' }, makeConfig());
     expect(vi.mocked(listAllSlots)).toHaveBeenCalledWith(expect.anything(), 'my-button');
   });
 
   it('marks default slot as default in output', async () => {
-    vi.mocked(listAllSlots).mockResolvedValue(MY_BUTTON_SLOTS);
+    vi.mocked(listAllSlots).mockReturnValue(MY_BUTTON_SLOTS);
     const result = await handleDiscoveryCall('list_slots', {}, makeConfig());
     expect(result.content[0].text).toContain('default');
     expect(result.content[0].text).toContain('(default)');
   });
 
   it('marks named slot as named in output', async () => {
-    vi.mocked(listAllSlots).mockResolvedValue(MY_BUTTON_SLOTS);
+    vi.mocked(listAllSlots).mockReturnValue(MY_BUTTON_SLOTS);
     const result = await handleDiscoveryCall('list_slots', {}, makeConfig());
     expect(result.content[0].text).toContain('named');
     expect(result.content[0].text).toContain('prefix');
   });
 
   it('includes slot name, component, description, and kind in output', async () => {
-    vi.mocked(listAllSlots).mockResolvedValue(MY_BUTTON_SLOTS);
+    vi.mocked(listAllSlots).mockReturnValue(MY_BUTTON_SLOTS);
     const result = await handleDiscoveryCall('list_slots', {}, makeConfig());
     expect(result.content[0].text).toContain('prefix');
     expect(result.content[0].text).toContain('my-button');
@@ -498,7 +498,7 @@ describe('handleDiscoveryCall — list_slots', () => {
   });
 
   it('returns empty message when no slots found', async () => {
-    vi.mocked(listAllSlots).mockResolvedValue([]);
+    vi.mocked(listAllSlots).mockReturnValue([]);
     const result = await handleDiscoveryCall('list_slots', {}, makeConfig());
     expect(result.isError).toBeFalsy();
     expect(result.content[0].text).toContain('No slots found');
@@ -511,7 +511,7 @@ describe('handleDiscoveryCall — list_slots', () => {
 
 describe('handleDiscoveryCall — list_css_parts', () => {
   it('returns 2 parts for my-button fixture', async () => {
-    vi.mocked(listAllCssParts).mockResolvedValue(MY_BUTTON_PARTS);
+    vi.mocked(listAllCssParts).mockReturnValue(MY_BUTTON_PARTS);
     const result = await handleDiscoveryCall(
       'list_css_parts',
       { tagName: 'my-button' },
@@ -524,13 +524,13 @@ describe('handleDiscoveryCall — list_css_parts', () => {
   });
 
   it('passes tagName filter arg to handler', async () => {
-    vi.mocked(listAllCssParts).mockResolvedValue(MY_BUTTON_PARTS);
+    vi.mocked(listAllCssParts).mockReturnValue(MY_BUTTON_PARTS);
     await handleDiscoveryCall('list_css_parts', { tagName: 'my-button' }, makeConfig());
     expect(vi.mocked(listAllCssParts)).toHaveBeenCalledWith(expect.anything(), 'my-button');
   });
 
   it('includes part name, component, and description in output', async () => {
-    vi.mocked(listAllCssParts).mockResolvedValue(MY_BUTTON_PARTS);
+    vi.mocked(listAllCssParts).mockReturnValue(MY_BUTTON_PARTS);
     const result = await handleDiscoveryCall('list_css_parts', {}, makeConfig());
     expect(result.content[0].text).toContain('base');
     expect(result.content[0].text).toContain('my-button');
@@ -539,7 +539,7 @@ describe('handleDiscoveryCall — list_css_parts', () => {
   });
 
   it('returns empty message when no CSS parts found', async () => {
-    vi.mocked(listAllCssParts).mockResolvedValue([]);
+    vi.mocked(listAllCssParts).mockReturnValue([]);
     const result = await handleDiscoveryCall('list_css_parts', {}, makeConfig());
     expect(result.isError).toBeFalsy();
     expect(result.content[0].text).toContain('No CSS parts found');

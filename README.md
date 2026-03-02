@@ -372,6 +372,59 @@ See [`mcpwc.config.json.example`](./mcpwc.config.json.example) for a ready-to-co
 
 ## AI Tool Configs
 
+### Claude Code (CLI)
+
+Add to `.mcp.json` in your project root (project-scoped) or `~/.claude.json` (global):
+
+**Option 1 — Install from npm (recommended)**
+
+```bash
+npx wc-tools init  # generates mcpwc.config.json in your project root
+```
+
+Then add to `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "wc-tools": {
+      "command": "npx",
+      "args": ["wc-tools"],
+      "env": {
+        "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
+      }
+    }
+  }
+}
+```
+
+**Option 2 — Install from local clone (development)**
+
+```bash
+git clone https://github.com/bookedsolidtech/wc-tools.git
+cd wc-tools
+pnpm install
+pnpm build
+```
+
+Then add to `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "wc-tools": {
+      "command": "node",
+      "args": ["/absolute/path/to/wc-tools/build/index.js"],
+      "env": {
+        "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
+      }
+    }
+  }
+}
+```
+
+Reload Claude Code after saving (`:mcp` to verify the server appears).
+
 ### Claude Desktop
 
 Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):

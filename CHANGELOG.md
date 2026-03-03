@@ -10,11 +10,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 
 ### Added
 
+**MCP server**
+
+- MCP server for web component Custom Elements Manifest (CEM) analysis — gives AI agents full situational awareness of any web component library.
+- Multi-library support: Shoelace, Lit, Stencil, FAST, Spectrum, Material, Vaadin, Carbon, Ionic, Lion, Fluent UI, and PatternFly.
+- CDN CEM resolution via `resolve_cdn_cem` — fetch and cache CEM files from unpkg/jsDelivr without a local install.
+- Watch mode (`--watch`) — automatically reloads the CEM when the source file changes.
+- `wc-tools init` CLI command — interactive setup wizard to generate a `wc-tools.config.json`.
+
 **Discovery tools**
 
 - `list_components` — list all custom elements registered in the Custom Elements Manifest.
 - `find_component` — semantic search for components by name, description, or member names using token-overlap scoring.
 - `get_library_summary` — library overview: component count, average health score, and grade distribution.
+- `list_events` — list all events exposed across all components.
+- `list_slots` — list all named slots across all components.
+- `list_css_parts` — list all CSS shadow parts across all components.
+- `list_components_by_category` — filter components by category tag.
 
 **Component tools**
 
@@ -22,6 +34,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 - `validate_cem` — validate CEM documentation completeness for a component; returns a 0–100 score and a list of issues.
 - `suggest_usage` — generate an HTML usage snippet showing key attributes with default values.
 - `generate_import` — generate side-effect and named import statements from CEM exports and `package.json`.
+- `get_component_narrative` — plain-language description of a component's purpose and API.
+- `get_prop_constraints` — list property constraints (allowed values, types, defaults) for a component.
+- `find_components_by_token` — find components that reference a specific design token.
+- `get_component_dependencies` — list components that a given component depends on.
+- `find_components_using_token` — reverse lookup: find all components that use a given CSS custom property.
 
 **Health tools**
 
@@ -29,6 +46,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 - `score_all_components` — health scores for every component in the library in one call.
 - `get_health_trend` — component health trend over the last N days with trend direction and change percentage.
 - `get_health_diff` — before/after health comparison between the current branch and a base branch.
+- `analyze_accessibility` — accessibility analysis for a component: ARIA roles, keyboard support, and WCAG coverage.
 
 **Safety tools**
 
@@ -44,3 +62,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 
 - `get_design_tokens` — list all design tokens from the configured tokens file, optionally filtered by category.
 - `find_token` — search for a design token by name or value.
+
+**Framework & validation tools**
+
+- `detect_framework` — detect the web component authoring framework (Lit, Stencil, FAST, etc.) used in the project.
+- `validate_usage` — validate a component usage snippet against the CEM (attribute names, types, required props).
+
+**Composition & story tools**
+
+- `get_composition_example` — generate a multi-component composition example showing components used together.
+- `generate_story` — generate a Storybook story (CSF format) for a component.
+
+**Bundle & benchmark tools**
+
+- `estimate_bundle_size` — estimate the tree-shaken bundle size contribution of one or more components.
+- Benchmark handler — compare component health metrics across branches or snapshots.
+- Compare handler — side-by-side library comparison for evaluating component coverage and quality.

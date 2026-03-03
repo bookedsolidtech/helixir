@@ -3,7 +3,8 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { existsSync, readFileSync, watch as fsWatch } from 'fs';
-import { resolve } from 'path';
+import { dirname, resolve } from 'path';
+import { fileURLToPath } from 'url';
 import { loadConfig } from './config.js';
 import { CemSchema } from './handlers/cem.js';
 import type { Cem } from './handlers/cem.js';
@@ -83,7 +84,13 @@ function startCemWatcher(cemAbsPath: string): void {
   });
 }
 
-const server = new Server({ name: 'wc-tools', version: '0.1.0' }, { capabilities: { tools: {} } });
+const _pkgJson = JSON.parse(
+  readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '..', 'package.json'), 'utf-8'),
+) as { version: string };
+const server = new Server(
+  { name: 'wc-tools', version: _pkgJson.version },
+  { capabilities: { tools: {} } },
+);
 
 async function main(): Promise<void> {
   const config = loadConfig();

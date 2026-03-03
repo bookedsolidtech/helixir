@@ -154,6 +154,12 @@ function mapDeclaration(decl: CemDeclaration): ComponentMetadata {
 
 // --- Public API ---
 
+/**
+ * Parses a Custom Elements Manifest and extracts component metadata for a given tag name.
+ * @param tagName - The custom element tag name to look up (e.g. "my-button")
+ * @param cem - The parsed Custom Elements Manifest
+ * @returns The component's full metadata including members, events, slots, and CSS API
+ */
 export function parseCem(tagName: string, cem: Cem): ComponentMetadata {
   const decl = findDeclaration(cem, tagName);
   if (!decl) {
@@ -162,6 +168,13 @@ export function parseCem(tagName: string, cem: Cem): ComponentMetadata {
   return mapDeclaration(decl);
 }
 
+/**
+ * Checks whether a component's CEM entry has sufficient documentation coverage.
+ * Inspects descriptions on the component itself, its properties, events, slots, CSS properties, and CSS parts.
+ * @param tagName - The custom element tag name to validate
+ * @param cem - The parsed Custom Elements Manifest
+ * @returns A completeness score (0–100) and a list of missing-documentation issues
+ */
 export function validateCompleteness(tagName: string, cem: Cem): CompletenessResult {
   const decl = findDeclaration(cem, tagName);
   if (!decl) {
@@ -258,6 +271,12 @@ export interface CssPartRow {
 
 // --- Cross-component aggregation functions ---
 
+/**
+ * Lists all custom events declared across components in the CEM.
+ * @param cem - The parsed Custom Elements Manifest
+ * @param tagName - Optional tag name to filter results to a single component
+ * @returns An array of event rows with the event name, owning tag, description, and type
+ */
 export function listAllEvents(cem: Cem, tagName?: string): EventRow[] {
   const rows: EventRow[] = [];
   for (const mod of cem.modules) {

@@ -119,6 +119,15 @@ function findDeclaration(cem: Cem, tagName: string) {
   return undefined;
 }
 
+/**
+ * Validates an HTML snippet against the Custom Elements Manifest (CEM) spec for a given component.
+ *
+ * @param tagName - The custom element tag name to validate against (e.g. `"my-button"`).
+ * @param html - The HTML snippet string to parse and validate.
+ * @param cem - The parsed Custom Elements Manifest containing component declarations.
+ * @returns A `ValidationResult` containing the tag name, overall validity, a list of issues, and a formatted summary string.
+ * @throws {MCPError} If `tagName` is not found in the CEM.
+ */
 export function validateUsage(tagName: string, html: string, cem: Cem): ValidationResult {
   const issues: ValidationIssue[] = [];
 

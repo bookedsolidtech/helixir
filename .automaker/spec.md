@@ -1,14 +1,14 @@
-# wc-mcp — Project Specification
+# wc-tools — Project Specification
 
 ## What It Is
-`wc-mcp` is a single, self-contained MCP (Model Context Protocol) server that gives AI coding assistants full situational awareness of any web component library.
+`wc-tools` is a single, self-contained MCP (Model Context Protocol) server that gives AI coding assistants full situational awareness of any web component library.
 
 **Framework-agnostic.** Works with Lit, Stencil, FAST, hand-coded JS, or any library that generates a Custom Elements Manifest (CEM). This is THE goto tool for anyone working with web components.
 
 **Tagline:** *Give Claude eyes into your design system.*
 
-**npm package:** `wc-mcp`
-**GitHub:** `git@github.com:clarity-house-press/wc-mcp.git`
+**npm package:** `wc-tools`
+**GitHub:** `git@github.com:clarity-house-press/wc-tools.git`
 
 ## OSS Context
 - Priority #2 in Clarity House / ProtoLabs OSS strategy
@@ -36,7 +36,7 @@
 | Testing | `vitest` ^3 + `@vitest/coverage-v8` |
 | Module format | ESM (`"type": "module"`) |
 | Package manager | pnpm |
-| Publish | npm (`wc-mcp`) |
+| Publish | npm (`wc-tools`) |
 
 ## Tool Groups (16 tools total)
 1. **Discovery** — `list_components`, `find_component`, `get_library_summary`

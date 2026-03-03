@@ -379,7 +379,7 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (without tokensPath c
   });
 
   describe('tools/list without tokensPath', () => {
-    it('does NOT include token tools when tokensPath is not configured', async () => {
+    it('DOES include token tools even when tokensPath is not configured', async () => {
       const id = sendNoTokensRequest('tools/list', {});
       const response = await recvNoTokens();
 
@@ -387,8 +387,8 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (without tokensPath c
       const result = response.result as { tools: Array<{ name: string }> };
       const toolNames = result.tools.map((t) => t.name);
 
-      expect(toolNames).not.toContain('get_design_tokens');
-      expect(toolNames).not.toContain('find_token');
+      expect(toolNames).toContain('get_design_tokens');
+      expect(toolNames).toContain('find_token');
     });
   });
 

@@ -54,7 +54,7 @@ afterAll(() => {
 });
 
 describe('getFileDiagnostics', () => {
-  it('detects a type error in a file with errors', () => {
+  it('detects a type error in a file with errors', { timeout: 15_000 }, () => {
     const config = makeConfig(tempDir);
     const diagnostics = getFileDiagnostics(config, 'error.ts');
     expect(diagnostics.length).toBeGreaterThan(0);

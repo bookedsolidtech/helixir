@@ -1,6 +1,7 @@
 # wc-tools — Agent Context
 
 ## What This Is
+
 An OSS MCP server that gives AI coding assistants full situational awareness of any web component library. Framework-agnostic — works with Lit, Stencil, FAST, hand-coded JS, or any library that generates a Custom Elements Manifest (CEM). Single package, multiple tools across several handler groups. Published to npm as `wc-tools`.
 
 ## Common Commands

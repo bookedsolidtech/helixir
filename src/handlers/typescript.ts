@@ -28,6 +28,7 @@ try {
   ts = null;
 }
 
+/** Returns `true` if the `typescript` package is installed and available at runtime, `false` otherwise. */
 export function isTypescriptAvailable(): boolean {
   return ts !== null;
 }

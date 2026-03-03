@@ -16,7 +16,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 - Multi-library support: Shoelace, Lit, Stencil, FAST, Spectrum, Material, Vaadin, Carbon, Ionic, Lion, Fluent UI, and PatternFly.
 - CDN CEM resolution via `resolve_cdn_cem` — fetch and cache CEM files from unpkg/jsDelivr without a local install.
 - Watch mode (`--watch`) — automatically reloads the CEM when the source file changes.
-- `wc-tools init` CLI command — interactive setup wizard to generate a `wc-tools.config.json`.
+- `wc-tools init` CLI command — interactive setup wizard to generate a `mcpwc.config.json`.
 
 **Discovery tools**
 

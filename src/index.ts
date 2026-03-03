@@ -84,9 +84,14 @@ function startCemWatcher(cemAbsPath: string): void {
   });
 }
 
-const _pkgJson = JSON.parse(
-  readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '..', 'package.json'), 'utf-8'),
-) as { version: string };
+let _pkgJson: { version: string };
+try {
+  _pkgJson = JSON.parse(
+    readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '..', 'package.json'), 'utf-8'),
+  ) as { version: string };
+} catch {
+  _pkgJson = { version: '0.0.0' };
+}
 const server = new Server(
   { name: 'wc-tools', version: _pkgJson.version },
   { capabilities: { tools: {} } },

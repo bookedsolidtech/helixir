@@ -469,6 +469,136 @@ export function mergeCems(packages: PackagedCem[]): Cem {
   };
 }
 
+// --- Namespaced CEM Store ---
+
+export type CemSourceType = 'config' | 'local' | 'cdn';
+
+export interface CemStoreEntry {
+  cem: Cem;
+  sourceType: CemSourceType;
+  componentCount: number;
+}
+
+const cemStore = new Map<string, CemStoreEntry>();
+
+/**
+ * Loads a CEM into the namespaced store under the given libraryId.
+ * The "default" library is loaded from config at startup.
+ */
+export function loadLibrary(
+  libraryId: string,
+  cem: Cem,
+  sourceType: CemSourceType = 'local',
+): void {
+  const componentCount = cem.modules
+    .flatMap((m) => m.declarations ?? [])
+    .filter((d) => d.tagName).length;
+  cemStore.set(libraryId, { cem, sourceType, componentCount });
+}
+
+/**
+ * Returns the CEM for a given libraryId, or undefined if not loaded.
+ */
+export function getLibrary(libraryId: string): Cem | undefined {
+  return cemStore.get(libraryId)?.cem;
+}
+
+/**
+ * Returns all loaded library IDs with component counts and source types.
+ */
+export function listLibraries(): Array<{
+  libraryId: string;
+  componentCount: number;
+  sourceType: CemSourceType;
+}> {
+  return Array.from(cemStore.entries()).map(([libraryId, entry]) => ({
+    libraryId,
+    componentCount: entry.componentCount,
+    sourceType: entry.sourceType,
+  }));
+}
+
+/**
+ * Removes a library from the store. Cannot remove the "default" library.
+ * Returns true if the library was removed, false if it was not found.
+ */
+export function removeLibrary(libraryId: string): boolean {
+  if (libraryId === 'default') return false;
+  return cemStore.delete(libraryId);
+}
+
+/**
+ * Clears all non-default libraries from the store. Intended for use in tests.
+ */
+export function clearCemStore(): void {
+  const defaultEntry = cemStore.get('default');
+  cemStore.clear();
+  if (defaultEntry) cemStore.set('default', defaultEntry);
+}
+
+/**
+ * Clears ALL libraries from the store, including default. Intended for use in tests.
+ */
+export function resetCemStore(): void {
+  cemStore.clear();
+}
+
+// --- Backward-compatible CDN aliases ---
+
+/**
+ * Loads a CDN-resolved CEM into the store under the given libraryId.
+ * @deprecated Use loadLibrary(libraryId, cem, 'cdn') instead.
+ */
+export function loadCdnCem(libraryId: string, cem: Cem): void {
+  loadLibrary(libraryId, cem, 'cdn');
+}
+
+/**
+ * Clears all non-default libraries from the store. Intended for use in tests.
+ * @deprecated Use clearCemStore() instead.
+ */
+export function clearCdnCemCache(): void {
+  clearCemStore();
+}
+
+/**
+ * Returns a merged CEM combining the local CEM with all non-default loaded CEMs.
+ * If no additional CEMs have been loaded, returns the local CEM unchanged.
+ * Tag names that collide across packages are namespaced as `libraryId:tagName`.
+ */
+export function getMergedCem(localCem: Cem): Cem {
+  // Collect all non-default libraries
+  const additionalLibs = Array.from(cemStore.entries()).filter(([id]) => id !== 'default');
+  if (additionalLibs.length === 0) return localCem;
+
+  const packages: PackagedCem[] = [
+    { cem: localCem, packageName: 'local' },
+    ...additionalLibs.map(([id, entry]) => ({ cem: entry.cem, packageName: id })),
+  ];
+
+  return mergeCems(packages);
+}
+
+/**
+ * Resolves which CEM to use based on an optional libraryId parameter.
+ * If libraryId is provided and found, returns that library's CEM.
+ * If libraryId is omitted or "default", returns the merged CEM (backward compat).
+ * Throws if a specific libraryId is requested but not found.
+ */
+export function resolveCem(libraryId: string | undefined, defaultCem: Cem): Cem {
+  if (!libraryId || libraryId === 'default') {
+    return getMergedCem(defaultCem);
+  }
+  const entry = cemStore.get(libraryId);
+  if (!entry) {
+    throw new MCPError(
+      `Library "${libraryId}" not found. Use list_libraries to see loaded libraries.`,
+      ErrorCategory.NOT_FOUND,
+    );
+  }
+  return entry.cem;
+}
+
 // --- Token-component lookup ---
 
 export interface TokenComponentMatch {

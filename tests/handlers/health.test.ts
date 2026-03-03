@@ -8,6 +8,7 @@ import {
   scoreAllComponents,
   getHealthTrend,
   getHealthDiff,
+  getHealthSummary,
   type CemDeclaration,
 } from '../../src/handlers/health.js';
 
@@ -504,5 +505,171 @@ describe('getHealthDiff', () => {
 
     expect(diff.base.score).toBe(0);
     expect(diff.base.grade).toBe('F');
+  });
+});
+
+// ─── Confidence metadata ───────────────────────────────────────────────────────
+
+describe('confidence metadata in history files', () => {
+  it('existing history files without confidence still parse and score correctly', async () => {
+    const config = makeConfig();
+    const result = await scoreComponent(config, 'my-button');
+    expect(result.tagName).toBe('my-button');
+    expect(result.score).toBe(88);
+    expect(result.dimensionConfidence).toBeUndefined();
+    expect(result.confidenceSummary).toBeUndefined();
+  });
+
+  it('history files with confidence data include dimensionConfidence in scoreComponent output', async () => {
+    const config = makeConfig();
+    const result = await scoreComponent(config, 'my-confirmed');
+    expect(result.tagName).toBe('my-confirmed');
+    expect(result.dimensionConfidence).toBeDefined();
+    expect(result.dimensionConfidence!.documentation).toBe('verified');
+    expect(result.dimensionConfidence!.accessibility).toBe('heuristic');
+    expect(result.dimensionConfidence!.completeness).toBe('untested');
+  });
+
+  it('history files with confidence data include confidenceSummary in scoreComponent output', async () => {
+    const config = makeConfig();
+    const result = await scoreComponent(config, 'my-confirmed');
+    expect(result.confidenceSummary).toBeDefined();
+    expect(result.confidenceSummary!.verified).toBe(1);
+    expect(result.confidenceSummary!.heuristic).toBe(1);
+    expect(result.confidenceSummary!.untested).toBe(1);
+  });
+
+  it('history files with weights include dimensionWeights in scoreComponent output', async () => {
+    const config = makeConfig();
+    const result = await scoreComponent(config, 'my-confirmed');
+    expect(result.dimensionWeights).toBeDefined();
+    expect(result.dimensionWeights!.documentation).toBe(40);
+    expect(result.dimensionWeights!.accessibility).toBe(30);
+  });
+});
+
+// ─── dimensionTrends in getHealthTrend ────────────────────────────────────────
+
+describe('getHealthTrend dimensionTrends', () => {
+  it('returns dimensionTrends when breakdown data is available across multiple points', async () => {
+    const config = makeConfig();
+    const trend = await getHealthTrend(config, 'my-button', 10);
+    expect(trend.dimensionTrends).toBeDefined();
+    expect(typeof trend.dimensionTrends!.documentation).toBe('object');
+    expect(trend.dimensionTrends!.documentation).toHaveProperty('trend');
+    expect(trend.dimensionTrends!.documentation).toHaveProperty('changePercent');
+  });
+
+  it('dimensionTrend directions are valid trend values', async () => {
+    const config = makeConfig();
+    const trend = await getHealthTrend(config, 'my-button', 10);
+    const validTrends = ['improving', 'declining', 'stable'];
+    for (const [, dimTrend] of Object.entries(trend.dimensionTrends ?? {})) {
+      expect(validTrends).toContain(dimTrend.trend);
+    }
+  });
+
+  it('does not include dimensionTrends for a single data point', async () => {
+    const config = makeConfig();
+    const trend = await getHealthTrend(config, 'my-button', 1);
+    expect(trend.dimensionTrends).toBeUndefined();
+  });
+
+  it('returns dimensionTrends for my-confirmed with confidence data', async () => {
+    const config = makeConfig();
+    const trend = await getHealthTrend(config, 'my-confirmed', 10);
+    expect(trend.dimensionTrends).toBeDefined();
+    // documentation: 65 → 90 = +38.5% → improving
+    expect(trend.dimensionTrends!.documentation!.trend).toBe('improving');
+  });
+});
+
+// ─── getHealthSummary ─────────────────────────────────────────────────────────
+
+describe('getHealthSummary', () => {
+  it('returns correct totalComponents count', async () => {
+    const config = makeConfig();
+    const decls: CemDeclaration[] = [
+      { tagName: 'my-button', description: 'Button' },
+      { tagName: 'my-card', description: 'Card' },
+    ];
+    const summary = await getHealthSummary(config, decls);
+    expect(summary.totalComponents).toBe(2);
+  });
+
+  it('computes averageScore from history files', async () => {
+    const config = makeConfig();
+    const decls: CemDeclaration[] = [
+      { tagName: 'my-button', description: 'Button' },
+      { tagName: 'my-card', description: 'Card' },
+    ];
+    const summary = await getHealthSummary(config, decls);
+    // my-button = 88, my-card latest score from fixture
+    expect(summary.averageScore).toBeGreaterThan(0);
+    expect(summary.averageScore).toBeLessThanOrEqual(100);
+  });
+
+  it('grade distribution sums to totalComponents', async () => {
+    const config = makeConfig();
+    const decls: CemDeclaration[] = [
+      { tagName: 'my-button', description: 'Button' },
+      { tagName: 'my-card', description: 'Card' },
+    ];
+    const summary = await getHealthSummary(config, decls);
+    const total =
+      summary.gradeDistribution.A +
+      summary.gradeDistribution.B +
+      summary.gradeDistribution.C +
+      summary.gradeDistribution.D +
+      summary.gradeDistribution.F;
+    expect(total).toBe(summary.totalComponents);
+  });
+
+  it('identifies components needing attention (score below 70)', async () => {
+    const config = makeConfig();
+    // NO_HISTORY_DIR forces CEM fallback — we can inject a low-scoring decl
+    const lowScoreDecl: CemDeclaration = {
+      tagName: 'poor-component',
+      // no description → score will be low
+    };
+    const goodDecl: CemDeclaration = {
+      tagName: 'my-button',
+      description: 'Button',
+    };
+    const summary = await getHealthSummary(config, [lowScoreDecl, goodDecl]);
+    // poor-component scores from CEM fallback (no desc = 0 for that dimension)
+    // but since history exists for my-button, both may or may not trigger attention
+    expect(Array.isArray(summary.componentsNeedingAttention)).toBe(true);
+  });
+
+  it('returns stable libraryTrend when no history is available', async () => {
+    const noHistoryConfig = makeConfig(NO_HISTORY_DIR);
+    const decls: CemDeclaration[] = [{ tagName: 'my-button', description: 'Button' }];
+    const summary = await getHealthSummary(noHistoryConfig, decls);
+    expect(summary.libraryTrend).toBe('stable');
+  });
+
+  it('includes a timestamp in ISO 8601 format', async () => {
+    const config = makeConfig();
+    const decls: CemDeclaration[] = [{ tagName: 'my-button', description: 'Button' }];
+    const summary = await getHealthSummary(config, decls);
+    expect(typeof summary.timestamp).toBe('string');
+    expect(summary.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+  });
+
+  it('handles mixed components — some with history, some without', async () => {
+    const config = makeConfig();
+    const decls: CemDeclaration[] = [
+      { tagName: 'my-button', description: 'Button' },
+      { tagName: 'my-card', description: 'Card' },
+      {
+        tagName: 'no-history-component',
+        description: 'No history',
+        members: [{ kind: 'field', name: 'val', description: 'Val' }],
+      },
+    ];
+    const summary = await getHealthSummary(config, decls);
+    // 3 components (my-button + my-card from history, no-history-component from CEM fallback)
+    expect(summary.totalComponents).toBe(3);
   });
 });

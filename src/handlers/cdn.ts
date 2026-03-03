@@ -2,6 +2,7 @@ import { mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import type { McpWcConfig } from '../config.js';
 import { CemSchema } from './cem.js';
+import { loadCdnCem } from './cem.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
 
 /**
@@ -29,42 +30,62 @@ function sanitizeVersion(version: string): string {
 
 /**
  * Fetches and caches a library's Custom Elements Manifest from a CDN registry.
+ * Tries the provided cemPath (or default root path), then falls back to
+ * dist/custom-elements.json and lib/custom-elements.json before failing.
+ * On success, loads the CEM into the in-memory CDN cache so subsequent tool
+ * calls can reference the resolved library.
  */
 export async function resolveCdnCem(
   pkg: string,
   version: string,
   registry: 'jsdelivr' | 'unpkg',
   config: McpWcConfig,
-): Promise<{ cachePath: string; componentCount: number; formatted: string }> {
+  cemPath?: string,
+): Promise<{ cachePath: string; componentCount: number; formatted: string; libraryId: string }> {
   const sanitized = sanitizePackageName(pkg);
   const safeVersion = sanitizeVersion(version);
 
-  // Build URL using percent-encoded package name and version to prevent URL injection.
+  // Build base URL using percent-encoded package name and version to prevent URL injection.
   const protocol = 'https';
   const host = registry === 'jsdelivr' ? 'cdn.jsdelivr.net' : 'unpkg.com';
   const encodedPkg = encodeURIComponent(pkg).replace('%40', '@').replace('%2F', '/');
-  const url = `${protocol}://${host}/npm/${encodedPkg}@${encodeURIComponent(safeVersion)}/custom-elements.json`;
+  const baseUrl = `${protocol}://${host}/npm/${encodedPkg}@${encodeURIComponent(safeVersion)}`;
 
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 10_000);
+  // Paths to try in order. If cemPath is provided, only try that path.
+  const pathsToTry = cemPath
+    ? [cemPath]
+    : ['custom-elements.json', 'dist/custom-elements.json', 'lib/custom-elements.json'];
 
-  let response: Response;
-  try {
-    response = await fetch(url, { signal: controller.signal });
-  } finally {
-    clearTimeout(timer);
+  let successResponse: Response | null = null;
+
+  for (const path of pathsToTry) {
+    const url = `${baseUrl}/${path}`;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10_000);
+
+    let res: Response;
+    try {
+      res = await fetch(url, { signal: controller.signal });
+    } finally {
+      clearTimeout(timer);
+    }
+
+    if (res.ok) {
+      successResponse = res;
+      break;
+    }
   }
 
-  if (!response.ok) {
+  if (!successResponse) {
     throw new MCPError(
-      `CDN fetch failed: HTTP ${response.status} for ${pkg}@${version} from ${registry}`,
+      `CDN fetch failed: no CEM found for ${pkg}@${version} from ${registry}. Tried: ${pathsToTry.join(', ')}`,
       ErrorCategory.NETWORK_ERROR,
     );
   }
 
   let json: unknown;
   try {
-    json = JSON.parse(await response.text());
+    json = JSON.parse(await successResponse.text());
   } catch {
     throw new MCPError(
       `CDN response for ${pkg}@${version} is not valid JSON`,
@@ -88,11 +109,15 @@ export async function resolveCdnCem(
   const cachePath = join(cacheDir, `${sanitized}@${safeVersion}.json`);
   writeFileSync(cachePath, JSON.stringify(cem, null, 2), 'utf-8');
 
+  // Load into in-memory CDN CEM registry so subsequent tool calls can use this library.
+  loadCdnCem(sanitized, cem);
+
   const componentCount = cem.modules
     .flatMap((m) => m.declarations ?? [])
     .filter((d) => d.tagName).length;
 
-  const formatted = `Resolved ${pkg}@${version} from ${registry}: ${componentCount} component(s). Cached to ${cachePath}.`;
+  const libraryId = sanitized;
+  const formatted = `Resolved ${pkg}@${version} from ${registry}: ${componentCount} component(s). Library ID: "${libraryId}". Cached to ${cachePath}.`;
 
-  return { cachePath, componentCount, formatted };
+  return { cachePath, componentCount, formatted, libraryId };
 }

@@ -14,6 +14,9 @@ export interface ComponentHealth {
   score: number;
   grade: 'A' | 'B' | 'C' | 'D' | 'F';
   dimensions: Record<string, number>;
+  dimensionWeights?: Record<string, number>;
+  dimensionConfidence?: Record<string, 'verified' | 'heuristic' | 'untested'>;
+  confidenceSummary?: { verified: number; heuristic: number; untested: number };
   issues: string[];
   timestamp: string;
 }
@@ -24,6 +27,19 @@ export interface HealthTrend {
   dataPoints: Array<{ date: string; score: number; grade: string }>;
   trend: 'improving' | 'declining' | 'stable';
   changePercent: number;
+  dimensionTrends?: Record<
+    string,
+    { trend: 'improving' | 'declining' | 'stable'; changePercent: number }
+  >;
+}
+
+export interface HealthSummary {
+  totalComponents: number;
+  averageScore: number;
+  gradeDistribution: { A: number; B: number; C: number; D: number; F: number };
+  libraryTrend: 'improving' | 'declining' | 'stable';
+  componentsNeedingAttention: string[];
+  timestamp: string;
 }
 
 export interface HealthDiff {
@@ -52,11 +68,19 @@ const HistoryFileSchema = z.object({
       z.object({
         score: z.number(),
         weight: z.number().optional(),
+        confidence: z.enum(['verified', 'heuristic', 'untested']).optional(),
         details: z.record(z.unknown()).optional(),
       }),
     )
     .default({}),
   issues: z.array(z.object({ message: z.string() })).default([]),
+  overallConfidence: z
+    .object({
+      verified: z.number(),
+      heuristic: z.number(),
+      untested: z.number(),
+    })
+    .optional(),
 });
 
 // Manually typed to avoid Zod's optional/default inference quirks
@@ -64,8 +88,17 @@ interface HistoryFileRaw {
   component: string;
   date: string;
   score: number;
-  breakdown: Record<string, { score: number; weight?: number; details?: Record<string, unknown> }>;
+  breakdown: Record<
+    string,
+    {
+      score: number;
+      weight?: number;
+      confidence?: 'verified' | 'heuristic' | 'untested';
+      details?: Record<string, unknown>;
+    }
+  >;
   issues: Array<{ message: string }>;
+  overallConfidence?: { verified: number; heuristic: number; untested: number };
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -89,10 +122,23 @@ function proportional(count: number, total: number, maxPoints: number): number {
 
 function historyToHealth(file: HistoryFileRaw): ComponentHealth {
   const dimensions: Record<string, number> = {};
+  const dimensionWeights: Record<string, number> = {};
+  const dimensionConfidence: Record<string, 'verified' | 'heuristic' | 'untested'> = {};
+
   for (const [key, val] of Object.entries(file.breakdown ?? {})) {
     dimensions[key] = val.score;
+    if (val.weight !== undefined) {
+      dimensionWeights[key] = val.weight;
+    }
+    if (val.confidence !== undefined) {
+      dimensionConfidence[key] = val.confidence;
+    }
   }
-  return {
+
+  const hasWeights = Object.keys(dimensionWeights).length > 0;
+  const hasConfidence = Object.keys(dimensionConfidence).length > 0;
+
+  const result: ComponentHealth = {
     tagName: file.component,
     score: file.score,
     grade: computeGrade(file.score),
@@ -100,6 +146,12 @@ function historyToHealth(file: HistoryFileRaw): ComponentHealth {
     issues: (file.issues ?? []).map((i) => i.message),
     timestamp: file.date,
   };
+
+  if (hasWeights) result.dimensionWeights = dimensionWeights;
+  if (hasConfidence) result.dimensionConfidence = dimensionConfidence;
+  if (file.overallConfidence) result.confidenceSummary = file.overallConfidence;
+
+  return result;
 }
 
 function componentHistoryDir(config: McpWcConfig, tagName: string): string {
@@ -127,6 +179,7 @@ async function parseHistoryFile(filePath: string): Promise<HistoryFileRaw> {
     score: result.data.score,
     breakdown: result.data.breakdown ?? {},
     issues: result.data.issues ?? [],
+    overallConfidence: result.data.overallConfidence,
   };
 }
 
@@ -297,9 +350,11 @@ export async function getHealthTrend(
   }
 
   const dataPoints: Array<{ date: string; score: number; grade: string }> = [];
+  const parsedFiles: HistoryFileRaw[] = [];
 
   for (const file of selectedFiles) {
     const data = await parseHistoryFile(join(dir, file));
+    parsedFiles.push(data);
     dataPoints.push({
       date: data.date,
       score: data.score,
@@ -322,12 +377,46 @@ export async function getHealthTrend(
     else if (changePercent < -5) trend = 'declining';
   }
 
+  // Compute per-dimension trends when breakdown data is available across multiple points
+  let dimensionTrends:
+    | Record<string, { trend: 'improving' | 'declining' | 'stable'; changePercent: number }>
+    | undefined;
+
+  if (parsedFiles.length > 1) {
+    const firstFile = parsedFiles[0] as HistoryFileRaw;
+    const lastFile = parsedFiles[parsedFiles.length - 1] as HistoryFileRaw;
+    const allDimensions = new Set([
+      ...Object.keys(firstFile.breakdown ?? {}),
+      ...Object.keys(lastFile.breakdown ?? {}),
+    ]);
+
+    if (allDimensions.size > 0) {
+      dimensionTrends = {};
+      for (const dim of allDimensions) {
+        const firstDimScore = firstFile.breakdown[dim]?.score ?? 0;
+        const lastDimScore = lastFile.breakdown[dim]?.score ?? 0;
+        const dimChangePercent =
+          firstDimScore === 0
+            ? lastDimScore > 0
+              ? 100
+              : 0
+            : ((lastDimScore - firstDimScore) / firstDimScore) * 100;
+        const roundedDimChange = Math.round(dimChangePercent * 10) / 10;
+        let dimTrend: 'improving' | 'declining' | 'stable' = 'stable';
+        if (roundedDimChange > 5) dimTrend = 'improving';
+        else if (roundedDimChange < -5) dimTrend = 'declining';
+        dimensionTrends[dim] = { trend: dimTrend, changePercent: roundedDimChange };
+      }
+    }
+  }
+
   return {
     tagName,
     days: dataPoints.length,
     dataPoints,
     trend,
     changePercent,
+    ...(dimensionTrends !== undefined ? { dimensionTrends } : {}),
   };
 }
 
@@ -417,5 +506,79 @@ export async function getHealthDiff(
     regressed,
     scoreDelta: Math.round(scoreDelta * 10) / 10,
     changedDimensions,
+  };
+}
+
+/**
+ * Returns aggregate health statistics for all components.
+ * Uses history files when available; falls back to CEM-derived scoring.
+ */
+export async function getHealthSummary(
+  config: McpWcConfig,
+  cemDeclarations: CemDeclaration[],
+): Promise<HealthSummary> {
+  const withTag = cemDeclarations.filter((decl) => decl.tagName !== undefined);
+
+  const results = await Promise.all(
+    withTag.map(async (decl) => {
+      try {
+        return await scoreComponent(config, decl.tagName as string, decl);
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  const scored = results.filter((r): r is ComponentHealth => r !== null);
+
+  const totalComponents = scored.length;
+  const averageScore =
+    totalComponents === 0
+      ? 0
+      : Math.round((scored.reduce((sum, r) => sum + r.score, 0) / totalComponents) * 10) / 10;
+
+  const gradeDistribution = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+  for (const r of scored) {
+    gradeDistribution[r.grade]++;
+  }
+
+  const componentsNeedingAttention = scored.filter((r) => r.score < 70).map((r) => r.tagName);
+
+  // Determine library-wide trend using per-component history files.
+  // Collect individual trend directions and pick the plurality.
+  const trendCounts: Record<'improving' | 'declining' | 'stable', number> = {
+    improving: 0,
+    declining: 0,
+    stable: 0,
+  };
+
+  await Promise.all(
+    withTag.map(async (decl) => {
+      try {
+        const t = await getHealthTrend(config, decl.tagName as string, 7);
+        trendCounts[t.trend]++;
+      } catch {
+        // no history — skip
+      }
+    }),
+  );
+
+  let libraryTrend: 'improving' | 'declining' | 'stable' = 'stable';
+  if (trendCounts.improving > trendCounts.declining && trendCounts.improving > trendCounts.stable) {
+    libraryTrend = 'improving';
+  } else if (
+    trendCounts.declining > trendCounts.improving &&
+    trendCounts.declining > trendCounts.stable
+  ) {
+    libraryTrend = 'declining';
+  }
+
+  return {
+    totalComponents,
+    averageScore,
+    gradeDistribution,
+    libraryTrend,
+    componentsNeedingAttention,
+    timestamp: new Date().toISOString(),
   };
 }

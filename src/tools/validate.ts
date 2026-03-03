@@ -18,6 +18,11 @@ export const VALIDATE_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         tagName: {
           type: 'string',
           description: 'The custom element tag name (e.g. "my-button").',

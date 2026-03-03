@@ -48,6 +48,11 @@ export const HEALTH_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         tagName: {
           type: 'string',
           description: 'The tag name of the component to score (e.g. "my-button").',
@@ -63,7 +68,13 @@ export const HEALTH_TOOL_DEFINITIONS = [
       'Returns health scores for all components in the library. Maps over all CEM declarations.',
     inputSchema: {
       type: 'object' as const,
-      properties: {},
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+      },
       additionalProperties: false,
     },
   },
@@ -74,6 +85,11 @@ export const HEALTH_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         tagName: {
           type: 'string',
           description: 'The tag name of the component (e.g. "my-button").',
@@ -94,6 +110,11 @@ export const HEALTH_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         tagName: {
           type: 'string',
           description: 'The tag name of the component (e.g. "my-button").',
@@ -108,12 +129,33 @@ export const HEALTH_TOOL_DEFINITIONS = [
     },
   },
   {
+    name: 'get_health_summary',
+    description:
+      'Returns aggregate health statistics for all components: average score, grade distribution, total count, library-wide trend, and components needing attention (score below 70).',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'analyze_accessibility',
     description:
       'Analyzes the accessibility profile of one or all web components from CEM data. Checks for ARIA roles, aria-* attributes, form association, keyboard events, focus management, disabled state, label support, and accessibility documentation.',
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         tagName: {
           type: 'string',
           description:

@@ -6,7 +6,7 @@ import { existsSync, readFileSync, watch as fsWatch } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { loadConfig } from './config.js';
-import { CemSchema } from './handlers/cem.js';
+import { CemSchema, loadLibrary, resolveCem } from './handlers/cem.js';
 import type { Cem } from './handlers/cem.js';
 import {
   DISCOVERY_TOOL_DEFINITIONS,
@@ -41,6 +41,12 @@ import {
 import { BUNDLE_TOOL_DEFINITIONS, handleBundleCall, isBundleTool } from './tools/bundle.js';
 import { CDN_TOOL_DEFINITIONS, handleCdnCall, isCdnTool } from './tools/cdn.js';
 import { STORY_TOOL_DEFINITIONS, handleStoryCall, isStoryTool } from './tools/story.js';
+import {
+  BENCHMARK_TOOL_DEFINITIONS,
+  handleBenchmarkCall,
+  isBenchmarkTool,
+} from './tools/benchmark.js';
+import { LIBRARY_TOOL_DEFINITIONS, handleLibraryCall, isLibraryTool } from './tools/library.js';
 import { createErrorResponse } from './shared/mcp-helpers.js';
 import type { MCPToolResult } from './shared/mcp-helpers.js';
 
@@ -55,6 +61,8 @@ function loadCem(cemAbsPath: string): { componentCount: number } {
   const parsed: unknown = JSON.parse(raw);
   cemCache = CemSchema.parse(parsed);
   cemLoadedAt = new Date();
+  // Register the default CEM in the namespaced store
+  loadLibrary('default', cemCache, 'config');
   const componentCount = cemCache.modules
     .flatMap((m) => m.declarations ?? [])
     .filter((d) => d.tagName).length;
@@ -142,6 +150,8 @@ async function main(): Promise<void> {
     ...BUNDLE_TOOL_DEFINITIONS,
     ...CDN_TOOL_DEFINITIONS,
     ...STORY_TOOL_DEFINITIONS,
+    ...BENCHMARK_TOOL_DEFINITIONS,
+    ...LIBRARY_TOOL_DEFINITIONS,
     ...tsTools,
   ];
 
@@ -156,6 +166,13 @@ async function main(): Promise<void> {
     const typedArgs = args as Record<string, unknown>;
 
     const result = await (async (): Promise<MCPToolResult> => {
+      // Library management tools (no CEM dependency)
+      if (isLibraryTool(name)) return handleLibraryCall(name, typedArgs, config);
+
+      // Extract optional libraryId from args for CEM resolution
+      const libraryId =
+        typeof typedArgs['libraryId'] === 'string' ? typedArgs['libraryId'] : undefined;
+
       if (
         isDiscoveryTool(name) ||
         isComponentTool(name) ||
@@ -166,11 +183,13 @@ async function main(): Promise<void> {
           return createErrorResponse(
             'CEM not yet loaded — server is still initializing. Please retry.',
           );
+        const effectiveCem = resolveCem(libraryId, cemCache);
         if (isDiscoveryTool(name))
-          return handleDiscoveryCall(name, typedArgs, config, cemCache, cemLoadedAt);
-        if (isComponentTool(name)) return handleComponentCall(name, typedArgs, config, cemCache);
-        if (isSafetyTool(name)) return handleSafetyCall(name, typedArgs, config, cemCache);
-        if (isHealthTool(name)) return handleHealthCall(name, typedArgs, config, cemCache);
+          return handleDiscoveryCall(name, typedArgs, config, effectiveCem, cemLoadedAt);
+        if (isComponentTool(name))
+          return handleComponentCall(name, typedArgs, config, effectiveCem);
+        if (isSafetyTool(name)) return handleSafetyCall(name, typedArgs, config, effectiveCem);
+        if (isHealthTool(name)) return handleHealthCall(name, typedArgs, config, effectiveCem);
       }
       if (isTypeScriptTool(name)) {
         if (!isTypescriptAvailable()) {
@@ -187,7 +206,7 @@ async function main(): Promise<void> {
           return createErrorResponse(
             'CEM not yet loaded — server is still initializing. Please retry.',
           );
-        return handleCompositionCall(name, typedArgs, cemCache);
+        return handleCompositionCall(name, typedArgs, resolveCem(libraryId, cemCache));
       }
       if (isBundleTool(name)) return handleBundleCall(name, typedArgs, config);
       if (isCdnTool(name)) return handleCdnCall(name, typedArgs, config);
@@ -196,7 +215,7 @@ async function main(): Promise<void> {
           return createErrorResponse(
             'CEM not yet loaded — server is still initializing. Please retry.',
           );
-        return handleStoryCall(name, typedArgs, cemCache);
+        return handleStoryCall(name, typedArgs, resolveCem(libraryId, cemCache));
       }
       if (isFrameworkTool(name)) return handleFrameworkCall(name, typedArgs, config);
       if (isValidateTool(name)) {
@@ -204,8 +223,9 @@ async function main(): Promise<void> {
           return createErrorResponse(
             'CEM not yet loaded — server is still initializing. Please retry.',
           );
-        return handleValidateCall(name, typedArgs, cemCache);
+        return handleValidateCall(name, typedArgs, resolveCem(libraryId, cemCache));
       }
+      if (isBenchmarkTool(name)) return handleBenchmarkCall(name, typedArgs, config);
       if (isTokenTool(name)) {
         if (!config.tokensPath) {
           return createErrorResponse(

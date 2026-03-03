@@ -145,7 +145,7 @@ async function main(): Promise<void> {
     ...tsTools,
   ];
 
-  const allTools = config.tokensPath ? [...coreTools, ...TOKEN_TOOL_DEFINITIONS] : coreTools;
+  const allTools = [...coreTools, ...TOKEN_TOOL_DEFINITIONS];
 
   server.setRequestHandler(ListToolsRequestSchema, async () => {
     return { tools: allTools };

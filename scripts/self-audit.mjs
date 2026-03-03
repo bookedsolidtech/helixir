@@ -2,7 +2,7 @@
 /**
  * self-audit.mjs
  *
- * Runs wc-mcp against itself, collects the tool output, uses Claude to identify
+ * Runs wc-tools against itself, collects the tool output, uses Claude to identify
  * gaps, writes JSONL + markdown to .automaker/self-review/, and creates board
  * feature stubs for every gap discovered.
  *
@@ -105,7 +105,7 @@ function buildServer() {
     log('--skip-build: skipping pnpm build');
     return;
   }
-  log('Building wc-mcp …');
+  log('Building wc-tools …');
   execSync('pnpm run build', { cwd: ROOT, stdio: 'inherit' });
   log('Build complete');
 }
@@ -115,7 +115,7 @@ function buildServer() {
 // ---------------------------------------------------------------------------
 
 async function runMcpAudit() {
-  log('Starting wc-mcp server for self-audit …');
+  log('Starting wc-tools server for self-audit …');
 
   // Dynamically import the MCP SDK (it's an ESM package in node_modules)
   const { Client } = await import('@modelcontextprotocol/sdk/client/index.js');
@@ -266,7 +266,7 @@ async function runGapAnalysis(auditResults) {
 
   const auditSummary = JSON.stringify(auditResults, null, 2);
 
-  const prompt = `You are a ruthless VP of Engineering reviewing an MCP server called wc-mcp.
+  const prompt = `You are a ruthless VP of Engineering reviewing an MCP server called wc-tools.
 This server provides AI agents with introspection capabilities for web component libraries
 via the Model Context Protocol.
 
@@ -376,7 +376,7 @@ function writeOutputFiles(auditResults, gaps) {
           )
           .join('\n\n');
 
-  const summaryContent = `# wc-mcp Self-Audit — ${TODAY}
+  const summaryContent = `# wc-tools Self-Audit — ${TODAY}
 
 ## Tools Available (${auditResults.tools_available.length})
 
@@ -455,7 +455,7 @@ function createFeatureTickets(gaps, summaryPath) {
 // ---------------------------------------------------------------------------
 
 async function main() {
-  log(`wc-mcp self-audit — ${TODAY}`);
+  log(`wc-tools self-audit — ${TODAY}`);
   log(`Project root: ${ROOT}`);
 
   // Step 1 — CEM

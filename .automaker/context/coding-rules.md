@@ -1,4 +1,4 @@
-# wc-mcp Coding Rules
+# wc-tools Coding Rules
 
 ## Language & Runtime
 - TypeScript 5.7+ strict mode — no `any`, no implicit `any`

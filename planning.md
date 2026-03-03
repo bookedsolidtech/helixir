@@ -18,9 +18,9 @@
 
 **Tagline:** _Give Claude eyes into your design system._
 
-**npm package name:** `wc-mcp`
+**npm package name:** `wc-tools`
 
-**MCP server name (in .mcp.json):** `wc-mcp`
+**MCP server name (in .mcp.json):** `wc-tools`
 
 ---
 
@@ -614,12 +614,12 @@ mcp-web-components/
 
 ```json
 {
-  "name": "wc-mcp",
+  "name": "wc-tools",
   "version": "0.1.0",
   "description": "MCP server that gives AI agents full situational awareness of any web component library",
   "type": "module",
   "bin": {
-    "wc-mcp": "./build/index.js"
+    "wc-tools": "./build/index.js"
   },
   "main": "./build/index.js",
   "files": ["build", "README.md", "CHANGELOG.md"],
@@ -668,9 +668,9 @@ mcp-web-components/
 ```json
 {
   "mcpServers": {
-    "wc-mcp": {
+    "wc-tools": {
       "command": "npx",
-      "args": ["wc-mcp"],
+      "args": ["wc-tools"],
       "env": {
         "MCP_WC_CEM_PATH": "packages/my-library/custom-elements.json",
         "MCP_WC_COMPONENT_PREFIX": "my-",
@@ -712,7 +712,10 @@ import { registerTypescriptTools } from './tools/typescript.js';
 async function main() {
   const config = loadConfig();
 
-  const server = new Server({ name: 'wc-mcp', version: '0.1.0' }, { capabilities: { tools: {} } });
+  const server = new Server(
+    { name: 'wc-tools', version: '0.1.0' },
+    { capabilities: { tools: {} } },
+  );
 
   registerDiscoveryTools(server, config);
   registerComponentTools(server, config);
@@ -798,9 +801,9 @@ Use `@vitest/coverage-v8`. Set coverage thresholds: statements 80%, branches 75%
 
 The README is a key marketing asset. Structure:
 
-1. **Hero section** — Tagline, 1-sentence description, badge row (npm version `wc-mcp`, license, MCP compatible)
+1. **Hero section** — Tagline, 1-sentence description, badge row (npm version `wc-tools`, license, MCP compatible)
 2. **Why mcp-web-components?** — 3 bullet points on the value prop
-3. **Quick Start** — 3 commands to get running: `npx wc-mcp`, configure `.mcp.json`, reload Claude
+3. **Quick Start** — 3 commands to get running: `npx wc-tools`, configure `.mcp.json`, reload Claude
 4. **Tools Reference** — Table with all 16 tools, 1-line description each
 5. **Configuration** — Full config reference table
 6. **Framework support** — Lit ✅, FAST ✅, Stencil ✅, any CEM-generating library ✅

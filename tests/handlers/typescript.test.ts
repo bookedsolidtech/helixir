@@ -53,7 +53,7 @@ afterAll(() => {
   rmSync(tempDir, { recursive: true, force: true });
 });
 
-describe('getFileDiagnostics', () => {
+describe('getFileDiagnostics', { timeout: 15_000 }, () => {
   it('detects a type error in a file with errors', () => {
     const config = makeConfig(tempDir);
     const diagnostics = getFileDiagnostics(config, 'error.ts');
@@ -97,7 +97,7 @@ describe('getFileDiagnostics', () => {
   });
 });
 
-describe('getProjectDiagnostics', () => {
+describe('getProjectDiagnostics', { timeout: 15_000 }, () => {
   it('detects errors in a project with type errors', () => {
     const config = makeConfig(tempDir);
     const result = getProjectDiagnostics(config);

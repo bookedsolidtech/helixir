@@ -55,6 +55,18 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@22.19.13)(jiti@2.6.1)(yaml@2.8.2)
 
+  packages/core:
+    dependencies:
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.26.0
+        version: 1.27.1(zod@3.25.76)
+      typescript:
+        specifier: '>=5.0.0'
+        version: 5.9.3
+      zod:
+        specifier: ^3.22.0
+        version: 3.25.76
+
 packages:
 
   '@ampproject/remapping@2.3.0':

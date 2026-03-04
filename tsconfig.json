@@ -5,7 +5,6 @@
     "moduleResolution": "NodeNext",
     "lib": ["ES2022"],
     "outDir": "build",
-    "rootDir": "src",
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "declaration": true,
@@ -15,6 +14,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "packages/core/src/**/*"],
   "exclude": ["node_modules", "build"]
 }

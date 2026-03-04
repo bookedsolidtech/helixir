@@ -2,13 +2,13 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { readFileSync } from 'fs';
-import { generateMigrationGuide } from '../../src/handlers/migration.js';
-import { CemSchema } from '../../src/handlers/cem.js';
-import type { Cem } from '../../src/handlers/cem.js';
-import { GitOperations } from '../../src/shared/git.js';
-import type { McpWcConfig } from '../../src/config.js';
+import { generateMigrationGuide } from '../../packages/core/src/handlers/migration.js';
+import { CemSchema } from '../../packages/core/src/handlers/cem.js';
+import type { Cem } from '../../packages/core/src/handlers/cem.js';
+import { GitOperations } from '../../packages/core/src/shared/git.js';
+import type { McpWcConfig } from '../../packages/core/src/config.js';
 
-vi.mock('../../src/shared/git.js', () => ({
+vi.mock('../../packages/core/src/shared/git.js', () => ({
   GitOperations: vi.fn(),
 }));
 
@@ -32,6 +32,8 @@ function makeConfig(): McpWcConfig {
     healthHistoryDir: '.mcp-wc/health',
     tsconfigPath: 'tsconfig.json',
     tokensPath: null,
+    cdnBase: null,
+    watch: false,
   };
 }
 

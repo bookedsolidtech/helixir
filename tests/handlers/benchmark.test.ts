@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { join } from 'node:path';
-import { benchmarkLibraries } from '../../src/handlers/benchmark.js';
-import { MCPError } from '../../src/shared/error-handling.js';
-import type { McpWcConfig } from '../../src/config.js';
+import { benchmarkLibraries } from '../../packages/core/src/handlers/benchmark.js';
+import { MCPError } from '../../packages/core/src/shared/error-handling.js';
+import type { McpWcConfig } from '../../packages/core/src/config.js';
 
 const fixturesDir = join(import.meta.dirname, '../__fixtures__');
 
@@ -10,6 +10,8 @@ const baseConfig: McpWcConfig = {
   projectRoot: fixturesDir,
   cemPath: 'cem-v1.json',
   tokensPath: null,
+  cdnBase: null,
+  watch: false,
   componentPrefix: '',
   packageName: 'test',
 };
@@ -82,6 +84,25 @@ describe('benchmarkLibraries', () => {
         baseConfig,
       ),
     ).rejects.toThrow(MCPError);
+  });
+
+  it('error message for missing file uses relative path in display prefix', async () => {
+    let errorMessage = '';
+    try {
+      await benchmarkLibraries(
+        [
+          { label: 'Missing', cemPath: 'nonexistent.json' },
+          { label: 'Good', cemPath: 'cem-compare-a.json' },
+        ],
+        baseConfig,
+      );
+    } catch (e) {
+      errorMessage = (e as Error).message;
+    }
+    expect(errorMessage).toBeTruthy();
+    // The display path in the error prefix must be relative (not absolute)
+    expect(errorMessage).not.toMatch(new RegExp(`"${fixturesDir.replace(/\//g, '\\/')}/nonexistent\\.json"`));
+    expect(errorMessage).toContain('"nonexistent.json"');
   });
 
   it('returns zero scores for a library with no tagged components (n===0 branch)', async () => {

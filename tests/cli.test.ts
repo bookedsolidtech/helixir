@@ -8,7 +8,7 @@ import { dirname } from 'node:path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const SERVER_PATH = resolve(__dirname, '../build/index.js');
+const SERVER_PATH = resolve(__dirname, '../build/src/index.js');
 
 describe('wc-tools init', () => {
   it('writes mcpwc.config.json and prints snippets when CEM is found', () => {

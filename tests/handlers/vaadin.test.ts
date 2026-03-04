@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { CemSchema } from '../../src/handlers/cem.js';
-import { listAllComponents, parseCem } from '../../src/handlers/cem.js';
-import { validateUsage } from '../../src/handlers/validate.js';
+import { CemSchema } from '../../packages/core/src/handlers/cem.js';
+import { listAllComponents, parseCem } from '../../packages/core/src/handlers/cem.js';
+import { validateUsage } from '../../packages/core/src/handlers/validate.js';
 
 const fixturesDir = join(import.meta.dirname, '../__fixtures__');
 

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { readFileSync, readdirSync, mkdtempSync, writeFileSync, rmSync } from 'fs';
 import { join, resolve } from 'path';
 import { tmpdir } from 'os';
-import { loadConfig } from '../src/config.js';
+import { loadConfig } from '../packages/core/src/config.js';
 
 const EXAMPLES_DIR = resolve(new URL('.', import.meta.url).pathname, '../examples');
 

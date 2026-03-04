@@ -1,0 +1,28 @@
+{
+  "component": "my-confirmed",
+  "date": "2024-03-10",
+  "score": 85,
+  "breakdown": {
+    "documentation": {
+      "score": 90,
+      "weight": 40,
+      "confidence": "verified"
+    },
+    "accessibility": {
+      "score": 80,
+      "weight": 30,
+      "confidence": "heuristic"
+    },
+    "completeness": {
+      "score": 85,
+      "weight": 20,
+      "confidence": "untested"
+    }
+  },
+  "issues": [],
+  "overallConfidence": {
+    "verified": 1,
+    "heuristic": 1,
+    "untested": 1
+  }
+}

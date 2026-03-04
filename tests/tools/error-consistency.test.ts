@@ -6,14 +6,14 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
-import type { McpWcConfig } from '../../src/config.js';
-import type { Cem } from '../../src/handlers/cem.js';
+import type { McpWcConfig } from '../../packages/core/src/config.js';
+import type { Cem } from '../../packages/core/src/handlers/cem.js';
 
 // --- Mocks ---
 
-vi.mock('../../src/handlers/cem.js', async () => {
-  const actual = await vi.importActual<typeof import('../../src/handlers/cem.js')>(
-    '../../src/handlers/cem.js',
+vi.mock('../../packages/core/src/handlers/cem.js', async () => {
+  const actual = await vi.importActual<typeof import('../../packages/core/src/handlers/cem.js')>(
+    '../../packages/core/src/handlers/cem.js',
   );
   return {
     ...actual,
@@ -27,7 +27,7 @@ vi.mock('../../src/handlers/cem.js', async () => {
   };
 });
 
-vi.mock('../../src/handlers/health.js', () => ({
+vi.mock('../../packages/core/src/handlers/health.js', () => ({
   scoreComponent: vi.fn(),
   scoreAllComponents: vi.fn(),
   getHealthTrend: vi.fn(),
@@ -35,37 +35,37 @@ vi.mock('../../src/handlers/health.js', () => ({
   scoreCemFallback: vi.fn(),
 }));
 
-vi.mock('../../src/handlers/tokens.js', () => ({
+vi.mock('../../packages/core/src/handlers/tokens.js', () => ({
   getDesignTokens: vi.fn(),
   findToken: vi.fn(),
 }));
 
-vi.mock('../../src/handlers/typescript.js', () => ({
+vi.mock('../../packages/core/src/handlers/typescript.js', () => ({
   getFileDiagnostics: vi.fn(),
   getProjectDiagnostics: vi.fn(),
   isTypescriptAvailable: vi.fn().mockReturnValue(true),
   requireTs: vi.fn(),
 }));
 
-vi.mock('../../src/handlers/accessibility.js', () => ({
+vi.mock('../../packages/core/src/handlers/accessibility.js', () => ({
   analyzeAccessibility: vi.fn(),
   analyzeAllAccessibility: vi.fn(),
 }));
 
-import { handleDiscoveryCall, isDiscoveryTool } from '../../src/tools/discovery.js';
-import { handleHealthCall, isHealthTool } from '../../src/tools/health.js';
-import { handleSafetyCall, isSafetyTool } from '../../src/tools/safety.js';
-import { handleComponentCall, isComponentTool } from '../../src/tools/component.js';
-import { handleTokenCall, isTokenTool } from '../../src/tools/tokens.js';
-import { handleTypeScriptCall, isTypeScriptTool } from '../../src/tools/typescript.js';
-import { handleCdnCall, isCdnTool } from '../../src/tools/cdn.js';
-import { handleFrameworkCall, isFrameworkTool } from '../../src/tools/framework.js';
-import { handleValidateCall, isValidateTool } from '../../src/tools/validate.js';
+import { handleDiscoveryCall, isDiscoveryTool } from '../../packages/core/src/tools/discovery.js';
+import { handleHealthCall, isHealthTool } from '../../packages/core/src/tools/health.js';
+import { handleSafetyCall, isSafetyTool } from '../../packages/core/src/tools/safety.js';
+import { handleComponentCall, isComponentTool } from '../../packages/core/src/tools/component.js';
+import { handleTokenCall, isTokenTool } from '../../packages/core/src/tools/tokens.js';
+import { handleTypeScriptCall, isTypeScriptTool } from '../../packages/core/src/tools/typescript.js';
+import { handleCdnCall, isCdnTool } from '../../packages/core/src/tools/cdn.js';
+import { handleFrameworkCall, isFrameworkTool } from '../../packages/core/src/tools/framework.js';
+import { handleValidateCall, isValidateTool } from '../../packages/core/src/tools/validate.js';
 
-import { listAllComponents, parseCem, diffCem } from '../../src/handlers/cem.js';
-import { scoreComponent, scoreAllComponents } from '../../src/handlers/health.js';
-import { getDesignTokens } from '../../src/handlers/tokens.js';
-import { getFileDiagnostics } from '../../src/handlers/typescript.js';
+import { listAllComponents, parseCem, diffCem } from '../../packages/core/src/handlers/cem.js';
+import { scoreComponent, scoreAllComponents } from '../../packages/core/src/handlers/health.js';
+import { getDesignTokens } from '../../packages/core/src/handlers/tokens.js';
+import { getFileDiagnostics } from '../../packages/core/src/handlers/typescript.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = resolve(__dirname, '../__fixtures__');

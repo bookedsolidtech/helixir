@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import { discoverCemPath, FRIENDLY_CEM_ERROR } from '../src/shared/discovery.js';
-import { loadConfig } from '../src/config.js';
+import { discoverCemPath, FRIENDLY_CEM_ERROR } from '../packages/core/src/shared/discovery.js';
+import { loadConfig } from '../packages/core/src/config.js';
 
 function createTmpDir(): string {
   return mkdtempSync(join(tmpdir(), 'wc-tools-discovery-test-'));

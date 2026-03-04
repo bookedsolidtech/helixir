@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { detectFramework } from '../../src/handlers/framework.js';
-import type { McpWcConfig } from '../../src/config.js';
+import { detectFramework } from '../../packages/core/src/handlers/framework.js';
+import type { McpWcConfig } from '../../packages/core/src/config.js';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 

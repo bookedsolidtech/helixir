@@ -11,8 +11,8 @@ vi.mock('node:fs/promises', () => ({
 }));
 
 import { readFile, access } from 'node:fs/promises';
-import { SafeFileOperations } from '../../src/shared/file-ops.js';
-import { ErrorCategory } from '../../src/shared/error-handling.js';
+import { SafeFileOperations } from '../../packages/core/src/shared/file-ops.js';
+import { ErrorCategory } from '../../packages/core/src/shared/error-handling.js';
 
 const TestSchema = z.object({ name: z.string(), value: z.number() });
 

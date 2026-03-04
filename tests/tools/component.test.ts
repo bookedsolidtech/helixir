@@ -1,35 +1,35 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
-import { buildNarrative } from '../../src/handlers/narrative.js';
-import { handleComponentCall, isComponentTool } from '../../src/tools/component.js';
-import type { McpWcConfig } from '../../src/config.js';
+import { buildNarrative } from '../../packages/core/src/handlers/narrative.js';
+import { handleComponentCall, isComponentTool } from '../../packages/core/src/tools/component.js';
+import type { McpWcConfig } from '../../packages/core/src/config.js';
 
 // Mock the CEM handler to avoid real file system reads
-vi.mock('../../src/handlers/cem.js', () => ({
+vi.mock('../../packages/core/src/handlers/cem.js', () => ({
   parseCem: vi.fn(),
   validateCompleteness: vi.fn(),
   findComponentsByToken: vi.fn(),
 }));
 
 // Mock suggest handler
-vi.mock('../../src/handlers/suggest.js', () => ({
+vi.mock('../../packages/core/src/handlers/suggest.js', () => ({
   suggestUsage: vi.fn(),
   generateImport: vi.fn(),
 }));
 
 // Mock component handler
-vi.mock('../../src/handlers/component.js', () => ({
+vi.mock('../../packages/core/src/handlers/component.js', () => ({
   formatPropConstraints: vi.fn(),
 }));
 
 // Mock dependencies handler
-vi.mock('../../src/handlers/dependencies.js', () => ({
+vi.mock('../../packages/core/src/handlers/dependencies.js', () => ({
   getComponentDependencies: vi.fn(),
 }));
 
 // Mock tokens handler (find-components-using-token path)
-vi.mock('../../src/handlers/tokens.js', () => ({
+vi.mock('../../packages/core/src/handlers/tokens.js', () => ({
   parseTokens: vi.fn(),
   getDesignTokens: vi.fn(),
   findToken: vi.fn(),
@@ -37,7 +37,7 @@ vi.mock('../../src/handlers/tokens.js', () => ({
 }));
 
 // Mock narrative handler (only for handleComponentCall tests)
-vi.mock('../../src/handlers/narrative.js', async (importOriginal) => {
+vi.mock('../../packages/core/src/handlers/narrative.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../src/handlers/narrative.js')>();
   return {
     ...actual,
@@ -45,11 +45,11 @@ vi.mock('../../src/handlers/narrative.js', async (importOriginal) => {
   };
 });
 
-import { getComponentNarrative } from '../../src/handlers/narrative.js';
-import { formatPropConstraints } from '../../src/handlers/component.js';
-import { getComponentDependencies } from '../../src/handlers/dependencies.js';
-import { findComponentsUsingToken } from '../../src/handlers/tokens.js';
-import { parseCem, findComponentsByToken } from '../../src/handlers/cem.js';
+import { getComponentNarrative } from '../../packages/core/src/handlers/narrative.js';
+import { formatPropConstraints } from '../../packages/core/src/handlers/component.js';
+import { getComponentDependencies } from '../../packages/core/src/handlers/dependencies.js';
+import { findComponentsUsingToken } from '../../packages/core/src/handlers/tokens.js';
+import { parseCem, findComponentsByToken } from '../../packages/core/src/handlers/cem.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = resolve(__dirname, '../__fixtures__');
@@ -62,6 +62,8 @@ function makeConfig(): McpWcConfig {
     healthHistoryDir: '.mcp-wc/health',
     tsconfigPath: 'tsconfig.json',
     tokensPath: null,
+    cdnBase: null,
+    watch: false,
   };
 }
 

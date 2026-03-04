@@ -6,7 +6,8 @@
 [![npm downloads](https://img.shields.io/npm/dw/wc-tools)](https://www.npmjs.com/package/wc-tools)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node 20+](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
-[![CI](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/wc-tools/ci.yml?branch=main&label=tests)](https://github.com/bookedsolidtech/wc-tools/actions)
+[![Build](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/wc-tools/build.yml?branch=main&label=build)](https://github.com/bookedsolidtech/wc-tools/actions/workflows/build.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/wc-tools/test.yml?branch=main&label=tests)](https://github.com/bookedsolidtech/wc-tools/actions/workflows/test.yml)
 
 ---
 
@@ -300,6 +301,12 @@ All tools are exposed over the [Model Context Protocol](https://modelcontextprot
 | ---------------------- | ------------------------------------------------------------------------------------------- | ------------- |
 | `estimate_bundle_size` | Estimates minified + gzipped bundle size for a component's npm package via bundlephobia/npm | `tagName`     |
 
+### Benchmark
+
+| Tool                  | Description                                                                                                                        | Required Args |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| `benchmark_libraries` | Compare 2–10 web component libraries by health score, documentation quality, and API surface; returns a weighted score table       | `libraries`   |
+
 ### CDN
 
 | Tool              | Description                                                                                           | Required Args |
@@ -516,6 +523,43 @@ Add to your Zed settings (`~/.config/zed/settings.json`):
   }
 }
 ```
+
+---
+
+## Security
+
+wc-tools applies defense-in-depth on all inputs that touch the file system or network:
+
+- **Path containment** — all file paths are resolved and verified to stay within `projectRoot`; `..` traversals and absolute paths outside the root are rejected.
+- **Input validation** — every tool argument is validated with [Zod](https://zod.dev) schemas before reaching handler code; unknown properties are rejected via `additionalProperties: false`.
+- **CDN safety** — `resolve_cdn_cem` only fetches from allowlisted CDN origins (jsDelivr, UNPKG); arbitrary URLs are not accepted.
+- **No shell execution** — the server never spawns subprocesses based on user input; TypeScript diagnostics use the TS compiler API in-process.
+
+See [`SECURITY.md`](./SECURITY.md) for the vulnerability disclosure policy.
+
+---
+
+## Quality Gates
+
+Every pull request must pass all five CI checks before merge:
+
+| Workflow    | What it checks                                      |
+| ----------- | --------------------------------------------------- |
+| **build**   | TypeScript type-check + `tsc` compile on Node 20/22 |
+| **test**    | Full vitest suite with coverage on Node 20/22       |
+| **lint**    | ESLint (TypeScript + Prettier compatibility rules)  |
+| **format**  | Prettier formatting check                           |
+| **security**| `pnpm audit --audit-level=high`                     |
+
+**Pre-commit hooks** (via [husky](https://typicode.github.io/husky/) + [lint-staged](https://github.com/lint-staged/lint-staged)):
+
+- TypeScript/JavaScript files: ESLint auto-fix → Prettier format
+- JSON/CSS/Markdown/YAML files: Prettier format
+- Commit messages: validated by [commitlint](https://commitlint.js.org) against conventional-commits format
+
+**Allowed commit types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`, `audit`
+
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md) and [`LOCAL.md`](./LOCAL.md) for full setup details.
 
 ---
 

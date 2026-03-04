@@ -7,8 +7,8 @@ import {
   validateCompleteness,
   listAllComponents,
   CemSchema,
-} from '../../src/handlers/cem.js';
-import { validateUsage } from '../../src/handlers/validate.js';
+} from '../../packages/core/src/handlers/cem.js';
+import { validateUsage } from '../../packages/core/src/handlers/validate.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = resolve(__dirname, '../__fixtures__');

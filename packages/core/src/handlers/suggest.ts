@@ -326,24 +326,38 @@ export async function generateImport(
 
   if (config.cdnBase) {
     const cdnBase = config.cdnBase.replace(/\/$/, '');
+
+    // Resolve autoloader and stylesheet: explicit config overrides library-specific defaults.
     const isShoelace = packageName === '@shoelace-style/shoelace';
-    if (isShoelace) {
+    const autoloaderPath =
+      config.cdnAutoloader ?? (isShoelace ? `${cdnBase}/shoelace-autoloader.js` : null);
+    const stylesheetPath =
+      config.cdnStylesheet ?? (isShoelace ? `${cdnBase}/themes/light.css` : null);
+
+    if (autoloaderPath) {
       return {
-        sideEffectImport: `<script type="module" src="${cdnBase}/shoelace-autoloader.js"></script>`,
-        namedImport: `<!-- CDN mode: components auto-register via shoelace-autoloader.js -->`,
+        sideEffectImport: `<script type="module" src="${autoloaderPath}"></script>`,
+        namedImport: `<!-- CDN mode: components auto-register via ${autoloaderPath} -->`,
         modulePath,
         packageName,
         mode: 'cdn',
-        cdnStylesheetLink: `<link rel="stylesheet" href="${cdnBase}/themes/light.css">`,
-        cdnScriptLink: `<script type="module" src="${cdnBase}/shoelace-autoloader.js"></script>`,
+        ...(stylesheetPath
+          ? { cdnStylesheetLink: `<link rel="stylesheet" href="${stylesheetPath}">` }
+          : {}),
+        cdnScriptLink: `<script type="module" src="${autoloaderPath}"></script>`,
       };
     }
+
+    // Generic fallback: point directly at the component module.
     return {
       sideEffectImport: `<script type="module" src="${cdnBase}/${modulePath}"></script>`,
       namedImport: `<!-- CDN mode: component loaded via ${cdnBase}/${modulePath} -->`,
       modulePath,
       packageName,
       mode: 'cdn',
+      ...(stylesheetPath
+        ? { cdnStylesheetLink: `<link rel="stylesheet" href="${stylesheetPath}">` }
+        : {}),
       cdnScriptLink: `<script type="module" src="${cdnBase}/${modulePath}"></script>`,
     };
   }

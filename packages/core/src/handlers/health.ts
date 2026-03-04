@@ -152,9 +152,10 @@ async function parseHistoryFile(filePath: string, config: McpWcConfig): Promise<
 async function readLatestHistoryFile(
   config: McpWcConfig,
   tagName: string,
+  libraryId = 'default',
 ): Promise<HistoryFileRaw | null> {
-  // Try namespaced path first: {healthHistoryDir}/default/{tagName}
-  const namespacedDir = componentHistoryDir(config, tagName, 'default');
+  // Try namespaced path first: {healthHistoryDir}/{libraryId}/{tagName}
+  const namespacedDir = componentHistoryDir(config, tagName, libraryId);
 
   let dir = namespacedDir;
   let files: string[];
@@ -278,8 +279,9 @@ export async function scoreComponent(
   config: McpWcConfig,
   tagName: string,
   cemDecl?: CemDeclaration,
+  libraryId = 'default',
 ): Promise<ComponentHealth> {
-  const history = await readLatestHistoryFile(config, tagName);
+  const history = await readLatestHistoryFile(config, tagName, libraryId);
   if (history) {
     return historyToHealth(history);
   }
@@ -301,9 +303,12 @@ export async function scoreComponent(
 export async function scoreAllComponents(
   config: McpWcConfig,
   cemDeclarations: CemDeclaration[],
+  libraryId = 'default',
 ): Promise<ComponentHealth[]> {
   const withTag = cemDeclarations.filter((decl) => decl.tagName !== undefined);
-  return Promise.all(withTag.map((decl) => scoreComponent(config, decl.tagName as string, decl)));
+  return Promise.all(
+    withTag.map((decl) => scoreComponent(config, decl.tagName as string, decl, libraryId)),
+  );
 }
 
 /**
@@ -315,9 +320,10 @@ export async function getHealthTrend(
   config: McpWcConfig,
   tagName: string,
   days: number = 7,
+  libraryId = 'default',
 ): Promise<HealthTrend> {
-  // Try namespaced path first: {healthHistoryDir}/default/{tagName}
-  const namespacedDir = componentHistoryDir(config, tagName, 'default');
+  // Try namespaced path first: {healthHistoryDir}/{libraryId}/{tagName}
+  const namespacedDir = componentHistoryDir(config, tagName, libraryId);
 
   let allFiles: string[];
   let dir = namespacedDir;
@@ -391,8 +397,9 @@ export async function getHealthDiff(
   baseBranch: string = 'main',
   cemDecl?: CemDeclaration,
   gitOps?: GitOperations,
+  libraryId = 'default',
 ): Promise<HealthDiff> {
-  const current = await scoreComponent(config, tagName, cemDecl);
+  const current = await scoreComponent(config, tagName, cemDecl, libraryId);
 
   const git = gitOps ?? new GitOperations();
 

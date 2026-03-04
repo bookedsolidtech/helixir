@@ -20,6 +20,7 @@ import { handleToolError } from '../shared/error-handling.js';
 
 const ScoreComponentArgsSchema = z.object({
   tagName: z.string(),
+  libraryId: z.string().optional(),
 });
 
 const ScoreAllComponentsArgsSchema = z.object({});
@@ -27,11 +28,13 @@ const ScoreAllComponentsArgsSchema = z.object({});
 const GetHealthTrendArgsSchema = z.object({
   tagName: z.string(),
   days: z.number().int().positive().optional(),
+  libraryId: z.string().optional(),
 });
 
 const GetHealthDiffArgsSchema = z.object({
   tagName: z.string(),
   baseBranch: z.string().optional(),
+  libraryId: z.string().optional(),
 });
 
 const AnalyzeAccessibilityArgsSchema = z.object({
@@ -51,6 +54,10 @@ export const HEALTH_TOOL_DEFINITIONS = [
         tagName: {
           type: 'string',
           description: 'The tag name of the component to score (e.g. "my-button").',
+        },
+        libraryId: {
+          type: 'string',
+          description: 'The library ID to scope the health history lookup (default: "default").',
         },
       },
       required: ['tagName'],
@@ -82,6 +89,10 @@ export const HEALTH_TOOL_DEFINITIONS = [
           type: 'number',
           description: 'Number of days to look back (default: 7).',
         },
+        libraryId: {
+          type: 'string',
+          description: 'The library ID to scope the health history lookup (default: "default").',
+        },
       },
       required: ['tagName'],
       additionalProperties: false,
@@ -101,6 +112,10 @@ export const HEALTH_TOOL_DEFINITIONS = [
         baseBranch: {
           type: 'string',
           description: 'The base branch to compare against (default: "main").',
+        },
+        libraryId: {
+          type: 'string',
+          description: 'The library ID to scope the health history lookup (default: "default").',
         },
       },
       required: ['tagName'],
@@ -145,11 +160,11 @@ export async function handleHealthCall(
 ): Promise<MCPToolResult> {
   try {
     if (name === 'score_component') {
-      const { tagName } = ScoreComponentArgsSchema.parse(args);
+      const { tagName, libraryId } = ScoreComponentArgsSchema.parse(args);
       // Pass the CEM declaration so scoreComponent can fall back to CEM-derived scoring
       // when no pre-computed history files exist for this component.
       const cemDecl = cem ? getAllDeclarations(cem).find((d) => d.tagName === tagName) : undefined;
-      const result = await scoreComponent(config, tagName, cemDecl);
+      const result = await scoreComponent(config, tagName, cemDecl, libraryId);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 
@@ -168,14 +183,21 @@ export async function handleHealthCall(
     }
 
     if (name === 'get_health_trend') {
-      const { tagName, days } = GetHealthTrendArgsSchema.parse(args);
-      const result = await getHealthTrend(config, tagName, days);
+      const { tagName, days, libraryId } = GetHealthTrendArgsSchema.parse(args);
+      const result = await getHealthTrend(config, tagName, days, libraryId);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 
     if (name === 'get_health_diff') {
-      const { tagName, baseBranch } = GetHealthDiffArgsSchema.parse(args);
-      const result = await getHealthDiff(config, tagName, baseBranch);
+      const { tagName, baseBranch, libraryId } = GetHealthDiffArgsSchema.parse(args);
+      const result = await getHealthDiff(
+        config,
+        tagName,
+        baseBranch,
+        undefined,
+        undefined,
+        libraryId,
+      );
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

@@ -10,6 +10,8 @@ export interface McpWcConfig {
   readonly tsconfigPath: string;
   readonly tokensPath: string | null;
   readonly cdnBase: string | null;
+  readonly cdnAutoloader?: string | null;
+  readonly cdnStylesheet?: string | null;
   readonly watch: boolean;
 }
 
@@ -24,6 +26,8 @@ const defaults: McpWcConfig = {
   tsconfigPath: 'tsconfig.json',
   tokensPath: null,
   cdnBase: null,
+  cdnAutoloader: null,
+  cdnStylesheet: null,
   watch: false,
 };
 
@@ -86,6 +90,14 @@ export function loadConfig(): Readonly<McpWcConfig> {
   if (process.env['MCP_WC_CDN_BASE'] !== undefined) {
     const val = process.env['MCP_WC_CDN_BASE'];
     config.cdnBase = val === 'null' ? null : val;
+  }
+  if (process.env['MCP_WC_CDN_AUTOLOADER'] !== undefined) {
+    const val = process.env['MCP_WC_CDN_AUTOLOADER'];
+    config.cdnAutoloader = val === 'null' ? null : val;
+  }
+  if (process.env['MCP_WC_CDN_STYLESHEET'] !== undefined) {
+    const val = process.env['MCP_WC_CDN_STYLESHEET'];
+    config.cdnStylesheet = val === 'null' ? null : val;
   }
 
   // --watch CLI flag overrides config file value

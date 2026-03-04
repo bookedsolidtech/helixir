@@ -183,9 +183,9 @@ describe('handleHealthCall — score_component', () => {
   it('passes tag_name to scoreComponent', async () => {
     vi.mocked(scoreComponent).mockResolvedValue(makeComponentHealth({ tagName: 'my-card' }));
 
-    // The dispatcher passes (config, tag_name, cemDecl?) — cemDecl is undefined when no cem is given.
+    // The dispatcher passes (config, tag_name, cemDecl?, libraryId?) — cemDecl and libraryId are undefined when not given.
     await handleHealthCall('score_component', { tagName: 'my-card' }, makeConfig());
-    expect(scoreComponent).toHaveBeenCalledWith(expect.anything(), 'my-card', undefined);
+    expect(scoreComponent).toHaveBeenCalledWith(expect.anything(), 'my-card', undefined, undefined);
   });
 
   it('returns error when tag_name is missing', async () => {
@@ -314,7 +314,7 @@ describe('handleHealthCall — get_health_trend', () => {
     vi.mocked(getHealthTrend).mockResolvedValue(trend);
 
     await handleHealthCall('get_health_trend', { tagName: 'my-button', days: 14 }, makeConfig());
-    expect(getHealthTrend).toHaveBeenCalledWith(expect.anything(), 'my-button', 14);
+    expect(getHealthTrend).toHaveBeenCalledWith(expect.anything(), 'my-button', 14, undefined);
   });
 
   it('stable trend: single data point', async () => {
@@ -444,7 +444,14 @@ describe('handleHealthCall — get_health_diff', () => {
       { tagName: 'my-button', baseBranch: 'develop' },
       makeConfig(),
     );
-    expect(getHealthDiff).toHaveBeenCalledWith(expect.anything(), 'my-button', 'develop');
+    expect(getHealthDiff).toHaveBeenCalledWith(
+      expect.anything(),
+      'my-button',
+      'develop',
+      undefined,
+      undefined,
+      undefined,
+    );
   });
 
   it('returns error when tag_name is missing', async () => {

@@ -5,8 +5,8 @@ import { FilePathSchema } from './validation.js';
 
 const execFileAsync = promisify(execFile);
 
-/** Strict allowlist for git refs: alphanumeric, dots, underscores, hyphens, and forward slashes. */
-const GIT_REF_REGEX = /^[a-zA-Z0-9._\-/]+$/;
+/** Strict allowlist for git refs: must start with alphanumeric, then alphanumeric, dots, underscores, hyphens, and forward slashes. */
+const GIT_REF_REGEX = /^[a-zA-Z0-9][a-zA-Z0-9._\-/]*$/;
 
 /** Strict allowlist for git file paths: alphanumeric, dots, underscores, hyphens, and forward slashes. */
 const GIT_FILE_PATH_REGEX = /^[a-zA-Z0-9._\-/]+$/;

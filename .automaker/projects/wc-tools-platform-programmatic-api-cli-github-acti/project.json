@@ -1,0 +1,50 @@
+{
+  "slug": "wc-tools-platform-programmatic-api-cli-github-acti",
+  "title": "wc-tools Platform — Programmatic API, CLI, GitHub Action, Wrapper Generator, VS Code Extension",
+  "goal": "Transform wc-tools from an MCP-only server into the web component developer platform. One analysis engine, many surfaces. See full PRD at .automaker/projects/wc-tools-platform/prd.md\n\n## Situation\nwc-tools has 18+ handlers covering CEM analysis, health scoring, breaking change detection, accessibility auditing, migration guides, bundle analysis, CDN resolution, and framework detection. All of this is locked behind MCP protocol — only usable by AI assistants.\n\n## Problem\n- Non-MCP developers cannot use wc-tools (majority of the market)\n- No CI quality gates exist for web component APIs anywhere in the ecosystem\n- IDE web component support is framework-specific (lit-plugin = Lit only)\n- Framework wrapper generation tools lack health/migration awareness\n- The \"all-in-one web component platform\" niche is completely unoccupied\n\n## Approach\nMonorepo with packages/. Core analysis engine (current handlers) exported as public programmatic API. Extensions consume it:\n\nPhase 1: Programmatic API export — restructure src/ into api/, mcp/, cli/ directories. Add \"exports\" map to package.json. All handlers importable.\nPhase 2: CLI subcommands — wc-tools analyze, health, diff, migrate, suggest, bundle, tokens, compare, benchmark, validate, cdn, serve. Table/JSON/markdown output. CI-friendly exit codes.\nPhase 3: GitHub Action — clarity-house-press/wc-tools-action@v1. Health scores + breaking changes in PR comments. Configurable thresholds. Fail checks on quality drops.\nPhase 4: Framework wrapper generator — wc-tools generate react/vue/angular/svelte. Typed wrappers from CEM with health annotations and deprecation warnings.\nPhase 5: VS Code extension — hover docs, diagnostics, autocomplete, health status bar, component tree view. LSP-based.\n\n## Results\n- 10x addressable market (CLI usable by all developers)\n- Enterprise adoption via GitHub Action (viral in PRs)\n- Daily-driver status via VS Code extension\n- \"Must install\" positioning as the only all-in-one WC platform\n\n## Constraints\n- Zero new runtime deps in core (keep @modelcontextprotocol/sdk + zod only)\n- CLI uses Node.js built-in parseArgs\n- Backwards compatible: npx wc-tools still starts MCP server\n- ESM only, Node >= 20, pnpm workspaces",
+  "status": "active",
+  "milestones": [
+    {
+      "number": 1,
+      "slug": "phase-1-programmatic-api",
+      "title": "Phase 1: Programmatic API Export",
+      "description": "Restructure src/ into api/, mcp/, cli/ directories. Create barrel exports for all handlers. Add exports map to package.json. Convert to monorepo with packages/core/. Ensure npx wc-tools still starts MCP server. All existing tests pass from new locations.",
+      "phases": [],
+      "status": "pending"
+    },
+    {
+      "number": 2,
+      "slug": "phase-2-cli-subcommands",
+      "title": "Phase 2: CLI Subcommands",
+      "description": "CLI entry point with subcommands: analyze, health, diff, migrate, suggest, bundle, tokens, compare, benchmark, validate, cdn, serve, init. Output formats: table (TTY), JSON (pipe), markdown. CI-friendly exit codes (0=ok, 1=error, 2=breaking changes). Uses Node.js built-in parseArgs (zero deps).",
+      "phases": [],
+      "status": "pending"
+    },
+    {
+      "number": 3,
+      "slug": "phase-3-github-action",
+      "title": "Phase 3: GitHub Action",
+      "description": "packages/github-action/ with action.yml. Composite action that installs wc-tools and runs CLI. PR comment with health scores, breaking changes, accessibility grades. Configurable thresholds. Fail check on quality drops. Works with any CEM-based web component library.",
+      "phases": [],
+      "status": "pending"
+    },
+    {
+      "number": 4,
+      "slug": "phase-4-framework-wrapper",
+      "title": "Phase 4: Framework Wrapper Generator",
+      "description": "packages/wrapper-gen/ published as @wc-tools/wrapper-gen. CLI: wc-tools generate react --out ./wrappers/. React first (forwardRef, event binding, typed props from CEM, slot children). Then Vue, Angular, Svelte. Health annotations, deprecation warnings. Watch mode.",
+      "phases": [],
+      "status": "pending"
+    },
+    {
+      "number": 5,
+      "slug": "phase-5-vs-code-extension",
+      "title": "Phase 5: VS Code Extension",
+      "description": "packages/vscode/ published to VS Code Marketplace. LSP server wrapping wc-tools core. Hover docs, diagnostics (unknown attrs, deprecated), autocomplete (tags, attrs, slots, events, CSS props), health status bar, component tree sidebar, go-to-definition.",
+      "phases": [],
+      "status": "pending"
+    }
+  ],
+  "createdAt": "2026-03-04T05:56:37.266Z",
+  "updatedAt": "2026-03-04T05:57:36.429Z"
+}

@@ -52,7 +52,10 @@ const CemJsdocTagSchema = z.object({
 const CemDeclarationSchema = z.object({
   kind: z.string(),
   name: z.string(),
-  tagName: z.string().optional(),
+  tagName: z
+    .string()
+    .regex(/^[a-z][a-z0-9]*(-[a-z0-9]+)+$/)
+    .optional(),
   description: z.string().optional(),
   members: z.array(CemMemberSchema).optional(),
   events: z.array(CemEventSchema).optional(),

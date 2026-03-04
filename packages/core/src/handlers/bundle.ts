@@ -30,7 +30,7 @@ interface CacheEntry {
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 export const MAX_CACHE_SIZE = 500;
 
-// In-memory cache keyed by "<package>@<version>"
+// In-memory cache keyed by "<libraryId>:<package>@<version>"
 const bundleCache = new Map<string, CacheEntry>();
 
 /** Exposed for testing — clears the in-memory cache. */
@@ -187,6 +187,7 @@ export async function estimateBundleSize(
   config: McpWcConfig,
   packageOverride?: string,
   version = 'latest',
+  libraryId = 'default',
 ): Promise<BundleSizeResult> {
   // Determine package name
   const pkg = packageOverride ?? derivePackageFromPrefix(config.componentPrefix);
@@ -198,7 +199,7 @@ export async function estimateBundleSize(
     );
   }
 
-  const cacheKey = `${pkg}@${version}`;
+  const cacheKey = `${libraryId}:${pkg}@${version}`;
   const cached = bundleCache.get(cacheKey);
   if (cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
     return { ...cached.result, component: tagName, cached: true };

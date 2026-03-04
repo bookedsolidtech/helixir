@@ -1,0 +1,82 @@
+name: 'wc-tools Quality Gates'
+description: 'Run wc-tools CLI in PR workflows for web component health checks, breaking change detection, and accessibility grading'
+author: 'Booked Solid Tech'
+
+branding:
+  icon: 'check-circle'
+  color: 'blue'
+
+inputs:
+  checks:
+    description: 'Comma-separated list of checks to run: health, breaking-changes, accessibility'
+    required: false
+    default: 'health,breaking-changes,accessibility'
+  health-threshold:
+    description: 'Minimum health score (0–100) required for components to pass'
+    required: false
+    default: '70'
+  fail-on-breaking:
+    description: 'Fail the check if breaking changes are detected'
+    required: false
+    default: 'true'
+  comment:
+    description: 'Post a summary comment on the pull request'
+    required: false
+    default: 'true'
+  config-path:
+    description: 'Path to mcpwc.config.json (auto-discovered if not set)'
+    required: false
+    default: ''
+  node-version:
+    description: 'Node.js version to use'
+    required: false
+    default: '20'
+  wc-tools-version:
+    description: 'Version of wc-tools to install (default: latest)'
+    required: false
+    default: 'latest'
+
+outputs:
+  health-score:
+    description: 'Average health score across all components (empty if health check skipped)'
+  failing-components:
+    description: 'Number of components that failed the health threshold'
+  breaking-changes-count:
+    description: 'Number of breaking changes detected'
+  passed:
+    description: 'Whether all quality gates passed (true/false)'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Install wc-tools
+      shell: bash
+      run: |
+        if [ "${{ inputs.wc-tools-version }}" = "latest" ]; then
+          npm install -g wc-tools
+        else
+          npm install -g wc-tools@${{ inputs.wc-tools-version }}
+        fi
+        wc-tools --version || echo "wc-tools installed via npm global"
+
+    - name: Install action dependencies
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: npm install --production
+
+    - name: Run wc-tools quality gates
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+        INPUT_CHECKS: ${{ inputs.checks }}
+        INPUT_HEALTH-THRESHOLD: ${{ inputs.health-threshold }}
+        INPUT_FAIL-ON-BREAKING: ${{ inputs.fail-on-breaking }}
+        INPUT_COMMENT: ${{ inputs.comment }}
+        INPUT_CONFIG-PATH: ${{ inputs.config-path }}
+      run: node ${{ github.action_path }}/dist/index.js

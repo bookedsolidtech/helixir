@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { analyzeAccessibility, analyzeAllAccessibility } from '../../packages/core/src/handlers/accessibility.js';
+import {
+  analyzeAccessibility,
+  analyzeAllAccessibility,
+} from '../../packages/core/src/handlers/accessibility.js';
 import type { AccessibilityProfile } from '../../packages/core/src/handlers/accessibility.js';
 import type { CemDeclaration } from '../../packages/core/src/handlers/cem.js';
 

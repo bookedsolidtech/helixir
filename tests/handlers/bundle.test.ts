@@ -177,7 +177,9 @@ describe('bundleCache size limit', () => {
           ok: true,
           status: 200,
           json: vi.fn().mockResolvedValue({ gzip: 1000, size: 2000, version: '1.0.0' }),
-          text: vi.fn().mockResolvedValue(JSON.stringify({ gzip: 1000, size: 2000, version: '1.0.0' })),
+          text: vi
+            .fn()
+            .mockResolvedValue(JSON.stringify({ gzip: 1000, size: 2000, version: '1.0.0' })),
         }),
       );
       // Use a config with matching componentPrefix to derive the package name
@@ -195,10 +197,17 @@ describe('bundleCache size limit', () => {
         ok: true,
         status: 200,
         json: vi.fn().mockResolvedValue({ gzip: 1000, size: 2000, version: '1.0.0' }),
-        text: vi.fn().mockResolvedValue(JSON.stringify({ gzip: 1000, size: 2000, version: '1.0.0' })),
+        text: vi
+          .fn()
+          .mockResolvedValue(JSON.stringify({ gzip: 1000, size: 2000, version: '1.0.0' })),
       }),
     );
-    await estimateBundleSize('tag-new', makeConfig({ componentPrefix: '' }), 'pkg-new', 'latest').catch(() => undefined);
+    await estimateBundleSize(
+      'tag-new',
+      makeConfig({ componentPrefix: '' }),
+      'pkg-new',
+      'latest',
+    ).catch(() => undefined);
 
     // Cache size should remain at MAX_CACHE_SIZE (evicted one, added one)
     expect(getBundleCacheSize()).toBe(MAX_CACHE_SIZE);

@@ -77,8 +77,26 @@ describe('handleBenchmarkCall — benchmark_libraries', () => {
   it('returns scores and formatted markdown on success', async () => {
     const fakeResult = {
       scores: [
-        { label: 'Shoelace', componentCount: 3, avgProperties: 4, avgEvents: 2, avgSlots: 1, avgCssProps: 5, docQualityPct: 80, score: 90 },
-        { label: 'Helix', componentCount: 2, avgProperties: 2, avgEvents: 1, avgSlots: 0, avgCssProps: 1, docQualityPct: 0, score: 30 },
+        {
+          label: 'Shoelace',
+          componentCount: 3,
+          avgProperties: 4,
+          avgEvents: 2,
+          avgSlots: 1,
+          avgCssProps: 5,
+          docQualityPct: 80,
+          score: 90,
+        },
+        {
+          label: 'Helix',
+          componentCount: 2,
+          avgProperties: 2,
+          avgEvents: 1,
+          avgSlots: 0,
+          avgCssProps: 1,
+          docQualityPct: 0,
+          score: 30,
+        },
       ],
       formatted: '## Library Benchmark Results\n| Library | ...',
     };

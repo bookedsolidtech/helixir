@@ -10,7 +10,10 @@ import { isValidateTool, handleValidateCall } from '../../packages/core/src/tool
 import { isTokenTool } from '../../packages/core/src/tools/tokens.js';
 import { isTypeScriptTool } from '../../packages/core/src/tools/typescript.js';
 import { isBundleTool, handleBundleCall } from '../../packages/core/src/tools/bundle.js';
-import { isCompositionTool, handleCompositionCall } from '../../packages/core/src/tools/composition.js';
+import {
+  isCompositionTool,
+  handleCompositionCall,
+} from '../../packages/core/src/tools/composition.js';
 import { isStoryTool, handleStoryCall } from '../../packages/core/src/tools/story.js';
 import type { McpWcConfig } from '../../packages/core/src/config.js';
 import type { Cem } from '../../packages/core/src/handlers/cem.js';

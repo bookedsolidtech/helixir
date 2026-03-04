@@ -104,7 +104,10 @@ export async function getDesignTokens(
   category?: string,
 ): Promise<DesignToken[]> {
   if (!config.tokensPath)
-    throw new MCPError('Token tools are disabled: tokensPath is not configured', ErrorCategory.VALIDATION);
+    throw new MCPError(
+      'Token tools are disabled: tokensPath is not configured',
+      ErrorCategory.VALIDATION,
+    );
   const filePath = resolve(config.projectRoot, config.tokensPath);
   const tokens = await parseTokens(filePath);
 
@@ -122,7 +125,10 @@ export async function getDesignTokens(
  */
 export async function findToken(config: McpWcConfig, query: string): Promise<DesignToken[]> {
   if (!config.tokensPath)
-    throw new MCPError('Token tools are disabled: tokensPath is not configured', ErrorCategory.VALIDATION);
+    throw new MCPError(
+      'Token tools are disabled: tokensPath is not configured',
+      ErrorCategory.VALIDATION,
+    );
   const filePath = resolve(config.projectRoot, config.tokensPath);
   const tokens = await parseTokens(filePath);
 

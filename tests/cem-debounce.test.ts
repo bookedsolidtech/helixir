@@ -5,7 +5,14 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { spawn, ChildProcess } from 'node:child_process';
 import { createInterface } from 'node:readline';
-import { mkdtempSync, writeFileSync, readFileSync, rmSync, copyFileSync, existsSync } from 'node:fs';
+import {
+  mkdtempSync,
+  writeFileSync,
+  readFileSync,
+  rmSync,
+  copyFileSync,
+  existsSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -82,7 +89,9 @@ describe('CEM debounce window', () => {
         } else {
           messageQueue.push(msg);
         }
-      } catch { /* skip non-JSON */ }
+      } catch {
+        /* skip non-JSON */
+      }
     });
 
     child.on('error', (err) => console.error('Server error:', err));
@@ -108,7 +117,10 @@ describe('CEM debounce window', () => {
     const baselineId = sendRequest('tools/call', { name: 'list_components', arguments: {} });
     const baselineResp = await recv();
     expect(baselineResp.id).toBe(baselineId);
-    const baselineResult = baselineResp.result as { content: Array<{ text: string }>; isError?: boolean };
+    const baselineResult = baselineResp.result as {
+      content: Array<{ text: string }>;
+      isError?: boolean;
+    };
     expect(baselineResult.isError).toBeFalsy();
 
     // Trigger a file-change event to start the debounce timer (100ms delay)

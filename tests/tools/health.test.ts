@@ -1,7 +1,15 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { HEALTH_TOOL_DEFINITIONS, handleHealthCall, isHealthTool } from '../../packages/core/src/tools/health.js';
+import {
+  HEALTH_TOOL_DEFINITIONS,
+  handleHealthCall,
+  isHealthTool,
+} from '../../packages/core/src/tools/health.js';
 import type { McpWcConfig } from '../../packages/core/src/config.js';
-import type { ComponentHealth, HealthTrend, HealthDiff } from '../../packages/core/src/handlers/health.js';
+import type {
+  ComponentHealth,
+  HealthTrend,
+  HealthDiff,
+} from '../../packages/core/src/handlers/health.js';
 
 // ─── Mock health handler ──────────────────────────────────────────────────────
 

@@ -363,10 +363,7 @@ describe('resolveCdnCem', () => {
     });
 
     it('redirect error propagates without being silently swallowed', async () => {
-      vi.stubGlobal(
-        'fetch',
-        vi.fn().mockRejectedValue(new TypeError('opaqueredirect')),
-      );
+      vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('opaqueredirect')));
       const err = await resolveCdnCem(
         '@shoelace-style/shoelace',
         '2.15.0',
@@ -393,7 +390,11 @@ describe('resolveCdnCem', () => {
     it('propagates fetch abort error when request times out', async () => {
       vi.stubGlobal(
         'fetch',
-        vi.fn().mockRejectedValue(Object.assign(new Error('The operation was aborted'), { name: 'AbortError' })),
+        vi
+          .fn()
+          .mockRejectedValue(
+            Object.assign(new Error('The operation was aborted'), { name: 'AbortError' }),
+          ),
       );
       await expect(
         resolveCdnCem('@shoelace-style/shoelace', '2.15.0', 'jsdelivr', makeConfig()),

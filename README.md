@@ -303,9 +303,9 @@ All tools are exposed over the [Model Context Protocol](https://modelcontextprot
 
 ### Benchmark
 
-| Tool                  | Description                                                                                                                        | Required Args |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| `benchmark_libraries` | Compare 2–10 web component libraries by health score, documentation quality, and API surface; returns a weighted score table       | `libraries`   |
+| Tool                  | Description                                                                                                                  | Required Args |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| `benchmark_libraries` | Compare 2–10 web component libraries by health score, documentation quality, and API surface; returns a weighted score table | `libraries`   |
 
 ### CDN
 
@@ -543,13 +543,13 @@ See [`SECURITY.md`](./SECURITY.md) for the vulnerability disclosure policy.
 
 Every pull request must pass all five CI checks before merge:
 
-| Workflow    | What it checks                                      |
-| ----------- | --------------------------------------------------- |
-| **build**   | TypeScript type-check + `tsc` compile on Node 20/22 |
-| **test**    | Full vitest suite with coverage on Node 20/22       |
-| **lint**    | ESLint (TypeScript + Prettier compatibility rules)  |
-| **format**  | Prettier formatting check                           |
-| **security**| `pnpm audit --audit-level=high`                     |
+| Workflow     | What it checks                                      |
+| ------------ | --------------------------------------------------- |
+| **build**    | TypeScript type-check + `tsc` compile on Node 20/22 |
+| **test**     | Full vitest suite with coverage on Node 20/22       |
+| **lint**     | ESLint (TypeScript + Prettier compatibility rules)  |
+| **format**   | Prettier formatting check                           |
+| **security** | `pnpm audit --audit-level=high`                     |
 
 **Pre-commit hooks** (via [husky](https://typicode.github.io/husky/) + [lint-staged](https://github.com/lint-staged/lint-staged)):
 

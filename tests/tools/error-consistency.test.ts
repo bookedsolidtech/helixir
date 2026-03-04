@@ -57,7 +57,10 @@ import { handleHealthCall, isHealthTool } from '../../packages/core/src/tools/he
 import { handleSafetyCall, isSafetyTool } from '../../packages/core/src/tools/safety.js';
 import { handleComponentCall, isComponentTool } from '../../packages/core/src/tools/component.js';
 import { handleTokenCall, isTokenTool } from '../../packages/core/src/tools/tokens.js';
-import { handleTypeScriptCall, isTypeScriptTool } from '../../packages/core/src/tools/typescript.js';
+import {
+  handleTypeScriptCall,
+  isTypeScriptTool,
+} from '../../packages/core/src/tools/typescript.js';
 import { handleCdnCall, isCdnTool } from '../../packages/core/src/tools/cdn.js';
 import { handleFrameworkCall, isFrameworkTool } from '../../packages/core/src/tools/framework.js';
 import { handleValidateCall, isValidateTool } from '../../packages/core/src/tools/validate.js';

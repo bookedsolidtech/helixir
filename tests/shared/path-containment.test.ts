@@ -76,9 +76,7 @@ describe('main() startup CEM path containment guard (src/index.ts:100-109)', () 
   const PROJECT_ROOT = '/tmp/test-project';
 
   function isBlockedByGuard(resolvedProjectRoot: string, cemAbsPath: string): boolean {
-    return (
-      !cemAbsPath.startsWith(resolvedProjectRoot + sep) && cemAbsPath !== resolvedProjectRoot
-    );
+    return !cemAbsPath.startsWith(resolvedProjectRoot + sep) && cemAbsPath !== resolvedProjectRoot;
   }
 
   it('guard blocks an absolute cemAbsPath that resolves outside projectRoot', () => {

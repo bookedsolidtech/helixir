@@ -1,5 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
-import { MCPError, ErrorCategory, handleToolError } from '../../packages/core/src/shared/error-handling.js';
+import {
+  MCPError,
+  ErrorCategory,
+  handleToolError,
+} from '../../packages/core/src/shared/error-handling.js';
 
 // Mock the handler modules before importing the tool dispatch functions
 vi.mock('../../packages/core/src/handlers/tokens.js', () => ({

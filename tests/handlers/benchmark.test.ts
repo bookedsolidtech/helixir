@@ -101,7 +101,9 @@ describe('benchmarkLibraries', () => {
     }
     expect(errorMessage).toBeTruthy();
     // The display path in the error prefix must be relative (not absolute)
-    expect(errorMessage).not.toMatch(new RegExp(`"${fixturesDir.replace(/\//g, '\\/')}/nonexistent\\.json"`));
+    expect(errorMessage).not.toMatch(
+      new RegExp(`"${fixturesDir.replace(/\//g, '\\/')}/nonexistent\\.json"`),
+    );
     expect(errorMessage).toContain('"nonexistent.json"');
   });
 

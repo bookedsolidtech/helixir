@@ -137,6 +137,7 @@ Run `wc-tools init` to generate this file interactively.
 `pnpm install` installs husky hooks automatically (via the `prepare` lifecycle script). Two hooks run on every commit:
 
 **`pre-commit`** — runs lint-staged on staged files:
+
 - `.ts`/`.js` files: ESLint auto-fix → Prettier format
 - `.json`/`.css`/`.md`/`.yml` files: Prettier format
 

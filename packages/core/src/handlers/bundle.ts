@@ -43,7 +43,6 @@ export function getBundleCacheSize(): number {
   return bundleCache.size;
 }
 
-
 /**
  * Adds an entry to bundleCache with size-bounded eviction.
  * When the cache exceeds MAX_CACHE_SIZE, the oldest entry (by insertion order) is removed first.

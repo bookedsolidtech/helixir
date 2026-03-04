@@ -1,7 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
-import { parseTokens, getDesignTokens, findToken } from '../../packages/core/src/handlers/tokens.js';
+import {
+  parseTokens,
+  getDesignTokens,
+  findToken,
+} from '../../packages/core/src/handlers/tokens.js';
 import type { McpWcConfig } from '../../packages/core/src/config.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

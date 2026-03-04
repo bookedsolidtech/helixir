@@ -7,7 +7,11 @@ vi.mock('../../packages/core/src/handlers/cem.js', () => ({
   listAllComponents: vi.fn(),
 }));
 
-import { handleSafetyCall, isSafetyTool, SAFETY_TOOL_DEFINITIONS } from '../../packages/core/src/tools/safety.js';
+import {
+  handleSafetyCall,
+  isSafetyTool,
+  SAFETY_TOOL_DEFINITIONS,
+} from '../../packages/core/src/tools/safety.js';
 import { diffCem, listAllComponents } from '../../packages/core/src/handlers/cem.js';
 import type { McpWcConfig } from '../../packages/core/src/config.js';
 

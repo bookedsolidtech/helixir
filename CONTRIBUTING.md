@@ -251,10 +251,10 @@ wc-tools uses [husky](https://typicode.github.io/husky/) + [lint-staged](https:/
 
 **What runs on every commit:**
 
-| Hook          | What it does                                                               |
-| ------------- | -------------------------------------------------------------------------- |
-| `pre-commit`  | Runs lint-staged: ESLint + Prettier on staged `.ts`/`.js` files; Prettier on JSON/CSS/Markdown/YAML |
-| `commit-msg`  | Validates the commit message against the conventional-commits format       |
+| Hook         | What it does                                                                                        |
+| ------------ | --------------------------------------------------------------------------------------------------- |
+| `pre-commit` | Runs lint-staged: ESLint + Prettier on staged `.ts`/`.js` files; Prettier on JSON/CSS/Markdown/YAML |
+| `commit-msg` | Validates the commit message against the conventional-commits format                                |
 
 **Allowed commit types:**
 
@@ -265,6 +265,7 @@ feat | fix | docs | style | refactor | perf | test | build | ci | chore | revert
 **Format:** `<type>(<optional scope>): <description>` — max 120 characters per line.
 
 Examples:
+
 ```
 feat(health): add trend direction to get_health_trend
 fix(validation): reject path traversal in cemPath input
@@ -277,13 +278,13 @@ Merge commits (starting with `Merge`) bypass commitlint automatically.
 
 Five parallel GitHub Actions workflows run on every push and PR to `main`, `dev`, and `staging`:
 
-| Workflow       | File                                | What it does                                                          |
-| -------------- | ----------------------------------- | --------------------------------------------------------------------- |
-| **build**      | `.github/workflows/build.yml`       | `tsc --noEmit` type-check + `pnpm run build` on Node 20 and 22       |
-| **test**       | `.github/workflows/test.yml`        | `pnpm run test:coverage` (vitest) on Node 20 and 22                   |
-| **lint**       | `.github/workflows/lint.yml`        | `pnpm run lint` (ESLint)                                              |
-| **format**     | `.github/workflows/format.yml`      | `pnpm run format:check` (Prettier)                                    |
-| **security**   | `.github/workflows/security.yml`    | `pnpm audit --audit-level=high`                                       |
+| Workflow     | File                             | What it does                                                   |
+| ------------ | -------------------------------- | -------------------------------------------------------------- |
+| **build**    | `.github/workflows/build.yml`    | `tsc --noEmit` type-check + `pnpm run build` on Node 20 and 22 |
+| **test**     | `.github/workflows/test.yml`     | `pnpm run test:coverage` (vitest) on Node 20 and 22            |
+| **lint**     | `.github/workflows/lint.yml`     | `pnpm run lint` (ESLint)                                       |
+| **format**   | `.github/workflows/format.yml`   | `pnpm run format:check` (Prettier)                             |
+| **security** | `.github/workflows/security.yml` | `pnpm audit --audit-level=high`                                |
 
 All five must pass before a PR can merge.
 

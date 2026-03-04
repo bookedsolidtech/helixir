@@ -33,11 +33,28 @@ pnpm run dev
 # Run all tests once
 pnpm test
 
-# Run with coverage report
+# Run with v8 coverage report (output in coverage/)
 pnpm run test:coverage
 
-# Watch mode
+# Watch mode — reruns on file changes
 pnpm run test:watch
+```
+
+### Running Individual Test Suites
+
+```bash
+# Single test file
+pnpm exec vitest run tests/handlers/health.test.ts
+
+# All tests in a directory
+pnpm exec vitest run tests/handlers/
+pnpm exec vitest run tests/tools/
+
+# Watch a specific file
+pnpm exec vitest tests/handlers/health.test.ts
+
+# Filter by test name pattern
+pnpm exec vitest run --reporter=verbose -t "score_component"
 ```
 
 ## Linting and Formatting
@@ -114,6 +131,36 @@ Place `mcpwc.config.json` at your project root to configure the server without e
 ```
 
 Run `wc-tools init` to generate this file interactively.
+
+## Pre-Commit Hooks
+
+`pnpm install` installs husky hooks automatically (via the `prepare` lifecycle script). Two hooks run on every commit:
+
+**`pre-commit`** — runs lint-staged on staged files:
+
+- `.ts`/`.js` files: ESLint auto-fix → Prettier format
+- `.json`/`.css`/`.md`/`.yml` files: Prettier format
+
+**`commit-msg`** — validates your commit message against conventional-commits format via commitlint.
+
+Allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`, `audit`
+
+Format: `<type>(<scope>): <description>` — max 120 chars. Example:
+
+```
+feat(health): add get_health_trend tool
+fix(validation): reject path traversal in cemPath
+```
+
+### Bypassing Hooks in Emergencies
+
+If you genuinely need to skip hooks (e.g., a WIP commit on a local branch), use:
+
+```bash
+git commit --no-verify -m "wip: emergency save"
+```
+
+**Do not use `--no-verify` on commits destined for `main`, `dev`, or `staging`** — the CI will catch what the hooks would have flagged, and the PR will fail.
 
 ## Project Structure
 

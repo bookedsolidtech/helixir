@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { generateStory } from '../../src/handlers/story.js';
-import type { CemDeclaration } from '../../src/handlers/cem.js';
+import { generateStory } from '../../packages/core/src/handlers/story.js';
+import type { CemDeclaration } from '../../packages/core/src/handlers/cem.js';
 
 // Minimal my-button declaration matching the fixture
 const myButtonDecl: CemDeclaration = {

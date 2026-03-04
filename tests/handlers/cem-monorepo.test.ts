@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { readFileSync } from 'fs';
-import { CemSchema, mergeCems, listAllComponents } from '../../src/handlers/cem.js';
-import type { Cem, PackagedCem } from '../../src/handlers/cem.js';
-import { resolveGlobCemPaths } from '../../src/shared/discovery.js';
+import { CemSchema, mergeCems, listAllComponents } from '../../packages/core/src/handlers/cem.js';
+import type { Cem, PackagedCem } from '../../packages/core/src/handlers/cem.js';
+import { resolveGlobCemPaths } from '../../packages/core/src/shared/discovery.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MONOREPO_ROOT = resolve(__dirname, '../__fixtures__/monorepo');

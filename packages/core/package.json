@@ -1,0 +1,29 @@
+{
+  "name": "@wc-tools/core",
+  "version": "0.1.0",
+  "description": "Core handlers, shared utilities, and tool definitions for wc-tools",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./handlers": "./src/handlers/index.ts",
+    "./handlers/*": "./src/handlers/*.ts",
+    "./shared": "./src/shared/index.ts",
+    "./shared/*": "./src/shared/*.ts",
+    "./tools/*": "./src/tools/*.ts",
+    "./config": "./src/config.ts"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "zod": "^3.22.0"
+  },
+  "peerDependencies": {
+    "typescript": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  }
+}

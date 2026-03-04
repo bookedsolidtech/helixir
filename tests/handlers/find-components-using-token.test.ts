@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { readFileSync } from 'fs';
-import { findComponentsUsingToken } from '../../src/handlers/tokens.js';
-import type { Cem } from '../../src/handlers/cem.js';
+import { findComponentsUsingToken } from '../../packages/core/src/handlers/tokens.js';
+import type { Cem } from '../../packages/core/src/handlers/cem.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_PATH = resolve(__dirname, '../__fixtures__/cem-token-lookup.json');

@@ -1,11 +1,19 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { HEALTH_TOOL_DEFINITIONS, handleHealthCall, isHealthTool } from '../../src/tools/health.js';
-import type { McpWcConfig } from '../../src/config.js';
-import type { ComponentHealth, HealthTrend, HealthDiff } from '../../src/handlers/health.js';
+import {
+  HEALTH_TOOL_DEFINITIONS,
+  handleHealthCall,
+  isHealthTool,
+} from '../../packages/core/src/tools/health.js';
+import type { McpWcConfig } from '../../packages/core/src/config.js';
+import type {
+  ComponentHealth,
+  HealthTrend,
+  HealthDiff,
+} from '../../packages/core/src/handlers/health.js';
 
 // ─── Mock health handler ──────────────────────────────────────────────────────
 
-vi.mock('../../src/handlers/health.js', () => ({
+vi.mock('../../packages/core/src/handlers/health.js', () => ({
   scoreComponent: vi.fn(),
   scoreAllComponents: vi.fn(),
   getHealthTrend: vi.fn(),
@@ -14,7 +22,7 @@ vi.mock('../../src/handlers/health.js', () => ({
 }));
 
 // Mock cem handler to avoid file reads in score_all_components
-vi.mock('../../src/handlers/cem.js', async (importOriginal) => {
+vi.mock('../../packages/core/src/handlers/cem.js', async (importOriginal) => {
   const orig = await importOriginal<typeof import('../../src/handlers/cem.js')>();
   return {
     ...orig,
@@ -32,7 +40,7 @@ import {
   scoreAllComponents,
   getHealthTrend,
   getHealthDiff,
-} from '../../src/handlers/health.js';
+} from '../../packages/core/src/handlers/health.js';
 import { readFile } from 'node:fs/promises';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
@@ -45,6 +53,8 @@ function makeConfig(): McpWcConfig {
     healthHistoryDir: '.mcp-wc/health',
     tsconfigPath: 'tsconfig.json',
     tokensPath: null,
+    cdnBase: null,
+    watch: false,
   };
 }
 

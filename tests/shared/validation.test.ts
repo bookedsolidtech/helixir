@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { TagNameSchema, FilePathSchema } from '../../src/shared/validation.js';
+import { TagNameSchema, FilePathSchema } from '../../packages/core/src/shared/validation.js';
 
 describe('TagNameSchema', () => {
   describe('with custom prefix', () => {
@@ -75,5 +75,36 @@ describe('FilePathSchema', () => {
   it('rejects absolute paths', () => {
     expect(FilePathSchema.safeParse('/etc/passwd').success).toBe(false);
     expect(FilePathSchema.safeParse('/absolute/path/file.ts').success).toBe(false);
+  });
+
+  describe('null byte injection', () => {
+    it('rejects paths with an embedded null byte', () => {
+      expect(FilePathSchema.safeParse('src/file\0.ts').success).toBe(false);
+      expect(FilePathSchema.safeParse('src/\0../etc/passwd').success).toBe(false);
+    });
+
+    it('rejects paths with a leading null byte', () => {
+      expect(FilePathSchema.safeParse('\0etc/passwd').success).toBe(false);
+      expect(FilePathSchema.safeParse('\0').success).toBe(false);
+    });
+  });
+
+  describe('Finding #3 hardening', () => {
+    it('rejects Windows drive letter paths (C:\\...)', () => {
+      expect(FilePathSchema.safeParse('C:\\Windows\\System32').success).toBe(false);
+      expect(FilePathSchema.safeParse('c:/etc/passwd').success).toBe(false);
+      expect(FilePathSchema.safeParse('Z:/secret').success).toBe(false);
+    });
+
+    it('rejects network share paths (\\\\server\\share)', () => {
+      expect(FilePathSchema.safeParse('\\\\server\\share').success).toBe(false);
+      expect(FilePathSchema.safeParse('\\\\192.168.1.1\\c$').success).toBe(false);
+    });
+
+    it('rejects paths that are absolute according to path.isAbsolute', () => {
+      // On POSIX these are absolute — already covered by the /- check
+      // On Windows, drive-letter paths are also caught by the windows check above
+      expect(FilePathSchema.safeParse('/usr/local/bin').success).toBe(false);
+    });
   });
 });

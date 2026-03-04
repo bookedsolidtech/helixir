@@ -1,8 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
-import { parseTokens, getDesignTokens, findToken } from '../../src/handlers/tokens.js';
-import type { McpWcConfig } from '../../src/config.js';
+import {
+  parseTokens,
+  getDesignTokens,
+  findToken,
+} from '../../packages/core/src/handlers/tokens.js';
+import type { McpWcConfig } from '../../packages/core/src/config.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_TOKENS_PATH = resolve(__dirname, '../__fixtures__/tokens.json');
@@ -16,6 +20,8 @@ function makeConfig(tokensPath: string): McpWcConfig {
     healthHistoryDir: '.mcp-wc/health',
     tsconfigPath: 'tsconfig.json',
     tokensPath,
+    cdnBase: null,
+    watch: false,
   };
 }
 

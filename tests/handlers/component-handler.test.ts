@@ -2,8 +2,8 @@
  * Unit tests for src/handlers/component.ts (formatPropConstraints).
  */
 import { describe, it, expect } from 'vitest';
-import { formatPropConstraints } from '../../src/handlers/component.js';
-import type { CemMember } from '../../src/handlers/cem.js';
+import { formatPropConstraints } from '../../packages/core/src/handlers/component.js';
+import type { CemMember } from '../../packages/core/src/handlers/cem.js';
 
 function makeMember(typeText: string, name = 'variant'): CemMember {
   return { kind: 'field', name, type: { text: typeText } };

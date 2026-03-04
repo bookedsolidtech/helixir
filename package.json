@@ -3,25 +3,42 @@
   "version": "0.1.0",
   "description": "MCP server that gives AI agents full situational awareness of any web component library",
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "bin": {
-    "wc-tools": "./build/index.js"
+    "wc-tools": "./build/src/index.js"
   },
-  "main": "./build/index.js",
+  "main": "./build/src/index.js",
+  "exports": {
+    ".": "./build/src/index.js",
+    "./api": "./build/src/api/index.js",
+    "./mcp": "./build/src/mcp/index.js",
+    "./cli": "./build/src/cli/index.js",
+    "./core": "./build/packages/core/src/index.js",
+    "./core/handlers": "./build/packages/core/src/handlers/index.js",
+    "./core/handlers/*": "./build/packages/core/src/handlers/*.js",
+    "./core/shared": "./build/packages/core/src/shared/index.js",
+    "./core/shared/*": "./build/packages/core/src/shared/*.js",
+    "./core/tools/*": "./build/packages/core/src/tools/*.js",
+    "./core/config": "./build/packages/core/src/config.js"
+  },
   "files": [
     "build",
     "!build/**/*.map",
+    "packages/core/src",
     "README.md",
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "tsc && chmod 755 build/index.js",
+    "build": "tsc && chmod 755 build/src/index.js",
     "dev": "tsc --watch",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "type-check": "tsc --noEmit",
-    "lint": "eslint src",
-    "lint:fix": "eslint src --fix",
+    "lint": "eslint src packages/core/src",
+    "lint:fix": "eslint src packages/core/src --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepublishOnly": "pnpm run build && pnpm test",
@@ -61,6 +78,8 @@
     }
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.4.3",
+    "@commitlint/config-conventional": "^20.4.3",
     "@eslint/js": "^9.39.3",
     "@types/node": "^22.0.0",
     "@vitest/coverage-v8": "^3.0.0",
@@ -78,11 +97,11 @@
     "pnpm": ">=9"
   },
   "lint-staged": {
-    "*.{ts,js}": [
+    "*.{js,jsx,ts,tsx}": [
       "eslint --fix",
       "prettier --write"
     ],
-    "*.{json,md}": [
+    "*.{json,css,md,yml,yaml}": [
       "prettier --write"
     ]
   }

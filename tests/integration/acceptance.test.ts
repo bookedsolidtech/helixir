@@ -21,7 +21,7 @@ import { dirname } from 'node:path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const SERVER_PATH = resolve(__dirname, '../../build/index.js');
+const SERVER_PATH = resolve(__dirname, '../../build/src/index.js');
 const PROJECT_ROOT = resolve(__dirname, '../..');
 // Relative path so `git show main:<cemPath>` works correctly
 const CEM_PATH_RELATIVE = 'tests/__fixtures__/custom-elements.json';

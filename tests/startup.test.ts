@@ -8,7 +8,7 @@ import { dirname } from 'node:path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const SERVER_PATH = resolve(__dirname, '../build/index.js');
+const SERVER_PATH = resolve(__dirname, '../build/src/index.js');
 const FIXTURE_CEM = resolve(__dirname, './__fixtures__/custom-elements.json');
 
 describe('startup CEM validation', () => {

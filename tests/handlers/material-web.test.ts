@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { readFileSync } from 'fs';
-import { CemSchema, listAllComponents, parseCem } from '../../src/handlers/cem.js';
-import type { Cem } from '../../src/handlers/cem.js';
-import { validateUsage } from '../../src/handlers/validate.js';
+import { CemSchema, listAllComponents, parseCem } from '../../packages/core/src/handlers/cem.js';
+import type { Cem } from '../../packages/core/src/handlers/cem.js';
+import { validateUsage } from '../../packages/core/src/handlers/validate.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_PATH = resolve(__dirname, '../__fixtures__/material-web-custom-elements.json');

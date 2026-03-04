@@ -2,8 +2,8 @@
  * Unit tests for src/handlers/dependencies.ts (getComponentDependencies).
  */
 import { describe, it, expect } from 'vitest';
-import { getComponentDependencies } from '../../src/handlers/dependencies.js';
-import type { Cem } from '../../src/handlers/cem.js';
+import { getComponentDependencies } from '../../packages/core/src/handlers/dependencies.js';
+import type { Cem } from '../../packages/core/src/handlers/cem.js';
 
 // A CEM where my-dialog uses my-button (via declaration-level references).
 const CEM_WITH_DEPS: Cem = {

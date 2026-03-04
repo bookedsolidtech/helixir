@@ -15,11 +15,14 @@ import {
   listAllSlots,
   listAllCssParts,
   CemSchema,
-} from '../../src/handlers/cem.js';
-import type { Cem } from '../../src/handlers/cem.js';
-import { validateUsage } from '../../src/handlers/validate.js';
-import { scoreCemFallback } from '../../src/handlers/health.js';
-import { tokenize, scoreComponent as scoreSearch } from '../../src/tools/discovery.js';
+} from '../../packages/core/src/handlers/cem.js';
+import type { Cem } from '../../packages/core/src/handlers/cem.js';
+import { validateUsage } from '../../packages/core/src/handlers/validate.js';
+import { scoreCemFallback } from '../../packages/core/src/handlers/health.js';
+import {
+  tokenize,
+  scoreComponent as scoreSearch,
+} from '../../packages/core/src/tools/discovery.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = resolve(__dirname, '../__fixtures__');

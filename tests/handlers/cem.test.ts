@@ -8,14 +8,14 @@ import {
   listAllComponents,
   diffCem,
   CemSchema,
-} from '../../src/handlers/cem.js';
-import type { Cem } from '../../src/handlers/cem.js';
-import { GitOperations } from '../../src/shared/git.js';
-import { ErrorCategory, MCPError } from '../../src/shared/error-handling.js';
-import type { McpWcConfig } from '../../src/config.js';
+} from '../../packages/core/src/handlers/cem.js';
+import type { Cem } from '../../packages/core/src/handlers/cem.js';
+import { GitOperations } from '../../packages/core/src/shared/git.js';
+import { ErrorCategory, MCPError } from '../../packages/core/src/shared/error-handling.js';
+import type { McpWcConfig } from '../../packages/core/src/config.js';
 
 // Mock GitOperations so diffCem tests don't require a real git repo
-vi.mock('../../src/shared/git.js', () => ({
+vi.mock('../../packages/core/src/shared/git.js', () => ({
   GitOperations: vi.fn(),
 }));
 
@@ -35,6 +35,8 @@ function makeConfig(): McpWcConfig {
     healthHistoryDir: '.mcp-wc/health',
     tsconfigPath: 'tsconfig.json',
     tokensPath: null,
+    cdnBase: null,
+    watch: false,
   };
 }
 

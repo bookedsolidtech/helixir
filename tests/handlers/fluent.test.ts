@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { readFileSync } from 'fs';
-import { parseCem, listAllComponents, CemSchema } from '../../src/handlers/cem.js';
-import type { Cem } from '../../src/handlers/cem.js';
-import { validateUsage } from '../../src/handlers/validate.js';
+import { parseCem, listAllComponents, CemSchema } from '../../packages/core/src/handlers/cem.js';
+import type { Cem } from '../../packages/core/src/handlers/cem.js';
+import { validateUsage } from '../../packages/core/src/handlers/validate.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = resolve(__dirname, '../__fixtures__');

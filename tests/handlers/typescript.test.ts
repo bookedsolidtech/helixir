@@ -4,9 +4,12 @@ import { resolve } from 'path';
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import type { McpWcConfig } from '../../src/config.js';
-import { getFileDiagnostics, getProjectDiagnostics } from '../../src/handlers/typescript.js';
-import { FilePathSchema } from '../../src/shared/validation.js';
+import type { McpWcConfig } from '../../packages/core/src/config.js';
+import {
+  getFileDiagnostics,
+  getProjectDiagnostics,
+} from '../../packages/core/src/handlers/typescript.js';
+import { FilePathSchema } from '../../packages/core/src/shared/validation.js';
 
 let tempDir: string;
 
@@ -18,6 +21,8 @@ function makeConfig(projectRoot: string): McpWcConfig {
     healthHistoryDir: '.mcp-wc/health',
     tsconfigPath: 'tsconfig.json',
     tokensPath: null,
+    cdnBase: null,
+    watch: false,
   };
 }
 

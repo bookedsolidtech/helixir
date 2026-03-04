@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
-import { suggestUsage, generateImport } from '../../src/handlers/suggest.js';
-import { MCPError } from '../../src/shared/error-handling.js';
-import type { McpWcConfig } from '../../src/config.js';
+import { suggestUsage, generateImport } from '../../packages/core/src/handlers/suggest.js';
+import { MCPError } from '../../packages/core/src/shared/error-handling.js';
+import type { McpWcConfig } from '../../packages/core/src/config.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = resolve(__dirname, '../__fixtures__');
@@ -199,8 +199,8 @@ describe('generateImport', () => {
 
 function makeShoelaceConfig(overrides: Partial<McpWcConfig> = {}): McpWcConfig {
   return {
-    cemPath: 'shoelace-custom-elements.json',
-    projectRoot: FIXTURES_DIR,
+    cemPath: '../shoelace-custom-elements.json',
+    projectRoot: resolve(FIXTURES_DIR, 'shoelace'),
     componentPrefix: 'sl-',
     healthHistoryDir: '.mcp-wc/health',
     tsconfigPath: 'tsconfig.json',
@@ -552,5 +552,40 @@ describe('generateImport — CDN mode via cdnBase', () => {
   it('returns mode esm when cdnBase is null', async () => {
     const result = await generateImport('sl-button', makeShoelaceConfig());
     expect(result.mode).toBe('esm');
+  });
+});
+
+describe('generateImport — CDN mode for non-Shoelace library', () => {
+  function makeNonShoelaceCdnConfig(): McpWcConfig {
+    return {
+      cemPath: 'custom-elements.json',
+      projectRoot: FIXTURES_DIR,
+      componentPrefix: '',
+      healthHistoryDir: '.mcp-wc/health',
+      tsconfigPath: 'tsconfig.json',
+      tokensPath: null,
+      cdnBase: 'https://cdn.example.com/my-component-lib@1',
+    };
+  }
+
+  it('returns mode cdn for a non-Shoelace library with cdnBase set', async () => {
+    const result = await generateImport('my-button', makeNonShoelaceCdnConfig());
+    expect(result.mode).toBe('cdn');
+  });
+
+  it('does not include shoelace-autoloader.js for non-Shoelace library', async () => {
+    const result = await generateImport('my-button', makeNonShoelaceCdnConfig());
+    expect(result.cdnScriptLink).not.toContain('shoelace-autoloader.js');
+  });
+
+  it('does not include themes/light.css for non-Shoelace library', async () => {
+    const result = await generateImport('my-button', makeNonShoelaceCdnConfig());
+    expect(result.cdnStylesheetLink).toBeUndefined();
+  });
+
+  it('cdnScriptLink points to the component module path for non-Shoelace library', async () => {
+    const result = await generateImport('my-button', makeNonShoelaceCdnConfig());
+    expect(result.cdnScriptLink).toContain(result.modulePath);
+    expect(result.cdnScriptLink).toContain('https://cdn.example.com/my-component-lib@1');
   });
 });

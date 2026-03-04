@@ -8,12 +8,12 @@ import {
   classifyByHeuristic,
   isDiscoveryTool,
   handleDiscoveryCall,
-} from '../../src/tools/discovery.js';
-import type { McpWcConfig } from '../../src/config.js';
-import type { Cem } from '../../src/handlers/cem.js';
+} from '../../packages/core/src/tools/discovery.js';
+import type { McpWcConfig } from '../../packages/core/src/config.js';
+import type { Cem } from '../../packages/core/src/handlers/cem.js';
 
 // Mock the CEM handler to avoid real file system reads in unit tests
-vi.mock('../../src/handlers/cem.js', () => ({
+vi.mock('../../packages/core/src/handlers/cem.js', () => ({
   listAllComponents: vi.fn(),
   parseCem: vi.fn(),
   listAllEvents: vi.fn(),
@@ -27,7 +27,7 @@ import {
   listAllEvents,
   listAllSlots,
   listAllCssParts,
-} from '../../src/handlers/cem.js';
+} from '../../packages/core/src/handlers/cem.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = resolve(__dirname, '../__fixtures__');
@@ -40,6 +40,8 @@ function makeConfig(): McpWcConfig {
     healthHistoryDir: '.mcp-wc/health',
     tsconfigPath: 'tsconfig.json',
     tokensPath: null,
+    cdnBase: null,
+    watch: false,
   };
 }
 

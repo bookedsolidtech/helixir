@@ -4,16 +4,19 @@
  * These tests cover the basic paths: unknown tool → error, guard returns correct boolean.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { isCdnTool, handleCdnCall } from '../../src/tools/cdn.js';
-import { isFrameworkTool, handleFrameworkCall } from '../../src/tools/framework.js';
-import { isValidateTool, handleValidateCall } from '../../src/tools/validate.js';
-import { isTokenTool } from '../../src/tools/tokens.js';
-import { isTypeScriptTool } from '../../src/tools/typescript.js';
-import { isBundleTool, handleBundleCall } from '../../src/tools/bundle.js';
-import { isCompositionTool, handleCompositionCall } from '../../src/tools/composition.js';
-import { isStoryTool, handleStoryCall } from '../../src/tools/story.js';
-import type { McpWcConfig } from '../../src/config.js';
-import type { Cem } from '../../src/handlers/cem.js';
+import { isCdnTool, handleCdnCall } from '../../packages/core/src/tools/cdn.js';
+import { isFrameworkTool, handleFrameworkCall } from '../../packages/core/src/tools/framework.js';
+import { isValidateTool, handleValidateCall } from '../../packages/core/src/tools/validate.js';
+import { isTokenTool } from '../../packages/core/src/tools/tokens.js';
+import { isTypeScriptTool } from '../../packages/core/src/tools/typescript.js';
+import { isBundleTool, handleBundleCall } from '../../packages/core/src/tools/bundle.js';
+import {
+  isCompositionTool,
+  handleCompositionCall,
+} from '../../packages/core/src/tools/composition.js';
+import { isStoryTool, handleStoryCall } from '../../packages/core/src/tools/story.js';
+import type { McpWcConfig } from '../../packages/core/src/config.js';
+import type { Cem } from '../../packages/core/src/handlers/cem.js';
 
 const FAKE_CONFIG: McpWcConfig = {
   cemPath: 'custom-elements.json',
@@ -22,6 +25,8 @@ const FAKE_CONFIG: McpWcConfig = {
   healthHistoryDir: '.mcp-wc/health',
   tsconfigPath: 'tsconfig.json',
   tokensPath: null,
+  cdnBase: null,
+  watch: false,
 };
 
 const FAKE_CEM: Cem = { schemaVersion: '1.0.0', modules: [] };
@@ -58,7 +63,7 @@ describe('handleCdnCall — unknown tool', () => {
 // Framework tool dispatcher
 // ---------------------------------------------------------------------------
 
-vi.mock('../../src/handlers/framework.js', () => ({
+vi.mock('../../packages/core/src/handlers/framework.js', () => ({
   detectFramework: vi.fn(() => ({ formatted: 'Lit v3.0.0' })),
 }));
 
@@ -91,7 +96,7 @@ describe('handleFrameworkCall', () => {
 // Validate tool dispatcher
 // ---------------------------------------------------------------------------
 
-vi.mock('../../src/handlers/validate.js', () => ({
+vi.mock('../../packages/core/src/handlers/validate.js', () => ({
   validateUsage: vi.fn(() => ({ formatted: 'No issues found.' })),
 }));
 
@@ -126,6 +131,16 @@ describe('handleValidateCall', () => {
   it('returns error for missing required args', () => {
     const result = handleValidateCall('validate_usage', {}, FAKE_CEM);
     expect(result.isError).toBe(true);
+  });
+
+  it('returns error when html exceeds 50,000 characters', () => {
+    const result = handleValidateCall(
+      'validate_usage',
+      { tagName: 'my-button', html: 'x'.repeat(50_001) },
+      FAKE_CEM,
+    );
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('50,000');
   });
 });
 
@@ -167,7 +182,7 @@ describe('isTypeScriptTool', () => {
 // Bundle tool dispatcher
 // ---------------------------------------------------------------------------
 
-vi.mock('../../src/handlers/bundle.js', () => ({
+vi.mock('../../packages/core/src/handlers/bundle.js', () => ({
   estimateBundleSize: vi.fn(async () => ({
     tagName: 'sl-button',
     package: '@shoelace-style/shoelace',
@@ -214,7 +229,7 @@ describe('handleBundleCall', () => {
 // Composition tool dispatcher
 // ---------------------------------------------------------------------------
 
-vi.mock('../../src/handlers/composition.js', () => ({
+vi.mock('../../packages/core/src/handlers/composition.js', () => ({
   getCompositionExample: vi.fn(() => ({
     components: ['my-card', 'my-button'],
     html: '<my-card><my-button slot="footer">Submit</my-button></my-card>',
@@ -263,7 +278,7 @@ describe('handleCompositionCall', () => {
 // Story tool dispatcher
 // ---------------------------------------------------------------------------
 
-vi.mock('../../src/handlers/story.js', () => ({
+vi.mock('../../packages/core/src/handlers/story.js', () => ({
   generateStory: vi.fn(() => "import type { Meta, StoryObj } from '@storybook/web-components';"),
 }));
 

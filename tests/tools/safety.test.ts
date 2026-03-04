@@ -1,15 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { DiffResult } from '../../src/handlers/cem.js';
+import type { DiffResult } from '../../packages/core/src/handlers/cem.js';
 
 // Mock handler modules before importing the tool dispatch
-vi.mock('../../src/handlers/cem.js', () => ({
+vi.mock('../../packages/core/src/handlers/cem.js', () => ({
   diffCem: vi.fn(),
   listAllComponents: vi.fn(),
 }));
 
-import { handleSafetyCall, isSafetyTool, SAFETY_TOOL_DEFINITIONS } from '../../src/tools/safety.js';
-import { diffCem, listAllComponents } from '../../src/handlers/cem.js';
-import type { McpWcConfig } from '../../src/config.js';
+import {
+  handleSafetyCall,
+  isSafetyTool,
+  SAFETY_TOOL_DEFINITIONS,
+} from '../../packages/core/src/tools/safety.js';
+import { diffCem, listAllComponents } from '../../packages/core/src/handlers/cem.js';
+import type { McpWcConfig } from '../../packages/core/src/config.js';
 
 const baseConfig: McpWcConfig = {
   cemPath: 'custom-elements.json',
@@ -18,6 +22,8 @@ const baseConfig: McpWcConfig = {
   healthHistoryDir: '.mcp-wc/health',
   tsconfigPath: 'tsconfig.json',
   tokensPath: 'tokens.json',
+  cdnBase: null,
+  watch: false,
 };
 
 describe('SAFETY_TOOL_DEFINITIONS', () => {

@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { readFileSync } from 'fs';
-import { getComponentNarrative } from '../../src/handlers/narrative.js';
-import { CemSchema } from '../../src/handlers/cem.js';
-import type { Cem } from '../../src/handlers/cem.js';
-import { MCPError, ErrorCategory } from '../../src/shared/error-handling.js';
+import { getComponentNarrative } from '../../packages/core/src/handlers/narrative.js';
+import { CemSchema } from '../../packages/core/src/handlers/cem.js';
+import type { Cem } from '../../packages/core/src/handlers/cem.js';
+import { MCPError, ErrorCategory } from '../../packages/core/src/shared/error-handling.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = resolve(__dirname, '../__fixtures__');

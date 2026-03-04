@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { validateUsage } from '../../src/handlers/validate.js';
-import { CemSchema } from '../../src/handlers/cem.js';
+import { validateUsage } from '../../packages/core/src/handlers/validate.js';
+import { CemSchema } from '../../packages/core/src/handlers/cem.js';
 
 const FIXTURE_CEM = CemSchema.parse({
   schemaVersion: '1.0.0',
@@ -185,6 +185,26 @@ describe('validateUsage', () => {
       const err = result.issues.find((i) => i.message.includes('prefx'));
       expect(err?.message).toContain('did you mean');
       expect(err?.message).toContain('prefix');
+    });
+  });
+
+  describe('levenshtein size guard', () => {
+    it('skips suggestions for attribute names over 200 characters', () => {
+      const longAttr = 'a'.repeat(201);
+      const html = `<my-button ${longAttr}="x">Click</my-button>`;
+      const result = validateUsage('my-button', html, FIXTURE_CEM);
+      const err = result.issues.find((i) => i.message.includes(longAttr));
+      expect(err).toBeDefined();
+      expect(err?.message).not.toContain('did you mean');
+    });
+
+    it('still suggests for attribute names at exactly 200 characters', () => {
+      // 200-char name won't match anything closely, but should not throw and should not suggest
+      const attrAt200 = 'v' + 'a'.repeat(199); // 200 chars, not a typo of anything
+      const html = `<my-button ${attrAt200}="x">Click</my-button>`;
+      const result = validateUsage('my-button', html, FIXTURE_CEM);
+      const err = result.issues.find((i) => i.message.includes(attrAt200));
+      expect(err).toBeDefined();
     });
   });
 

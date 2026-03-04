@@ -5,7 +5,7 @@ Thank you for your interest in contributing! This guide covers everything you ne
 ## Development Setup
 
 ```bash
-git clone https://github.com/your-org/wc-tools.git
+git clone https://github.com/bookedsolidtech/wc-tools.git
 cd wc-tools
 pnpm install
 pnpm test
@@ -16,6 +16,8 @@ pnpm run build
 
 - Node.js >= 20
 - pnpm >= 9
+
+`pnpm install` automatically installs the husky pre-commit hooks via the `prepare` lifecycle script.
 
 ## Project Structure
 
@@ -243,10 +245,84 @@ Before opening a PR, verify:
 - [ ] Example config added to `examples/` if you added a new framework fixture
 - [ ] `CHANGELOG.md` entry added under `[Unreleased]`
 
+## Pre-Commit Hooks
+
+wc-tools uses [husky](https://typicode.github.io/husky/) + [lint-staged](https://github.com/lint-staged/lint-staged) + [commitlint](https://commitlint.js.org) to enforce quality at commit time. These are installed automatically by `pnpm install`.
+
+**What runs on every commit:**
+
+| Hook         | What it does                                                                                        |
+| ------------ | --------------------------------------------------------------------------------------------------- |
+| `pre-commit` | Runs lint-staged: ESLint + Prettier on staged `.ts`/`.js` files; Prettier on JSON/CSS/Markdown/YAML |
+| `commit-msg` | Validates the commit message against the conventional-commits format                                |
+
+**Allowed commit types:**
+
+```
+feat | fix | docs | style | refactor | perf | test | build | ci | chore | revert | audit
+```
+
+**Format:** `<type>(<optional scope>): <description>` — max 120 characters per line.
+
+Examples:
+
+```
+feat(health): add trend direction to get_health_trend
+fix(validation): reject path traversal in cemPath input
+docs: update CONTRIBUTING with pre-commit hook setup
+```
+
+Merge commits (starting with `Merge`) bypass commitlint automatically.
+
+## CI Pipeline
+
+Five parallel GitHub Actions workflows run on every push and PR to `main`, `dev`, and `staging`:
+
+| Workflow     | File                             | What it does                                                   |
+| ------------ | -------------------------------- | -------------------------------------------------------------- |
+| **build**    | `.github/workflows/build.yml`    | `tsc --noEmit` type-check + `pnpm run build` on Node 20 and 22 |
+| **test**     | `.github/workflows/test.yml`     | `pnpm run test:coverage` (vitest) on Node 20 and 22            |
+| **lint**     | `.github/workflows/lint.yml`     | `pnpm run lint` (ESLint)                                       |
+| **format**   | `.github/workflows/format.yml`   | `pnpm run format:check` (Prettier)                             |
+| **security** | `.github/workflows/security.yml` | `pnpm audit --audit-level=high`                                |
+
+All five must pass before a PR can merge.
+
+## Running Tests with Coverage
+
+```bash
+# Full suite with v8 coverage report
+pnpm run test:coverage
+```
+
+Coverage output lands in `coverage/`. The CI threshold is configured in `vitest.config.ts`. Aim for ≥80% on new handler code.
+
+Run a single test file or directory:
+
+```bash
+# Single file
+pnpm exec vitest run tests/handlers/health.test.ts
+
+# All handler tests
+pnpm exec vitest run tests/handlers/
+
+# Watch a specific file while developing
+pnpm exec vitest tests/handlers/health.test.ts
+```
+
+## Branch Protection
+
+`main`, `dev`, and `staging` have branch protection enabled:
+
+- All five CI checks must pass before merge
+- PRs require at least one approving review; stale reviews are dismissed on new pushes
+- Merge strategy: **squash-only** (no merge commits, no rebase)
+- Direct pushes to protected branches are blocked
+
 ## Code Style
 
 - ESM only — use `.js` extensions in imports even for `.ts` source files
 - No default exports — use named exports throughout
 - Handler functions must be pure: no global state, no direct MCP imports
-- Zod schemas for all external input validation
+- Zod schemas for all external input validation; use `additionalProperties: false` in JSON schemas
 - Run `pnpm run format` before committing (husky does this automatically on commit)

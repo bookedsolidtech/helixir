@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
-import type { McpWcConfig } from '../../src/config.js';
+import type { McpWcConfig } from '../../packages/core/src/config.js';
 import {
   scoreCemFallback,
   scoreComponent,
@@ -9,7 +9,7 @@ import {
   getHealthTrend,
   getHealthDiff,
   type CemDeclaration,
-} from '../../src/handlers/health.js';
+} from '../../packages/core/src/handlers/health.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_DIR = resolve(__dirname, '../__fixtures__');
@@ -26,6 +26,8 @@ function makeConfig(healthHistoryDir: string = HEALTH_HISTORY_DIR): McpWcConfig 
     healthHistoryDir,
     tsconfigPath: 'tsconfig.json',
     tokensPath: null,
+    cdnBase: null,
+    watch: false,
   };
 }
 
@@ -317,6 +319,36 @@ describe('getHealthTrend', () => {
       /No health history found for 'nonexistent-component'/,
     );
   });
+
+  describe('Finding #6: tag name positive allowlist', () => {
+    it('rejects tag names with path separators', async () => {
+      const config = makeConfig();
+      await expect(getHealthTrend(config, '../evil')).rejects.toThrow(/Invalid tag name/);
+    });
+
+    it('rejects tag names with null bytes', async () => {
+      const config = makeConfig();
+      await expect(getHealthTrend(config, 'my\0button')).rejects.toThrow(/Invalid tag name/);
+    });
+
+    it('rejects tag names with forward slash', async () => {
+      const config = makeConfig();
+      await expect(getHealthTrend(config, 'my/button')).rejects.toThrow(/Invalid tag name/);
+    });
+
+    it('rejects tag names with backslash', async () => {
+      const config = makeConfig();
+      await expect(getHealthTrend(config, 'my\\button')).rejects.toThrow(/Invalid tag name/);
+    });
+
+    it('accepts valid tag names with colon (monorepo pkg:tag notation)', async () => {
+      const config = makeConfig();
+      // Will throw NOT_FOUND (no history dir) but NOT a tag name validation error
+      await expect(getHealthTrend(config, 'pkg:my-button')).rejects.toThrow(
+        /No health history found/,
+      );
+    });
+  });
 });
 
 // ─── getHealthDiff ────────────────────────────────────────────────────────────
@@ -504,5 +536,79 @@ describe('getHealthDiff', () => {
 
     expect(diff.base.score).toBe(0);
     expect(diff.base.grade).toBe('F');
+  });
+});
+
+// ─── Finding #29: Corrupted history file tests ───────────────────────────────
+
+describe('scoreComponent — corrupted history files (Finding #29)', () => {
+  it('throws when history file contains malformed JSON', async () => {
+    const config = makeConfig(HEALTH_HISTORY_DIR);
+    await expect(scoreComponent(config, 'corrupted-tag')).rejects.toThrow();
+  });
+
+  it('throws when history file is missing required fields (no date or score)', async () => {
+    const config = makeConfig(HEALTH_HISTORY_DIR);
+    await expect(scoreComponent(config, 'missing-fields-tag')).rejects.toThrow();
+  });
+
+  it('throws when history file has non-numeric score value', async () => {
+    const config = makeConfig(HEALTH_HISTORY_DIR);
+    await expect(scoreComponent(config, 'non-numeric-score-tag')).rejects.toThrow();
+  });
+
+  it('throws when history file is empty (zero bytes)', async () => {
+    const config = makeConfig(HEALTH_HISTORY_DIR);
+    await expect(scoreComponent(config, 'empty-file-tag')).rejects.toThrow();
+  });
+});
+
+describe('scoreComponent — history directory with no JSON files (Finding #29)', () => {
+  it('falls back to CEM scoring when history dir has no JSON files', async () => {
+    const config = makeConfig(HEALTH_HISTORY_DIR);
+    // no-json-files-tag dir exists but has only a .gitkeep file — no JSON files
+    // readLatestHistoryFile returns null → falls back to CEM data if provided
+    const result = await scoreComponent(config, 'no-json-files-tag', {
+      tagName: 'no-json-files-tag',
+      description: 'A component with no history files.',
+    });
+    expect(result.tagName).toBe('no-json-files-tag');
+    expect(result.score).toBe(100); // all empty dimensions score max
+  });
+
+  it('throws when history dir has no JSON files and no CEM data provided', async () => {
+    const config = makeConfig(HEALTH_HISTORY_DIR);
+    await expect(scoreComponent(config, 'no-json-files-tag')).rejects.toThrow(
+      /No health history for 'no-json-files-tag'/,
+    );
+  });
+});
+
+describe('getHealthTrend — history directory with no JSON files (Finding #29)', () => {
+  it('throws when history directory exists but contains no JSON files', async () => {
+    const config = makeConfig(HEALTH_HISTORY_DIR);
+    await expect(getHealthTrend(config, 'no-json-files-tag')).rejects.toThrow(
+      /No health history files found for/,
+    );
+  });
+});
+
+// ─── Security: no absolute paths in error messages ───────────────────────────
+
+describe('parseHistoryFile — no absolute paths in error messages', () => {
+  it('error message for invalid history file does not contain an absolute path', async () => {
+    // Use the actual fixture root so relative() produces a short relative path
+    const config = { ...makeConfig(HEALTH_HISTORY_DIR), projectRoot: FIXTURE_DIR };
+    let thrown: Error | null = null;
+    try {
+      await scoreComponent(config, 'missing-fields-tag');
+    } catch (e) {
+      thrown = e as Error;
+    }
+    expect(thrown).not.toBeNull();
+    // Error message must NOT start the path with '/' (i.e. must be relative)
+    expect(thrown!.message).not.toMatch(/Invalid health history file "\//);
+    // Must not contain the absolute projectRoot itself
+    expect(thrown!.message).not.toContain(FIXTURE_DIR);
   });
 });

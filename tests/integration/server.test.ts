@@ -140,7 +140,7 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
       });
     });
 
-    it('returns all expected tool names (31 core + 2 token when configured)', async () => {
+    it('returns all expected tool names (36 core + 2 token when configured)', async () => {
       sendRequest('tools/list', {});
       const response = await recv();
 
@@ -176,6 +176,7 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
         'get_health_trend',
         'get_health_diff',
         'analyze_accessibility',
+        'get_health_summary',
         // framework
         'detect_framework',
         // validate
@@ -188,6 +189,12 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
         'generate_story',
         // component (dependency graph)
         'get_component_dependencies',
+        // benchmark
+        'benchmark_libraries',
+        // library management
+        'load_library',
+        'list_libraries',
+        'unload_library',
         // typescript
         'get_file_diagnostics',
         'get_project_diagnostics',

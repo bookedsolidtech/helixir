@@ -10,6 +10,7 @@ const ResolveCdnCemArgsSchema = z.object({
   version: z.string().optional().default('latest'),
   registry: z.enum(['jsdelivr', 'unpkg']).optional().default('jsdelivr'),
   register: z.boolean().optional().default(false),
+  cemPath: z.string().optional(),
 });
 
 export const CDN_TOOL_DEFINITIONS = [
@@ -40,6 +41,11 @@ export const CDN_TOOL_DEFINITIONS = [
           description:
             'When true, registers the fetched CEM into the multi-library store. Default: false (preview only, does not mutate server state).',
         },
+        cemPath: {
+          type: 'string',
+          description:
+            'Optional path to the CEM file within the package, e.g. "dist/custom-elements.json". If omitted, tries "custom-elements.json", then "dist/custom-elements.json", then "lib/custom-elements.json".',
+        },
       },
       required: ['package'],
       additionalProperties: false,
@@ -57,8 +63,8 @@ export async function handleCdnCall(
 ): Promise<MCPToolResult> {
   try {
     if (name === 'resolve_cdn_cem') {
-      const { package: pkg, version, registry, register } = ResolveCdnCemArgsSchema.parse(args);
-      const result = await resolveCdnCem(pkg, version, registry, config, register);
+      const { package: pkg, version, registry, register, cemPath } = ResolveCdnCemArgsSchema.parse(args);
+      const result = await resolveCdnCem(pkg, version, registry, config, register, cemPath);
       return createSuccessResponse(result.formatted);
     }
     return createErrorResponse(`Unknown CDN tool: ${name}`);

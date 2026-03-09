@@ -108,16 +108,17 @@ afterEach(() => {
 // ─── HEALTH_TOOL_DEFINITIONS ──────────────────────────────────────────────────
 
 describe('HEALTH_TOOL_DEFINITIONS', () => {
-  it('exports exactly 5 tool definitions', () => {
-    expect(HEALTH_TOOL_DEFINITIONS).toHaveLength(5);
+  it('exports exactly 6 tool definitions', () => {
+    expect(HEALTH_TOOL_DEFINITIONS).toHaveLength(6);
   });
 
-  it('includes score_component, score_all_components, get_health_trend, get_health_diff, analyze_accessibility', () => {
+  it('includes score_component, score_all_components, get_health_trend, get_health_diff, get_health_summary, analyze_accessibility', () => {
     const names = HEALTH_TOOL_DEFINITIONS.map((t) => t.name);
     expect(names).toContain('score_component');
     expect(names).toContain('score_all_components');
     expect(names).toContain('get_health_trend');
     expect(names).toContain('get_health_diff');
+    expect(names).toContain('get_health_summary');
     expect(names).toContain('analyze_accessibility');
   });
 

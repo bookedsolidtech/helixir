@@ -13,8 +13,7 @@ const NPM_PACKAGE_NAME_REGEX = /^(?:@[a-z0-9_.-]+\/)?[a-z0-9][a-z0-9._-]*$/;
  * Strict semver regex: digits.digits.digits with optional pre-release and build metadata.
  * The special tag "latest" is also accepted.
  */
-const STRICT_SEMVER_REGEX =
-  /^(?:latest|\d+\.\d+\.\d+(?:-[a-zA-Z0-9._-]+)?(?:\+[a-zA-Z0-9._-]+)?)$/;
+const STRICT_SEMVER_REGEX = /^(?:latest|\d+\.\d+\.\d+(?:-[a-zA-Z0-9._-]+)?(?:\+[a-zA-Z0-9._-]+)?)$/;
 
 export interface BundleSizeBreakdown {
   minified: number;

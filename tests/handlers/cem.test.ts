@@ -272,7 +272,9 @@ describe('listAllComponents', () => {
 describe('diffCem', () => {
   function mockGitShowImpl(mockFn: (ref: string, filePath: string) => Promise<string>) {
     vi.mocked(GitOperations).mockImplementation(
-      () => ({ gitShow: mockFn }) as unknown as GitOperations,
+      (function(this: any) {
+        this.gitShow = mockFn;
+      }) as any,
     );
   }
 

@@ -209,7 +209,10 @@ export async function benchmarkLibraries(
   for (const lib of libraries) {
     const pathResult = FilePathSchema.safeParse(lib.cemPath);
     if (!pathResult.success) {
-      throw new MCPError(pathResult.error.errors[0]?.message ?? 'Invalid path', ErrorCategory.VALIDATION);
+      throw new MCPError(
+        pathResult.error.errors[0]?.message ?? 'Invalid path',
+        ErrorCategory.VALIDATION,
+      );
     }
     const absPath = resolve(join(config.projectRoot, lib.cemPath));
     const cem = await fileOps.readJSON(absPath, CemSchema);

@@ -10,6 +10,7 @@ import {
   scoreAllComponents,
   getHealthTrend,
   getHealthDiff,
+  getHealthSummary,
 } from '../handlers/health.js';
 import { analyzeAccessibility, analyzeAllAccessibility } from '../handlers/accessibility.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
@@ -123,6 +124,22 @@ export const HEALTH_TOOL_DEFINITIONS = [
     },
   },
   {
+    name: 'get_health_summary',
+    description:
+      'Returns aggregate health statistics for all components: average score, grade distribution, total count, library-wide trend, and components needing attention (score below 70).',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'analyze_accessibility',
     description:
       'Analyzes the accessibility profile of one or all web components from CEM data. Checks for ARIA roles, aria-* attributes, form association, keyboard events, focus management, disabled state, label support, and accessibility documentation.',
@@ -198,6 +215,12 @@ export async function handleHealthCall(
         undefined,
         libraryId,
       );
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'get_health_summary') {
+      const declarations = cem ? getAllDeclarations(cem) : [];
+      const result = await getHealthSummary(config, declarations);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

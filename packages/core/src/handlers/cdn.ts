@@ -69,7 +69,13 @@ export async function resolveCdnCem(
   config: McpWcConfig,
   register = false,
   cemPath?: string,
-): Promise<{ cachePath?: string; componentCount: number; formatted: string; registered: boolean; libraryId: string }> {
+): Promise<{
+  cachePath?: string;
+  componentCount: number;
+  formatted: string;
+  registered: boolean;
+  libraryId: string;
+}> {
   validatePackageName(pkg);
   const sanitized = sanitizePackageName(pkg);
   const safeVersion = sanitizeVersion(version);
@@ -116,10 +122,13 @@ export async function resolveCdnCem(
     );
   }
 
+  // Narrow response to Response type (no longer null)
+  const safeResponse: Response = response;
+
   const MAX_RESPONSE_BYTES = 10 * 1024 * 1024; // 10 MB
 
   // Reject before reading if Content-Length header advertises an oversized body.
-  const contentLengthHeader = response!.headers.get('content-length');
+  const contentLengthHeader = safeResponse.headers.get('content-length');
   if (contentLengthHeader !== null) {
     const declared = parseInt(contentLengthHeader, 10);
     if (Number.isFinite(declared) && declared > MAX_RESPONSE_BYTES) {
@@ -132,8 +141,8 @@ export async function resolveCdnCem(
 
   // Stream body with a running byte counter; abort and reject if limit is exceeded.
   let rawBody: string;
-  if (response!.body) {
-    const reader = response!.body.getReader();
+  if (safeResponse.body) {
+    const reader = safeResponse.body.getReader();
     const chunks: Uint8Array[] = [];
     let totalBytes = 0;
     try {
@@ -163,7 +172,7 @@ export async function resolveCdnCem(
     rawBody = new TextDecoder().decode(merged);
   } else {
     // Fallback for environments without streaming support (e.g. test mocks).
-    rawBody = await response!.text();
+    rawBody = await safeResponse.text();
   }
 
   let json: unknown;

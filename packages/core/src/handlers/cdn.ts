@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from 'fs';
 import { join, relative } from 'path';
 import type { McpWcConfig } from '../config.js';
-import { CemSchema } from './cem.js';
+import { CemSchema, loadCdnCem } from './cem.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
 
 /**
@@ -56,7 +56,10 @@ function sanitizeVersion(version: string): string {
 
 /**
  * Fetches and caches a library's Custom Elements Manifest from a CDN registry.
- * @param register - When true, registers the fetched CEM into the multi-CEM store (future use).
+ * Tries the provided cemPath (or default root path), then falls back to
+ * dist/custom-elements.json and lib/custom-elements.json before failing.
+ * @param cemPath - Optional explicit path within the package. If omitted, auto-discovers.
+ * @param register - When true, registers the fetched CEM into the multi-CEM store.
  *                   Defaults to false so a preview fetch does not permanently mutate server state.
  */
 export async function resolveCdnCem(
@@ -65,32 +68,50 @@ export async function resolveCdnCem(
   registry: 'jsdelivr' | 'unpkg',
   config: McpWcConfig,
   register = false,
-): Promise<{ cachePath?: string; componentCount: number; formatted: string; registered: boolean }> {
+  cemPath?: string,
+): Promise<{ cachePath?: string; componentCount: number; formatted: string; registered: boolean; libraryId: string }> {
   validatePackageName(pkg);
   const sanitized = sanitizePackageName(pkg);
   const safeVersion = sanitizeVersion(version);
 
-  // Build URL using percent-encoded package name and version to prevent URL injection.
+  // Build base URL using percent-encoded package name and version to prevent URL injection.
   const protocol = 'https';
   const host = registry === 'jsdelivr' ? 'cdn.jsdelivr.net' : 'unpkg.com';
   const expectedPrefix =
     registry === 'jsdelivr' ? `${protocol}://${host}/npm/` : `${protocol}://${host}/`;
   const encodedPkg = encodeURIComponent(pkg).replace('%40', '@').replace('%2F', '/');
-  const url = `${expectedPrefix}${encodedPkg}@${encodeURIComponent(safeVersion)}/custom-elements.json`;
+  const baseUrl = `${expectedPrefix}${encodedPkg}@${encodeURIComponent(safeVersion)}`;
 
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 10_000);
+  // Paths to try in order. If cemPath is provided, only try that path.
+  const pathsToTry = cemPath
+    ? [cemPath]
+    : ['custom-elements.json', 'dist/custom-elements.json', 'lib/custom-elements.json'];
 
-  let response: Response;
-  try {
-    response = await fetch(url, { signal: controller.signal, redirect: 'error' });
-  } finally {
-    clearTimeout(timer);
+  let response: Response | null = null;
+  let lastStatus = 0;
+
+  for (const path of pathsToTry) {
+    const url = `${baseUrl}/${path}`;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10_000);
+
+    let res: Response;
+    try {
+      res = await fetch(url, { signal: controller.signal, redirect: 'error' });
+    } finally {
+      clearTimeout(timer);
+    }
+
+    if (res.ok) {
+      response = res;
+      break;
+    }
+    lastStatus = res.status;
   }
 
-  if (!response.ok) {
+  if (!response) {
     throw new MCPError(
-      `CDN fetch failed: HTTP ${response.status} for ${pkg}@${version} from ${registry}`,
+      `CDN fetch failed: no CEM found for ${pkg}@${version} from ${registry} (last HTTP ${lastStatus}). Tried: ${pathsToTry.join(', ')}`,
       ErrorCategory.NETWORK_ERROR,
     );
   }
@@ -98,7 +119,7 @@ export async function resolveCdnCem(
   const MAX_RESPONSE_BYTES = 10 * 1024 * 1024; // 10 MB
 
   // Reject before reading if Content-Length header advertises an oversized body.
-  const contentLengthHeader = response.headers.get('content-length');
+  const contentLengthHeader = response!.headers.get('content-length');
   if (contentLengthHeader !== null) {
     const declared = parseInt(contentLengthHeader, 10);
     if (Number.isFinite(declared) && declared > MAX_RESPONSE_BYTES) {
@@ -111,8 +132,8 @@ export async function resolveCdnCem(
 
   // Stream body with a running byte counter; abort and reject if limit is exceeded.
   let rawBody: string;
-  if (response.body) {
-    const reader = response.body.getReader();
+  if (response!.body) {
+    const reader = response!.body.getReader();
     const chunks: Uint8Array[] = [];
     let totalBytes = 0;
     try {
@@ -142,7 +163,7 @@ export async function resolveCdnCem(
     rawBody = new TextDecoder().decode(merged);
   } else {
     // Fallback for environments without streaming support (e.g. test mocks).
-    rawBody = await response.text();
+    rawBody = await response!.text();
   }
 
   let json: unknown;
@@ -182,14 +203,18 @@ export async function resolveCdnCem(
     .flatMap((m) => m.declarations ?? [])
     .filter((d) => d.tagName).length;
 
-  // TODO: When register=true and a multi-CEM store is available, register the fetched CEM here.
-  // For now, the register flag is accepted and returned but no store mutation occurs.
+  const libraryId = sanitized;
+
+  // Load into in-memory CDN CEM registry when register=true.
+  if (register) {
+    loadCdnCem(libraryId, cem);
+  }
 
   const formatted = cacheWritten
-    ? `Resolved ${pkg}@${version} from ${registry}: ${componentCount} component(s). Cached to ${relative(config.projectRoot, cachePath)}.`
-    : `Resolved ${pkg}@${version} from ${registry}: ${componentCount} component(s).`;
+    ? `Resolved ${pkg}@${version} from ${registry}: ${componentCount} component(s). Library ID: "${libraryId}". Cached to ${relative(config.projectRoot, cachePath)}.`
+    : `Resolved ${pkg}@${version} from ${registry}: ${componentCount} component(s). Library ID: "${libraryId}".`;
 
   return cacheWritten
-    ? { cachePath, componentCount, formatted, registered: register }
-    : { componentCount, formatted, registered: register };
+    ? { cachePath, componentCount, formatted, registered: register, libraryId }
+    : { componentCount, formatted, registered: register, libraryId };
 }

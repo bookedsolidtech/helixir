@@ -127,6 +127,9 @@ export async function resolveCdnCem(
 
   const MAX_RESPONSE_BYTES = 10 * 1024 * 1024; // 10 MB
 
+  // At this point response is guaranteed to be non-null due to the throw above
+  const safeResponse = response as Response;
+
   // Reject before reading if Content-Length header advertises an oversized body.
   const contentLengthHeader = safeResponse.headers.get('content-length');
   if (contentLengthHeader !== null) {

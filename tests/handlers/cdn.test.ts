@@ -376,6 +376,9 @@ describe('resolveCdnCem', () => {
 
   describe('Security: error message path stripping', () => {
     it('formatted success message uses relative cache path, not absolute projectRoot', async () => {
+      const { mkdirSync, writeFileSync } = await import('fs');
+      vi.mocked(mkdirSync).mockImplementation(() => undefined);
+      vi.mocked(writeFileSync).mockImplementation(() => undefined);
       stubFetch({ body: JSON.stringify(VALID_CEM) });
       const config = makeConfig(); // projectRoot: '/tmp/test-project'
       const result = await resolveCdnCem('@shoelace-style/shoelace', '2.15.0', 'jsdelivr', config);

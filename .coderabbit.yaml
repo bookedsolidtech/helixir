@@ -17,6 +17,13 @@ reviews:
       - main
       - dev
       - staging
+    ignore_title_keywords:
+      - 'AUDIT'
+      - 'audit'
+      - 'Deep Audit'
+      - 'deep-audit'
+    path_filters:
+      - '!**/AUDIT.md'
 
   finishing_touches:
     docstrings:

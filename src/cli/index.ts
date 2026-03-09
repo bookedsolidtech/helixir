@@ -721,7 +721,6 @@ export async function runInit(projectRoot: string = process.cwd()): Promise<void
     // Step 4: Write mcpwc.config.json
     const configObj = {
       cemPath,
-      projectRoot,
       componentPrefix: '',
       healthHistoryDir: '.mcp-wc/health',
       tsconfigPath: 'tsconfig.json',
@@ -738,15 +737,27 @@ export async function runInit(projectRoot: string = process.cwd()): Promise<void
         'wc-tools': {
           command: 'npx',
           args: ['wc-tools'],
-          cwd: projectRoot,
+          env: {
+            MCP_WC_PROJECT_ROOT: projectRoot,
+          },
         },
       },
     };
 
     const snippetJson = JSON.stringify(snippet, null, 2);
 
+    const platform = process.platform;
+    let claudeConfigPath: string;
+    if (platform === 'darwin') {
+      claudeConfigPath = '~/Library/Application Support/Claude/claude_desktop_config.json';
+    } else if (platform === 'win32') {
+      claudeConfigPath = '%APPDATA%\\Claude\\claude_desktop_config.json';
+    } else {
+      claudeConfigPath = '~/.config/Claude/claude_desktop_config.json';
+    }
+
     process.stdout.write(`
-Add this to your Claude Desktop config (~/.claude/claude_desktop_config.json):
+Add this to your Claude Desktop config (${claudeConfigPath}):
 
 ${snippetJson}
 

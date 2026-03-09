@@ -61,6 +61,11 @@ export const COMPONENT_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         tagName: {
           type: 'string',
           description: 'The custom element tag name (e.g. "my-button").',
@@ -77,6 +82,11 @@ export const COMPONENT_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         tagName: {
           type: 'string',
           description: 'The custom element tag name to validate.',
@@ -93,6 +103,11 @@ export const COMPONENT_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         tagName: {
           type: 'string',
           description: 'The custom element tag name (e.g. "my-button").',
@@ -115,6 +130,11 @@ export const COMPONENT_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         tagName: {
           type: 'string',
           description: 'The custom element tag name (e.g. "my-button").',
@@ -131,6 +151,11 @@ export const COMPONENT_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         tagName: {
           type: 'string',
           description: 'The custom element tag name (e.g. "my-button").',
@@ -147,6 +172,11 @@ export const COMPONENT_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         tagName: {
           type: 'string',
           description: 'The custom element tag name (e.g. "sl-button").',
@@ -167,6 +197,11 @@ export const COMPONENT_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         tokenName: {
           type: 'string',
           description:
@@ -188,6 +223,11 @@ export const COMPONENT_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         tagName: {
           type: 'string',
           description: 'The custom element tag name to inspect (e.g. "my-dialog").',
@@ -208,6 +248,11 @@ export const COMPONENT_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         tokenName: {
           type: 'string',
           description: 'CSS custom property token name to search for (e.g. "--color-primary-500").',

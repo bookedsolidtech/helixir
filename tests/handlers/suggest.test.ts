@@ -229,8 +229,11 @@ describe('suggestUsage — Shoelace sl-button', () => {
 
   it('includes slots in the result', async () => {
     const result = await suggestUsage('sl-button', makeShoelaceConfig());
-    expect(result.slots.length).toBeGreaterThan(0);
-    expect(result.slots.some((s) => s.name === 'prefix')).toBe(true);
+    expect(result.slots.length).toBe(3);
+    const slotNames = result.slots.map((s) => s.name);
+    expect(slotNames).toContain('');
+    expect(slotNames).toContain('prefix');
+    expect(slotNames).toContain('suffix');
   });
 
   it('does not include notes for sl-button', async () => {
@@ -242,7 +245,7 @@ describe('suggestUsage — Shoelace sl-button', () => {
 describe('suggestUsage — Shoelace sl-icon awareness', () => {
   it('includes a notes array for sl-icon', async () => {
     const result = await suggestUsage('sl-icon', makeShoelaceConfig());
-    expect(result.notes).toBeDefined();
+    expect(Array.isArray(result.notes)).toBe(true);
     expect(result.notes!.length).toBeGreaterThan(0);
   });
 
@@ -265,7 +268,8 @@ describe('suggestUsage — framework snippets', () => {
   it('returns frameworkSnippet when framework="react" is explicitly set', async () => {
     const result = await suggestUsage('my-button', makeConfig(), undefined, { framework: 'react' });
     expect(result.framework).toBe('react');
-    expect(result.frameworkSnippet).toBeDefined();
+    expect(typeof result.frameworkSnippet).toBe('string');
+    expect(result.frameworkSnippet!.length).toBeGreaterThan(0);
     expect(result.frameworkSnippet).toContain('function MyComponent');
     expect(result.frameworkSnippet).toContain('my-button');
   });

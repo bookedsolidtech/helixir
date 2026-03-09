@@ -259,7 +259,7 @@ describe('resolveCdnCem', () => {
     it('returns success without cachePath when cache write fails', async () => {
       const { mkdirSync, writeFileSync } = await import('fs');
       vi.mocked(mkdirSync).mockImplementation(() => {
-        throw new Error('ENOSPC: no space left');
+        throw Object.assign(new Error('ENOSPC: no space left'), { code: 'ENOSPC' });
       });
       vi.mocked(writeFileSync).mockImplementation(() => {});
 
@@ -408,7 +408,7 @@ describe('resolveCdnCem', () => {
       const { mkdirSync, writeFileSync } = await import('fs');
       vi.mocked(mkdirSync).mockImplementation(() => undefined);
       vi.mocked(writeFileSync).mockImplementation(() => {
-        throw new Error('ENOSPC: no space left on device');
+        throw Object.assign(new Error('ENOSPC: no space left on device'), { code: 'ENOSPC' });
       });
 
       stubFetch({ body: JSON.stringify(VALID_CEM) });

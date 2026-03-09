@@ -29,7 +29,7 @@ describe('parseTokens', () => {
   it('parses the fixture tokens.json into a flat array', async () => {
     const tokens = await parseTokens(FIXTURE_TOKENS_PATH);
     expect(Array.isArray(tokens)).toBe(true);
-    expect(tokens.length).toBeGreaterThan(0);
+    expect(tokens.length).toBe(52);
   });
 
   it('every token has required fields', async () => {
@@ -57,9 +57,9 @@ describe('parseTokens', () => {
     const colorTokens = tokens.filter((t) => t.category === 'color');
     const spacingTokens = tokens.filter((t) => t.category === 'spacing');
     const typographyTokens = tokens.filter((t) => t.category === 'typography');
-    expect(colorTokens.length).toBeGreaterThan(0);
-    expect(spacingTokens.length).toBeGreaterThan(0);
-    expect(typographyTokens.length).toBeGreaterThan(0);
+    expect(colorTokens.length).toBe(19);
+    expect(spacingTokens.length).toBe(12);
+    expect(typographyTokens.length).toBe(21);
   });
 
   it('parses correct values from the fixture', async () => {
@@ -96,15 +96,15 @@ describe('getDesignTokens', () => {
   it('returns all tokens when no category filter is provided', async () => {
     const config = makeConfig(FIXTURE_TOKENS_PATH);
     const tokens = await getDesignTokens(config);
-    expect(tokens.length).toBeGreaterThan(0);
+    expect(tokens.length).toBe(52);
     const categories = new Set(tokens.map((t) => t.category));
-    expect(categories.size).toBeGreaterThan(1);
+    expect(categories.size).toBe(3);
   });
 
   it('filters tokens by category (color)', async () => {
     const config = makeConfig(FIXTURE_TOKENS_PATH);
     const tokens = await getDesignTokens(config, 'color');
-    expect(tokens.length).toBeGreaterThan(0);
+    expect(tokens.length).toBe(19);
     for (const token of tokens) {
       expect(token.category).toBe('color');
     }
@@ -113,7 +113,7 @@ describe('getDesignTokens', () => {
   it('filters tokens by category (spacing)', async () => {
     const config = makeConfig(FIXTURE_TOKENS_PATH);
     const tokens = await getDesignTokens(config, 'spacing');
-    expect(tokens.length).toBeGreaterThan(0);
+    expect(tokens.length).toBe(12);
     for (const token of tokens) {
       expect(token.category).toBe('spacing');
     }
@@ -122,7 +122,7 @@ describe('getDesignTokens', () => {
   it('filters tokens by category (typography)', async () => {
     const config = makeConfig(FIXTURE_TOKENS_PATH);
     const tokens = await getDesignTokens(config, 'typography');
-    expect(tokens.length).toBeGreaterThan(0);
+    expect(tokens.length).toBe(21);
     for (const token of tokens) {
       expect(token.category).toBe('typography');
     }
@@ -153,7 +153,7 @@ describe('findToken', () => {
   it('finds tokens by name pattern (case-insensitive substring)', async () => {
     const config = makeConfig(FIXTURE_TOKENS_PATH);
     const results = await findToken(config, 'primary');
-    expect(results.length).toBeGreaterThan(0);
+    expect(results.length).toBe(6);
     for (const token of results) {
       expect(token.name.toLowerCase()).toContain('primary');
     }
@@ -170,7 +170,7 @@ describe('findToken', () => {
     const config = makeConfig(FIXTURE_TOKENS_PATH);
     // Search for "#3366ff" — exact value
     const results = await findToken(config, '#3366ff');
-    expect(results.length).toBeGreaterThan(0);
+    expect(results.length).toBe(1);
     const primary400 = results.find((t) => t.name === 'color.primary.400');
     expect(primary400).toBeDefined();
   });
@@ -178,7 +178,7 @@ describe('findToken', () => {
   it('finds tokens by partial value (e.g. "16px")', async () => {
     const config = makeConfig(FIXTURE_TOKENS_PATH);
     const results = await findToken(config, '16px');
-    expect(results.length).toBeGreaterThan(0);
+    expect(results.length).toBe(2);
     // Should include spacing.4 (value "16px") and typography.fontSize.md (value "16px")
     const names = results.map((t) => t.name);
     expect(names).toContain('spacing.4');
@@ -188,7 +188,7 @@ describe('findToken', () => {
   it('finds tokens by name pattern for nested paths', async () => {
     const config = makeConfig(FIXTURE_TOKENS_PATH);
     const results = await findToken(config, 'fontfamily');
-    expect(results.length).toBeGreaterThan(0);
+    expect(results.length).toBe(3);
     for (const token of results) {
       expect(token.name.toLowerCase()).toContain('fontfamily');
     }

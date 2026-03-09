@@ -78,7 +78,9 @@ describe('estimateBundleSize', () => {
     it('note field is present', async () => {
       stubFetch([{ ok: true, body: BUNDLEPHOBIA_RESPONSE }]);
       const result = await estimateBundleSize('sl-button', makeConfig());
-      expect(result.note).toBeTruthy();
+      expect(typeof result.note).toBe('string');
+      expect(result.note.length).toBeGreaterThan(0);
+      expect(result.note).toContain('Sizes are estimates');
     });
   });
 
@@ -292,7 +294,7 @@ describe('estimateBundleSize', () => {
     it('gzip estimate is a non-negative number from bundlephobia', async () => {
       stubFetch([{ ok: true, body: BUNDLEPHOBIA_RESPONSE }]);
       const result = await estimateBundleSize('sl-button', makeConfig());
-      expect(result.estimates.full_package!.gzipped).toBeGreaterThan(0);
+      expect(result.estimates.full_package!.gzipped).toBe(3100);
     });
   });
 });

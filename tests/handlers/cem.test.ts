@@ -271,11 +271,9 @@ describe('listAllComponents', () => {
 
 describe('diffCem', () => {
   function mockGitShowImpl(mockFn: (ref: string, filePath: string) => Promise<string>) {
-    vi.mocked(GitOperations).mockImplementation(
-      (function(this: any) {
-        this.gitShow = mockFn;
-      }) as any,
-    );
+    vi.mocked(GitOperations).mockImplementation(function (this: any) {
+      this.gitShow = mockFn;
+    } as any);
   }
 
   it('returns isNew: true when component does not exist on base branch', async () => {

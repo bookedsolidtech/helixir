@@ -204,14 +204,14 @@ export async function benchmarkLibraries(
   config: McpWcConfig,
 ): Promise<{ scores: LibraryScore[]; formatted: string }> {
   const fileOps = new SafeFileOperations(config.projectRoot);
-  const root = resolve(config.projectRoot);
   const rawList: RawMetrics[] = [];
 
   for (const lib of libraries) {
-    const absPath = resolve(join(config.projectRoot, lib.cemPath));
-    if (!absPath.startsWith(root + '/') && absPath !== root) {
-      throw new MCPError('Path escapes project root', ErrorCategory.VALIDATION);
+    const pathResult = FilePathSchema.safeParse(lib.cemPath);
+    if (!pathResult.success) {
+      throw new MCPError(pathResult.error.errors[0]?.message ?? 'Invalid path', ErrorCategory.VALIDATION);
     }
+    const absPath = resolve(join(config.projectRoot, lib.cemPath));
     const cem = await fileOps.readJSON(absPath, CemSchema);
     rawList.push(computeRawMetrics(lib.label, cem));
   }

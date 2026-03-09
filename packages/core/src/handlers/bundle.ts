@@ -1,6 +1,21 @@
 import type { McpWcConfig } from '../config.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
 
+/**
+ * Valid npm package name regex per the npm naming rules:
+ * - Scoped: @scope/name where scope and name are [a-z0-9._-]
+ * - Unscoped: [a-z0-9][a-z0-9._-]*
+ * Null bytes, newlines, and filesystem-invalid characters are excluded.
+ */
+const NPM_PACKAGE_NAME_REGEX = /^(?:@[a-z0-9_.-]+\/)?[a-z0-9][a-z0-9._-]*$/;
+
+/**
+ * Strict semver regex: digits.digits.digits with optional pre-release and build metadata.
+ * The special tag "latest" is also accepted.
+ */
+const STRICT_SEMVER_REGEX =
+  /^(?:latest|\d+\.\d+\.\d+(?:-[a-zA-Z0-9._-]+)?(?:\+[a-zA-Z0-9._-]+)?)$/;
+
 export interface BundleSizeBreakdown {
   minified: number;
   gzipped: number;
@@ -189,6 +204,22 @@ export async function estimateBundleSize(
   version = 'latest',
   libraryId = 'default',
 ): Promise<BundleSizeResult> {
+  // Validate packageOverride format to prevent injection via npm package name.
+  if (packageOverride !== undefined && !NPM_PACKAGE_NAME_REGEX.test(packageOverride)) {
+    throw new MCPError(
+      `Invalid npm package name: "${packageOverride}". Must follow npm naming rules.`,
+      ErrorCategory.VALIDATION,
+    );
+  }
+
+  // Validate version string to prevent path traversal and URL injection.
+  if (!STRICT_SEMVER_REGEX.test(version)) {
+    throw new MCPError(
+      `Invalid version string: "${version}". Must be "latest" or a valid semver (e.g. 1.2.3, 1.2.3-beta.1).`,
+      ErrorCategory.VALIDATION,
+    );
+  }
+
   // Determine package name
   const pkg = packageOverride ?? derivePackageFromPrefix(config.componentPrefix);
   if (!pkg) {

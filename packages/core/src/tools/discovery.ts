@@ -38,7 +38,13 @@ export const DISCOVERY_TOOL_DEFINITIONS = [
     description: 'List all custom element components registered in the Custom Elements Manifest.',
     inputSchema: {
       type: 'object' as const,
-      properties: {},
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+      },
       additionalProperties: false,
     },
   },
@@ -49,6 +55,11 @@ export const DISCOVERY_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         query: {
           type: 'string',
           description:
@@ -65,7 +76,13 @@ export const DISCOVERY_TOOL_DEFINITIONS = [
       'Get an overview of the component library: component count, average health score, grade distribution, and last health check timestamp.',
     inputSchema: {
       type: 'object' as const,
-      properties: {},
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+      },
       additionalProperties: false,
     },
   },
@@ -76,6 +93,11 @@ export const DISCOVERY_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         tagName: {
           type: 'string',
           description: 'Optional component tag name to filter events (e.g. "my-button").',
@@ -91,6 +113,11 @@ export const DISCOVERY_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         tagName: {
           type: 'string',
           description: 'Optional component tag name to filter slots (e.g. "my-button").',
@@ -106,6 +133,11 @@ export const DISCOVERY_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         tagName: {
           type: 'string',
           description: 'Optional component tag name to filter CSS parts (e.g. "my-button").',
@@ -121,6 +153,11 @@ export const DISCOVERY_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         category: {
           type: 'string',
           description:

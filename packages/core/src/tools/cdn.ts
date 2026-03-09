@@ -63,7 +63,13 @@ export async function handleCdnCall(
 ): Promise<MCPToolResult> {
   try {
     if (name === 'resolve_cdn_cem') {
-      const { package: pkg, version, registry, register, cemPath } = ResolveCdnCemArgsSchema.parse(args);
+      const {
+        package: pkg,
+        version,
+        registry,
+        register,
+        cemPath,
+      } = ResolveCdnCemArgsSchema.parse(args);
       const result = await resolveCdnCem(pkg, version, registry, config, register, cemPath);
       return createSuccessResponse(result.formatted);
     }

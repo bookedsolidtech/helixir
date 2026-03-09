@@ -219,7 +219,8 @@ export async function main(): Promise<void> {
         const effectiveCem = resolveCem(libraryId, cemCache);
         if (isDiscoveryTool(name))
           return handleDiscoveryCall(name, typedArgs, config, effectiveCem, cemLoadedAt);
-        if (isComponentTool(name)) return handleComponentCall(name, typedArgs, config, effectiveCem);
+        if (isComponentTool(name))
+          return handleComponentCall(name, typedArgs, config, effectiveCem);
         if (isSafetyTool(name)) return handleSafetyCall(name, typedArgs, config, effectiveCem);
         if (isHealthTool(name)) return handleHealthCall(name, typedArgs, config, effectiveCem);
       }

@@ -60,8 +60,9 @@ export function getBundleCacheSize(): number {
 /**
  * Adds an entry to bundleCache with size-bounded eviction.
  * When the cache exceeds MAX_CACHE_SIZE, the oldest entry (by insertion order) is removed first.
+ * Exported for testing.
  */
-function setBundleCacheEntry(key: string, entry: CacheEntry): void {
+export function setBundleCacheEntry(key: string, entry: CacheEntry): void {
   if (!bundleCache.has(key) && bundleCache.size >= MAX_CACHE_SIZE) {
     const oldestKey = bundleCache.keys().next().value;
     if (oldestKey !== undefined) {
@@ -89,8 +90,9 @@ interface NpmRegistryResponse {
 /**
  * Derives an npm package name from the configured componentPrefix.
  * Returns null when no mapping can be determined.
+ * Exported for testing.
  */
-function derivePackageFromPrefix(prefix: string): string | null {
+export function derivePackageFromPrefix(prefix: string): string | null {
   if (!prefix) return null;
   // Common prefix → package mappings for well-known libraries
   const known: Record<string, string> = {
@@ -110,7 +112,8 @@ function derivePackageFromPrefix(prefix: string): string | null {
   return null;
 }
 
-async function fetchBundlephobia(
+/** Exported for testing. */
+export async function fetchBundlephobia(
   pkg: string,
   version: string,
 ): Promise<{ gzip: number; minified: number; resolvedVersion: string } | null> {
@@ -147,7 +150,8 @@ async function fetchBundlephobia(
   return { gzip: data.gzip, minified: data.size, resolvedVersion: data.version ?? version };
 }
 
-async function fetchNpmRegistrySize(
+/** Exported for testing. */
+export async function fetchNpmRegistrySize(
   pkg: string,
   version: string,
 ): Promise<{ tarballBytes: number; resolvedVersion: string } | null> {

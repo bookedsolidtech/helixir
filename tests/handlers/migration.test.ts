@@ -8,9 +8,22 @@ import type { Cem } from '../../packages/core/src/handlers/cem.js';
 import { GitOperations } from '../../packages/core/src/shared/git.js';
 import type { McpWcConfig } from '../../packages/core/src/config.js';
 
-vi.mock('../../packages/core/src/shared/git.js', () => ({
-  GitOperations: vi.fn(),
-}));
+let mockGitShowFn: (() => Promise<string>) | null = null;
+
+vi.mock('../../packages/core/src/shared/git.js', () => {
+  class MockGitOperations {
+    async gitShow(ref: string, filePath: string): Promise<string> {
+      if (!mockGitShowFn) {
+        throw new Error('Mock not configured');
+      }
+      return mockGitShowFn(ref, filePath);
+    }
+  }
+
+  return {
+    GitOperations: MockGitOperations,
+  };
+});
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = resolve(__dirname, '../__fixtures__');
@@ -38,9 +51,7 @@ function makeConfig(): McpWcConfig {
 }
 
 function mockGitShow(returnValue: () => Promise<string>) {
-  vi.mocked(GitOperations).mockImplementation(function (this: any) {
-    this.gitShow = async (_ref: string, _filePath: string) => returnValue();
-  } as any);
+  mockGitShowFn = returnValue;
 }
 
 afterEach(() => {

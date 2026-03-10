@@ -282,7 +282,7 @@ describe('listAllComponents', () => {
 
 describe('diffCem', () => {
   function setMockGitShowImpl(mockFn: (ref: string, filePath: string) => Promise<string>) {
-    mockGitShowImpl = mockFn;
+    mockGitShowFn = mockFn;
   }
 
   it('returns isNew: true when component does not exist on base branch', async () => {

@@ -37,7 +37,6 @@ function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
   try {
     const raw = readFileSync(configPath, 'utf-8');
     return JSON.parse(raw) as Partial<McpWcConfig>;
-<<<<<<< HEAD
   } catch {
     process.stderr.write(`[helixir] Warning: mcpwc.config.json is malformed. Using defaults.\n`);
     return {};

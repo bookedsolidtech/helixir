@@ -734,7 +734,7 @@ export async function runInit(projectRoot: string = process.cwd()): Promise<void
     // Step 5: Print copy-paste snippets
     const snippet = {
       mcpServers: {
-        'helixir': {
+        helixir: {
           command: 'npx',
           args: ['helixir'],
           cwd: projectRoot,

@@ -68,7 +68,7 @@ export function setBundleCacheEntry(key: string, entry: CacheEntry): void {
     if (oldestKey !== undefined) {
       bundleCache.delete(oldestKey);
       process.stderr.write(
-        `[wc-tools] bundleCache evicted "${oldestKey}" (cache full at ${MAX_CACHE_SIZE} entries)\n`,
+        `[helixir] bundleCache evicted "${oldestKey}" (cache full at ${MAX_CACHE_SIZE} entries)\n`,
       );
     }
   }

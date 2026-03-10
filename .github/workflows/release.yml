@@ -4,6 +4,13 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Run in dry-run mode (no publish)'
+        required: false
+        default: 'false'
+        type: boolean
 
 permissions:
   contents: write
@@ -43,7 +50,12 @@ jobs:
         run: pnpm test
 
       - name: Release
-        run: pnpm exec semantic-release
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            pnpm exec semantic-release --dry-run
+          else
+            pnpm exec semantic-release
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

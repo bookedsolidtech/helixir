@@ -347,7 +347,7 @@ pnpm exec vitest tests/handlers/health.test.ts
 
 - All five CI checks must pass before merge
 - PRs require at least one approving review; stale reviews are dismissed on new pushes
-- Merge strategy: **squash-only** (no merge commits, no rebase)
+- Merge strategy: **merge commits only** (no squash, no rebase) — required for semantic-release to read conventional commit messages
 - Direct pushes to protected branches are blocked
 
 ## Code Style

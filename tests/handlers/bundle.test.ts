@@ -78,7 +78,9 @@ describe('estimateBundleSize', () => {
     it('note field is present', async () => {
       stubFetch([{ ok: true, body: BUNDLEPHOBIA_RESPONSE }]);
       const result = await estimateBundleSize('sl-button', makeConfig());
-      expect(result.note).toBeTruthy();
+      expect(typeof result.note).toBe('string');
+      expect(result.note.length).toBeGreaterThan(0);
+      expect(result.note).toContain('Sizes are estimates');
     });
   });
 
@@ -155,6 +157,116 @@ describe('estimateBundleSize', () => {
       const result = await estimateBundleSize('my-button', config, '@my-org/my-lib', '1.0.0');
       expect(result.package).toBe('@my-org/my-lib');
       expect(result.source).toBe('bundlephobia');
+    });
+
+    it('rejects invalid npm package names with uppercase letters', async () => {
+      const config = makeConfig();
+      await expect(
+        estimateBundleSize('my-button', config, '@MyOrg/MyLib', 'latest'),
+      ).rejects.toMatchObject({
+        category: ErrorCategory.VALIDATION,
+        message: /Invalid npm package name/,
+      });
+    });
+
+    it('rejects invalid npm package names with invalid characters', async () => {
+      const config = makeConfig();
+      await expect(
+        estimateBundleSize('my-button', config, '@my-org/my@lib', 'latest'),
+      ).rejects.toMatchObject({
+        category: ErrorCategory.VALIDATION,
+        message: /Invalid npm package name/,
+      });
+    });
+
+    it('rejects invalid npm package names starting with non-alphanumeric', async () => {
+      const config = makeConfig();
+      await expect(
+        estimateBundleSize('my-button', config, '-invalid-pkg', 'latest'),
+      ).rejects.toMatchObject({
+        category: ErrorCategory.VALIDATION,
+        message: /Invalid npm package name/,
+      });
+    });
+
+    it('accepts valid scoped package names', async () => {
+      stubFetch([{ ok: true, body: BUNDLEPHOBIA_RESPONSE }]);
+      const config = makeConfig({ componentPrefix: '' });
+      const result = await estimateBundleSize(
+        'my-button',
+        config,
+        '@valid-scope/pkg-name',
+        '1.0.0',
+      );
+      expect(result.package).toBe('@valid-scope/pkg-name');
+    });
+  });
+
+  describe('version validation', () => {
+    it('accepts "latest" as a valid version', async () => {
+      stubFetch([{ ok: true, body: BUNDLEPHOBIA_RESPONSE }]);
+      const config = makeConfig({ componentPrefix: '' });
+      const result = await estimateBundleSize('my-button', config, '@my-org/my-lib', 'latest');
+      expect(result.version).toBe('2.14.0');
+    });
+
+    it('accepts valid semantic versions', async () => {
+      stubFetch([{ ok: true, body: { ...BUNDLEPHOBIA_RESPONSE, version: '1.2.3' } }]);
+      const config = makeConfig({ componentPrefix: '' });
+      const result = await estimateBundleSize('my-button', config, '@my-org/my-lib', '1.2.3');
+      expect(result.version).toBe('1.2.3');
+    });
+
+    it('accepts semantic versions with pre-release tags', async () => {
+      stubFetch([{ ok: true, body: { ...BUNDLEPHOBIA_RESPONSE, version: '1.2.3-beta.1' } }]);
+      const config = makeConfig({ componentPrefix: '' });
+      const result = await estimateBundleSize(
+        'my-button',
+        config,
+        '@my-org/my-lib',
+        '1.2.3-beta.1',
+      );
+      expect(result.version).toBe('1.2.3-beta.1');
+    });
+
+    it('rejects versions with path traversal attempts', async () => {
+      const config = makeConfig();
+      await expect(
+        estimateBundleSize('my-button', config, '@my-org/my-lib', '../../../etc/passwd'),
+      ).rejects.toMatchObject({
+        category: ErrorCategory.VALIDATION,
+        message: /Invalid version string/,
+      });
+    });
+
+    it('rejects malformed versions like "v1.2.3"', async () => {
+      const config = makeConfig();
+      await expect(
+        estimateBundleSize('my-button', config, '@my-org/my-lib', 'v1.2.3'),
+      ).rejects.toMatchObject({
+        category: ErrorCategory.VALIDATION,
+        message: /Invalid version string/,
+      });
+    });
+
+    it('rejects versions with invalid characters', async () => {
+      const config = makeConfig();
+      await expect(
+        estimateBundleSize('my-button', config, '@my-org/my-lib', '1.2.3; rm -rf /'),
+      ).rejects.toMatchObject({
+        category: ErrorCategory.VALIDATION,
+        message: /Invalid version string/,
+      });
+    });
+
+    it('rejects incomplete semver like "1.2"', async () => {
+      const config = makeConfig();
+      await expect(
+        estimateBundleSize('my-button', config, '@my-org/my-lib', '1.2'),
+      ).rejects.toMatchObject({
+        category: ErrorCategory.VALIDATION,
+        message: /Invalid version string/,
+      });
     });
   });
 
@@ -292,7 +404,7 @@ describe('estimateBundleSize', () => {
     it('gzip estimate is a non-negative number from bundlephobia', async () => {
       stubFetch([{ ok: true, body: BUNDLEPHOBIA_RESPONSE }]);
       const result = await estimateBundleSize('sl-button', makeConfig());
-      expect(result.estimates.full_package!.gzipped).toBeGreaterThan(0);
+      expect(result.estimates.full_package!.gzipped).toBe(3100);
     });
   });
 });

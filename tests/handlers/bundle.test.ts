@@ -530,6 +530,139 @@ describe('setBundleCacheEntry', () => {
   });
 });
 
+// ─── Helper function: fetchBundlephobia ──────────────────────────────────
+
+describe('fetchBundlephobia', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('fetches bundle sizes from bundlephobia', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        text: vi
+          .fn()
+          .mockResolvedValue(JSON.stringify({ gzip: 2500, size: 7500, version: '1.5.0' })),
+      }),
+    );
+
+    const result = await fetchBundlephobia('test-pkg', '1.5.0');
+    expect(result).not.toBeNull();
+    expect(result?.gzip).toBe(2500);
+    expect(result?.minified).toBe(7500);
+    expect(result?.resolvedVersion).toBe('1.5.0');
+  });
+
+  it('returns null if response is not ok', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 404,
+      }),
+    );
+
+    const result = await fetchBundlephobia('missing-pkg', '1.0.0');
+    expect(result).toBeNull();
+  });
+
+  it('returns null if JSON parsing fails', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        text: vi.fn().mockResolvedValue('invalid json'),
+      }),
+    );
+
+    const result = await fetchBundlephobia('bad-pkg', '1.0.0');
+    expect(result).toBeNull();
+  });
+
+  it('returns null if gzip or size is missing', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        text: vi.fn().mockResolvedValue(JSON.stringify({ gzip: 1000 })), // missing size
+      }),
+    );
+
+    const result = await fetchBundlephobia('incomplete-pkg', '1.0.0');
+    expect(result).toBeNull();
+  });
+
+  it('returns null if response body is too large', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        text: vi.fn().mockResolvedValue('x'.repeat(1_048_577)), // exceeds 1MB
+      }),
+    );
+
+    const result = await fetchBundlephobia('large-pkg', '1.0.0');
+    expect(result).toBeNull();
+  });
+
+  it('returns null if fetch throws', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('Network error')));
+
+    const result = await fetchBundlephobia('unreachable-pkg', '1.0.0');
+    expect(result).toBeNull();
+  });
+
+  it('uses resolved version from response when available', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        text: vi
+          .fn()
+          .mockResolvedValue(JSON.stringify({ gzip: 1000, size: 3000, version: '2.0.0' })),
+      }),
+    );
+
+    const result = await fetchBundlephobia('versioned-pkg', '2.0.0');
+    expect(result?.resolvedVersion).toBe('2.0.0');
+  });
+
+  it('falls back to requested version if response version is missing', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        text: vi.fn().mockResolvedValue(JSON.stringify({ gzip: 1000, size: 3000 })), // no version
+      }),
+    );
+
+    const result = await fetchBundlephobia('fallback-pkg', '1.5.0');
+    expect(result?.resolvedVersion).toBe('1.5.0');
+  });
+
+  it('properly encodes package name in URL', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: vi.fn().mockResolvedValue(JSON.stringify({ gzip: 1000, size: 3000, version: '1.0.0' })),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    await fetchBundlephobia('@scoped/pkg-name', '1.0.0');
+    const callArgs = (fetchMock as any).mock.calls[0]?.[0];
+    expect(callArgs).toContain('bundlephobia.com');
+    expect(callArgs).toContain('package=');
+  });
+});
+
 // ─── Helper function: fetchNpmRegistrySize ────────────────────────────────
 
 describe('fetchNpmRegistrySize', () => {
@@ -655,5 +788,73 @@ describe('fetchNpmRegistrySize', () => {
 
     const result = await fetchNpmRegistrySize('timeout-pkg', '1.0.0');
     expect(result).toBeNull();
+  });
+});
+
+// ─── Helper function: clearBundleCache and getBundleCacheSize ──────────────
+
+describe('clearBundleCache and getBundleCacheSize', () => {
+  afterEach(() => {
+    clearBundleCache();
+    vi.restoreAllMocks();
+  });
+
+  it('clearBundleCache empties the cache', () => {
+    const entry = {
+      result: {
+        component: 'test',
+        package: 'test-pkg',
+        version: '1.0.0',
+        estimates: {
+          component_only: null,
+          full_package: { minified: 1000, gzipped: 500 },
+          shared_dependencies: null,
+        },
+        source: 'bundlephobia' as const,
+        cached: false,
+        note: 'Test',
+      },
+      fetchedAt: Date.now(),
+    };
+
+    setBundleCacheEntry('test@1.0.0', entry);
+    expect(getBundleCacheSize()).toBe(1);
+
+    clearBundleCache();
+    expect(getBundleCacheSize()).toBe(0);
+  });
+
+  it('getBundleCacheSize returns 0 when cache is empty', () => {
+    clearBundleCache();
+    expect(getBundleCacheSize()).toBe(0);
+  });
+
+  it('getBundleCacheSize returns correct count after multiple entries', () => {
+    for (let i = 0; i < 5; i++) {
+      const entry = {
+        result: {
+          component: `comp-${i}`,
+          package: `pkg-${i}`,
+          version: '1.0.0',
+          estimates: {
+            component_only: null,
+            full_package: { minified: 1000, gzipped: 500 },
+            shared_dependencies: null,
+          },
+          source: 'bundlephobia' as const,
+          cached: false,
+          note: 'Test',
+        },
+        fetchedAt: Date.now(),
+      };
+      setBundleCacheEntry(`pkg-${i}@1.0.0`, entry);
+    }
+    expect(getBundleCacheSize()).toBe(5);
+  });
+
+  it('clearBundleCache works even when cache is already empty', () => {
+    clearBundleCache();
+    clearBundleCache(); // Call again
+    expect(getBundleCacheSize()).toBe(0); // Should still be 0
   });
 });

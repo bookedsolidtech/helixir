@@ -1,6 +1,6 @@
-# wc-tools + Claude Desktop
+# HELiXiR + Claude Desktop
 
-This example shows how to connect wc-tools to [Claude Desktop](https://claude.ai/download) so Claude can introspect your web component library during conversations.
+This example shows how to connect HELiXiR to [Claude Desktop](https://claude.ai/download) so Claude can introspect your web component library during conversations.
 
 ## Prerequisites
 
@@ -25,9 +25,9 @@ The file may not exist yet — create it if needed.
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/path/to/your/project"
       }
@@ -52,9 +52,9 @@ mkdir -p "$HOME/Library/Application Support/Claude"
 cat > "$HOME/Library/Application Support/Claude/claude_desktop_config.json" << 'EOF'
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/path/to/your/project"
       }
@@ -73,9 +73,9 @@ New-Item -ItemType Directory -Force -Path $configDir
 @'
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "C:\\path\\to\\your\\project"
       }
@@ -94,9 +94,9 @@ mkdir -p "$HOME/.config/Claude"
 cat > "$HOME/.config/Claude/claude_desktop_config.json" << 'EOF'
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/path/to/your/project"
       }
@@ -113,9 +113,9 @@ If you prefer, drop a `mcpwc.config.json` in your project root (see other exampl
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools", "--project-root", "/path/to/your/project"]
+      "args": ["helixir", "--project-root", "/path/to/your/project"]
     }
   }
 }
@@ -130,13 +130,13 @@ Or keep the env var approach and let `mcpwc.config.json` hold only the component
 3. Look for the hammer (🔨) icon in the toolbar — this indicates MCP tools are available.
 4. Ask Claude: _"What web component tools do you have available?"_
 
-Claude should list the wc-tools tools: `list_components`, `describe_component`, `suggest_usage`, and others.
+Claude should list the HELiXiR tools: `list_components`, `describe_component`, `suggest_usage`, and others.
 
-## Example: Claude Using wc-tools in Claude Desktop
+## Example: Claude Using HELiXiR in Claude Desktop
 
 **Prompt:** "Using my component library, build me a login form with email and password fields and a submit button."
 
-**Claude's response (powered by wc-tools):**
+**Claude's response (powered by HELiXiR):**
 
 > Here's a login form using your component library:
 >
@@ -160,6 +160,6 @@ Claude should list the wc-tools tools: `list_components`, `describe_component`, 
 
 **Hammer icon not appearing:** Restart Claude Desktop. If still missing, check the config file path and JSON syntax with `cat` or a JSON validator.
 
-**`npx wc-tools` fails:** Ensure Node 20+ is on your PATH. Try `which node` and `node --version` in a terminal.
+**`npx helixir` fails:** Ensure Node 20+ is on your PATH. Try `which node` and `node --version` in a terminal.
 
 **"No CEM found" error:** Set `MCP_WC_PROJECT_ROOT` to the directory containing your `custom-elements.json` or `mcpwc.config.json`.

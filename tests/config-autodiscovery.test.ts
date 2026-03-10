@@ -6,7 +6,7 @@ import { discoverCemPath, FRIENDLY_CEM_ERROR } from '../packages/core/src/shared
 import { loadConfig } from '../packages/core/src/config.js';
 
 function createTmpDir(): string {
-  return mkdtempSync(join(tmpdir(), 'wc-tools-discovery-test-'));
+  return mkdtempSync(join(tmpdir(), 'helixir-discovery-test-'));
 }
 
 function createCemFile(dir: string, relativePath: string): void {

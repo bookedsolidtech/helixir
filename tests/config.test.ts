@@ -9,7 +9,7 @@ describe('loadConfig', () => {
 
   beforeEach(() => {
     vi.unstubAllEnvs();
-    tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-test-'));
+    tmpDir = mkdtempSync(join(tmpdir(), 'helixir-test-'));
   });
 
   afterEach(() => {
@@ -327,7 +327,7 @@ describe('loadConfig', () => {
         }),
       );
 
-      const envRoot = mkdtempSync(join(tmpdir(), 'wc-tools-test-env-'));
+      const envRoot = mkdtempSync(join(tmpdir(), 'helixir-test-env-'));
       try {
         vi.stubEnv('MCP_WC_PROJECT_ROOT', envRoot);
         vi.stubEnv('MCP_WC_CEM_PATH', 'env-cem.json');

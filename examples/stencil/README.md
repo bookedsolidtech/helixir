@@ -1,6 +1,6 @@
-# wc-tools + Stencil
+# HELiXiR + Stencil
 
-This example configures wc-tools to work with a [Stencil](https://stenciljs.com/) component library.
+This example configures HELiXiR to work with a [Stencil](https://stenciljs.com/) component library.
 
 ## Prerequisites
 
@@ -56,9 +56,9 @@ Add to your `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/path/to/your/stencil-project"
       }
@@ -67,11 +67,11 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-## Example: Claude Using wc-tools with Stencil
+## Example: Claude Using HELiXiR with Stencil
 
 **Prompt:** "What props does my-button accept and what are the valid values for its `variant` attribute?"
 
-**Claude's response (powered by wc-tools):**
+**Claude's response (powered by HELiXiR):**
 
 > The `my-button` component accepts the following props:
 >

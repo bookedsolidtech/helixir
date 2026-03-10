@@ -1,8 +1,8 @@
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
       }

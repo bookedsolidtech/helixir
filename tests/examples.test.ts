@@ -29,7 +29,7 @@ describe('example configs', () => {
 
   beforeEach(() => {
     vi.unstubAllEnvs();
-    tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-examples-test-'));
+    tmpDir = mkdtempSync(join(tmpdir(), 'helixir-examples-test-'));
   });
 
   afterEach(() => {
@@ -56,7 +56,7 @@ describe('example configs', () => {
     const configs = getExampleConfigs();
 
     for (const { name, content } of configs) {
-      const exampleTmpDir = mkdtempSync(join(tmpdir(), `wc-tools-example-${name}-`));
+      const exampleTmpDir = mkdtempSync(join(tmpdir(), `helixir-example-${name}-`));
       try {
         writeFileSync(join(exampleTmpDir, 'mcpwc.config.json'), content);
         vi.stubEnv('MCP_WC_PROJECT_ROOT', exampleTmpDir);

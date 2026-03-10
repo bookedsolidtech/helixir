@@ -1,13 +1,13 @@
-# wc-tools
+# HELiXiR
 
 > Give AI agents full situational awareness of any web component library.
 
-[![npm version](https://img.shields.io/npm/v/wc-tools)](https://www.npmjs.com/package/wc-tools)
-[![npm downloads](https://img.shields.io/npm/dw/wc-tools)](https://www.npmjs.com/package/wc-tools)
+[![npm version](https://img.shields.io/npm/v/helixir)](https://www.npmjs.com/package/helixir)
+[![npm downloads](https://img.shields.io/npm/dw/helixir)](https://www.npmjs.com/package/helixir)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node 20+](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
-[![Build](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/wc-tools/build.yml?branch=main&label=build)](https://github.com/bookedsolidtech/wc-tools/actions/workflows/build.yml)
-[![Tests](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/wc-tools/test.yml?branch=main&label=tests)](https://github.com/bookedsolidtech/wc-tools/actions/workflows/test.yml)
+[![Build](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/helixir/build.yml?branch=main&label=build)](https://github.com/bookedsolidtech/helixir/actions/workflows/build.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/helixir/test.yml?branch=main&label=tests)](https://github.com/bookedsolidtech/helixir/actions/workflows/test.yml)
 
 ---
 
@@ -17,10 +17,10 @@
 
 ```bash
 # 1. Install globally (or use npx — no install required)
-npm install -g wc-tools
+npm install -g helixir
 
 # 2. Generate a starter config in your component library
-npx wc-tools init
+npx helixir init
 # → writes mcpwc.config.json to the current directory
 ```
 
@@ -35,14 +35,14 @@ Edit `mcpwc.config.json` to point at your library:
 }
 ```
 
-Add wc-tools to your Claude Desktop config (see [AI Tool Configs](#ai-tool-configs) for other editors):
+Add HELiXiR to your Claude Desktop config (see [AI Tool Configs](#ai-tool-configs) for other editors):
 
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
       }
@@ -57,7 +57,7 @@ Restart Claude Desktop. Done — your AI agent now knows every property, event, 
 
 ## What You Get
 
-### Without wc-tools
+### Without HELiXiR
 
 > **You:** How do I use sl-button?
 >
@@ -73,7 +73,7 @@ Restart Claude Desktop. Done — your AI agent now knows every property, event, 
 
 ---
 
-### With wc-tools
+### With HELiXiR
 
 > **You:** How do I use sl-button?
 >
@@ -105,7 +105,7 @@ Restart Claude Desktop. Done — your AI agent now knows every property, event, 
 
 ## Framework Setup
 
-wc-tools works with any toolchain that produces a [`custom-elements.json`](https://github.com/webcomponents/custom-elements-manifest) (CEM). Below are quick-start setups for the most common frameworks.
+HELiXiR works with any toolchain that produces a [`custom-elements.json`](https://github.com/webcomponents/custom-elements-manifest) (CEM). Below are quick-start setups for the most common frameworks.
 
 ### Shoelace
 
@@ -341,7 +341,7 @@ Place this file at the root of your component library project (or wherever `MCP_
 | `tsconfigPath`     | `string`         | `"tsconfig.json"`        | Path to the project's `tsconfig.json`, relative to `projectRoot`.                                                                                    |
 | `tokensPath`       | `string \| null` | `null`                   | Path to a design tokens JSON file. Set to `null` to disable token tools.                                                                             |
 | `cdnBase`          | `string \| null` | `null`                   | Base URL for CDN import snippets in `suggest_usage` output (e.g. for Shoelace via CDN). Does not affect `resolve_cdn_cem`. Set to `null` to disable. |
-| `watch`            | `boolean`        | `false`                  | When `true`, wc-tools automatically reloads the CEM on file changes.                                                                                 |
+| `watch`            | `boolean`        | `false`                  | When `true`, HELiXiR automatically reloads the CEM on file changes.                                                                                  |
 
 **Full example:**
 
@@ -386,7 +386,7 @@ Add to `.mcp.json` in your project root (project-scoped) or `~/.claude.json` (gl
 **Option 1 — Install from npm (recommended)**
 
 ```bash
-npx wc-tools init  # generates mcpwc.config.json in your project root
+npx helixir init  # generates mcpwc.config.json in your project root
 ```
 
 Then add to `.mcp.json`:
@@ -394,9 +394,9 @@ Then add to `.mcp.json`:
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
       }
@@ -408,8 +408,8 @@ Then add to `.mcp.json`:
 **Option 2 — Install from local clone (development)**
 
 ```bash
-git clone https://github.com/bookedsolidtech/wc-tools.git
-cd wc-tools
+git clone https://github.com/bookedsolidtech/helixir.git
+cd helixir
 pnpm install
 pnpm build
 ```
@@ -419,9 +419,9 @@ Then add to `.mcp.json`:
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "node",
-      "args": ["/absolute/path/to/wc-tools/build/index.js"],
+      "args": ["/absolute/path/to/helixir/build/index.js"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
       }
@@ -439,9 +439,9 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) o
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
       }
@@ -459,9 +459,9 @@ Add to `.cursor/mcp.json` in your project root (or `~/.cursor/mcp.json` for glob
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "${workspaceFolder}"
       }
@@ -477,9 +477,9 @@ Add to `.cursor/mcp.json` in your project root (or `~/.cursor/mcp.json` for glob
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "${workspaceFolder}"
       }
@@ -494,8 +494,8 @@ Add to `.cursor/mcp.json` in your project root (or `~/.cursor/mcp.json` for glob
 {
   "mcpServers": [
     {
-      "name": "wc-tools",
-      "command": "npx wc-tools",
+      "name": "helixir",
+      "command": "npx helixir",
       "env": {
         "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
       }
@@ -511,10 +511,10 @@ Add to your Zed settings (`~/.config/zed/settings.json`):
 ```json
 {
   "context_servers": {
-    "wc-tools": {
+    "helixir": {
       "command": {
         "path": "npx",
-        "args": ["wc-tools"],
+        "args": ["helixir"],
         "env": {
           "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
         }
@@ -528,7 +528,7 @@ Add to your Zed settings (`~/.config/zed/settings.json`):
 
 ## Security
 
-wc-tools applies defense-in-depth on all inputs that touch the file system or network:
+HELiXiR applies defense-in-depth on all inputs that touch the file system or network:
 
 - **Path containment** — all file paths are resolved and verified to stay within `projectRoot`; `..` traversals and absolute paths outside the root are rejected.
 - **Input validation** — every tool argument is validated with [Zod](https://zod.dev) schemas before reaching handler code; unknown properties are rejected via `additionalProperties: false`.

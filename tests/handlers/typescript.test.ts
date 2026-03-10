@@ -27,7 +27,7 @@ function makeConfig(projectRoot: string): McpWcConfig {
 }
 
 beforeAll(() => {
-  tempDir = resolve(tmpdir(), `wc-tools-ts-test-${Date.now()}`);
+  tempDir = resolve(tmpdir(), `helixir-ts-test-${Date.now()}`);
   mkdirSync(tempDir, { recursive: true });
 
   writeFileSync(
@@ -123,7 +123,7 @@ describe('getProjectDiagnostics', { timeout: 15_000 }, () => {
 
   it('returns zero errors for a clean project', () => {
     // Create a separate temp dir with only a clean file
-    const cleanDir = resolve(tmpdir(), `wc-tools-ts-clean-${Date.now()}`);
+    const cleanDir = resolve(tmpdir(), `helixir-ts-clean-${Date.now()}`);
     mkdirSync(cleanDir, { recursive: true });
 
     writeFileSync(

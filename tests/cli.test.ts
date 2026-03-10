@@ -204,7 +204,7 @@ describe('helixir CLI subcommands (requires build)', () => {
 
 describe('helixir init', () => {
   it('writes mcpwc.config.json and prints snippets when CEM is found', () => {
-    const tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-init-'));
+    const tmpDir = mkdtempSync(join(tmpdir(), 'helixir-init-'));
     try {
       // Create a package.json with lit to trigger framework detection
       writeFileSync(
@@ -247,7 +247,7 @@ describe('helixir init', () => {
   });
 
   it('uses custom CEM path when user declines auto-discovered CEM', () => {
-    const tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-init-'));
+    const tmpDir = mkdtempSync(join(tmpdir(), 'helixir-init-'));
     try {
       writeFileSync(
         join(tmpDir, 'custom-elements.json'),
@@ -277,7 +277,7 @@ describe('helixir init', () => {
   });
 
   it('records tokensPath when user provides one', () => {
-    const tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-init-'));
+    const tmpDir = mkdtempSync(join(tmpdir(), 'helixir-init-'));
     try {
       writeFileSync(
         join(tmpDir, 'custom-elements.json'),
@@ -307,7 +307,7 @@ describe('helixir init', () => {
   });
 
   it('falls back to default CEM path when none is auto-detected and user skips', () => {
-    const tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-init-'));
+    const tmpDir = mkdtempSync(join(tmpdir(), 'helixir-init-'));
     try {
       // No CEM file present, no package.json
       // Simulate: press Enter for CEM path (use default), skip tokens

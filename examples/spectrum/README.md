@@ -1,6 +1,6 @@
-# wc-tools + Adobe Spectrum Web Components
+# HELiXiR + Adobe Spectrum Web Components
 
-This example configures wc-tools to work with [Adobe Spectrum Web Components](https://opensource.adobe.com/spectrum-web-components/) — Adobe's design system implementation as web components.
+This example configures HELiXiR to work with [Adobe Spectrum Web Components](https://opensource.adobe.com/spectrum-web-components/) — Adobe's design system implementation as web components.
 
 Spectrum is a **multi-package monorepo** where each component is published separately (e.g., `@spectrum-web-components/button`, `@spectrum-web-components/dialog`). The `@spectrum-web-components/bundle` package re-exports everything and ships a combined CEM file, making it the easiest starting point.
 
@@ -62,9 +62,9 @@ Add to your `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/path/to/your/spectrum-project"
       }
@@ -73,11 +73,11 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-## Example: Claude Using wc-tools with Spectrum
+## Example: Claude Using HELiXiR with Spectrum
 
 **Prompt:** "How do I build an accessible modal dialog with Spectrum Web Components?"
 
-**Claude's response (powered by wc-tools):**
+**Claude's response (powered by HELiXiR):**
 
 > Use `sp-dialog-wrapper` (handles the overlay + dismiss behavior) or the lower-level `sp-dialog` inside `sp-overlay`:
 >

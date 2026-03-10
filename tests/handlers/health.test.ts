@@ -313,6 +313,51 @@ describe('getHealthTrend', () => {
     expect(trend.days).toBe(3);
   });
 
+  it('includes dimensionTrends when multiple data points with breakdown data exist', async () => {
+    const config = makeConfig();
+    const trend = await getHealthTrend(config, 'my-button', 10);
+    // Should have dimensionTrends since we have 3 data points with breakdown data
+    expect(trend.dimensionTrends).toBeDefined();
+    expect(typeof trend.dimensionTrends).toBe('object');
+  });
+
+  it('dimensionTrends includes all dimensions from first and last data points', async () => {
+    const config = makeConfig();
+    const trend = await getHealthTrend(config, 'my-button', 10);
+    if (trend.dimensionTrends) {
+      // my-button fixture has: documentation, accessibility, completeness, consistency
+      expect(trend.dimensionTrends).toHaveProperty('documentation');
+      expect(trend.dimensionTrends).toHaveProperty('accessibility');
+      expect(trend.dimensionTrends).toHaveProperty('completeness');
+      expect(trend.dimensionTrends).toHaveProperty('consistency');
+    }
+  });
+
+  it('dimensionTrends tracks per-dimension improvement', async () => {
+    const config = makeConfig();
+    const trend = await getHealthTrend(config, 'my-button', 10);
+    if (trend.dimensionTrends) {
+      for (const [dimension, dimTrend] of Object.entries(trend.dimensionTrends)) {
+        expect(['improving', 'declining', 'stable']).toContain(dimTrend.trend);
+        expect(typeof dimTrend.changePercent).toBe('number');
+        // changePercent is at most 2 decimal places due to Math.round(...) / 10
+        const str = dimTrend.changePercent.toString();
+        const decimalIndex = str.indexOf('.');
+        if (decimalIndex !== -1) {
+          const decimalPlaces = str.length - decimalIndex - 1;
+          expect(decimalPlaces).toBeLessThanOrEqual(1);
+        }
+      }
+    }
+  });
+
+  it('dimensionTrends is undefined when only single data point exists', async () => {
+    const config = makeConfig();
+    // Request only 1 day — most recent file is 2024-03-10.json
+    const trend = await getHealthTrend(config, 'my-button', 1);
+    expect(trend.dimensionTrends).toBeUndefined();
+  });
+
   it('throws when no history directory exists for the component', async () => {
     const config = makeConfig();
     await expect(getHealthTrend(config, 'nonexistent-component')).rejects.toThrow(

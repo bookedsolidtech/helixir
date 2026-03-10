@@ -8,6 +8,9 @@ import {
   clearCemStore,
   resolveCem,
   listAllComponents,
+  getMergedCem,
+  loadCdnCem,
+  clearCdnCemCache,
 } from '../../packages/core/src/handlers/cem.js';
 import type { Cem } from '../../packages/core/src/handlers/cem.js';
 
@@ -221,6 +224,108 @@ describe('CEM Store', () => {
 
       // Subsequent query throws
       expect(() => resolveCem('shoelace', LIBRARY_A)).toThrow(/Library "shoelace" not found/);
+    });
+  });
+
+  describe('getMergedCem', () => {
+    it('returns the local CEM unchanged when no additional libraries are loaded', () => {
+      const merged = getMergedCem(LIBRARY_A);
+      expect(listAllComponents(merged)).toEqual(['my-button', 'my-input']);
+    });
+
+    it('merges local CEM with loaded libraries', () => {
+      loadLibrary('shoelace', LIBRARY_B, 'cdn');
+      const merged = getMergedCem(LIBRARY_A);
+      const components = listAllComponents(merged);
+      expect(components).toContain('my-button');
+      expect(components).toContain('my-input');
+      expect(components).toContain('sl-card');
+      expect(components).toContain('sl-dialog');
+      expect(components).toContain('sl-alert');
+    });
+
+    it('merges local CEM with loaded libraries, excluding default', () => {
+      loadLibrary('default', LIBRARY_B, 'config');
+      loadLibrary('shoelace', LIBRARY_B, 'cdn');
+      const merged = getMergedCem(LIBRARY_A);
+      const components = listAllComponents(merged);
+      // Should have local (LIBRARY_A) components plus namespaced shoelace components
+      expect(components).toContain('my-button');
+      expect(components).toContain('my-input');
+      // Shoelace components are namespaced
+      expect(components.some((c) => c.includes('sl-card'))).toBe(true);
+    });
+
+    it('handles multiple loaded libraries', () => {
+      loadLibrary('lib1', LIBRARY_B, 'cdn');
+      const library_c: Cem = {
+        schemaVersion: '1.0.0',
+        modules: [
+          {
+            kind: 'javascript-module',
+            path: 'src/menu.ts',
+            declarations: [
+              {
+                kind: 'class',
+                name: 'MyMenu',
+                tagName: 'my-menu',
+                description: 'A menu component',
+              },
+            ],
+          },
+        ],
+      };
+      loadLibrary('lib2', library_c, 'local');
+      const merged = getMergedCem(LIBRARY_A);
+      const components = listAllComponents(merged);
+      expect(components).toHaveLength(6); // 2 from A + 3 from B + 1 from C
+      expect(components).toContain('my-button');
+      expect(components).toContain('sl-card');
+      expect(components).toContain('my-menu');
+    });
+  });
+
+  describe('resetCemStore', () => {
+    it('clears all libraries including default', () => {
+      loadLibrary('default', LIBRARY_A, 'config');
+      loadLibrary('shoelace', LIBRARY_B, 'cdn');
+      resetCemStore();
+      expect(listLibraries()).toHaveLength(0);
+      expect(getLibrary('default')).toBeUndefined();
+      expect(getLibrary('shoelace')).toBeUndefined();
+    });
+
+    it('allows reloading after reset', () => {
+      loadLibrary('default', LIBRARY_A, 'config');
+      resetCemStore();
+      loadLibrary('default', LIBRARY_B, 'config');
+      const cem = getLibrary('default');
+      expect(listAllComponents(cem!)).toEqual(['sl-card', 'sl-dialog', 'sl-alert']);
+    });
+  });
+
+  describe('CDN aliases (backward compatibility)', () => {
+    it('loadCdnCem loads a library with "cdn" source type', () => {
+      loadCdnCem('shoelace', LIBRARY_B);
+      const libs = listLibraries();
+      const shoelaceLib = libs.find((l) => l.libraryId === 'shoelace');
+      expect(shoelaceLib?.sourceType).toBe('cdn');
+    });
+
+    it('clearCdnCemCache clears all non-default libraries', () => {
+      loadCdnCem('shoelace', LIBRARY_B);
+      loadLibrary('default', LIBRARY_A, 'config');
+      clearCdnCemCache();
+      expect(getLibrary('shoelace')).toBeUndefined();
+      expect(getLibrary('default')).toBeDefined();
+    });
+
+    it('clearCdnCemCache is equivalent to clearCemStore', () => {
+      loadLibrary('default', LIBRARY_A, 'config');
+      loadCdnCem('lib1', LIBRARY_B);
+      clearCdnCemCache();
+      expect(listLibraries()).toHaveLength(1);
+      expect(listLibraries()[0]!.libraryId).toBe('default');
     });
   });
 });

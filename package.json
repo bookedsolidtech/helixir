@@ -57,7 +57,10 @@
     "developer-tools"
   ],
   "license": "MIT",
-  "author": "Booked Solid Tech",
+  "author": {
+    "name": "Booked Solid",
+    "url": "https://github.com/bookedsolidtech"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/bookedsolidtech/helixir.git"

@@ -15,9 +15,22 @@ import { ErrorCategory, MCPError } from '../../packages/core/src/shared/error-ha
 import type { McpWcConfig } from '../../packages/core/src/config.js';
 
 // Mock GitOperations so diffCem tests don't require a real git repo
-vi.mock('../../packages/core/src/shared/git.js', () => ({
-  GitOperations: vi.fn(),
-}));
+let mockGitShowImpl: ((ref: string, filePath: string) => Promise<string>) | null = null;
+
+vi.mock('../../packages/core/src/shared/git.js', () => {
+  class MockGitOperations {
+    async gitShow(ref: string, filePath: string): Promise<string> {
+      if (!mockGitShowImpl) {
+        throw new Error('Mock not configured');
+      }
+      return mockGitShowImpl(ref, filePath);
+    }
+  }
+
+  return {
+    GitOperations: MockGitOperations,
+  };
+});
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = resolve(__dirname, '../__fixtures__');
@@ -270,15 +283,13 @@ describe('listAllComponents', () => {
 // ---------------------------------------------------------------------------
 
 describe('diffCem', () => {
-  function mockGitShowImpl(mockFn: (ref: string, filePath: string) => Promise<string>) {
-    vi.mocked(GitOperations).mockImplementation(function (this: any) {
-      this.gitShow = mockFn;
-    } as any);
+  function setMockGitShowImpl(mockFn: (ref: string, filePath: string) => Promise<string>) {
+    mockGitShowImpl = mockFn;
   }
 
   it('returns isNew: true when component does not exist on base branch', async () => {
     const emptyCem = { schemaVersion: '1.0.0', modules: [] };
-    mockGitShowImpl(async () => JSON.stringify(emptyCem));
+    setMockGitShowImpl(async () => JSON.stringify(emptyCem));
 
     const result = await diffCem('my-button', 'main', makeConfig(), FIXTURE_CEM);
     expect(result.isNew).toBe(true);
@@ -287,7 +298,7 @@ describe('diffCem', () => {
   });
 
   it('returns isNew: true when CEM file is missing on base branch (git show error)', async () => {
-    mockGitShowImpl(async () => {
+    setMockGitShowImpl(async () => {
       throw new Error('git show failed');
     });
 
@@ -296,7 +307,7 @@ describe('diffCem', () => {
   });
 
   it('returns no breaking changes when component is identical on both branches', async () => {
-    mockGitShowImpl(async () => JSON.stringify(FIXTURE_CEM));
+    setMockGitShowImpl(async () => JSON.stringify(FIXTURE_CEM));
 
     const result = await diffCem('my-button', 'main', makeConfig(), FIXTURE_CEM);
     expect(result.isNew).toBe(false);
@@ -341,7 +352,7 @@ describe('diffCem', () => {
       ],
     };
 
-    mockGitShowImpl(async () => JSON.stringify(baseCem));
+    setMockGitShowImpl(async () => JSON.stringify(baseCem));
 
     const result = await diffCem('my-button', 'main', makeConfig(), FIXTURE_CEM);
     expect(result.isNew).toBe(false);
@@ -383,7 +394,7 @@ describe('diffCem', () => {
       ],
     };
 
-    mockGitShowImpl(async () => JSON.stringify(baseCem));
+    setMockGitShowImpl(async () => JSON.stringify(baseCem));
 
     const result = await diffCem('my-button', 'main', makeConfig(), FIXTURE_CEM);
     const typeChange = result.breaking.find(
@@ -428,7 +439,7 @@ describe('diffCem', () => {
       ],
     };
 
-    mockGitShowImpl(async () => JSON.stringify(baseCem));
+    setMockGitShowImpl(async () => JSON.stringify(baseCem));
 
     const result = await diffCem('my-button', 'main', makeConfig(), FIXTURE_CEM);
     const eventRemoved = result.breaking.find(
@@ -469,7 +480,7 @@ describe('diffCem', () => {
       ],
     };
 
-    mockGitShowImpl(async () => JSON.stringify(baseCem));
+    setMockGitShowImpl(async () => JSON.stringify(baseCem));
 
     const result = await diffCem('my-button', 'main', makeConfig(), FIXTURE_CEM);
     expect(result.isNew).toBe(false);
@@ -504,7 +515,7 @@ describe('diffCem', () => {
       ],
     };
 
-    mockGitShowImpl(async () => JSON.stringify(baseCem));
+    setMockGitShowImpl(async () => JSON.stringify(baseCem));
 
     const result = await diffCem('my-button', 'main', makeConfig(), FIXTURE_CEM);
     expect(result.breaking).toHaveLength(0);
@@ -514,7 +525,7 @@ describe('diffCem', () => {
 
   it('throws MCPError NOT_FOUND when the component does not exist on the current branch', async () => {
     // parseCem throws synchronously before gitShow is called
-    mockGitShowImpl(async () => JSON.stringify({ schemaVersion: '1.0.0', modules: [] }));
+    setMockGitShowImpl(async () => JSON.stringify({ schemaVersion: '1.0.0', modules: [] }));
 
     const err = await diffCem('no-such-component', 'main', makeConfig(), FIXTURE_CEM).catch(
       (e) => e,

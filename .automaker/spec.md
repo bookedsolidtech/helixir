@@ -9,7 +9,7 @@
 **Tagline:** *Give Claude eyes into your design system.*
 
 **npm package:** `helixir`
-**GitHub:** `git@github.com:bookedsolidtech/wc-tools.git`
+**GitHub:** `git@github.com:bookedsolidtech/helixir.git`
 
 ## OSS Context
 - Priority #2 in Clarity House / ProtoLabs OSS strategy

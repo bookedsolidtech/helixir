@@ -60,11 +60,11 @@
   "author": "Booked Solid Tech",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bookedsolidtech/wc-tools.git"
+    "url": "https://github.com/bookedsolidtech/helixir.git"
   },
-  "homepage": "https://github.com/bookedsolidtech/wc-tools#readme",
+  "homepage": "https://github.com/bookedsolidtech/helixir#readme",
   "bugs": {
-    "url": "https://github.com/bookedsolidtech/wc-tools/issues"
+    "url": "https://github.com/bookedsolidtech/helixir/issues"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",

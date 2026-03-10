@@ -578,8 +578,8 @@ For contributors working on helixir itself, or for using a local build instead o
 ### Clone and build
 
 ```bash
-git clone https://github.com/bookedsolidtech/wc-tools.git
-cd wc-tools
+git clone https://github.com/bookedsolidtech/helixir.git
+cd helixir
 pnpm install
 pnpm build
 ```

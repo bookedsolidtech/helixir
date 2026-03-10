@@ -5,8 +5,8 @@ Thank you for your interest in contributing! This guide covers everything you ne
 ## Development Setup
 
 ```bash
-git clone https://github.com/bookedsolidtech/wc-tools.git
-cd wc-tools
+git clone https://github.com/bookedsolidtech/helixir.git
+cd helixir
 pnpm install
 pnpm test
 pnpm run build

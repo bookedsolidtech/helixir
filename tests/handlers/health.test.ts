@@ -621,192 +621,122 @@ describe('getHealthSummary', () => {
     const config = makeConfig();
     const components = [MY_BUTTON_DECL];
 
-    const summary = await getHealthSummary(config, components, 7);
+    const summary = await getHealthSummary(config, components);
 
     expect(summary).toBeDefined();
-    expect(summary.library_score).toBeDefined();
-    expect(summary.library_grade).toBeDefined();
-    expect(summary.library_trend).toBeDefined();
-    expect(summary.components_analyzed).toBe(1);
-    expect(summary.components_needing_attention).toBeDefined();
-    expect(Array.isArray(summary.components_needing_attention)).toBe(true);
+    expect(summary.averageScore).toBeDefined();
+    expect(summary.totalComponents).toBe(1);
+    expect(summary.gradeDistribution).toBeDefined();
+    expect(summary.libraryTrend).toBeDefined();
+    expect(summary.componentsNeedingAttention).toBeDefined();
+    expect(Array.isArray(summary.componentsNeedingAttention)).toBe(true);
+    expect(summary.timestamp).toBeDefined();
   });
 
-  it('calculates library score as average of component scores', async () => {
+  it('calculates average score from component scores', async () => {
     const config = makeConfig();
     const components = [MY_BUTTON_DECL, PERFECT_DECL, UNDOCUMENTED_DECL];
 
-    const summary = await getHealthSummary(config, components, 7);
+    const summary = await getHealthSummary(config, components);
 
-    // Perfect: 100, MyButton: some score > 0, Undocumented: 0
-    // Should average these scores
-    expect(summary.library_score).toBeGreaterThan(0);
-    expect(summary.library_score).toBeLessThanOrEqual(100);
-    expect(summary.components_analyzed).toBe(3);
+    // Perfect: 100, MyButton: 82, Undocumented: 0 → average
+    expect(summary.averageScore).toBeGreaterThan(0);
+    expect(summary.averageScore).toBeLessThanOrEqual(100);
+    expect(summary.totalComponents).toBe(3);
   });
 
   it('includes components needing attention (score < 70)', async () => {
     const config = makeConfig();
-    const components = [UNDOCUMENTED_DECL]; // score should be very low
+    const components = [UNDOCUMENTED_DECL]; // score should be 0
 
-    const summary = await getHealthSummary(config, components, 7);
+    const summary = await getHealthSummary(config, components);
 
-    // Undocumented component should need attention
-    const needingAttention = summary.components_needing_attention.some(
-      (c) => c.tag === 'undocumented-component',
-    );
-    expect(needingAttention || summary.library_score < 70).toBe(true);
+    // Undocumented component has score 0, so should need attention
+    expect(summary.componentsNeedingAttention.length).toBeGreaterThan(0);
+    expect(summary.componentsNeedingAttention[0]).toBe('undocumented-component');
   });
 
-  it('assigns correct grade based on library score', async () => {
+  it('assigns correct grade distribution', async () => {
     const config = makeConfig();
-    const components = [PERFECT_DECL]; // Should get A grade
+    const components = [PERFECT_DECL, MY_BUTTON_DECL];
 
-    const summary = await getHealthSummary(config, components, 7);
+    const summary = await getHealthSummary(config, components);
 
-    expect(summary.library_grade).toBe('A');
+    // Perfect gets A (100), MyButton gets B (82)
+    expect(summary.gradeDistribution.A).toBe(1);
+    expect(summary.gradeDistribution.B).toBeGreaterThan(0);
   });
 
   it('handles empty component list gracefully', async () => {
     const config = makeConfig();
     const components: CemDeclaration[] = [];
 
-    const summary = await getHealthSummary(config, components, 7);
+    const summary = await getHealthSummary(config, components);
 
-    expect(summary.components_analyzed).toBe(0);
-    expect(summary.components_needing_attention).toEqual([]);
+    expect(summary.totalComponents).toBe(0);
+    expect(summary.componentsNeedingAttention).toEqual([]);
+    expect(summary.averageScore).toBe(0);
   });
 
   it('handles single component', async () => {
     const config = makeConfig();
     const components = [MY_BUTTON_DECL];
 
-    const summary = await getHealthSummary(config, components, 7);
+    const summary = await getHealthSummary(config, components);
 
-    expect(summary.components_analyzed).toBe(1);
-    expect(summary.library_score).toBeGreaterThan(0);
+    expect(summary.totalComponents).toBe(1);
+    expect(summary.averageScore).toBeGreaterThan(0);
   });
 
   it('library trend reflects overall improvement/decline/stability', async () => {
     const config = makeConfig();
     const components = [MY_BUTTON_DECL];
 
-    const summary = await getHealthSummary(config, components, 7);
+    const summary = await getHealthSummary(config, components);
 
-    expect(['improving', 'declining', 'stable']).toContain(summary.library_trend);
+    expect(['improving', 'declining', 'stable']).toContain(summary.libraryTrend);
   });
 
-  it('includes dimension-level data when components have history', async () => {
+  it('includes timestamp in response', async () => {
     const config = makeConfig();
     const components = [MY_BUTTON_DECL];
 
-    const summary = await getHealthSummary(config, components, 7);
+    const summary = await getHealthSummary(config, components);
 
-    // Check if dimension scores are present (from history or CEM)
-    if (summary.components_needing_attention.length > 0) {
-      const comp = summary.components_needing_attention[0];
-      // Should have dimension information
-      expect(comp).toBeDefined();
-    }
+    expect(typeof summary.timestamp).toBe('string');
+    expect(summary.timestamp.length).toBeGreaterThan(0);
   });
 
-  it('calculates library_score accurately with mixed component scores', async () => {
+  it('averageScore is accurate with mixed component scores', async () => {
     const config = makeConfig();
-    // Perfect (100) and Undocumented (0) should average to 50 (rough estimate)
+    // Perfect (100) and Undocumented (0) should average to 50
     const components = [PERFECT_DECL, UNDOCUMENTED_DECL];
 
-    const summary = await getHealthSummary(config, components, 7);
+    const summary = await getHealthSummary(config, components);
 
     // Average should be between the two scores
-    expect(summary.library_score).toBeGreaterThan(0);
-    expect(summary.library_score).toBeLessThan(100);
-  });
-
-  it('respects the days_back parameter for trend calculation', async () => {
-    const config = makeConfig();
-    const components = [MY_BUTTON_DECL];
-
-    const summary7days = await getHealthSummary(config, components, 7);
-    const summary30days = await getHealthSummary(config, components, 30);
-
-    // Both should complete without error
-    expect(summary7days).toBeDefined();
-    expect(summary30days).toBeDefined();
-  });
-
-  it('component needing attention includes score and grade', async () => {
-    const config = makeConfig();
-    const components = [UNDOCUMENTED_DECL];
-
-    const summary = await getHealthSummary(config, components, 7);
-
-    // Even if undocumented is not explicitly "needing attention",
-    // it should be flagged if we have low scoring components
-    if (summary.components_needing_attention.length > 0) {
-      const comp = summary.components_needing_attention[0];
-      expect(comp.score).toBeDefined();
-      expect(comp.grade).toBeDefined();
-      expect(comp.tag).toBeDefined();
-    }
+    expect(summary.averageScore).toBeGreaterThan(0);
+    expect(summary.averageScore).toBeLessThan(100);
   });
 
   it('handles components with no events or slots gracefully', async () => {
     const config = makeConfig();
     const components = [NO_ITEMS_DECL];
 
-    const summary = await getHealthSummary(config, components, 7);
+    const summary = await getHealthSummary(config, components);
 
     // Component with no items gets full marks (100)
-    expect(summary.library_score).toBe(100);
-    expect(summary.library_grade).toBe('A');
+    expect(summary.averageScore).toBe(100);
+    expect(summary.totalComponents).toBe(1);
   });
 
-  it('error cases: throws when config or components array is invalid', async () => {
-    const config = makeConfig();
-
-    // This test verifies error handling exists
-    // We expect the function to handle edge cases gracefully
-    try {
-      const summary = await getHealthSummary(config, [], 7);
-      expect(summary.components_analyzed).toBe(0);
-    } catch (e) {
-      // If it throws, that's also acceptable for empty array
-      expect(true).toBe(true);
-    }
-  });
-
-  it('reports stable trend when all components are stable', async () => {
-    const config = makeConfig();
-    // If history files show stable scores, trend should be stable
-    const components = [MY_BUTTON_DECL];
-
-    const summary = await getHealthSummary(config, components, 7);
-
-    // Verify trend is one of the expected values
-    expect(['improving', 'declining', 'stable']).toContain(summary.library_trend);
-  });
-
-  it('library_score increases when components improve', async () => {
-    const config = makeConfig();
-    // Perfect component should have high score
-    const components = [PERFECT_DECL];
-
-    const summary = await getHealthSummary(config, components, 7);
-
-    // Should be high score
-    expect(summary.library_score).toBeGreaterThan(80);
-  });
-
-  it('components_needing_attention excludes high-scoring components', async () => {
+  it('high-scoring components excluded from needing attention', async () => {
     const config = makeConfig();
     const components = [PERFECT_DECL]; // Score 100
 
-    const summary = await getHealthSummary(config, components, 7);
+    const summary = await getHealthSummary(config, components);
 
-    // Perfect component should not need attention
-    const perfInAttention = summary.components_needing_attention.some(
-      (c) => c.tag === 'perfect-component',
-    );
-    expect(perfInAttention).toBe(false);
+    // Perfect component should not need attention (score >= 70)
+    expect(summary.componentsNeedingAttention).not.toContain('perfect-component');
   });
 });

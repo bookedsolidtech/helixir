@@ -5,8 +5,10 @@ import {
   parseTokens,
   getDesignTokens,
   findToken,
+  findComponentsUsingToken,
 } from '../../packages/core/src/handlers/tokens.js';
 import type { McpWcConfig } from '../../packages/core/src/config.js';
+import type { Cem } from '../../packages/core/src/handlers/cem.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_TOKENS_PATH = resolve(__dirname, '../__fixtures__/tokens.json');
@@ -203,5 +205,193 @@ describe('findToken', () => {
   it('throws an error when tokensPath file does not exist', async () => {
     const config = makeConfig(NONEXISTENT_PATH);
     await expect(findToken(config, 'primary')).rejects.toThrow(/not found/i);
+  });
+});
+
+describe('findComponentsUsingToken', () => {
+  const testCem: Cem = {
+    schemaVersion: '1.0.0',
+    modules: [
+      {
+        kind: 'javascript-module',
+        path: 'src/components/my-button.js',
+        declarations: [
+          {
+            kind: 'class',
+            name: 'MyButton',
+            tagName: 'my-button',
+            description: 'A button component.',
+            cssProperties: [
+              { name: '--primary-color', description: 'Primary brand color' },
+              { name: '--button-size', description: 'Button size' },
+              { name: '--button-padding', description: 'Button padding' },
+            ],
+          },
+        ],
+      },
+      {
+        kind: 'javascript-module',
+        path: 'src/components/my-input.js',
+        declarations: [
+          {
+            kind: 'class',
+            name: 'MyInput',
+            tagName: 'my-input',
+            description: 'An input component.',
+            cssProperties: [
+              { name: '--input-border-color', description: 'Border color' },
+              { name: '--primary-color', description: 'Primary brand color' },
+            ],
+          },
+        ],
+      },
+      {
+        kind: 'javascript-module',
+        path: 'src/components/my-card.js',
+        declarations: [
+          {
+            kind: 'class',
+            name: 'MyCard',
+            tagName: 'my-card',
+            description: 'A card component without CSS properties.',
+            // No cssProperties — should not match anything
+          },
+        ],
+      },
+      {
+        kind: 'javascript-module',
+        path: 'src/components/my-badge.js',
+        declarations: [
+          {
+            kind: 'class',
+            name: 'MyBadge',
+            tagName: 'my-badge',
+            description: 'A badge component.',
+            cssProperties: [],
+          },
+        ],
+      },
+    ],
+  };
+
+  it('finds exact match when fuzzy=false', () => {
+    const result = findComponentsUsingToken(testCem, '--primary-color', { fuzzy: false });
+    expect(result.token).toBe('--primary-color');
+    expect(result.total).toBe(2);
+    expect(result.components.length).toBe(2);
+    const tagNames = result.components.map((c) => c.tagName);
+    expect(tagNames).toContain('my-button');
+    expect(tagNames).toContain('my-input');
+  });
+
+  it('returns empty when no exact match found with fuzzy=false', () => {
+    const result = findComponentsUsingToken(testCem, '--nonexistent-token', { fuzzy: false });
+    expect(result.token).toBe('--nonexistent-token');
+    expect(result.total).toBe(0);
+    expect(result.components).toEqual([]);
+  });
+
+  it('supports wildcard matching with prefix when fuzzy=true', () => {
+    const result = findComponentsUsingToken(testCem, '--button-*', { fuzzy: true });
+    expect(result.token).toBe('--button-*');
+    expect(result.total).toBe(2);
+    const usedIn = result.components.map((c) => c.usedIn);
+    expect(usedIn).toContain('--button-size');
+    expect(usedIn).toContain('--button-padding');
+    // Should only match properties starting with --button-
+    expect(usedIn).not.toContain('--primary-color');
+  });
+
+  it('supports substring matching when fuzzy=true without wildcard', () => {
+    const result = findComponentsUsingToken(testCem, 'primary', { fuzzy: true });
+    expect(result.token).toBe('primary');
+    expect(result.total).toBe(2);
+    const usedIn = result.components.map((c) => c.usedIn);
+    expect(usedIn.every((name) => name.includes('primary'))).toBe(true);
+  });
+
+  it('finds components that have no cssProperties (should return empty)', () => {
+    const result = findComponentsUsingToken(testCem, '--primary-color');
+    // my-card has no cssProperties, so it won't be found
+    // only my-button and my-input should be found
+    expect(result.total).toBe(2);
+  });
+
+  it('finds components with empty cssProperties array', () => {
+    const result = findComponentsUsingToken(testCem, '--any-token', { fuzzy: true });
+    // my-badge has empty cssProperties, so no match
+    expect(result.components.length).toBe(0);
+  });
+
+  it('returns correct structure with token, total, and components', () => {
+    const result = findComponentsUsingToken(testCem, '--button-size', { fuzzy: false });
+    expect(typeof result.token).toBe('string');
+    expect(typeof result.total).toBe('number');
+    expect(Array.isArray(result.components)).toBe(true);
+    for (const component of result.components) {
+      expect(typeof component.tagName).toBe('string');
+      expect(typeof component.usedIn).toBe('string');
+      expect(typeof component.description).toBe('string');
+    }
+  });
+
+  it('defaults to fuzzy=false when options.fuzzy is not specified', () => {
+    const resultWithoutOption = findComponentsUsingToken(testCem, '--primary-color');
+    const resultWithFalse = findComponentsUsingToken(testCem, '--primary-color', { fuzzy: false });
+    expect(resultWithoutOption.total).toBe(resultWithFalse.total);
+    expect(resultWithoutOption.components.length).toBe(resultWithFalse.components.length);
+  });
+
+  it('supports case-sensitive token matching', () => {
+    const result1 = findComponentsUsingToken(testCem, '--primary-color');
+    const result2 = findComponentsUsingToken(testCem, '--PRIMARY-COLOR');
+    // Case-sensitive: should not match
+    expect(result1.total).toBe(2);
+    expect(result2.total).toBe(0);
+  });
+
+  it('preserves component description in results', () => {
+    const result = findComponentsUsingToken(testCem, '--primary-color');
+    const buttonComponent = result.components.find((c) => c.tagName === 'my-button');
+    expect(buttonComponent).toBeDefined();
+    expect(buttonComponent?.description).toBe('Primary brand color');
+  });
+
+  it('returns empty when CEM has no modules', () => {
+    const emptyCem: Cem = { schemaVersion: '1.0.0', modules: [] };
+    const result = findComponentsUsingToken(emptyCem, '--any-token');
+    expect(result.total).toBe(0);
+    expect(result.components).toEqual([]);
+  });
+
+  it('handles modules with no declarations', () => {
+    const cemWithEmptyModules: Cem = {
+      schemaVersion: '1.0.0',
+      modules: [{ kind: 'javascript-module', path: 'src/empty.js' }],
+    };
+    const result = findComponentsUsingToken(cemWithEmptyModules, '--any-token');
+    expect(result.total).toBe(0);
+  });
+
+  it('skips declarations without tagName', () => {
+    const cemWithMissingTag: Cem = {
+      schemaVersion: '1.0.0',
+      modules: [
+        {
+          kind: 'javascript-module',
+          path: 'src/helper.js',
+          declarations: [
+            {
+              kind: 'class',
+              name: 'HelperClass',
+              // No tagName — should be skipped
+              cssProperties: [{ name: '--helper-color' }],
+            },
+          ],
+        },
+      ],
+    };
+    const result = findComponentsUsingToken(cemWithMissingTag, '--helper-color');
+    expect(result.total).toBe(0);
   });
 });

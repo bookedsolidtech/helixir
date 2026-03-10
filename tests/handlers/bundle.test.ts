@@ -152,6 +152,109 @@ describe('estimateBundleSize', () => {
       expect(result.package).toBe('@my-org/my-lib');
       expect(result.source).toBe('bundlephobia');
     });
+
+    it('throws VALIDATION error for invalid package name (uppercase letters)', async () => {
+      const config = makeConfig({ componentPrefix: '' });
+      await expect(estimateBundleSize('my-button', config, '@My-Org/my-lib')).rejects.toMatchObject(
+        {
+          category: ErrorCategory.VALIDATION,
+          message: expect.stringContaining('Invalid npm package name'),
+        },
+      );
+    });
+
+    it('throws VALIDATION error for invalid package name (special characters)', async () => {
+      const config = makeConfig({ componentPrefix: '' });
+      await expect(estimateBundleSize('my-button', config, '@my-org/my!lib')).rejects.toMatchObject(
+        {
+          category: ErrorCategory.VALIDATION,
+        },
+      );
+    });
+
+    it('throws VALIDATION error for invalid package name (spaces)', async () => {
+      const config = makeConfig({ componentPrefix: '' });
+      await expect(estimateBundleSize('my-button', config, '@my org/my-lib')).rejects.toMatchObject(
+        {
+          category: ErrorCategory.VALIDATION,
+        },
+      );
+    });
+  });
+
+  describe('version validation', () => {
+    it('accepts "latest" as a valid version', async () => {
+      stubFetch([{ ok: true, body: BUNDLEPHOBIA_RESPONSE }]);
+      const config = makeConfig({ componentPrefix: '' });
+      const result = await estimateBundleSize(
+        'my-button',
+        config,
+        '@shoelace-style/shoelace',
+        'latest',
+      );
+      expect(result.version).toBeDefined();
+    });
+
+    it('accepts standard semver versions', async () => {
+      stubFetch([{ ok: true, body: BUNDLEPHOBIA_RESPONSE }]);
+      const config = makeConfig({ componentPrefix: '' });
+      const result = await estimateBundleSize(
+        'my-button',
+        config,
+        '@shoelace-style/shoelace',
+        '2.14.0',
+      );
+      expect(result.version).toBe('2.14.0');
+    });
+
+    it('accepts semver with prerelease', async () => {
+      stubFetch([{ ok: true, body: BUNDLEPHOBIA_RESPONSE }]);
+      const config = makeConfig({ componentPrefix: '' });
+      const result = await estimateBundleSize(
+        'my-button',
+        config,
+        '@shoelace-style/shoelace',
+        '2.14.0-beta.1',
+      );
+      expect(result.version).toBe('2.14.0');
+    });
+
+    it('throws VALIDATION error for invalid version (path traversal)', async () => {
+      const config = makeConfig({ componentPrefix: '' });
+      await expect(
+        estimateBundleSize('my-button', config, '@shoelace-style/shoelace', '../../../etc/passwd'),
+      ).rejects.toMatchObject({
+        category: ErrorCategory.VALIDATION,
+        message: expect.stringContaining('Invalid version string'),
+      });
+    });
+
+    it('throws VALIDATION error for invalid version (uppercase)', async () => {
+      const config = makeConfig({ componentPrefix: '' });
+      await expect(
+        estimateBundleSize('my-button', config, '@shoelace-style/shoelace', 'LATEST'),
+      ).rejects.toMatchObject({
+        category: ErrorCategory.VALIDATION,
+      });
+    });
+
+    it('throws VALIDATION error for invalid version (random string)', async () => {
+      const config = makeConfig({ componentPrefix: '' });
+      await expect(
+        estimateBundleSize('my-button', config, '@shoelace-style/shoelace', 'random-version'),
+      ).rejects.toMatchObject({
+        category: ErrorCategory.VALIDATION,
+      });
+    });
+
+    it('throws VALIDATION error for invalid version (empty string)', async () => {
+      const config = makeConfig({ componentPrefix: '' });
+      await expect(
+        estimateBundleSize('my-button', config, '@shoelace-style/shoelace', ''),
+      ).rejects.toMatchObject({
+        category: ErrorCategory.VALIDATION,
+      });
+    });
   });
 
   describe('include_full_package via tool layer (direct handler test)', () => {

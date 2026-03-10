@@ -10,6 +10,7 @@
     "helixir": "./build/src/index.js"
   },
   "main": "./build/src/index.js",
+  "types": "./build/src/index.d.ts",
   "exports": {
     ".": "./build/src/index.js",
     "./api": "./build/src/api/index.js",

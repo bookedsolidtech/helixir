@@ -168,7 +168,7 @@ npm search is keyword-heavy. Every missing keyword is a missed discovery.
 This is a significant gap. When something doesn't work, the developer has no debugging tool other than reading stderr.
 
 **Sharp edges:**
-1. **`wc-mcp` package name vs `wc-tools` server identity** — The npm package is `wc-mcp`, but `src/index.ts` line 79 registers the server as `name: 'wc-tools'`. Claude Desktop shows "wc-tools" in the MCP server list. The README Quick Start uses `"wc-tools"` as the config key. This dual naming will confuse every single user. Pick ONE name and use it everywhere.
+1. **`wc-mcp` package name vs `helixir` server identity** — The npm package is `wc-mcp`, but `src/index.ts` line 79 registers the server as `name: 'helixir'`. Claude Desktop shows "helixir" in the MCP server list. The README Quick Start uses `"helixir"` as the config key. This dual naming will confuse every single user. Pick ONE name and use it everywhere.
 2. **The pnpm engine constraint** — A developer doing `npm install -g wc-mcp` gets a warning about pnpm not being installed. Confusing for npm/yarn users.
 
 ---
@@ -204,7 +204,7 @@ This is a significant gap. When something doesn't work, the developer has no deb
 
 4. **Missing `repository`, `homepage`, `bugs`, `author` in package.json** — npm page will look empty and untrustworthy. These fields populate the npm sidebar.
 
-5. **`wc-mcp` vs `wc-tools` naming confusion** — Two names for one product = cognitive overhead on every setup.
+5. **`wc-mcp` vs `helixir` naming confusion** — Two names for one product = cognitive overhead on every setup.
 
 6. **No verification command** — Developer can't confirm it's working without a full AI client setup.
 
@@ -260,7 +260,7 @@ Consider enabling GitHub Discussions for questions that don't fit as issues.
 | 10 | **Document `--watch` mode** in the README Configuration section | LOW — feature discoverability | 10 min |
 
 **Honorable mentions (do soon after publish):**
-- Resolve `wc-mcp` vs `wc-tools` naming (pick one, alias the other)
+- Resolve `wc-mcp` vs `helixir` naming (pick one, alias the other)
 - Fix bug_report.yml reference to `get_component_api` → `get_component`
 - Add an `[Unreleased]` section to CHANGELOG.md
 - Add a brief Roadmap section to README

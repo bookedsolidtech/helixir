@@ -1,6 +1,6 @@
 # Multi-CEM Architecture Review
 
-> **Scope:** Audit of current wc-tools architecture for multi-library readiness
+> **Scope:** Audit of current helixir architecture for multi-library readiness
 > **Date:** 2026-03-04
 > **Status:** Audit only — no code changes
 
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-wc-tools is **architecturally single-CEM by design**. A module-level `cemCache` singleton in `src/index.ts` is the foundation of all handler dispatch. While several subsystems show forward-looking design (health history namespacing, `mergeCems()`, `benchmarkLibraries()` multi-path support), the core server architecture would require a **significant refactor** to support true multi-CEM functionality — approximately 30–40% of the codebase is affected.
+helixir is **architecturally single-CEM by design**. A module-level `cemCache` singleton in `src/index.ts` is the foundation of all handler dispatch. While several subsystems show forward-looking design (health history namespacing, `mergeCems()`, `benchmarkLibraries()` multi-path support), the core server architecture would require a **significant refactor** to support true multi-CEM functionality — approximately 30–40% of the codebase is affected.
 
 ---
 

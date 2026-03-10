@@ -1,6 +1,6 @@
 # DX-REVIEW.md — Developer Experience Audit
 
-**Project:** wc-tools
+**Project:** helixir
 **Audit date:** 2026-03-04
 **Reviewer:** Code-only static analysis (no code changes)
 **Scope:** First-run experience, config footguns, error message quality, CLI output, framework detection, MCP client configuration snippets.
@@ -11,7 +11,7 @@
 
 Simulated path: fresh developer, component library using Lit, no prior MCP experience.
 
-### Step 1 — `npx wc-tools` with no config
+### Step 1 — `npx helixir` with no config
 
 **What actually happens** (from `src/index.ts`):
 
@@ -23,13 +23,13 @@ Fatal: CEM file not found at custom-elements.json. Set MCP_WC_CEM_PATH or add ce
 
 **Pain points:**
 
-- Running `npx wc-tools` with no args **starts the MCP server**, not a help screen. A developer expecting onboarding sees nothing on stdout (MCP servers speak JSON-RPC, not human text). They only see the fatal on stderr.
+- Running `npx helixir` with no args **starts the MCP server**, not a help screen. A developer expecting onboarding sees nothing on stdout (MCP servers speak JSON-RPC, not human text). They only see the fatal on stderr.
 - `FRIENDLY_CEM_ERROR` fires during `loadConfig()` but then a _second_ message fires when `existsSync` fails. The developer sees two stderr messages for the same root cause — the more helpful one first, the less helpful one after.
-- There is no `npx wc-tools help` short-circuit that prints human-readable usage. (`--help` flag is handled correctly — see CLI section.)
+- There is no `npx helixir help` short-circuit that prints human-readable usage. (`--help` flag is handled correctly — see CLI section.)
 
 ---
 
-### Step 2 — `npx wc-tools --help`
+### Step 2 — `npx helixir --help`
 
 **What actually happens:**
 
@@ -39,7 +39,7 @@ Fatal: CEM file not found at custom-elements.json. Set MCP_WC_CEM_PATH or add ce
 
 ---
 
-### Step 3 — `npx wc-tools init`
+### Step 3 — `npx helixir init`
 
 **What happens step-by-step** (from `src/cli/index.ts`, `runInit()`):
 
@@ -65,7 +65,7 @@ Fatal: CEM file not found at custom-elements.json. Set MCP_WC_CEM_PATH or add ce
 
 3. **CEM path not validated before writing config.** If the developer types a path that doesn't exist, the wizard writes it without warning. The server will fail at startup.
 
-4. **No "next step" guidance.** After printing the IDE snippet, the process exits. There is no "Restart Claude Desktop to pick up changes" or "Run `wc-tools serve` to test" message.
+4. **No "next step" guidance.** After printing the IDE snippet, the process exits. There is no "Restart Claude Desktop to pick up changes" or "Run `helixir serve` to test" message.
 
 5. **`init` wizard and runtime use different CEM candidate lists.** `src/cli/index.ts` checks 5 candidates including `custom-elements-manifest.json`. Runtime `packages/core/src/shared/discovery.ts` checks 4 candidates (omits `custom-elements-manifest.json`). A file found during init may not be found at runtime.
 
@@ -84,7 +84,7 @@ Fatal: CEM file not found at custom-elements.json. Set MCP_WC_CEM_PATH or add ce
 `packages/core/src/shared/discovery.ts` emits to stderr:
 
 ```
-[wc-tools] Warning: Multiple custom-elements.json files found. Using first: custom-elements.json
+[helixir] Warning: Multiple custom-elements.json files found. Using first: custom-elements.json
   Candidates: custom-elements.json, dist/custom-elements.json
   Set cemPath in mcpwc.config.json to suppress this warning.
 ```
@@ -107,7 +107,7 @@ Fatal: CEM file not found at custom-elements.json. Set MCP_WC_CEM_PATH or add ce
 | `tokensPath`        | Valid JSON, wrong structure (array/primitive) | `MCPError: Tokens file has invalid structure: {filePath} — Token file must be a JSON object`                          | Handled  | ✅ Clear                                                                  |
 | `cdnBase`           | Invalid URL (e.g. `not-a-url`)                | No validation. String used verbatim in generated `<script>` tags.                                                     | **High** | ❌ No validation whatsoever                                               |
 | `healthHistoryDir`  | Wrong path                                    | `getHealthTrend` throws "No health history found for '{tag}'" — misleading, sounds like no data rather than wrong dir | Medium   | ⚠️ Misleading root cause                                                  |
-| `mcpwc.config.json` | Malformed JSON                                | `[wc-tools] Warning: mcpwc.config.json is malformed. Using defaults.`                                                 | **High** | ❌ Swallows the SyntaxError; no line/column info                          |
+| `mcpwc.config.json` | Malformed JSON                                | `[helixir] Warning: mcpwc.config.json is malformed. Using defaults.`                                                 | **High** | ❌ Swallows the SyntaxError; no line/column info                          |
 | `mcpwc.config.json` | Missing                                       | Silent — defaults used with no warning                                                                                | Medium   | ⚠️ No hint that config is being ignored                                   |
 
 ---
@@ -122,11 +122,11 @@ Fatal: CEM file not found at custom-elements.json. Set MCP_WC_CEM_PATH or add ce
 | `src/index.ts` — CEM not found                                        | `Fatal: CEM file not found at {relPath}. Set MCP_WC_CEM_PATH or add cemPath to mcpwc.config.json`                                  | 3   | 2   | 3   | 8/9     | Good; could append FRIENDLY_CEM_ERROR for generator commands |
 | `src/index.ts` — CEM invalid                                          | `Fatal: CEM file at {relPath} is invalid: {ZodError}`                                                                              | 2   | 1   | 2   | 5/9     | Raw Zod output is technical                                  |
 | `src/index.ts` — CEM reloading                                        | `CEM not yet loaded — server is still initializing. Please retry.`                                                                 | 3   | 3   | 1   | 7/9     | Good                                                         |
-| `src/index.ts` — TypeScript unavailable                               | `TypeScript diagnostics require TypeScript to be installed.\nRun: npm install typescript --save-dev\nThen restart wc-tools.`       | 3   | 3   | 3   | **9/9** | Best-in-class                                                |
+| `src/index.ts` — TypeScript unavailable                               | `TypeScript diagnostics require TypeScript to be installed.\nRun: npm install typescript --save-dev\nThen restart helixir.`       | 3   | 3   | 3   | **9/9** | Best-in-class                                                |
 | `src/index.ts` — token tools not enabled                              | `Token tools are not enabled. Set tokensPath in mcpwc.config.json or MCP_WC_TOKENS_PATH.`                                          | 3   | 3   | 2   | 8/9     | Good                                                         |
-| `packages/core/src/config.ts` — malformed config                      | `[wc-tools] Warning: mcpwc.config.json is malformed. Using defaults.`                                                              | 2   | 1   | 1   | **4/9** | Swallows SyntaxError; worst message in codebase              |
+| `packages/core/src/config.ts` — malformed config                      | `[helixir] Warning: mcpwc.config.json is malformed. Using defaults.`                                                              | 2   | 1   | 1   | **4/9** | Swallows SyntaxError; worst message in codebase              |
 | `packages/core/src/shared/discovery.ts` — FRIENDLY_CEM_ERROR          | Multi-line: paths tried + generator commands                                                                                       | 3   | 3   | 3   | **9/9** | Best-in-class                                                |
-| `packages/core/src/shared/discovery.ts` — multi-CEM                   | `[wc-tools] Warning: Multiple CEM files found. Using first: ... Set cemPath to suppress.`                                          | 3   | 3   | 3   | **9/9** |                                                              |
+| `packages/core/src/shared/discovery.ts` — multi-CEM                   | `[helixir] Warning: Multiple CEM files found. Using first: ... Set cemPath to suppress.`                                          | 3   | 3   | 3   | **9/9** |                                                              |
 | `packages/core/src/handlers/cem.ts` — component not found             | `Component "{tag}" not found in CEM.`                                                                                              | 3   | 1   | 2   | 6/9     | No "did you mean?" or list suggestion                        |
 | `packages/core/src/handlers/bundle.ts` — no package                   | `Cannot determine npm package name for tag <{tag}>. Set componentPrefix in mcpwc.config.json or provide the package explicitly.`   | 3   | 3   | 2   | **8/9** | Excellent actionable message                                 |
 | `packages/core/src/handlers/tokens.ts` — tokensPath not set (handler) | `Token tools are disabled: tokensPath is not configured`                                                                           | 3   | 1   | 1   | 5/9     | Doesn't say HOW to configure it                              |
@@ -135,7 +135,7 @@ Fatal: CEM file not found at custom-elements.json. Set MCP_WC_CEM_PATH or add ce
 | `packages/core/src/handlers/health.ts` — tag name invalid             | `Invalid tag name for health history lookup: "{tag}". Only alphanumeric characters, hyphens, colons, and underscores are allowed.` | 3   | 2   | 3   | 8/9     | Very clear                                                   |
 | `packages/core/src/handlers/health.ts` — no history                   | `No health history found for '{tag}'`                                                                                              | 2   | 1   | 2   | 5/9     | Misleading — could be wrong dir, not missing data            |
 | `packages/core/src/handlers/cem.ts` — findComponentsByToken prefix    | `CSS custom property name must start with "--": "{token}"` (throws `Error`, not `MCPError`)                                        | 3   | 2   | 2   | 7/9     | Correct but uses wrong error class                           |
-| `src/mcp/index.ts` — bundleCache eviction                             | `[wc-tools] bundleCache evicted "{key}" (cache full at 500 entries)`                                                               | 3   | 1   | 2   | 6/9     | **Internal detail leaking to stderr** — not user-relevant    |
+| `src/mcp/index.ts` — bundleCache eviction                             | `[helixir] bundleCache evicted "{key}" (cache full at 500 entries)`                                                               | 3   | 1   | 2   | 6/9     | **Internal detail leaking to stderr** — not user-relevant    |
 
 **Summary:**
 
@@ -233,9 +233,9 @@ This is a **false-positive risk** for TypeScript React projects that happen to u
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "cwd": "<projectRoot>"
     }
   }
@@ -245,7 +245,7 @@ This is a **false-positive risk** for TypeScript React projects that happen to u
 | Check                              | Result                                                                                      |
 | ---------------------------------- | ------------------------------------------------------------------------------------------- |
 | Valid JSON                         | ✅                                                                                          |
-| `npx wc-tools` launches MCP server | ✅ (via `src/index.ts` dispatch)                                                            |
+| `npx helixir` launches MCP server | ✅ (via `src/index.ts` dispatch)                                                            |
 | `cwd` key works in Claude Desktop  | **❌ Claude Desktop ignores `cwd`** — the server starts from Claude's own working directory |
 | `cwd` key works in Claude Code     | ❌ Not a supported MCP config key                                                           |
 | Cross-platform `cwd` path          | ⚠️ Hardcodes OS-absolute path — breaks on other machines                                    |
@@ -271,7 +271,7 @@ On **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
 ### `args` array correctness
 
-All generated snippets use `args: ["wc-tools"]` with `command: "npx"`. This is correct — `npx wc-tools` runs the binary.
+All generated snippets use `args: ["helixir"]` with `command: "npx"`. This is correct — `npx helixir` runs the binary.
 
 ---
 
@@ -287,7 +287,7 @@ Current:
 
 ```javascript
 const snippet = {
-  mcpServers: { 'wc-tools': { command: 'npx', args: ['wc-tools'], cwd: projectRoot } },
+  mcpServers: { 'helixir': { command: 'npx', args: ['helixir'], cwd: projectRoot } },
 };
 ```
 
@@ -296,9 +296,9 @@ Should be:
 ```javascript
 const snippet = {
   mcpServers: {
-    'wc-tools': {
+    'helixir': {
       command: 'npx',
-      args: ['wc-tools'],
+      args: ['helixir'],
       env: { MCP_WC_PROJECT_ROOT: projectRoot },
     },
   },
@@ -364,7 +364,7 @@ Add one prompt: `What tag prefix do your components use? (e.g. "my-", "sl-", or 
 
 File: `packages/core/src/config.ts`, end of `loadConfig()`.
 
-Add: `try { new URL(config.cdnBase!); } catch { process.stderr.write('[wc-tools] Warning: cdnBase is not a valid URL: ...'); }`
+Add: `try { new URL(config.cdnBase!); } catch { process.stderr.write('[helixir] Warning: cdnBase is not a valid URL: ...'); }`
 
 ---
 
@@ -374,7 +374,7 @@ Add: `try { new URL(config.cdnBase!); } catch { process.stderr.write('[wc-tools]
 
 File: `src/mcp/index.ts`, after `startCemWatcher()` call.
 
-Print to stderr: `[wc-tools] Watch mode enabled. CEM will reload automatically when {cemAbsPath} changes.`
+Print to stderr: `[helixir] Watch mode enabled. CEM will reload automatically when {cemAbsPath} changes.`
 
 ---
 

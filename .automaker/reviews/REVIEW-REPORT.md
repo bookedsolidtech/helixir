@@ -1,4 +1,4 @@
-# wc-tools MCP Server — Security & Architecture Review Report
+# HELiXiR MCP Server — Security & Architecture Review Report
 
 **Date:** 2026-03-03
 **Reviewer:** Automated antagonistic review
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-The wc-tools MCP server is well-structured and demonstrates security awareness (Zod validation, `resolve()` for paths, no `eval`/`exec`). However, several medium-severity issues need addressing before the server handles untrusted input in production.
+The helixir MCP server is well-structured and demonstrates security awareness (Zod validation, `resolve()` for paths, no `eval`/`exec`). However, several medium-severity issues need addressing before the server handles untrusted input in production.
 
 ### Top 5 Priorities
 

@@ -1,4 +1,4 @@
-# IDE Integration Guide — wc-tools
+# IDE Integration Guide — HELiXiR
 
 > Complete setup guide for every supported IDE and MCP client. This document is standalone — no need to read the README first.
 
@@ -31,7 +31,7 @@ Run the interactive wizard inside your component library project:
 
 ```bash
 cd /path/to/your/component-library
-npx wc-tools init
+npx helixir init
 ```
 
 The wizard:
@@ -61,9 +61,9 @@ Pick your editor from the sections below. At minimum you need:
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
       }
@@ -74,7 +74,7 @@ Pick your editor from the sections below. At minimum you need:
 
 ### Step 3 — Verify
 
-Ask your AI agent: **"List the components available in wc-tools."**
+Ask your AI agent: **"List the components available in helixir."**
 
 If it responds with a real component list from your library, everything is working.
 
@@ -98,9 +98,9 @@ Claude Code reads MCP server configuration from `.mcp.json` (project-scoped) or 
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
       }
@@ -109,12 +109,12 @@ Claude Code reads MCP server configuration from `.mcp.json` (project-scoped) or 
 }
 ```
 
-> **Note:** `npx` downloads wc-tools on first use and caches it. Subsequent starts are fast.
+> **Note:** `npx` downloads helixir on first use and caches it. Subsequent starts are fast.
 
 ### Option B — Global install
 
 ```bash
-npm install -g wc-tools
+npm install -g helixir
 ```
 
 Then in `.mcp.json`:
@@ -122,8 +122,8 @@ Then in `.mcp.json`:
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
-      "command": "wc-tools",
+    "helixir": {
+      "command": "helixir",
       "args": [],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
@@ -135,7 +135,7 @@ Then in `.mcp.json`:
 
 ### Verifying it works
 
-After saving `.mcp.json`, type `/mcp` in Claude Code. You should see `wc-tools` listed as a connected server with a green status indicator.
+After saving `.mcp.json`, type `/mcp` in Claude Code. You should see `helixir` listed as a connected server with a green status indicator.
 
 Then try: `list_components` — Claude should return the component list from your library.
 
@@ -143,7 +143,7 @@ Then try: `list_components` — Claude should return the component list from you
 
 - **Absolute paths only** — `MCP_WC_PROJECT_ROOT` must be an absolute path. `~` is not expanded.
 - **JSON must be valid** — A trailing comma or comment in `.mcp.json` will silently prevent the server from loading.
-- **npx version lag** — If npx serves a cached old version, run `npm cache clean --force` or pin to a version: `"args": ["wc-tools@0.1.0"]`.
+- **npx version lag** — If npx serves a cached old version, run `npm cache clean --force` or pin to a version: `"args": ["helixir@0.1.0"]`.
 - **Reload required** — Claude Code does not hot-reload `.mcp.json`. Restart or use `/mcp reload` after changes.
 
 ---
@@ -165,9 +165,9 @@ Claude Desktop uses a single JSON config file. Edit it, save, and restart the ap
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
       }
@@ -181,9 +181,9 @@ Claude Desktop uses a single JSON config file. Edit it, save, and restart the ap
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/Users/yourname/projects/my-design-system"
       }
@@ -197,9 +197,9 @@ Claude Desktop uses a single JSON config file. Edit it, save, and restart the ap
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "C:\\Users\\yourname\\projects\\my-design-system"
       }
@@ -217,9 +217,9 @@ Claude Desktop uses a single JSON config file. Edit it, save, and restart the ap
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "/usr/local/bin/npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/Users/yourname/projects/my-design-system"
       }
@@ -235,9 +235,9 @@ Find the full path with: `which npx`
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx.cmd",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "C:\\Users\\yourname\\projects\\my-design-system"
       }
@@ -250,7 +250,7 @@ Find the full path with: `which npx`
 
 1. Restart Claude Desktop after saving the config.
 2. Start a new conversation.
-3. Click the hammer/tools icon — you should see "wc-tools" listed.
+3. Click the hammer/tools icon — you should see "helixir" listed.
 4. Ask: **"What components are available?"** — Claude will call `list_components` automatically.
 
 ### Common pitfalls
@@ -258,7 +258,7 @@ Find the full path with: `which npx`
 - **Must restart** — Claude Desktop does not hot-reload config. Always restart after edits.
 - **Tilde not expanded** — Use absolute paths, not `~/projects/...`.
 - **File must be valid JSON** — Use a JSON validator if the server doesn't appear after restart.
-- **Node.js version** — wc-tools requires Node.js 20+. Check with `node --version`.
+- **Node.js version** — helixir requires Node.js 20+. Check with `node --version`.
 
 ---
 
@@ -278,9 +278,9 @@ Cursor supports MCP via `.cursor/mcp.json` (project-scoped) or `~/.cursor/mcp.js
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "${workspaceFolder}"
       }
@@ -296,9 +296,9 @@ Cursor supports MCP via `.cursor/mcp.json` (project-scoped) or `~/.cursor/mcp.js
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
       }
@@ -312,9 +312,9 @@ Cursor supports MCP via `.cursor/mcp.json` (project-scoped) or `~/.cursor/mcp.js
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "${workspaceFolder}",
         "MCP_WC_TOKENS_PATH": "${workspaceFolder}/dist/tokens/tokens.json"
@@ -327,7 +327,7 @@ Cursor supports MCP via `.cursor/mcp.json` (project-scoped) or `~/.cursor/mcp.js
 ### Verifying it works
 
 1. Open Cursor Settings → Features → MCP.
-2. You should see `wc-tools` listed with a green dot (connected).
+2. You should see `helixir` listed with a green dot (connected).
 3. Open the Composer (`Cmd+I` / `Ctrl+I`) and ask: **"List available components."**
 
 ### Common pitfalls
@@ -353,9 +353,9 @@ Cline is a VS Code extension that reads MCP config from `.vscode/cline_mcp_setti
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "${workspaceFolder}"
       }
@@ -371,9 +371,9 @@ If your component library lives outside the current workspace:
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
       }
@@ -387,9 +387,9 @@ If your component library lives outside the current workspace:
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "${workspaceFolder}",
         "MCP_WC_COMPONENT_PREFIX": "sl-"
@@ -402,8 +402,8 @@ If your component library lives outside the current workspace:
 ### Verifying it works
 
 1. Open the Cline sidebar in VS Code.
-2. Click the MCP servers icon — `wc-tools` should appear as connected.
-3. Start a chat and ask: **"Use wc-tools to get information about sl-button."**
+2. Click the MCP servers icon — `helixir` should appear as connected.
+3. Start a chat and ask: **"Use helixir to get information about sl-button."**
 
 ### Common pitfalls
 
@@ -435,8 +435,8 @@ Add a `mcpServers` array to your existing `~/.continue/config.json`:
   "models": [],
   "mcpServers": [
     {
-      "name": "wc-tools",
-      "command": "npx wc-tools",
+      "name": "helixir",
+      "command": "npx helixir",
       "env": {
         "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
       }
@@ -453,15 +453,15 @@ Add a `mcpServers` array to your existing `~/.continue/config.json`:
 {
   "mcpServers": [
     {
-      "name": "wc-tools-shoelace",
-      "command": "npx wc-tools",
+      "name": "helixir-shoelace",
+      "command": "npx helixir",
       "env": {
         "MCP_WC_PROJECT_ROOT": "/Users/yourname/projects/shoelace"
       }
     },
     {
-      "name": "wc-tools-spectrum",
-      "command": "npx wc-tools",
+      "name": "helixir-spectrum",
+      "command": "npx helixir",
       "env": {
         "MCP_WC_PROJECT_ROOT": "/Users/yourname/projects/spectrum-web-components"
       }
@@ -474,14 +474,14 @@ Add a `mcpServers` array to your existing `~/.continue/config.json`:
 
 1. Reload VS Code after editing `~/.continue/config.json`.
 2. Open the Continue sidebar and click the "@" context provider icon.
-3. You should see `wc-tools` listed under MCP tools.
-4. In a chat, type `@wc-tools` to trigger context injection.
+3. You should see `helixir` listed under MCP tools.
+4. In a chat, type `@helixir` to trigger context injection.
 
 ### Common pitfalls
 
 - **File might not exist** — Create it with `mkdir -p ~/.continue && echo '{"models":[],"mcpServers":[]}' > ~/.continue/config.json`.
 - **Reload required** — VS Code must be reloaded after changing `~/.continue/config.json`. Use `Cmd+Shift+P` → "Reload Window".
-- **String command format** — Unlike other clients, Continue uses `"command": "npx wc-tools"` (a single string), not an array.
+- **String command format** — Unlike other clients, Continue uses `"command": "npx helixir"` (a single string), not an array.
 - **Continue version** — MCP support requires Continue v0.8.0+. Check **Extensions** → **Continue** for the installed version.
 
 ---
@@ -503,10 +503,10 @@ Add a `context_servers` block to your existing `settings.json`:
 ```json
 {
   "context_servers": {
-    "wc-tools": {
+    "helixir": {
       "command": {
         "path": "npx",
-        "args": ["wc-tools"],
+        "args": ["helixir"],
         "env": {
           "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
         }
@@ -521,10 +521,10 @@ Add a `context_servers` block to your existing `settings.json`:
 ```json
 {
   "context_servers": {
-    "wc-tools": {
+    "helixir": {
       "command": {
         "path": "npx",
-        "args": ["wc-tools"],
+        "args": ["helixir"],
         "env": {
           "MCP_WC_PROJECT_ROOT": "/Users/yourname/projects/my-design-system",
           "MCP_WC_COMPONENT_PREFIX": "my-"
@@ -540,10 +540,10 @@ Add a `context_servers` block to your existing `settings.json`:
 ```json
 {
   "context_servers": {
-    "wc-tools": {
+    "helixir": {
       "command": {
         "path": "/usr/local/bin/npx",
-        "args": ["wc-tools"],
+        "args": ["helixir"],
         "env": {
           "MCP_WC_PROJECT_ROOT": "/Users/yourname/projects/my-design-system"
         }
@@ -559,7 +559,7 @@ Find the path: `which npx`
 
 1. Save `settings.json` — Zed reloads context servers automatically.
 2. Open the Assistant panel (`Cmd+?` or the chat icon).
-3. The context server list shows `wc-tools` with a connected indicator.
+3. The context server list shows `helixir` with a connected indicator.
 4. Start a message with `/` to browse available tools, or ask: **"What components are in my library?"**
 
 ### Common pitfalls
@@ -573,7 +573,7 @@ Find the path: `which npx`
 
 ## Local Development Setup
 
-For contributors working on wc-tools itself, or for using a local build instead of the npm version.
+For contributors working on helixir itself, or for using a local build instead of the npm version.
 
 ### Clone and build
 
@@ -595,16 +595,16 @@ build/
 
 ### Point your IDE at the local build
 
-Replace the `npx wc-tools` command with `node /path/to/build/src/index.js`:
+Replace the `npx helixir` command with `node /path/to/build/src/index.js`:
 
 **Claude Code `.mcp.json`:**
 
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "node",
-      "args": ["/absolute/path/to/wc-tools/build/src/index.js"],
+      "args": ["/absolute/path/to/helixir/build/src/index.js"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/absolute/path/to/your/component-library"
       }
@@ -618,9 +618,9 @@ Replace the `npx wc-tools` command with `node /path/to/build/src/index.js`:
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "node",
-      "args": ["/Users/yourname/code/wc-tools/build/src/index.js"],
+      "args": ["/Users/yourname/code/helixir/build/src/index.js"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/Users/yourname/projects/my-design-system"
       }
@@ -654,24 +654,24 @@ node build/src/index.js --help
 
 ## Multi-project Setup
 
-You can run multiple instances of wc-tools — one per component library — each with a different name and `MCP_WC_PROJECT_ROOT`.
+You can run multiple instances of helixir — one per component library — each with a different name and `MCP_WC_PROJECT_ROOT`.
 
 ### Claude Desktop — two libraries
 
 ```json
 {
   "mcpServers": {
-    "wc-tools-shoelace": {
+    "helixir-shoelace": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/Users/yourname/projects/shoelace",
         "MCP_WC_COMPONENT_PREFIX": "sl-"
       }
     },
-    "wc-tools-my-lib": {
+    "helixir-my-lib": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/Users/yourname/projects/my-design-system",
         "MCP_WC_COMPONENT_PREFIX": "ds-"
@@ -690,9 +690,9 @@ Use a project-scoped `.cursor/mcp.json` in each library's repo:
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "${workspaceFolder}",
         "MCP_WC_COMPONENT_PREFIX": "sl-"
@@ -706,7 +706,7 @@ When you open a different repo in Cursor, it automatically uses that repo's `.cu
 
 ### Tips for multi-project setups
 
-- **Use descriptive server names** — `wc-tools-shoelace` is better than `wc-tools-1` when you see tool calls in the UI.
+- **Use descriptive server names** — `helixir-shoelace` is better than `helixir-1` when you see tool calls in the UI.
 - **Component prefixes reduce confusion** — Set `MCP_WC_COMPONENT_PREFIX` per library so `list_components` returns only that library's components.
 - **Design tokens per library** — Set `MCP_WC_TOKENS_PATH` independently per server instance.
 
@@ -823,7 +823,7 @@ Run `npm run analyze` after each build, then configure:
 }
 ```
 
-**Watch mode tip:** Set `"watch": true` in `mcpwc.config.json` so wc-tools reloads the CEM automatically when `npm run analyze` regenerates it.
+**Watch mode tip:** Set `"watch": true` in `mcpwc.config.json` so helixir reloads the CEM automatically when `npm run analyze` regenerates it.
 
 ### Stencil
 
@@ -920,13 +920,13 @@ npm install -D @custom-elements-manifest/analyzer
 
 ### 1. The MCP server doesn't appear in my IDE
 
-**Symptoms:** No `wc-tools` in the tool list; no MCP connection.
+**Symptoms:** No `helixir` in the tool list; no MCP connection.
 
 **Causes and fixes:**
 
 - **Invalid JSON** in your config file — Run through a JSON validator (e.g. `node -e "JSON.parse(require('fs').readFileSync('.mcp.json','utf8'))"`) to catch syntax errors.
 - **Node.js not found** — Claude Desktop and some IDEs don't inherit shell PATH. Use the full path to `npx` (find it with `which npx`).
-- **Node.js version too old** — wc-tools requires Node.js 20+. Check with `node --version`.
+- **Node.js version too old** — helixir requires Node.js 20+. Check with `node --version`.
 - **Restart required** — Most IDEs require a full restart (not just reload) after config changes.
 
 ---
@@ -954,10 +954,10 @@ npm install -D @custom-elements-manifest/analyzer
 **Fix:** Install globally once to avoid the download delay:
 
 ```bash
-npm install -g wc-tools
+npm install -g helixir
 ```
 
-Then change `"command": "npx"` to `"command": "wc-tools"` in your config.
+Then change `"command": "npx"` to `"command": "helixir"` in your config.
 
 ---
 
@@ -1015,14 +1015,14 @@ This is valid JSON and works correctly. The space issue only occurs in shell con
 
 ---
 
-### 8. Server starts but Claude doesn't call wc-tools tools
+### 8. Server starts but Claude doesn't call helixir tools
 
 **Symptoms:** The server appears connected, but Claude never calls `list_components` or other tools.
 
 **Fix:** Be more explicit in your prompt:
 
 - Instead of: "What components are available?"
-- Try: "Use the wc-tools MCP server to list all components."
+- Try: "Use the helixir MCP server to list all components."
 
 Or ask directly: "Call the `list_components` tool and show me the result."
 
@@ -1032,17 +1032,17 @@ Once Claude uses the tool successfully once, it learns to use it proactively.
 
 ### Getting more debug output
 
-Set the `DEBUG` environment variable to get verbose logging from wc-tools:
+Set the `DEBUG` environment variable to get verbose logging from helixir:
 
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/path/to/your/library",
-        "DEBUG": "wc-tools:*"
+        "DEBUG": "helixir:*"
       }
     }
   }
@@ -1051,8 +1051,8 @@ Set the `DEBUG` environment variable to get verbose logging from wc-tools:
 
 Check your IDE's MCP server logs for the output. In Claude Desktop, logs are at:
 
-- **macOS:** `~/Library/Logs/Claude/mcp-server-wc-tools.log`
-- **Windows:** `%APPDATA%\Claude\logs\mcp-server-wc-tools.log`
+- **macOS:** `~/Library/Logs/Claude/mcp-server-helixir.log`
+- **Windows:** `%APPDATA%\Claude\logs\mcp-server-helixir.log`
 
 ---
 

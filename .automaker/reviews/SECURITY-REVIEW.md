@@ -1,4 +1,4 @@
-# Security Review: wc-tools v0.1.0 — 10-Fix Audit
+# Security Review: HELiXiR v0.1.0 — 10-Fix Audit
 
 **Review Date:** 2026-03-03
 **Methodology:** Antagonistic — every claim treated as guilty until the code proves otherwise
@@ -199,7 +199,7 @@ try {
   writeFileSync(cachePath, JSON.stringify(cem, null, 2), 'utf-8');
   cacheWritten = true;
 } catch (err) {
-  process.stderr.write(`[wc-tools] CDN cache write failed (non-fatal): ${String(err)}\n`);
+  process.stderr.write(`[helixir] CDN cache write failed (non-fatal): ${String(err)}\n`);
 }
 ```
 

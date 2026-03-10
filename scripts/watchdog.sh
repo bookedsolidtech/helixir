@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# watchdog.sh — Monitors the wc-tools protoLabs board and wakes up auto-mode if stalled.
+# watchdog.sh — Monitors the helixir protoLabs board and wakes up auto-mode if stalled.
 #
 # Usage: ./scripts/watchdog.sh
 # Runs indefinitely. Ctrl+C to stop.
@@ -52,7 +52,7 @@ log() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
 }
 
-log "=== wc-tools board watchdog started (interval: ${INTERVAL_SECONDS}s) ==="
+log "=== helixir board watchdog started (interval: ${INTERVAL_SECONDS}s) ==="
 log "Project: $PROJECT_ROOT"
 log "Press Ctrl+C to stop."
 echo ""

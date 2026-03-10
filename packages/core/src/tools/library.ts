@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { readFileSync } from 'fs';
-import { resolve } from 'path';
+import { resolve, sep } from 'path';
 
 import type { McpWcConfig } from '../config.js';
 import {
@@ -116,8 +116,12 @@ export async function handleLibraryCall(
       }
 
       if (cemPath) {
-        // Load from local file
+        // Load from local file — validate path stays within projectRoot
         const absPath = resolve(config.projectRoot, cemPath);
+        const resolvedRoot = resolve(config.projectRoot);
+        if (!absPath.startsWith(resolvedRoot + sep) && absPath !== resolvedRoot) {
+          return createErrorResponse('cemPath must resolve to a location within the project root.');
+        }
         let raw: string;
         try {
           raw = readFileSync(absPath, 'utf-8');

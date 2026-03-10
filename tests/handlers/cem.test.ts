@@ -15,20 +15,18 @@ import { ErrorCategory, MCPError } from '../../packages/core/src/shared/error-ha
 import type { McpWcConfig } from '../../packages/core/src/config.js';
 
 // Mock GitOperations so diffCem tests don't require a real git repo
-let mockGitShowImpl: ((ref: string, filePath: string) => Promise<string>) | null = null;
+let mockGitShowFn: ((ref: string, filePath: string) => Promise<string>) | null = null;
 
 vi.mock('../../packages/core/src/shared/git.js', () => {
-  class MockGitOperations {
-    async gitShow(ref: string, filePath: string): Promise<string> {
-      if (!mockGitShowImpl) {
-        throw new Error('Mock not configured');
-      }
-      return mockGitShowImpl(ref, filePath);
-    }
-  }
-
   return {
-    GitOperations: MockGitOperations,
+    GitOperations: class {
+      async gitShow(ref: string, filePath: string) {
+        if (!mockGitShowFn) {
+          throw new Error('mockGitShowFn not set');
+        }
+        return mockGitShowFn(ref, filePath);
+      }
+    },
   };
 });
 
@@ -284,7 +282,7 @@ describe('listAllComponents', () => {
 
 describe('diffCem', () => {
   function setMockGitShowImpl(mockFn: (ref: string, filePath: string) => Promise<string>) {
-    mockGitShowImpl = mockFn;
+    mockGitShowFn = mockFn;
   }
 
   it('returns isNew: true when component does not exist on base branch', async () => {

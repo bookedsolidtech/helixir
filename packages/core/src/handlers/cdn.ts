@@ -205,7 +205,7 @@ export async function resolveCdnCem(
     writeFileSync(cachePath, JSON.stringify(cem, null, 2), 'utf-8');
     cacheWritten = true;
   } catch (err) {
-    process.stderr.write(`[wc-tools] CDN cache write failed (non-fatal): ${String(err)}\n`);
+    process.stderr.write(`[helixir] CDN cache write failed (non-fatal): ${String(err)}\n`);
   }
 
   const componentCount = cem.modules

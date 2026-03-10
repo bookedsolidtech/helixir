@@ -276,17 +276,48 @@ Merge commits (starting with `Merge`) bypass commitlint automatically.
 
 ## CI Pipeline
 
-Five parallel GitHub Actions workflows run on every push and PR to `main`, `dev`, and `staging`:
+Six GitHub Actions workflows run on every push and PR:
 
-| Workflow     | File                             | What it does                                                   |
-| ------------ | -------------------------------- | -------------------------------------------------------------- |
-| **build**    | `.github/workflows/build.yml`    | `tsc --noEmit` type-check + `pnpm run build` on Node 20 and 22 |
-| **test**     | `.github/workflows/test.yml`     | `pnpm run test:coverage` (vitest) on Node 20 and 22            |
-| **lint**     | `.github/workflows/lint.yml`     | `pnpm run lint` (ESLint)                                       |
-| **format**   | `.github/workflows/format.yml`   | `pnpm run format:check` (Prettier)                             |
-| **security** | `.github/workflows/security.yml` | `pnpm audit --audit-level=high`                                |
+| Workflow     | File                             | What it does                                                      |
+| ------------ | -------------------------------- | ----------------------------------------------------------------- |
+| **build**    | `.github/workflows/build.yml`    | `tsc --noEmit` type-check + `pnpm run build` on Node 20 and 22    |
+| **test**     | `.github/workflows/test.yml`     | `pnpm run test:coverage` (vitest) on Node 20 and 22               |
+| **lint**     | `.github/workflows/lint.yml`     | `pnpm run lint` (ESLint)                                          |
+| **format**   | `.github/workflows/format.yml`   | `pnpm run format:check` (Prettier)                                |
+| **security** | `.github/workflows/security.yml` | `pnpm audit --audit-level=high`                                   |
+| **release**  | `.github/workflows/release.yml`  | semantic-release: npm publish, GitHub Release, CHANGELOG, Discord |
 
-All five must pass before a PR can merge.
+The first five must pass before a PR can merge. The release workflow runs only on `main` pushes.
+
+## Automated Releases
+
+HELiXiR uses [semantic-release](https://semantic-release.gitbook.io/) for fully automated versioning, publishing, and changelogs.
+
+**How it works:**
+
+1. Merge a PR to `main` (via staging promotion)
+2. semantic-release analyzes commit messages since the last release
+3. If releasable commits exist, it automatically:
+   - Determines the next version (major/minor/patch) from conventional commits
+   - Updates `CHANGELOG.md` with categorized release notes
+   - Bumps `package.json` version
+   - Publishes to npm
+   - Creates a GitHub Release with full notes
+   - Posts a release notification to Discord
+
+**Version bump rules:**
+
+| Commit type       | Version bump | Example                             |
+| ----------------- | ------------ | ----------------------------------- |
+| `feat`            | minor        | `feat: add new health trend tool`   |
+| `fix`             | patch        | `fix: correct CDN URL resolution`   |
+| `perf`            | patch        | `perf: optimize CEM parsing`        |
+| `refactor`        | patch        | `refactor: simplify health scoring` |
+| `BREAKING CHANGE` | major        | `feat!: redesign config format`     |
+
+Commits with types `docs`, `style`, `test`, `build`, `ci`, `chore` do not trigger a release.
+
+All five CI checks must pass before a PR can merge.
 
 ## Running Tests with Coverage
 
@@ -316,7 +347,7 @@ pnpm exec vitest tests/handlers/health.test.ts
 
 - All five CI checks must pass before merge
 - PRs require at least one approving review; stale reviews are dismissed on new pushes
-- Merge strategy: **squash-only** (no merge commits, no rebase)
+- Merge strategy: **merge commits only** (no squash, no rebase) — required for semantic-release to read conventional commit messages
 - Direct pushes to protected branches are blocked
 
 ## Code Style

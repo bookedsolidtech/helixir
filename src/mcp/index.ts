@@ -119,11 +119,11 @@ function startCemWatcher(cemAbsPath: string): void {
       try {
         const { componentCount } = loadCem(cemAbsPath);
         process.stderr.write(
-          `[wc-tools] CEM reloaded: ${componentCount} components (was ${prevCount})\n`,
+          `[helixir] CEM reloaded: ${componentCount} components (was ${prevCount})\n`,
         );
         prevCount = componentCount;
       } catch (err) {
-        process.stderr.write(`[wc-tools] CEM reload failed: ${String(err)}\n`);
+        process.stderr.write(`[helixir] CEM reload failed: ${String(err)}\n`);
       } finally {
         cemReloading = false;
       }
@@ -131,7 +131,7 @@ function startCemWatcher(cemAbsPath: string): void {
   });
 }
 
-const server = new Server({ name: 'wc-tools', version: '0.1.0' }, { capabilities: { tools: {} } });
+const server = new Server({ name: 'helixir', version: '0.1.0' }, { capabilities: { tools: {} } });
 
 export async function main(): Promise<void> {
   const config = loadConfig();
@@ -229,7 +229,7 @@ export async function main(): Promise<void> {
           return createErrorResponse(
             'TypeScript diagnostics require TypeScript to be installed.\n' +
               'Run: npm install typescript --save-dev\n' +
-              'Then restart wc-tools.',
+              'Then restart helixir.',
           );
         }
         return handleTypeScriptCall(name, typedArgs, config);

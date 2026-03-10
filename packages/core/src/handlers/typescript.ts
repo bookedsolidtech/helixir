@@ -39,7 +39,7 @@ function requireTs(): typeof TSType {
     throw new MCPError(
       'TypeScript diagnostics require TypeScript to be installed.\n' +
         'Run: npm install typescript --save-dev\n' +
-        'Then restart wc-tools.',
+        'Then restart helixir.',
       ErrorCategory.VALIDATION,
     );
   }

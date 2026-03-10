@@ -60,7 +60,7 @@ describe('formatTable', () => {
 
 // ─── CLI subcommand integration tests ────────────────────────────────────────
 
-describe('wc-tools CLI subcommands (requires build)', () => {
+describe('helixir CLI subcommands (requires build)', () => {
   function runCli(args: string[], extraEnv?: Record<string, string>) {
     return spawnSync('node', [SERVER_PATH, ...args], {
       env: {
@@ -77,7 +77,7 @@ describe('wc-tools CLI subcommands (requires build)', () => {
   it('help subcommand prints usage text', () => {
     const result = runCli(['help']);
     expect(result.status).toBe(0);
-    expect(result.stdout).toContain('wc-tools');
+    expect(result.stdout).toContain('helixir');
     expect(result.stdout).toContain('Subcommands');
     expect(result.stdout).toContain('analyze');
     expect(result.stdout).toContain('health');
@@ -85,7 +85,7 @@ describe('wc-tools CLI subcommands (requires build)', () => {
 
   it('--help flag with no subcommand prints usage text', () => {
     const result = runCli(['--help']);
-    expect(result.stdout).toContain('wc-tools');
+    expect(result.stdout).toContain('helixir');
   });
 
   it('unknown subcommand exits 1 with error message', () => {
@@ -202,7 +202,7 @@ describe('wc-tools CLI subcommands (requires build)', () => {
   });
 });
 
-describe('wc-tools init', () => {
+describe('helixir init', () => {
   it('writes mcpwc.config.json and prints snippets when CEM is found', () => {
     const tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-init-'));
     try {
@@ -233,7 +233,7 @@ describe('wc-tools init', () => {
       expect(result.stdout).toContain('Found CEM: custom-elements.json');
       expect(result.stdout).toContain('Written: mcpwc.config.json');
       expect(result.stdout).toContain('claude_desktop_config.json');
-      expect(result.stdout).toContain('"wc-tools"');
+      expect(result.stdout).toContain('"helixir"');
 
       // Verify config file was written
       const configPath = join(tmpDir, 'mcpwc.config.json');

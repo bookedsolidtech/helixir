@@ -1,7 +1,7 @@
 {
-  "name": "@wc-tools/core",
+  "name": "@helixir/core",
   "version": "0.1.0",
-  "description": "Core handlers, shared utilities, and tool definitions for wc-tools",
+  "description": "Core handlers, shared utilities, and tool definitions for helixir",
   "type": "module",
   "main": "./src/index.ts",
   "exports": {

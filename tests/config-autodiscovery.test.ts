@@ -101,7 +101,7 @@ describe('discoverCemPath', () => {
       discoverCemPath(tmpDir);
       expect(stderrSpy).toHaveBeenCalledOnce();
       const message = String(stderrSpy.mock.calls[0][0]);
-      expect(message).toContain('[wc-tools] Warning: Multiple custom-elements.json files found');
+      expect(message).toContain('[helixir] Warning: Multiple custom-elements.json files found');
       expect(message).toContain('custom-elements.json');
       expect(message).toContain('dist/custom-elements.json');
     } finally {

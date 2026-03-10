@@ -1,0 +1,87 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Run in dry-run mode (no publish)'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    # Skip release commits from semantic-release itself
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '>=9'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Test
+        run: pnpm test
+
+      - name: Release
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            pnpm exec semantic-release --dry-run
+          else
+            pnpm exec semantic-release
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Notify Discord
+        if: success()
+        run: |
+          # Read version from package.json (semantic-release updates it)
+          VERSION=$(node -p "require('./package.json').version")
+          REPO_URL="https://github.com/${{ github.repository }}"
+
+          # Only post if DISCORD_RELEASE_WEBHOOK is set
+          if [ -n "${{ secrets.DISCORD_RELEASE_WEBHOOK }}" ]; then
+            curl -s -H "Content-Type: application/json" \
+              -d "{
+                \"embeds\": [{
+                  \"title\": \"HELiXiR v${VERSION} Released\",
+                  \"url\": \"${REPO_URL}/releases/tag/v${VERSION}\",
+                  \"color\": 5814783,
+                  \"fields\": [
+                    { \"name\": \"npm\", \"value\": \"\`npm install helixir@${VERSION}\`\", \"inline\": true },
+                    { \"name\": \"GitHub\", \"value\": \"[Release Notes](${REPO_URL}/releases/tag/v${VERSION})\", \"inline\": true }
+                  ],
+                  \"footer\": { \"text\": \"Automated release via semantic-release\" }
+                }]
+              }" \
+              "${{ secrets.DISCORD_RELEASE_WEBHOOK }}"
+          fi

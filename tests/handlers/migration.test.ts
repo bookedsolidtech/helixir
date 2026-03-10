@@ -49,7 +49,12 @@ function makeConfig(): McpWcConfig {
 }
 
 function mockGitShow(returnValue: () => Promise<string>) {
-  mockGitShowFn = returnValue;
+  vi.mocked(GitOperations).mockImplementation(
+    function(this: any) {
+      this.gitShow = returnValue;
+      return this;
+    } as unknown as any,
+  );
 }
 
 afterEach(() => {

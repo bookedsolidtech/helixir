@@ -122,13 +122,10 @@ export async function resolveCdnCem(
     );
   }
 
-  // Narrow response to Response type (no longer null)
-  const safeResponse: Response = response;
-
   const MAX_RESPONSE_BYTES = 10 * 1024 * 1024; // 10 MB
 
   // Reject before reading if Content-Length header advertises an oversized body.
-  const contentLengthHeader = safeResponse.headers.get('content-length');
+  const contentLengthHeader = response.headers.get('content-length');
   if (contentLengthHeader !== null) {
     const declared = parseInt(contentLengthHeader, 10);
     if (Number.isFinite(declared) && declared > MAX_RESPONSE_BYTES) {
@@ -141,8 +138,8 @@ export async function resolveCdnCem(
 
   // Stream body with a running byte counter; abort and reject if limit is exceeded.
   let rawBody: string;
-  if (safeResponse.body) {
-    const reader = safeResponse.body.getReader();
+  if (response.body) {
+    const reader = response.body.getReader();
     const chunks: Uint8Array[] = [];
     let totalBytes = 0;
     try {
@@ -172,7 +169,7 @@ export async function resolveCdnCem(
     rawBody = new TextDecoder().decode(merged);
   } else {
     // Fallback for environments without streaming support (e.g. test mocks).
-    rawBody = await safeResponse.text();
+    rawBody = await response.text();
   }
 
   let json: unknown;

@@ -11,17 +11,15 @@ import type { McpWcConfig } from '../../packages/core/src/config.js';
 let mockGitShowFn: (() => Promise<string>) | null = null;
 
 vi.mock('../../packages/core/src/shared/git.js', () => {
-  class MockGitOperations {
-    async gitShow(ref: string, filePath: string): Promise<string> {
-      if (!mockGitShowFn) {
-        throw new Error('Mock not configured');
-      }
-      return mockGitShowFn(ref, filePath);
-    }
-  }
-
   return {
-    GitOperations: MockGitOperations,
+    GitOperations: class {
+      async gitShow() {
+        if (!mockGitShowFn) {
+          throw new Error('mockGitShowFn not set');
+        }
+        return mockGitShowFn();
+      }
+    },
   };
 });
 

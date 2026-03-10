@@ -47,6 +47,30 @@ describe('loadConfig', () => {
 
       expect(config.componentPrefix).toBe('');
     });
+
+    it('cdnBase defaults to null (CDN disabled)', () => {
+      vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+
+      const config = loadConfig();
+
+      expect(config.cdnBase).toBeNull();
+    });
+
+    it('cdnAutoloader defaults to null', () => {
+      vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+
+      const config = loadConfig();
+
+      expect(config.cdnAutoloader).toBeNull();
+    });
+
+    it('cdnStylesheet defaults to null', () => {
+      vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+
+      const config = loadConfig();
+
+      expect(config.cdnStylesheet).toBeNull();
+    });
   });
 
   describe('config file (mcpwc.config.json)', () => {
@@ -92,6 +116,24 @@ describe('loadConfig', () => {
       expect(config.tokensPath).toBeNull();
     });
 
+    it('config file can set CDN fields', () => {
+      writeFileSync(
+        join(tmpDir, 'mcpwc.config.json'),
+        JSON.stringify({
+          cdnBase: 'https://cdn.example.com',
+          cdnAutoloader: 'https://cdn.example.com/autoloader.js',
+          cdnStylesheet: 'https://cdn.example.com/styles.css',
+        }),
+      );
+      vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+
+      const config = loadConfig();
+
+      expect(config.cdnBase).toBe('https://cdn.example.com');
+      expect(config.cdnAutoloader).toBe('https://cdn.example.com/autoloader.js');
+      expect(config.cdnStylesheet).toBe('https://cdn.example.com/styles.css');
+    });
+
     it('silently ignores missing config file', () => {
       vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
 
@@ -106,7 +148,9 @@ describe('loadConfig', () => {
       try {
         expect(() => loadConfig()).not.toThrow();
         expect(stderrSpy).toHaveBeenCalledWith(
-          '[wc-tools] Warning: mcpwc.config.json is malformed. Using defaults.\n',
+          expect.stringContaining(
+            '[wc-tools] Warning: mcpwc.config.json is malformed. Using defaults.',
+          ),
         );
       } finally {
         stderrSpy.mockRestore();
@@ -182,6 +226,60 @@ describe('loadConfig', () => {
       const config = loadConfig();
 
       expect(config.tokensPath).toBeNull();
+    });
+
+    it('MCP_WC_CDN_BASE sets cdnBase to the given path', () => {
+      vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+      vi.stubEnv('MCP_WC_CDN_BASE', 'https://cdn.example.com');
+
+      const config = loadConfig();
+
+      expect(config.cdnBase).toBe('https://cdn.example.com');
+    });
+
+    it('MCP_WC_CDN_BASE=null disables CDN (sets cdnBase to null)', () => {
+      vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+      vi.stubEnv('MCP_WC_CDN_BASE', 'null');
+
+      const config = loadConfig();
+
+      expect(config.cdnBase).toBeNull();
+    });
+
+    it('MCP_WC_CDN_AUTOLOADER sets cdnAutoloader to the given path', () => {
+      vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+      vi.stubEnv('MCP_WC_CDN_AUTOLOADER', 'https://cdn.example.com/autoloader.js');
+
+      const config = loadConfig();
+
+      expect(config.cdnAutoloader).toBe('https://cdn.example.com/autoloader.js');
+    });
+
+    it('MCP_WC_CDN_AUTOLOADER=null disables CDN autoloader (sets cdnAutoloader to null)', () => {
+      vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+      vi.stubEnv('MCP_WC_CDN_AUTOLOADER', 'null');
+
+      const config = loadConfig();
+
+      expect(config.cdnAutoloader).toBeNull();
+    });
+
+    it('MCP_WC_CDN_STYLESHEET sets cdnStylesheet to the given path', () => {
+      vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+      vi.stubEnv('MCP_WC_CDN_STYLESHEET', 'https://cdn.example.com/styles.css');
+
+      const config = loadConfig();
+
+      expect(config.cdnStylesheet).toBe('https://cdn.example.com/styles.css');
+    });
+
+    it('MCP_WC_CDN_STYLESHEET=null disables CDN stylesheet (sets cdnStylesheet to null)', () => {
+      vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+      vi.stubEnv('MCP_WC_CDN_STYLESHEET', 'null');
+
+      const config = loadConfig();
+
+      expect(config.cdnStylesheet).toBeNull();
     });
   });
 

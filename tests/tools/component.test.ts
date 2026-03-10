@@ -49,7 +49,13 @@ import { getComponentNarrative } from '../../packages/core/src/handlers/narrativ
 import { formatPropConstraints } from '../../packages/core/src/handlers/component.js';
 import { getComponentDependencies } from '../../packages/core/src/handlers/dependencies.js';
 import { findComponentsUsingToken } from '../../packages/core/src/handlers/tokens.js';
-import { parseCem, findComponentsByToken } from '../../packages/core/src/handlers/cem.js';
+import {
+  parseCem,
+  findComponentsByToken,
+  validateCompleteness,
+} from '../../packages/core/src/handlers/cem.js';
+import { suggestUsage, generateImport } from '../../packages/core/src/handlers/suggest.js';
+import type { Cem } from '../../packages/core/src/handlers/cem.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = resolve(__dirname, '../__fixtures__');
@@ -64,6 +70,90 @@ function makeConfig(): McpWcConfig {
     tokensPath: null,
     cdnBase: null,
     watch: false,
+  };
+}
+
+function makeMockCem(): Cem {
+  return {
+    version: '3.0.0',
+    schemaVersion: '1.0.0',
+    readme: '',
+    modules: [
+      {
+        kind: 'javascript-module',
+        path: '',
+        declarations: [
+          {
+            kind: 'class',
+            name: 'MyButton',
+            tagName: 'my-button',
+            members: [
+              {
+                kind: 'field',
+                name: 'variant',
+                type: { text: "'primary' | 'neutral' | 'danger'" },
+                description: 'The button variant.',
+              },
+              {
+                kind: 'field',
+                name: 'disabled',
+                type: { text: 'boolean' },
+                description: 'Disables the button.',
+              },
+              {
+                kind: 'field',
+                name: 'aria-label',
+                type: { text: 'string' },
+                description: 'Accessibility label.',
+              },
+              {
+                kind: 'method',
+                name: 'click',
+                description: 'Trigger click.',
+              },
+            ],
+            events: [
+              {
+                name: 'sl-click',
+                type: { text: 'CustomEvent' },
+                description: 'Emitted on click.',
+              },
+            ],
+            slots: [
+              {
+                name: '',
+                description: 'The button label.',
+              },
+              {
+                name: 'prefix',
+                description: 'Leading icon.',
+              },
+            ],
+            cssProperties: [
+              {
+                name: '--sl-button-font-size',
+                description: 'Font size.',
+              },
+            ],
+            cssParts: [
+              {
+                name: 'base',
+                description: 'The button element.',
+              },
+            ],
+            description: 'A versatile button component with role documentation.',
+            attributes: [
+              {
+                name: 'disabled',
+                type: { text: 'boolean' },
+                description: 'Whether button is disabled.',
+              },
+            ],
+          },
+        ],
+        exports: [],
+      },
+    ],
   };
 }
 
@@ -216,6 +306,167 @@ describe('isComponentTool', () => {
 });
 
 // ---------------------------------------------------------------------------
+// handleComponentCall — get_component
+// ---------------------------------------------------------------------------
+
+describe('handleComponentCall — get_component', () => {
+  it('returns component metadata with accessibility summary', async () => {
+    const mockMeta = {
+      tagName: 'my-button',
+      name: 'MyButton',
+      description: 'A button with role button',
+      members: [
+        { name: 'variant', kind: 'field', type: "'primary'" },
+        { name: 'aria-label', kind: 'field', type: 'string' },
+      ],
+      events: [],
+      slots: [],
+      cssProperties: [],
+      cssParts: [],
+    };
+    vi.mocked(parseCem).mockReturnValue(mockMeta);
+
+    const result = await handleComponentCall(
+      'get_component',
+      { tagName: 'my-button' },
+      makeConfig(),
+      makeMockCem(),
+    );
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text).toContain('my-button');
+    expect(result.content[0].text).toContain('accessibility');
+  });
+
+  it('returns error for missing tagName', async () => {
+    const result = await handleComponentCall('get_component', {}, makeConfig(), makeMockCem());
+    expect(result.isError).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// handleComponentCall — validate_cem
+// ---------------------------------------------------------------------------
+
+describe('handleComponentCall — validate_cem', () => {
+  it('returns PASS status for fully documented component', async () => {
+    vi.mocked(validateCompleteness).mockReturnValue({
+      score: 100,
+      issues: [],
+    });
+
+    const result = await handleComponentCall(
+      'validate_cem',
+      { tagName: 'my-button' },
+      makeConfig(),
+      makeMockCem(),
+    );
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text).toContain('PASS');
+    expect(result.content[0].text).toContain('100/100');
+  });
+
+  it('returns FAIL status with issues for incomplete documentation', async () => {
+    vi.mocked(validateCompleteness).mockReturnValue({
+      score: 60,
+      issues: ['Missing description', 'Missing events documentation'],
+    });
+
+    const result = await handleComponentCall(
+      'validate_cem',
+      { tagName: 'my-incomplete' },
+      makeConfig(),
+      makeMockCem(),
+    );
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text).toContain('FAIL');
+    expect(result.content[0].text).toContain('Missing description');
+  });
+
+  it('returns error for missing tagName', async () => {
+    const result = await handleComponentCall('validate_cem', {}, makeConfig(), makeMockCem());
+    expect(result.isError).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// handleComponentCall — suggest_usage
+// ---------------------------------------------------------------------------
+
+describe('handleComponentCall — suggest_usage', () => {
+  it('returns usage suggestion for a component', async () => {
+    vi.mocked(suggestUsage).mockResolvedValue({
+      html: '<my-button variant="primary">Click me</my-button>',
+      required: [],
+      optional: ['variant'],
+      variants: { variant: ['primary', 'neutral'] },
+    });
+
+    const result = await handleComponentCall(
+      'suggest_usage',
+      { tagName: 'my-button' },
+      makeConfig(),
+      makeMockCem(),
+    );
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text).toContain('my-button');
+  });
+
+  it('passes framework option to handler', async () => {
+    vi.mocked(suggestUsage).mockResolvedValue({
+      html: 'import MyButton from "@components/button"',
+      required: [],
+      optional: [],
+      variants: {},
+    });
+
+    await handleComponentCall(
+      'suggest_usage',
+      { tagName: 'my-button', framework: 'react' },
+      makeConfig(),
+      makeMockCem(),
+    );
+    expect(vi.mocked(suggestUsage)).toHaveBeenCalledWith(
+      'my-button',
+      expect.any(Object),
+      expect.any(Object),
+      { framework: 'react' },
+    );
+  });
+
+  it('returns error for missing tagName', async () => {
+    const result = await handleComponentCall('suggest_usage', {}, makeConfig(), makeMockCem());
+    expect(result.isError).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// handleComponentCall — generate_import
+// ---------------------------------------------------------------------------
+
+describe('handleComponentCall — generate_import', () => {
+  it('returns import statements for a component', async () => {
+    vi.mocked(generateImport).mockResolvedValue({
+      sideEffectImport: "import '@components/button/index.js'",
+      namedImport: "import { MyButton } from '@components/button'",
+    });
+
+    const result = await handleComponentCall(
+      'generate_import',
+      { tagName: 'my-button' },
+      makeConfig(),
+      makeMockCem(),
+    );
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text).toContain('import');
+  });
+
+  it('returns error for missing tagName', async () => {
+    const result = await handleComponentCall('generate_import', {}, makeConfig(), makeMockCem());
+    expect(result.isError).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // handleComponentCall — get_component_narrative
 // ---------------------------------------------------------------------------
 
@@ -226,6 +477,7 @@ describe('handleComponentCall — get_component_narrative', () => {
       'get_component_narrative',
       { tagName: 'my-button' },
       makeConfig(),
+      makeMockCem(),
     );
     expect(result.isError).toBeFalsy();
     expect(result.content[0].text).toContain('## my-button');
@@ -234,12 +486,22 @@ describe('handleComponentCall — get_component_narrative', () => {
 
   it('calls getComponentNarrative with the correct tagName', async () => {
     vi.mocked(getComponentNarrative).mockResolvedValue('## sl-button\n\n...');
-    await handleComponentCall('get_component_narrative', { tagName: 'sl-button' }, makeConfig());
-    expect(vi.mocked(getComponentNarrative)).toHaveBeenCalledWith('sl-button', undefined);
+    await handleComponentCall(
+      'get_component_narrative',
+      { tagName: 'sl-button' },
+      makeConfig(),
+      makeMockCem(),
+    );
+    expect(vi.mocked(getComponentNarrative)).toHaveBeenCalledWith('sl-button', expect.any(Object));
   });
 
   it('returns error for missing tagName', async () => {
-    const result = await handleComponentCall('get_component_narrative', {}, makeConfig());
+    const result = await handleComponentCall(
+      'get_component_narrative',
+      {},
+      makeConfig(),
+      makeMockCem(),
+    );
     expect(result.isError).toBe(true);
   });
 
@@ -249,6 +511,7 @@ describe('handleComponentCall — get_component_narrative', () => {
       'get_component_narrative',
       { tagName: 'unknown-tag' },
       makeConfig(),
+      makeMockCem(),
     );
     expect(result.isError).toBe(true);
   });
@@ -279,6 +542,7 @@ describe('handleComponentCall — get_prop_constraints', () => {
       'get_prop_constraints',
       { tagName: 'my-button', attributeName: 'variant' },
       makeConfig(),
+      makeMockCem(),
     );
     expect(result.isError).toBeFalsy();
     expect(result.content[0].text).toContain('primary');
@@ -300,6 +564,7 @@ describe('handleComponentCall — get_prop_constraints', () => {
       'get_prop_constraints',
       { tagName: 'my-button', attributeName: 'nonexistent' },
       makeConfig(),
+      makeMockCem(),
     );
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain('nonexistent');
@@ -310,6 +575,7 @@ describe('handleComponentCall — get_prop_constraints', () => {
       'get_prop_constraints',
       { tagName: 'my-button' },
       makeConfig(),
+      makeMockCem(),
     );
     expect(result.isError).toBe(true);
   });
@@ -327,6 +593,7 @@ describe('handleComponentCall — find_components_by_token', () => {
       'find_components_by_token',
       { tokenName: '--my-color', partialMatch: false },
       makeConfig(),
+      makeMockCem(),
     );
     expect(result.isError).toBeFalsy();
     expect(result.content[0].text).toContain('my-button');
@@ -337,13 +604,19 @@ describe('handleComponentCall — find_components_by_token', () => {
       'find_components_by_token',
       { tokenName: 'my-color' },
       makeConfig(),
+      makeMockCem(),
     );
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain('--');
   });
 
   it('returns error for missing tokenName', async () => {
-    const result = await handleComponentCall('find_components_by_token', {}, makeConfig());
+    const result = await handleComponentCall(
+      'find_components_by_token',
+      {},
+      makeConfig(),
+      makeMockCem(),
+    );
     expect(result.isError).toBe(true);
   });
 });
@@ -360,13 +633,19 @@ describe('handleComponentCall — get_component_dependencies', () => {
       'get_component_dependencies',
       { tagName: 'my-button', includeTransitive: false },
       makeConfig(),
+      makeMockCem(),
     );
     expect(result.isError).toBeFalsy();
     expect(result.content[0].text).toContain('my-icon');
   });
 
   it('returns error for missing tagName', async () => {
-    const result = await handleComponentCall('get_component_dependencies', {}, makeConfig());
+    const result = await handleComponentCall(
+      'get_component_dependencies',
+      {},
+      makeConfig(),
+      makeMockCem(),
+    );
     expect(result.isError).toBe(true);
   });
 });
@@ -385,13 +664,31 @@ describe('handleComponentCall — find_components_using_token', () => {
       'find_components_using_token',
       { tokenName: '--my-color', fuzzy: false },
       makeConfig(),
+      makeMockCem(),
     );
     expect(result.isError).toBeFalsy();
     expect(result.content[0].text).toContain('my-button');
   });
 
   it('returns error for missing tokenName', async () => {
-    const result = await handleComponentCall('find_components_using_token', {}, makeConfig());
+    const result = await handleComponentCall(
+      'find_components_using_token',
+      {},
+      makeConfig(),
+      makeMockCem(),
+    );
     expect(result.isError).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// handleComponentCall — unknown tool
+// ---------------------------------------------------------------------------
+
+describe('handleComponentCall — unknown tool', () => {
+  it('returns error for unknown tool name', async () => {
+    const result = await handleComponentCall('unknown_tool', {}, makeConfig(), makeMockCem());
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('Unknown');
   });
 });

@@ -12,11 +12,12 @@ on:
         default: 'false'
         type: boolean
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
-  contents: write
-  issues: write
-  pull-requests: write
-  id-token: write
+  contents: read
 
 jobs:
   build:
@@ -105,6 +106,11 @@ jobs:
   release:
     needs: [build, test, lint, format, audit]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -123,7 +129,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          node-version: '22'
           registry-url: 'https://registry.npmjs.org'
           cache: 'pnpm'
 

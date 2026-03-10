@@ -85,9 +85,9 @@ function getAllDeclarations(cem: Cem): CemDeclaration[] {
 
 // ─── Help text ────────────────────────────────────────────────────────────────
 
-const HELP_TEXT = `wc-tools — Web Component tooling CLI
+const HELP_TEXT = `helixir — Web Component tooling CLI
 
-Usage: wc-tools <subcommand> [options]
+Usage: helixir <subcommand> [options]
 
 Subcommands:
   analyze [tag]               Analyze a component (or list all) from CEM
@@ -734,12 +734,10 @@ export async function runInit(projectRoot: string = process.cwd()): Promise<void
     // Step 5: Print copy-paste snippets
     const snippet = {
       mcpServers: {
-        'wc-tools': {
+        helixir: {
           command: 'npx',
-          args: ['wc-tools'],
-          env: {
-            MCP_WC_PROJECT_ROOT: projectRoot,
-          },
+          args: ['helixir'],
+          cwd: projectRoot,
         },
       },
     };

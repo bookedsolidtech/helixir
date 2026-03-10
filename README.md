@@ -267,7 +267,16 @@ All tools are exposed over the [Model Context Protocol](https://modelcontextprot
 | `score_all_components`  | Health scores for every component in the library                                    | —                      |
 | `get_health_trend`      | Health trend for a component over the last N days with trend direction              | `tagName`              |
 | `get_health_diff`       | Before/after health comparison between current branch and a base branch             | `tagName`              |
+| `get_health_summary`    | Aggregate health stats for all components: average score, grade distribution        | —                      |
 | `analyze_accessibility` | Accessibility profile: ARIA roles, keyboard events, focus management, label support | `tagName` _(optional)_ |
+
+### Library
+
+| Tool             | Description                                                              | Required Args |
+| ---------------- | ------------------------------------------------------------------------ | ------------- |
+| `load_library`   | Load an additional web component library by npm package name or CEM path | `libraryId`   |
+| `list_libraries` | List all currently loaded web component libraries                        | —             |
+| `unload_library` | Remove a loaded library from memory                                      | `libraryId`   |
 
 ### Safety
 

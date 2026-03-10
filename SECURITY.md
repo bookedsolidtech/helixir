@@ -10,13 +10,13 @@
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-If you discover a security vulnerability in `wc-tools`, please report it privately using one of the following methods:
+If you discover a security vulnerability in `helixir`, please report it privately using one of the following methods:
 
 ### Option 1: GitHub Security Advisory (Preferred)
 
 Use GitHub's private vulnerability reporting feature:
 
-1. Go to the [Security tab](https://github.com/bookedsolidtech/wc-tools/security) of this repository
+1. Go to the [Security tab](https://github.com/bookedsolidtech/helixir/security) of this repository
 2. Click **"Report a vulnerability"**
 3. Fill in the details of the vulnerability
 
@@ -24,7 +24,7 @@ This creates a private advisory visible only to maintainers, allowing us to coor
 
 ### Option 2: Email
 
-If you prefer email, send details to the maintainer directly. You can find contact information on the [npm package page](https://www.npmjs.com/package/wc-tools) or by opening a blank GitHub issue requesting a security contact (without disclosing the vulnerability details).
+If you prefer email, send details to the maintainer directly. You can find contact information on the [npm package page](https://www.npmjs.com/package/helixir) or by opening a blank GitHub issue requesting a security contact (without disclosing the vulnerability details).
 
 ## What to Include
 
@@ -53,4 +53,4 @@ We follow [coordinated disclosure](https://en.wikipedia.org/wiki/Coordinated_vul
 
 ## Scope
 
-This security policy applies to the `wc-tools` package and its direct dependencies. Vulnerabilities in third-party dependencies should be reported to those projects directly, though we appreciate a heads-up if a dependency vulnerability affects `wc-tools` users.
+This security policy applies to the `helixir` package and its direct dependencies. Vulnerabilities in third-party dependencies should be reported to those projects directly, though we appreciate a heads-up if a dependency vulnerability affects `helixir` users.

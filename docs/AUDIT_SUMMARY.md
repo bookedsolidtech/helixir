@@ -1,4 +1,4 @@
-# wc-tools v0.1.0 Audit Summary
+# HELiXiR v0.1.0 Audit Summary
 
 Generated: 2026-03-02T10:00:00Z
 

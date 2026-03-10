@@ -1,15 +1,15 @@
-# wc-tools — Project Specification
+# HELiXiR — Project Specification
 
 ## What It Is
 
-`wc-tools` is a single, self-contained MCP (Model Context Protocol) server that gives AI coding assistants full situational awareness of any web component library.
+`helixir` is a single, self-contained MCP (Model Context Protocol) server that gives AI coding assistants full situational awareness of any web component library.
 
 **Framework-agnostic.** Works with Lit, Stencil, FAST, hand-coded JS, or any library that generates a Custom Elements Manifest (CEM). This is THE goto tool for anyone working with web components.
 
 **Tagline:** *Give Claude eyes into your design system.*
 
-**npm package:** `wc-tools`
-**GitHub:** `git@github.com:bookedsolidtech/wc-tools.git`
+**npm package:** `helixir`
+**GitHub:** `git@github.com:bookedsolidtech/helixir.git`
 
 ## OSS Context
 - Priority #2 in Clarity House / ProtoLabs OSS strategy
@@ -37,7 +37,7 @@
 | Testing | `vitest` ^3 + `@vitest/coverage-v8` |
 | Module format | ESM (`"type": "module"`) |
 | Package manager | pnpm |
-| Publish | npm (`wc-tools`) |
+| Publish | npm (`helixir`) |
 
 ## Tool Groups (16 tools total)
 1. **Discovery** — `list_components`, `find_component`, `get_library_summary`

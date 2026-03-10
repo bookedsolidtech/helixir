@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a bug or unexpected behavior in wc-tools
+description: Report a bug or unexpected behavior in HELiXiR
 labels: ['bug']
 body:
   - type: markdown
@@ -8,10 +8,10 @@ body:
         Thanks for taking the time to report a bug. Please fill out the fields below to help us diagnose the issue quickly.
 
   - type: input
-    id: wc-tools-version
+    id: helixir-version
     attributes:
-      label: wc-tools version
-      description: Run `wc-tools --version` or check your package.json
+      label: HELiXiR version
+      description: Run `helixir --version` or check your package.json
       placeholder: '0.1.0'
     validations:
       required: true

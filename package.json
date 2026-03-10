@@ -1,5 +1,5 @@
 {
-  "name": "wc-tools",
+  "name": "helixir",
   "version": "0.1.0",
   "description": "MCP server that gives AI agents full situational awareness of any web component library",
   "type": "module",
@@ -7,9 +7,10 @@
     "packages/*"
   ],
   "bin": {
-    "wc-tools": "./build/src/index.js"
+    "helixir": "./build/src/index.js"
   },
   "main": "./build/src/index.js",
+  "types": "./build/src/index.d.ts",
   "exports": {
     ".": "./build/src/index.js",
     "./api": "./build/src/api/index.js",
@@ -59,11 +60,11 @@
   "author": "Booked Solid Tech",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bookedsolidtech/wc-tools.git"
+    "url": "https://github.com/bookedsolidtech/helixir.git"
   },
-  "homepage": "https://github.com/bookedsolidtech/wc-tools#readme",
+  "homepage": "https://github.com/bookedsolidtech/helixir#readme",
   "bugs": {
-    "url": "https://github.com/bookedsolidtech/wc-tools/issues"
+    "url": "https://github.com/bookedsolidtech/helixir/issues"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",

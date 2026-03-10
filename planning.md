@@ -1,12 +1,12 @@
-# mcp-web-components — Planning Document
+# helixir — Planning Document
 
-> **Purpose of this document:** A comprehensive specification to be used as a prompt for an AI system to build the `mcp-web-components` OSS package from scratch, drawing on the Helix enterprise web component platform as its source of proven, battle-tested code.
+> **Purpose of this document:** A comprehensive specification to be used as a prompt for an AI system to build the `helixir` OSS package from scratch, drawing on the Helix enterprise web component platform as its source of proven, battle-tested code.
 
 ---
 
 ## 1. What It Is
 
-`mcp-web-components` is a single, self-contained MCP (Model Context Protocol) server that gives AI coding assistants (Claude, Cursor, Copilot, etc.) full situational awareness of any web component library. When connected, the AI can:
+`helixir` is a single, self-contained MCP (Model Context Protocol) server that gives AI coding assistants (Claude, Cursor, Copilot, etc.) full situational awareness of any web component library. When connected, the AI can:
 
 - Discover what components exist in the library
 - Read full component APIs (properties, events, slots, CSS parts, CSS custom properties)
@@ -18,9 +18,9 @@
 
 **Tagline:** _Give Claude eyes into your design system._
 
-**npm package name:** `wc-tools`
+**npm package name:** `helixir`
 
-**MCP server name (in .mcp.json):** `wc-tools`
+**MCP server name (in .mcp.json):** `helixir`
 
 ---
 
@@ -547,7 +547,7 @@ Ported from: `get-project-diagnostics` in Helix `typescript-diagnostics`
 ## 6. Repo Structure
 
 ```
-mcp-web-components/
+helixir/
 ├── src/
 │   ├── index.ts              # Server entry point
 │   ├── config.ts             # Config loading
@@ -614,12 +614,12 @@ mcp-web-components/
 
 ```json
 {
-  "name": "wc-tools",
+  "name": "helixir",
   "version": "0.1.0",
   "description": "MCP server that gives AI agents full situational awareness of any web component library",
   "type": "module",
   "bin": {
-    "wc-tools": "./build/index.js"
+    "helixir": "./build/index.js"
   },
   "main": "./build/index.js",
   "files": ["build", "README.md", "CHANGELOG.md"],
@@ -668,9 +668,9 @@ mcp-web-components/
 ```json
 {
   "mcpServers": {
-    "wc-tools": {
+    "helixir": {
       "command": "npx",
-      "args": ["wc-tools"],
+      "args": ["helixir"],
       "env": {
         "MCP_WC_CEM_PATH": "packages/my-library/custom-elements.json",
         "MCP_WC_COMPONENT_PREFIX": "my-",
@@ -712,10 +712,7 @@ import { registerTypescriptTools } from './tools/typescript.js';
 async function main() {
   const config = loadConfig();
 
-  const server = new Server(
-    { name: 'wc-tools', version: '0.1.0' },
-    { capabilities: { tools: {} } },
-  );
+  const server = new Server({ name: 'helixir', version: '0.1.0' }, { capabilities: { tools: {} } });
 
   registerDiscoveryTools(server, config);
   registerComponentTools(server, config);
@@ -801,9 +798,9 @@ Use `@vitest/coverage-v8`. Set coverage thresholds: statements 80%, branches 75%
 
 The README is a key marketing asset. Structure:
 
-1. **Hero section** — Tagline, 1-sentence description, badge row (npm version `wc-tools`, license, MCP compatible)
-2. **Why mcp-web-components?** — 3 bullet points on the value prop
-3. **Quick Start** — 3 commands to get running: `npx wc-tools`, configure `.mcp.json`, reload Claude
+1. **Hero section** — Tagline, 1-sentence description, badge row (npm version `helixir`, license, MCP compatible)
+2. **Why helixir?** — 3 bullet points on the value prop
+3. **Quick Start** — 3 commands to get running: `npx helixir`, configure `.mcp.json`, reload Claude
 4. **Tools Reference** — Table with all 16 tools, 1-line description each
 5. **Configuration** — Full config reference table
 6. **Framework support** — Lit ✅, FAST ✅, Stencil ✅, any CEM-generating library ✅

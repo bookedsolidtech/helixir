@@ -1,5 +1,5 @@
 name: Feature Request
-description: Propose a new tool or capability for wc-tools
+description: Propose a new tool or capability for HELiXiR
 labels: ['enhancement']
 body:
   - type: markdown

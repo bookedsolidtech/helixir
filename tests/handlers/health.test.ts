@@ -8,6 +8,7 @@ import {
   scoreAllComponents,
   getHealthTrend,
   getHealthDiff,
+  getHealthSummary,
   type CemDeclaration,
 } from '../../packages/core/src/handlers/health.js';
 
@@ -313,6 +314,51 @@ describe('getHealthTrend', () => {
     expect(trend.days).toBe(3);
   });
 
+  it('includes dimensionTrends when multiple data points with breakdown data exist', async () => {
+    const config = makeConfig();
+    const trend = await getHealthTrend(config, 'my-button', 10);
+    // Should have dimensionTrends since we have 3 data points with breakdown data
+    expect(trend.dimensionTrends).toBeDefined();
+    expect(typeof trend.dimensionTrends).toBe('object');
+  });
+
+  it('dimensionTrends includes all dimensions from first and last data points', async () => {
+    const config = makeConfig();
+    const trend = await getHealthTrend(config, 'my-button', 10);
+    if (trend.dimensionTrends) {
+      // my-button fixture has: documentation, accessibility, completeness, consistency
+      expect(trend.dimensionTrends).toHaveProperty('documentation');
+      expect(trend.dimensionTrends).toHaveProperty('accessibility');
+      expect(trend.dimensionTrends).toHaveProperty('completeness');
+      expect(trend.dimensionTrends).toHaveProperty('consistency');
+    }
+  });
+
+  it('dimensionTrends tracks per-dimension improvement', async () => {
+    const config = makeConfig();
+    const trend = await getHealthTrend(config, 'my-button', 10);
+    if (trend.dimensionTrends) {
+      for (const [dimension, dimTrend] of Object.entries(trend.dimensionTrends)) {
+        expect(['improving', 'declining', 'stable']).toContain(dimTrend.trend);
+        expect(typeof dimTrend.changePercent).toBe('number');
+        // changePercent is at most 2 decimal places due to Math.round(...) / 10
+        const str = dimTrend.changePercent.toString();
+        const decimalIndex = str.indexOf('.');
+        if (decimalIndex !== -1) {
+          const decimalPlaces = str.length - decimalIndex - 1;
+          expect(decimalPlaces).toBeLessThanOrEqual(1);
+        }
+      }
+    }
+  });
+
+  it('dimensionTrends is undefined when only single data point exists', async () => {
+    const config = makeConfig();
+    // Request only 1 day — most recent file is 2024-03-10.json
+    const trend = await getHealthTrend(config, 'my-button', 1);
+    expect(trend.dimensionTrends).toBeUndefined();
+  });
+
   it('throws when no history directory exists for the component', async () => {
     const config = makeConfig();
     await expect(getHealthTrend(config, 'nonexistent-component')).rejects.toThrow(
@@ -610,5 +656,132 @@ describe('parseHistoryFile — no absolute paths in error messages', () => {
     expect(thrown!.message).not.toMatch(/Invalid health history file "\//);
     // Must not contain the absolute projectRoot itself
     expect(thrown!.message).not.toContain(FIXTURE_DIR);
+  });
+});
+
+// ─── getHealthSummary ────────────────────────────────────────────────────────
+
+describe('getHealthSummary', () => {
+  it('returns a summary object with required fields', async () => {
+    const config = makeConfig();
+    const components = [MY_BUTTON_DECL];
+
+    const summary = await getHealthSummary(config, components);
+
+    expect(summary).toBeDefined();
+    expect(summary.averageScore).toBeDefined();
+    expect(summary.totalComponents).toBe(1);
+    expect(summary.gradeDistribution).toBeDefined();
+    expect(summary.libraryTrend).toBeDefined();
+    expect(summary.componentsNeedingAttention).toBeDefined();
+    expect(Array.isArray(summary.componentsNeedingAttention)).toBe(true);
+    expect(summary.timestamp).toBeDefined();
+  });
+
+  it('calculates average score from component scores', async () => {
+    const config = makeConfig();
+    const components = [MY_BUTTON_DECL, PERFECT_DECL, UNDOCUMENTED_DECL];
+
+    const summary = await getHealthSummary(config, components);
+
+    // Perfect: 100, MyButton: 82, Undocumented: 0 → average
+    expect(summary.averageScore).toBeGreaterThan(0);
+    expect(summary.averageScore).toBeLessThanOrEqual(100);
+    expect(summary.totalComponents).toBe(3);
+  });
+
+  it('includes components needing attention (score < 70)', async () => {
+    const config = makeConfig();
+    const components = [UNDOCUMENTED_DECL]; // score should be 0
+
+    const summary = await getHealthSummary(config, components);
+
+    // Undocumented component has score 0, so should need attention
+    expect(summary.componentsNeedingAttention.length).toBeGreaterThan(0);
+    expect(summary.componentsNeedingAttention[0]).toBe('undocumented-component');
+  });
+
+  it('assigns correct grade distribution', async () => {
+    const config = makeConfig();
+    const components = [PERFECT_DECL, MY_BUTTON_DECL];
+
+    const summary = await getHealthSummary(config, components);
+
+    // Perfect gets A (100), MyButton gets B (82)
+    expect(summary.gradeDistribution.A).toBe(1);
+    expect(summary.gradeDistribution.B).toBeGreaterThan(0);
+  });
+
+  it('handles empty component list gracefully', async () => {
+    const config = makeConfig();
+    const components: CemDeclaration[] = [];
+
+    const summary = await getHealthSummary(config, components);
+
+    expect(summary.totalComponents).toBe(0);
+    expect(summary.componentsNeedingAttention).toEqual([]);
+    expect(summary.averageScore).toBe(0);
+  });
+
+  it('handles single component', async () => {
+    const config = makeConfig();
+    const components = [MY_BUTTON_DECL];
+
+    const summary = await getHealthSummary(config, components);
+
+    expect(summary.totalComponents).toBe(1);
+    expect(summary.averageScore).toBeGreaterThan(0);
+  });
+
+  it('library trend reflects overall improvement/decline/stability', async () => {
+    const config = makeConfig();
+    const components = [MY_BUTTON_DECL];
+
+    const summary = await getHealthSummary(config, components);
+
+    expect(['improving', 'declining', 'stable']).toContain(summary.libraryTrend);
+  });
+
+  it('includes timestamp in response', async () => {
+    const config = makeConfig();
+    const components = [MY_BUTTON_DECL];
+
+    const summary = await getHealthSummary(config, components);
+
+    expect(typeof summary.timestamp).toBe('string');
+    expect(summary.timestamp.length).toBeGreaterThan(0);
+  });
+
+  it('averageScore is accurate with mixed component scores', async () => {
+    const config = makeConfig();
+    // Perfect (100) and Undocumented (0) should average to 50
+    const components = [PERFECT_DECL, UNDOCUMENTED_DECL];
+
+    const summary = await getHealthSummary(config, components);
+
+    // Average should be between the two scores
+    expect(summary.averageScore).toBeGreaterThan(0);
+    expect(summary.averageScore).toBeLessThan(100);
+  });
+
+  it('handles components with no events or slots gracefully', async () => {
+    const config = makeConfig();
+    const components = [NO_ITEMS_DECL];
+
+    const summary = await getHealthSummary(config, components);
+
+    // Component with no items gets full marks (100)
+    expect(summary.averageScore).toBe(100);
+    expect(summary.totalComponents).toBe(1);
+  });
+
+  it('high-scoring components excluded from needing attention', async () => {
+    const config = makeConfig();
+    const components = [PERFECT_DECL]; // Score 100
+
+    const summary = await getHealthSummary(config, components);
+
+    // Perfect component should not need attention (score >= 70)
+    expect(summary.componentsNeedingAttention).not.toContain('perfect-component');
   });
 });

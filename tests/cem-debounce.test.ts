@@ -65,7 +65,7 @@ describe('CEM debounce window', () => {
       throw new Error(`Server binary not found at ${SERVER_PATH}. Run 'pnpm run build' first.`);
     }
 
-    tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-debounce-'));
+    tmpDir = mkdtempSync(join(tmpdir(), 'helixir-debounce-'));
     cemPath = join(tmpDir, 'custom-elements.json');
     copyFileSync(FIXTURE_CEM, cemPath);
 

@@ -320,9 +320,9 @@ usageStats:
 - **Trade-offs:** Simplicity and consistency gained, but packages/core cannot be published or used independently; tight coupling to root build process.
 
 ### Entry point dispatching via process.argv allows a single package (and single node_modules footprint) to serve multiple use cases: MCP server mode and CLI init mode. (2026-03-04)
-- **Context:** npx wc-tools with no args starts MCP server; npx wc-tools init runs CLI setup. Both must coexist in one package.
+- **Context:** npx helixir with no args starts MCP server; npx helixir init runs CLI setup. Both must coexist in one package.
 - **Why:** Avoids splitting dependencies and shared logic (handlers, tools, config) across separate packages or entry points. Single dependencies list, shared test coverage, unified version.
-- **Rejected:** Alternative: separate @wc-tools/mcp and @wc-tools/cli packages. This would isolate concerns but duplicate dependencies, shared code, and tests.
+- **Rejected:** Alternative: separate @helixir/mcp and @helixir/cli packages. This would isolate concerns but duplicate dependencies, shared code, and tests.
 - **Trade-offs:** Unified package is simpler to maintain and deploy, but src/index.ts gains dispatcher logic; users running CLI must include unused MCP dependencies.
 - **Breaking if changed:** Removing the dispatcher would require separate entry points, package.json exports, and likely separate packages to avoid wasted dependencies.
 
@@ -386,7 +386,7 @@ usageStats:
 - **Why this works:** Validation should enforce platform-level requirements. Browsers reject non-spec-compliant custom element names anyway; catching them early prevents wasted processing and attack surface.
 - **Trade-offs:** Strict validation ensures correctness but couples validation tightly to W3C spec. Non-compliant CEM files from external sources will be rejected at parse time.
 
-### Keep 'npx wc-tools' (no subcommand) routing to MCP server instead of showing help. Use '--help' flag for help text. (2026-03-04)
+### Keep 'npx helixir' (no subcommand) routing to MCP server instead of showing help. Use '--help' flag for help text. (2026-03-04)
 - **Context:** Conflict between ideal CLI UX (show help with no args) and pre-existing startup.test.ts which expects no-arg behavior to launch MCP server
 - **Why:** Changing no-arg behavior breaks existing integrations. MCP client configurations and startup tests depend on this. Backward compatibility required preserving MCP routing.
 - **Rejected:** Show help on no-args (matches standard CLI UX) — breaks startup.test.ts and breaks MCP client configurations expecting server launch
@@ -405,12 +405,12 @@ usageStats:
 - **Why this works:** Composite actions have a setup step that can run npm install at github.action_path before the main script executes. This means dependencies are always available at runtime, eliminating the bundling requirement. Plain tsc output is sufficient—no need for esbuild complexity.
 - **Trade-offs:** dist/index.js is larger (~50KB+ vs ~10-20KB bundled); eliminates bundler toolchain complexity and pnpm friction; install step adds ~3-5 seconds to action runtime but improves maintainability
 
-### Allow config file auto-discovery via wc-tools CLI defaults instead of requiring explicit config-path input (2026-03-04)
-- **Context:** GitHub Action wraps wc-tools CLI which already has convention-based config discovery (mcpwc.config.json)
-- **Why:** wc-tools CLI auto-discovers config in standard locations. Duplicating this logic in the action or requiring users to explicitly pass config-path would add friction. Delegating to the CLI's existing defaults reduces configuration burden and keeps the action simple.
+### Allow config file auto-discovery via helixir CLI defaults instead of requiring explicit config-path input (2026-03-04)
+- **Context:** GitHub Action wraps helixir CLI which already has convention-based config discovery (mcpwc.config.json)
+- **Why:** helixir CLI auto-discovers config in standard locations. Duplicating this logic in the action or requiring users to explicitly pass config-path would add friction. Delegating to the CLI's existing defaults reduces configuration burden and keeps the action simple.
 - **Rejected:** Could require config-path as mandatory input, ensuring explicit configuration; or hard-code config path in action
-- **Trade-offs:** Easier for users (less configuration required); requires knowledge of wc-tools defaults; CLI command must support auto-discovery for this to work
-- **Breaking if changed:** If wc-tools CLI stops supporting config auto-discovery or changes its default paths, action behavior becomes unpredictable unless config-path is explicitly provided
+- **Trade-offs:** Easier for users (less configuration required); requires knowledge of helixir defaults; CLI command must support auto-discovery for this to work
+- **Breaking if changed:** If helixir CLI stops supporting config auto-discovery or changes its default paths, action behavior becomes unpredictable unless config-path is explicitly provided
 
 #### [Pattern] Multi-CEM namespace isolation via flat key format with colon separator (libraryId:pkg@version) in in-memory Map, rather than nested Map<libraryId, Map<pkg, CacheEntry>> (2026-03-04)
 - **Problem solved:** Implementing multi-CEM readiness for bundle cache to prevent collisions across different library instances
@@ -429,7 +429,7 @@ usageStats:
 
 #### [Pattern] Config generation must be validated end-to-end against actual target systems, not just theoretical correctness. MCP config assumes cwd support but never tested against Claude Desktop. (2026-03-04)
 - **Problem solved:** Gap between assumed behavior of config consumers and actual behavior
-- **Why this works:** Config is written by one system (wc-tools) but consumed by another (Claude Desktop). Assumptions about the consumer's API aren't validated.
+- **Why this works:** Config is written by one system (helixir) but consumed by another (Claude Desktop). Assumptions about the consumer's API aren't validated.
 - **Trade-offs:** End-to-end testing is expensive; theoretical validation is cheap. But theory doesn't catch API differences.
 
 #### [Gotcha] Init wizard outputs `cwd` field in snippets; IDE config sections require `env` field. These are not equivalent and users commonly confuse them. (2026-03-04)
@@ -449,7 +449,7 @@ usageStats:
 
 ### Created fully standalone `IDE-INTEGRATION.md` independent of README. No cross-references back to main docs; complete information in one document. (2026-03-04)
 - **Context:** Guide needed to cover all 6 editors with exact paths, platform-specific instructions, framework notes, and troubleshooting without bloating README.
-- **Why:** IDE integration is a distinct user journey (not everyone using wc-tools uses an IDE; some use CLI). Standalone doc allows independent discovery and updates without breaking main README.
+- **Why:** IDE integration is a distinct user journey (not everyone using helixir uses an IDE; some use CLI). Standalone doc allows independent discovery and updates without breaking main README.
 - **Rejected:** Putting IDE docs in README (would double its size and mix different concerns); cross-referencing to README sections (creates maintenance coupling).
 - **Trade-offs:** Users must find the guide separately, but once found, it's self-contained and doesn't require README context.
 - **Breaking if changed:** If guide is removed, IDE users have no single place to find their specific editor config; they're forced to infer from code.
@@ -460,8 +460,8 @@ usageStats:
 - **Trade-offs:** Makes guide longer (one section per OS per editor) but eliminates path confusion entirely.
 
 #### [Pattern] Framework-specific notes (Shoelace, Lit, Stencil, FAST, Spectrum, Polymer) included in integration guide. Not assuming generic web component compatibility. (2026-03-04)
-- **Problem solved:** wc-tools is framework-agnostic but different frameworks have different token formats, component export patterns, and CEM generation approaches.
-- **Why this works:** Users don't use wc-tools in isolation; they use it with their framework. If their framework's token format or component structure doesn't match documentation, they fail silently.
+- **Problem solved:** helixir is framework-agnostic but different frameworks have different token formats, component export patterns, and CEM generation approaches.
+- **Why this works:** Users don't use helixir in isolation; they use it with their framework. If their framework's token format or component structure doesn't match documentation, they fail silently.
 - **Trade-offs:** Larger guide but real-world applicable; users can configure for their specific framework without trial-and-error.
 
 #### [Pattern] Asymmetric error handling across fallback layers: outer catch must be selective (only ENOENT triggers fallback), inner legacy-path catch can be bare (any error means 'no history available') (2026-03-04)

@@ -60,7 +60,7 @@ describe('formatTable', () => {
 
 // ─── CLI subcommand integration tests ────────────────────────────────────────
 
-describe('wc-tools CLI subcommands (requires build)', () => {
+describe('helixir CLI subcommands (requires build)', () => {
   function runCli(args: string[], extraEnv?: Record<string, string>) {
     return spawnSync('node', [SERVER_PATH, ...args], {
       env: {
@@ -77,7 +77,7 @@ describe('wc-tools CLI subcommands (requires build)', () => {
   it('help subcommand prints usage text', () => {
     const result = runCli(['help']);
     expect(result.status).toBe(0);
-    expect(result.stdout).toContain('wc-tools');
+    expect(result.stdout).toContain('helixir');
     expect(result.stdout).toContain('Subcommands');
     expect(result.stdout).toContain('analyze');
     expect(result.stdout).toContain('health');
@@ -85,7 +85,7 @@ describe('wc-tools CLI subcommands (requires build)', () => {
 
   it('--help flag with no subcommand prints usage text', () => {
     const result = runCli(['--help']);
-    expect(result.stdout).toContain('wc-tools');
+    expect(result.stdout).toContain('helixir');
   });
 
   it('unknown subcommand exits 1 with error message', () => {
@@ -202,9 +202,9 @@ describe('wc-tools CLI subcommands (requires build)', () => {
   });
 });
 
-describe('wc-tools init', () => {
+describe('helixir init', () => {
   it('writes mcpwc.config.json and prints snippets when CEM is found', () => {
-    const tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-init-'));
+    const tmpDir = mkdtempSync(join(tmpdir(), 'helixir-init-'));
     try {
       // Create a package.json with lit to trigger framework detection
       writeFileSync(
@@ -233,7 +233,7 @@ describe('wc-tools init', () => {
       expect(result.stdout).toContain('Found CEM: custom-elements.json');
       expect(result.stdout).toContain('Written: mcpwc.config.json');
       expect(result.stdout).toContain('claude_desktop_config.json');
-      expect(result.stdout).toContain('"wc-tools"');
+      expect(result.stdout).toContain('"helixir"');
 
       // Verify config file was written
       const configPath = join(tmpDir, 'mcpwc.config.json');
@@ -247,7 +247,7 @@ describe('wc-tools init', () => {
   });
 
   it('uses custom CEM path when user declines auto-discovered CEM', () => {
-    const tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-init-'));
+    const tmpDir = mkdtempSync(join(tmpdir(), 'helixir-init-'));
     try {
       writeFileSync(
         join(tmpDir, 'custom-elements.json'),
@@ -277,7 +277,7 @@ describe('wc-tools init', () => {
   });
 
   it('records tokensPath when user provides one', () => {
-    const tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-init-'));
+    const tmpDir = mkdtempSync(join(tmpdir(), 'helixir-init-'));
     try {
       writeFileSync(
         join(tmpDir, 'custom-elements.json'),
@@ -307,7 +307,7 @@ describe('wc-tools init', () => {
   });
 
   it('falls back to default CEM path when none is auto-detected and user skips', () => {
-    const tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-init-'));
+    const tmpDir = mkdtempSync(join(tmpdir(), 'helixir-init-'));
     try {
       // No CEM file present, no package.json
       // Simulate: press Enter for CEM path (use default), skip tokens

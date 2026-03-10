@@ -5,7 +5,6 @@ import { CemSchema, listAllComponents } from './cem.js';
 import type { Cem } from './cem.js';
 import { SafeFileOperations } from '../shared/file-ops.js';
 import { FilePathSchema } from '../shared/validation.js';
-import { MCPError, ErrorCategory } from '../shared/error-handling.js';
 
 // --- Input schema ---
 
@@ -130,16 +129,11 @@ export async function compareLibraries(
   const labelA = args.labelA ?? cemPathA;
   const labelB = args.labelB ?? cemPathB;
 
+  FilePathSchema.parse(cemPathA);
+  FilePathSchema.parse(cemPathB);
+
   const absPathA = resolve(join(config.projectRoot, cemPathA));
   const absPathB = resolve(join(config.projectRoot, cemPathB));
-  const root = resolve(config.projectRoot);
-
-  if (!absPathA.startsWith(root + '/') && absPathA !== root) {
-    throw new MCPError('Path escapes project root', ErrorCategory.VALIDATION);
-  }
-  if (!absPathB.startsWith(root + '/') && absPathB !== root) {
-    throw new MCPError('Path escapes project root', ErrorCategory.VALIDATION);
-  }
 
   const cemA = await fileOps.readJSON(absPathA, CemSchema);
   const cemB = await fileOps.readJSON(absPathB, CemSchema);

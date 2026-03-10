@@ -20,13 +20,13 @@ Web component libraries (Lit, Stencil, FAST, Shoelace, etc.) lack integrated dev
 - IDE support for web components is framework-specific (lit-plugin only helps Lit users) and limited to autocomplete — no health scores, no accessibility grades, no migration warnings
 - Component library maintainers have no standardized way to measure and communicate API health over time
 
-**wc-tools already solves the hard problems** — CEM analysis, health scoring, breaking change detection, accessibility auditing, migration guides, bundle analysis, and CDN resolution. But it's locked behind the MCP protocol, limiting it to AI assistant users.
+**helixir already solves the hard problems** — CEM analysis, health scoring, breaking change detection, accessibility auditing, migration guides, bundle analysis, and CDN resolution. But it's locked behind the MCP protocol, limiting it to AI assistant users.
 
 ## 2. Vision
 
-**Transform wc-tools from an MCP server into THE web component developer platform.**
+**Transform helixir from an MCP server into THE web component developer platform.**
 
-One analysis engine. Many surfaces. Every web component developer installs wc-tools — whether they use AI assistants or not, whether they use VS Code or the terminal, whether they're building a design system or consuming one.
+One analysis engine. Many surfaces. Every web component developer installs helixir — whether they use AI assistants or not, whether they use VS Code or the terminal, whether they're building a design system or consuming one.
 
 **Tagline evolution:**
 - Today: *"Give Claude eyes into your design system"*
@@ -37,26 +37,26 @@ One analysis engine. Many surfaces. Every web component developer installs wc-to
 ### Core + Extensions Model
 
 ```
-wc-tools/                          ← monorepo (pnpm workspaces)
+helixir/                           ← monorepo (pnpm workspaces)
   packages/
-    core/                          ← current src/, published as "wc-tools"
+    core/                          ← current src/, published as "helixir"
       src/
         handlers/                  ← pure analysis functions (already exist)
         api/                       ← NEW: public programmatic API
         mcp/                       ← MCP server entry point (refactored from index.ts)
         cli/                       ← NEW: CLI subcommand interface
-      package.json                 ← "wc-tools" on npm
+      package.json                 ← "helixir" on npm
 
     github-action/                 ← published as GitHub Action
       action.yml
-      src/index.ts                 ← imports from @wc-tools/core
+      src/index.ts                 ← imports from @helixir/core
       package.json
 
     vscode/                        ← published to VS Code Marketplace
-      src/extension.ts             ← imports from wc-tools core
+      src/extension.ts             ← imports from helixir core
       package.json
 
-    wrapper-gen/                   ← published as "@wc-tools/wrapper-gen"
+    wrapper-gen/                   ← published as "@helixir/wrapper-gen"
       src/
         react.ts
         vue.ts
@@ -64,8 +64,8 @@ wc-tools/                          ← monorepo (pnpm workspaces)
         svelte.ts
       package.json
 
-    docs-gen/                      ← published as "@wc-tools/docs-gen"  (Phase 5+)
-    storybook/                     ← published as "@wc-tools/storybook" (Phase 5+)
+    docs-gen/                      ← published as "@helixir/docs-gen"  (Phase 5+)
+    storybook/                     ← published as "@helixir/storybook" (Phase 5+)
 ```
 
 ### The Key Unlock: Programmatic API
@@ -74,15 +74,15 @@ The handlers in `src/handlers/*.ts` are already pure functions. The refactor is:
 
 1. **Extract** the MCP dispatch logic from `src/index.ts` into `src/mcp/server.ts`
 2. **Export** handler functions from a public `src/api/index.ts` barrel file
-3. **Add** `"exports"` field to package.json so consumers can `import { scoreComponent } from 'wc-tools'`
+3. **Add** `"exports"` field to package.json so consumers can `import { scoreComponent } from 'helixir'`
 4. **Keep** the `bin` entry for MCP server and CLI
 
 ```ts
 // Consumer usage after Phase 1:
-import { loadConfig, loadCem } from 'wc-tools';
-import { scoreComponent, analyzeAccessibility } from 'wc-tools/health';
-import { diffCem, checkBreakingChanges } from 'wc-tools/safety';
-import { suggestUsage, generateImport } from 'wc-tools/suggest';
+import { loadConfig, loadCem } from 'helixir';
+import { scoreComponent, analyzeAccessibility } from 'helixir/health';
+import { diffCem, checkBreakingChanges } from 'helixir/safety';
+import { suggestUsage, generateImport } from 'helixir/suggest';
 
 const config = loadConfig('/path/to/project');
 const cem = loadCem(config);
@@ -100,7 +100,7 @@ const score = scoreComponent(config, 'my-button', cem);
 
 ### Phase 1: Programmatic API Export (Unlocks Everything)
 
-**Goal:** Make wc-tools importable as a library, not just runnable as a server.
+**Goal:** Make helixir importable as a library, not just runnable as a server.
 
 **Deliverables:**
 1. Restructure `src/` into `src/api/`, `src/mcp/`, `src/cli/` directories
@@ -120,17 +120,17 @@ const score = scoreComponent(config, 'my-button', cem);
        "./mcp": "./build/mcp/server.js"
      },
      "bin": {
-       "wc-tools": "./build/cli/index.js"
+       "helixir": "./build/cli/index.js"
      }
    }
    ```
 4. `loadConfig()` and `loadCem()` exported as first-class public functions
-5. MCP server still works exactly as before (`npx wc-tools` starts MCP mode)
+5. MCP server still works exactly as before (`npx helixir` starts MCP mode)
 6. Convert to monorepo structure (move current code into `packages/core/`)
 
 **Acceptance criteria:**
-- `import { scoreComponent } from 'wc-tools/health'` works
-- `npx wc-tools` still starts the MCP server (backwards compatible)
+- `import { scoreComponent } from 'helixir/health'` works
+- `npx helixir` still starts the MCP server (backwards compatible)
 - All existing tests pass from new locations
 - TypeScript declaration files generated for all exports
 
@@ -140,7 +140,7 @@ const score = scoreComponent(config, 'my-button', cem);
 
 ### Phase 2: CLI Subcommands
 
-**Goal:** Make every wc-tools capability usable from the terminal without MCP.
+**Goal:** Make every helixir capability usable from the terminal without MCP.
 
 **Deliverables:**
 1. CLI entry point at `packages/core/src/cli/index.ts`
@@ -148,20 +148,20 @@ const score = scoreComponent(config, 'my-button', cem);
 
 | Command | Handler | Output |
 |---------|---------|--------|
-| `wc-tools init` | existing init wizard | interactive setup |
-| `wc-tools analyze [tag]` | `parseCem` + `analyzeAccessibility` | component analysis JSON/table |
-| `wc-tools health [tag]` | `scoreComponent` / `scoreAllComponents` | health scores table |
-| `wc-tools health --trend [tag]` | `getHealthTrend` | score history |
-| `wc-tools diff [--base branch]` | `diffCem` + `checkBreakingChanges` | breaking changes list |
-| `wc-tools migrate [tag] [--base branch]` | `generateMigrationGuide` | migration guide |
-| `wc-tools suggest [tag]` | `suggestUsage` | usage examples |
-| `wc-tools bundle [tag]` | `estimateBundleSize` | bundle size report |
-| `wc-tools tokens [query]` | `getDesignTokens` / `findToken` | token search results |
-| `wc-tools compare [cemA] [cemB]` | `compareLibraries` | comparison table |
-| `wc-tools benchmark [cem...]` | `benchmarkLibraries` | benchmark report |
-| `wc-tools validate [tag] --html "..."` | `validateUsage` | validation report |
-| `wc-tools cdn [pkg] [--registry]` | `resolveCdnCem` | CDN CEM resolution |
-| `wc-tools serve` | MCP server (current behavior) | stdio MCP |
+| `helixir init` | existing init wizard | interactive setup |
+| `helixir analyze [tag]` | `parseCem` + `analyzeAccessibility` | component analysis JSON/table |
+| `helixir health [tag]` | `scoreComponent` / `scoreAllComponents` | health scores table |
+| `helixir health --trend [tag]` | `getHealthTrend` | score history |
+| `helixir diff [--base branch]` | `diffCem` + `checkBreakingChanges` | breaking changes list |
+| `helixir migrate [tag] [--base branch]` | `generateMigrationGuide` | migration guide |
+| `helixir suggest [tag]` | `suggestUsage` | usage examples |
+| `helixir bundle [tag]` | `estimateBundleSize` | bundle size report |
+| `helixir tokens [query]` | `getDesignTokens` / `findToken` | token search results |
+| `helixir compare [cemA] [cemB]` | `compareLibraries` | comparison table |
+| `helixir benchmark [cem...]` | `benchmarkLibraries` | benchmark report |
+| `helixir validate [tag] --html "..."` | `validateUsage` | validation report |
+| `helixir cdn [pkg] [--registry]` | `resolveCdnCem` | CDN CEM resolution |
+| `helixir serve` | MCP server (current behavior) | stdio MCP |
 
 3. Output formats: `--format json|table|markdown` (default: table for TTY, JSON for pipes)
 4. Config auto-discovery: looks for `mcpwc.config.json` in cwd, same as MCP mode
@@ -172,10 +172,10 @@ const score = scoreComponent(config, 'my-button', cem);
 
 **Acceptance criteria:**
 - Every MCP tool accessible as a CLI subcommand
-- `wc-tools health` produces a readable table in terminal
-- `wc-tools diff --ci` returns exit code 2 on breaking changes
-- `wc-tools serve` starts MCP server (backwards compat with existing usage)
-- `npx wc-tools` without subcommand shows help
+- `helixir health` produces a readable table in terminal
+- `helixir diff --ci` returns exit code 2 on breaking changes
+- `helixir serve` starts MCP server (backwards compat with existing usage)
+- `npx helixir` without subcommand shows help
 
 **Complexity:** Medium
 
@@ -189,7 +189,7 @@ const score = scoreComponent(config, 'my-button', cem);
 1. `packages/github-action/` with `action.yml`
 2. Usage:
    ```yaml
-   - uses: clarity-house-press/wc-tools-action@v1
+   - uses: clarity-house-press/helixir-action@v1
      with:
        checks: health,breaking-changes,accessibility
        health-threshold: 70
@@ -197,8 +197,8 @@ const score = scoreComponent(config, 'my-button', cem);
        comment: true
    ```
 3. Action runs:
-   - `wc-tools health --ci --format json` → parse scores
-   - `wc-tools diff --base ${{ github.base_ref }} --ci --format json` → detect breaking changes
+   - `helixir health --ci --format json` → parse scores
+   - `helixir diff --base ${{ github.base_ref }} --ci --format json` → detect breaking changes
    - Posts a PR comment with:
      - Health score summary (table with per-component scores)
      - Breaking changes (if any)
@@ -208,10 +208,10 @@ const score = scoreComponent(config, 'my-button', cem);
    - Any component health score drops below threshold
    - Breaking changes detected and `fail-on-breaking: true`
 5. Uses the CLI (Phase 2) internally — no direct handler imports needed
-6. Composite action (runs node, installs wc-tools, executes CLI)
+6. Composite action (runs node, installs helixir, executes CLI)
 
 **Acceptance criteria:**
-- `uses: clarity-house-press/wc-tools-action@v1` works in any GitHub Actions workflow
+- `uses: clarity-house-press/helixir-action@v1` works in any GitHub Actions workflow
 - PR comment shows health scores and breaking changes
 - Check fails on configurable thresholds
 - Works with any web component library that has a CEM
@@ -225,8 +225,8 @@ const score = scoreComponent(config, 'my-button', cem);
 **Goal:** "I want a React library that wraps all our web components."
 
 **Deliverables:**
-1. `packages/wrapper-gen/` published as `@wc-tools/wrapper-gen`
-2. CLI: `wc-tools generate react --out ./src/react-wrappers/`
+1. `packages/wrapper-gen/` published as `@helixir/wrapper-gen`
+2. CLI: `helixir generate react --out ./src/react-wrappers/`
 3. Generates typed wrapper components for:
    - **React** — `React.forwardRef` with proper event binding (`onSlChange` → `sl-change`), typed props from CEM, slot children as `children`
    - **Vue** — `defineComponent` with prop definitions, `v-model` support for form components, event bindings
@@ -237,14 +237,14 @@ const score = scoreComponent(config, 'my-button', cem);
    - JSDoc comments with property descriptions from CEM
    - Health score annotation (comment warning if component health < 70)
    - Deprecation warnings from CEM `@deprecated` tags
-5. Config: `wc-tools generate react --prefix sl- --package @shoelace-style/shoelace`
-6. Watch mode: `wc-tools generate react --watch` (regenerate on CEM changes)
+5. Config: `helixir generate react --prefix sl- --package @shoelace-style/shoelace`
+6. Watch mode: `helixir generate react --watch` (regenerate on CEM changes)
 
 **Competitive advantage over existing tools (Plasma, cem-plugin-reactify):**
 - Health-aware: warns about unhealthy components
 - Migration-aware: includes deprecation notices from CEM
 - Multi-framework from one tool (not React-only)
-- Uses wc-tools' richer CEM analysis (accessibility, composition, dependencies)
+- Uses helixir's richer CEM analysis (accessibility, composition, dependencies)
 
 **Acceptance criteria:**
 - Generated React wrappers compile with `tsc --strict`
@@ -258,10 +258,10 @@ const score = scoreComponent(config, 'my-button', cem);
 
 ### Phase 5: VS Code Extension
 
-**Goal:** wc-tools analysis as real-time IDE features.
+**Goal:** helixir analysis as real-time IDE features.
 
 **Deliverables:**
-1. `packages/vscode/` published to VS Code Marketplace as `wc-tools`
+1. `packages/vscode/` published to VS Code Marketplace as `helixir`
 2. Features:
    - **Hover documentation** — hover over `<sl-button>` and see full component API, health score, accessibility grade
    - **Diagnostics** — red squiggles for unknown attributes, deprecated components, type mismatches
@@ -270,7 +270,7 @@ const score = scoreComponent(config, 'my-button', cem);
    - **Code actions** — "Generate import for sl-button", "Show migration guide", "View health trend"
    - **Component tree view** — sidebar showing all components in the library with health indicators
    - **Go to definition** — click a tag name to jump to its CEM declaration or source
-3. Architecture: Language Server Protocol (LSP) server that wraps wc-tools core
+3. Architecture: Language Server Protocol (LSP) server that wraps helixir core
 4. Configuration: reads `mcpwc.config.json` from workspace root (same config as CLI/MCP)
 
 **Competitive advantage over lit-plugin / custom-elements-language-server:**
@@ -294,17 +294,17 @@ const score = scoreComponent(config, 'my-button', cem);
 
 | Extension | What | Priority |
 |-----------|------|----------|
-| **Docs Generator** | `wc-tools docs --out ./docs/` → static site with API reference, health dashboards, token catalog | Medium |
-| **Storybook Integration** | `wc-tools storybook --out ./stories/` → auto-generated `.stories.ts` from CEM | Medium |
+| **Docs Generator** | `helixir docs --out ./docs/` → static site with API reference, health dashboards, token catalog | Medium |
+| **Storybook Integration** | `helixir storybook --out ./stories/` → auto-generated `.stories.ts` from CEM | Medium |
 | **Design Token Bridge** | Figma plugin ↔ W3C DTCG tokens ↔ CSS custom properties | Low |
-| **Component Playground** | `wc-tools.dev/playground` — paste a CEM URL, explore components interactively | Low |
-| **Comparison Dashboard** | `wc-tools.dev/compare` — compare N libraries head-to-head (health, bundle, API surface) | Low |
+| **Component Playground** | `helixir.dev/playground` — paste a CEM URL, explore components interactively | Low |
+| **Comparison Dashboard** | `helixir.dev/compare` — compare N libraries head-to-head (health, bundle, API surface) | Low |
 
 ---
 
 ## 5. Competitive Landscape
 
-| Niche | Existing Tools | wc-tools Advantage |
+| Niche | Existing Tools | HELiXiR Advantage |
 |-------|---------------|-------------------|
 | VS Code extension | lit-plugin, custom-elements-ls, wc-toolkit-ls | Framework-agnostic + health scores + migration warnings |
 | CI quality gates | **NONE** | First mover — zero competition |
@@ -316,7 +316,7 @@ const score = scoreComponent(config, 'my-button', cem);
 
 | Metric | 6 months | 12 months |
 |--------|----------|-----------|
-| npm weekly downloads (wc-tools) | 2,000 | 10,000 |
+| npm weekly downloads (helixir) | 2,000 | 10,000 |
 | GitHub stars | 1,000 | 5,000 |
 | GitHub Action installations | 100 repos | 500 repos |
 | VS Code Marketplace installs | — | 2,000 |
@@ -326,7 +326,7 @@ const score = scoreComponent(config, 'my-button', cem);
 
 - **Zero new runtime dependencies** in core package (keep `@modelcontextprotocol/sdk` + `zod` only)
 - **CLI uses Node.js built-in `parseArgs`** — no commander/yargs dependency
-- **Backwards compatible** — `npx wc-tools` must continue to start MCP server for existing users
+- **Backwards compatible** — `npx helixir` must continue to start MCP server for existing users
 - **ESM only** — all packages are `"type": "module"`
 - **Node.js >= 20** — can use built-in `parseArgs`, `fetch`, `test` runner
 - **pnpm workspaces** — already the package manager
@@ -335,14 +335,14 @@ const score = scoreComponent(config, 'my-button', cem);
 
 | Risk | Mitigation |
 |------|-----------|
-| Monorepo migration breaks existing users | Version bump to 1.0.0, `npx wc-tools` behavior preserved |
+| Monorepo migration breaks existing users | Version bump to 1.0.0, `npx helixir` behavior preserved |
 | Too many packages to maintain | Start with core + CLI + action only, add extensions based on demand |
 | VS Code extension scope creep | Ship minimal viable (hover + autocomplete + diagnostics) first |
 | Wrapper generator correctness across frameworks | Start React-only, add frameworks incrementally |
 
 ## 9. Open Questions
 
-1. **Package name for v1.0:** Keep `wc-tools` or rename to something catchier?
-2. **GitHub org:** Keep under `clarity-house-press` or create `wc-tools` org?
+1. **Package name for v1.0:** Keep `helixir` or rename to something catchier?
+2. **GitHub org:** Keep under `clarity-house-press` or create `helixir` org?
 3. **Monorepo migration timing:** Do we version-bump to 1.0.0 at the same time or ship current fixes as 0.2.0 first?
-4. **VS Code extension name:** `wc-tools` or something more descriptive like `Web Component Toolkit`?
+4. **VS Code extension name:** `helixir` or something more descriptive like `Web Component Toolkit`?

@@ -24,6 +24,11 @@ export const SAFETY_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         tagName: {
           type: 'string',
           description: 'The HTML tag name of the component to diff (e.g. "my-button").',
@@ -44,6 +49,11 @@ export const SAFETY_TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
         baseBranch: {
           type: 'string',
           description: 'The git branch or ref to compare against (e.g. "main").',

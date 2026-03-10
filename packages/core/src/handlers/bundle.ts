@@ -1,6 +1,20 @@
 import type { McpWcConfig } from '../config.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
 
+/**
+ * Valid npm package name regex per the npm naming rules:
+ * - Scoped: @scope/name where scope and name are [a-z0-9._-]
+ * - Unscoped: [a-z0-9][a-z0-9._-]*
+ * Null bytes, newlines, and filesystem-invalid characters are excluded.
+ */
+const NPM_PACKAGE_NAME_REGEX = /^(?:@[a-z0-9_.-]+\/)?[a-z0-9][a-z0-9._-]*$/;
+
+/**
+ * Strict semver regex: digits.digits.digits with optional pre-release and build metadata.
+ * The special tag "latest" is also accepted.
+ */
+const STRICT_SEMVER_REGEX = /^(?:latest|\d+\.\d+\.\d+(?:-[a-zA-Z0-9._-]+)?(?:\+[a-zA-Z0-9._-]+)?)$/;
+
 export interface BundleSizeBreakdown {
   minified: number;
   gzipped: number;
@@ -46,14 +60,15 @@ export function getBundleCacheSize(): number {
 /**
  * Adds an entry to bundleCache with size-bounded eviction.
  * When the cache exceeds MAX_CACHE_SIZE, the oldest entry (by insertion order) is removed first.
+ * Exported for testing.
  */
-function setBundleCacheEntry(key: string, entry: CacheEntry): void {
+export function setBundleCacheEntry(key: string, entry: CacheEntry): void {
   if (!bundleCache.has(key) && bundleCache.size >= MAX_CACHE_SIZE) {
     const oldestKey = bundleCache.keys().next().value;
     if (oldestKey !== undefined) {
       bundleCache.delete(oldestKey);
       process.stderr.write(
-        `[wc-tools] bundleCache evicted "${oldestKey}" (cache full at ${MAX_CACHE_SIZE} entries)\n`,
+        `[helixir] bundleCache evicted "${oldestKey}" (cache full at ${MAX_CACHE_SIZE} entries)\n`,
       );
     }
   }
@@ -75,8 +90,9 @@ interface NpmRegistryResponse {
 /**
  * Derives an npm package name from the configured componentPrefix.
  * Returns null when no mapping can be determined.
+ * Exported for testing.
  */
-function derivePackageFromPrefix(prefix: string): string | null {
+export function derivePackageFromPrefix(prefix: string): string | null {
   if (!prefix) return null;
   // Common prefix → package mappings for well-known libraries
   const known: Record<string, string> = {
@@ -96,7 +112,8 @@ function derivePackageFromPrefix(prefix: string): string | null {
   return null;
 }
 
-async function fetchBundlephobia(
+/** Exported for testing. */
+export async function fetchBundlephobia(
   pkg: string,
   version: string,
 ): Promise<{ gzip: number; minified: number; resolvedVersion: string } | null> {
@@ -133,7 +150,8 @@ async function fetchBundlephobia(
   return { gzip: data.gzip, minified: data.size, resolvedVersion: data.version ?? version };
 }
 
-async function fetchNpmRegistrySize(
+/** Exported for testing. */
+export async function fetchNpmRegistrySize(
   pkg: string,
   version: string,
 ): Promise<{ tarballBytes: number; resolvedVersion: string } | null> {
@@ -189,6 +207,22 @@ export async function estimateBundleSize(
   version = 'latest',
   libraryId = 'default',
 ): Promise<BundleSizeResult> {
+  // Validate packageOverride format to prevent injection via npm package name.
+  if (packageOverride !== undefined && !NPM_PACKAGE_NAME_REGEX.test(packageOverride)) {
+    throw new MCPError(
+      `Invalid npm package name: "${packageOverride}". Must follow npm naming rules.`,
+      ErrorCategory.VALIDATION,
+    );
+  }
+
+  // Validate version string to prevent path traversal and URL injection.
+  if (!STRICT_SEMVER_REGEX.test(version)) {
+    throw new MCPError(
+      `Invalid version string: "${version}". Must be "latest" or a valid semver (e.g. 1.2.3, 1.2.3-beta.1).`,
+      ErrorCategory.VALIDATION,
+    );
+  }
+
   // Determine package name
   const pkg = packageOverride ?? derivePackageFromPrefix(config.componentPrefix);
   if (!pkg) {

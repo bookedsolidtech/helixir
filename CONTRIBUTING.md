@@ -1,12 +1,12 @@
-# Contributing to wc-tools
+# Contributing to HELiXiR
 
 Thank you for your interest in contributing! This guide covers everything you need to get started.
 
 ## Development Setup
 
 ```bash
-git clone https://github.com/bookedsolidtech/wc-tools.git
-cd wc-tools
+git clone https://github.com/bookedsolidtech/helixir.git
+cd helixir
 pnpm install
 pnpm test
 pnpm run build
@@ -22,7 +22,7 @@ pnpm run build
 ## Project Structure
 
 ```
-wc-tools/
+helixir/
 ├── src/
 │   ├── index.ts              # Server entry point, tool dispatch
 │   ├── config.ts             # Config loading (env vars → file → defaults)
@@ -247,7 +247,7 @@ Before opening a PR, verify:
 
 ## Pre-Commit Hooks
 
-wc-tools uses [husky](https://typicode.github.io/husky/) + [lint-staged](https://github.com/lint-staged/lint-staged) + [commitlint](https://commitlint.js.org) to enforce quality at commit time. These are installed automatically by `pnpm install`.
+HELiXiR uses [husky](https://typicode.github.io/husky/) + [lint-staged](https://github.com/lint-staged/lint-staged) + [commitlint](https://commitlint.js.org) to enforce quality at commit time. These are installed automatically by `pnpm install`.
 
 **What runs on every commit:**
 

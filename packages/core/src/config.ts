@@ -38,7 +38,7 @@ function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
     const raw = readFileSync(configPath, 'utf-8');
     return JSON.parse(raw) as Partial<McpWcConfig>;
   } catch {
-    process.stderr.write(`[wc-tools] Warning: mcpwc.config.json is malformed. Using defaults.\n`);
+    process.stderr.write(`[helixir] Warning: mcpwc.config.json is malformed. Using defaults.\n`);
     return {};
   }
 }

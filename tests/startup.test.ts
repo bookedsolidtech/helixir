@@ -13,7 +13,7 @@ const FIXTURE_CEM = resolve(__dirname, './__fixtures__/custom-elements.json');
 
 describe('startup CEM validation', () => {
   it('exits with code 1 and writes a helpful error when CEM file is missing', () => {
-    const tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-startup-'));
+    const tmpDir = mkdtempSync(join(tmpdir(), 'helixir-startup-'));
     try {
       const result = spawnSync('node', [SERVER_PATH], {
         env: {
@@ -34,7 +34,7 @@ describe('startup CEM validation', () => {
   });
 
   it('exits with code 1 and writes a parse error when CEM file is malformed JSON', () => {
-    const tmpDir = mkdtempSync(join(tmpdir(), 'wc-tools-startup-'));
+    const tmpDir = mkdtempSync(join(tmpdir(), 'helixir-startup-'));
     try {
       const cemPath = join(tmpDir, 'custom-elements.json');
       writeFileSync(cemPath, 'not-valid-json{{{');

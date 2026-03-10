@@ -1,4 +1,4 @@
-# Security Audit Report — wc-tools (Deep Audit)
+# Security Audit Report — HELiXiR (Deep Audit)
 
 **Date:** 2026-03-04
 **Scope:** All MCP tool input parameters, data flows, handler logic, shared utilities
@@ -30,7 +30,7 @@
                                 │  MCP stdio transport
                                 ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  SEMI-TRUSTED — MCP Server Process (wc-tools)                               │
+│  SEMI-TRUSTED — MCP Server Process (helixir)                               │
 │                                                                             │
 │  Entry point: src/index.ts → CallToolRequestSchema handler                  │
 │  First validation: Zod schema per-tool (args checked at dispatch boundary)  │

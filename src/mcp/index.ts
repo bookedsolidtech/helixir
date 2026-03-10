@@ -4,7 +4,7 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprot
 import { existsSync, readFileSync, watch as fsWatch } from 'fs';
 import { resolve, relative, sep } from 'path';
 import { loadConfig } from '../../packages/core/src/config.js';
-import { CemSchema } from '../../packages/core/src/handlers/cem.js';
+import { CemSchema, loadLibrary, resolveCem } from '../../packages/core/src/handlers/cem.js';
 import type { Cem } from '../../packages/core/src/handlers/cem.js';
 import {
   DISCOVERY_TOOL_DEFINITIONS,
@@ -67,6 +67,16 @@ import {
   handleStoryCall,
   isStoryTool,
 } from '../../packages/core/src/tools/story.js';
+import {
+  BENCHMARK_TOOL_DEFINITIONS,
+  handleBenchmarkCall,
+  isBenchmarkTool,
+} from '../../packages/core/src/tools/benchmark.js';
+import {
+  LIBRARY_TOOL_DEFINITIONS,
+  handleLibraryCall,
+  isLibraryTool,
+} from '../../packages/core/src/tools/library.js';
 import { createErrorResponse } from '../../packages/core/src/shared/mcp-helpers.js';
 import type { MCPToolResult } from '../../packages/core/src/shared/mcp-helpers.js';
 
@@ -87,6 +97,8 @@ function loadCem(cemAbsPath: string): { componentCount: number } {
   const parsed: unknown = JSON.parse(raw);
   cemCache = CemSchema.parse(parsed);
   cemLoadedAt = new Date();
+  // Register the default CEM in the namespaced store
+  loadLibrary('default', cemCache, 'config');
   const componentCount = cemCache.modules
     .flatMap((m) => m.declarations ?? [])
     .filter((d) => d.tagName).length;
@@ -107,11 +119,11 @@ function startCemWatcher(cemAbsPath: string): void {
       try {
         const { componentCount } = loadCem(cemAbsPath);
         process.stderr.write(
-          `[wc-tools] CEM reloaded: ${componentCount} components (was ${prevCount})\n`,
+          `[helixir] CEM reloaded: ${componentCount} components (was ${prevCount})\n`,
         );
         prevCount = componentCount;
       } catch (err) {
-        process.stderr.write(`[wc-tools] CEM reload failed: ${String(err)}\n`);
+        process.stderr.write(`[helixir] CEM reload failed: ${String(err)}\n`);
       } finally {
         cemReloading = false;
       }
@@ -119,7 +131,7 @@ function startCemWatcher(cemAbsPath: string): void {
   });
 }
 
-const server = new Server({ name: 'wc-tools', version: '0.1.0' }, { capabilities: { tools: {} } });
+const server = new Server({ name: 'helixir', version: '0.1.0' }, { capabilities: { tools: {} } });
 
 export async function main(): Promise<void> {
   const config = loadConfig();
@@ -167,6 +179,8 @@ export async function main(): Promise<void> {
     ...BUNDLE_TOOL_DEFINITIONS,
     ...CDN_TOOL_DEFINITIONS,
     ...STORY_TOOL_DEFINITIONS,
+    ...BENCHMARK_TOOL_DEFINITIONS,
+    ...LIBRARY_TOOL_DEFINITIONS,
     ...tsTools,
   ];
 
@@ -185,6 +199,13 @@ export async function main(): Promise<void> {
     const typedArgs = args as Record<string, unknown>;
 
     const result = await (async (): Promise<MCPToolResult> => {
+      // Library management tools (no CEM dependency)
+      if (isLibraryTool(name)) return handleLibraryCall(name, typedArgs, config);
+
+      // Extract optional libraryId from args for CEM resolution
+      const libraryId =
+        typeof typedArgs['libraryId'] === 'string' ? typedArgs['libraryId'] : undefined;
+
       if (
         isDiscoveryTool(name) ||
         isComponentTool(name) ||
@@ -195,18 +216,20 @@ export async function main(): Promise<void> {
           return createErrorResponse(
             'CEM not yet loaded — server is still initializing. Please retry.',
           );
+        const effectiveCem = resolveCem(libraryId, cemCache);
         if (isDiscoveryTool(name))
-          return handleDiscoveryCall(name, typedArgs, config, cemCache, cemLoadedAt);
-        if (isComponentTool(name)) return handleComponentCall(name, typedArgs, config, cemCache);
-        if (isSafetyTool(name)) return handleSafetyCall(name, typedArgs, config, cemCache);
-        if (isHealthTool(name)) return handleHealthCall(name, typedArgs, config, cemCache);
+          return handleDiscoveryCall(name, typedArgs, config, effectiveCem, cemLoadedAt);
+        if (isComponentTool(name))
+          return handleComponentCall(name, typedArgs, config, effectiveCem);
+        if (isSafetyTool(name)) return handleSafetyCall(name, typedArgs, config, effectiveCem);
+        if (isHealthTool(name)) return handleHealthCall(name, typedArgs, config, effectiveCem);
       }
       if (isTypeScriptTool(name)) {
         if (!isTypescriptAvailable()) {
           return createErrorResponse(
             'TypeScript diagnostics require TypeScript to be installed.\n' +
               'Run: npm install typescript --save-dev\n' +
-              'Then restart wc-tools.',
+              'Then restart helixir.',
           );
         }
         return handleTypeScriptCall(name, typedArgs, config);
@@ -216,7 +239,7 @@ export async function main(): Promise<void> {
           return createErrorResponse(
             'CEM not yet loaded — server is still initializing. Please retry.',
           );
-        return handleCompositionCall(name, typedArgs, cemCache);
+        return handleCompositionCall(name, typedArgs, resolveCem(libraryId, cemCache));
       }
       if (isBundleTool(name)) return handleBundleCall(name, typedArgs, config);
       if (isCdnTool(name)) return handleCdnCall(name, typedArgs, config);
@@ -225,7 +248,7 @@ export async function main(): Promise<void> {
           return createErrorResponse(
             'CEM not yet loaded — server is still initializing. Please retry.',
           );
-        return handleStoryCall(name, typedArgs, cemCache);
+        return handleStoryCall(name, typedArgs, resolveCem(libraryId, cemCache));
       }
       if (isFrameworkTool(name)) return handleFrameworkCall(name, typedArgs, config);
       if (isValidateTool(name)) {
@@ -233,8 +256,9 @@ export async function main(): Promise<void> {
           return createErrorResponse(
             'CEM not yet loaded — server is still initializing. Please retry.',
           );
-        return handleValidateCall(name, typedArgs, cemCache);
+        return handleValidateCall(name, typedArgs, resolveCem(libraryId, cemCache));
       }
+      if (isBenchmarkTool(name)) return handleBenchmarkCall(name, typedArgs, config);
       if (isTokenTool(name)) {
         if (!config.tokensPath) {
           return createErrorResponse(

@@ -11,7 +11,7 @@
 
 **Verdict: CONDITIONAL PASS**
 
-The wc-mcp codebase is well-architected with strong security fundamentals, consistent error handling patterns, and 100% schema validation coverage across all 28 MCP tools. Two items block an unconditional PASS: 8 ESLint errors (non-null assertions and an unused variable) that fail `pnpm run lint`, and 1 failing integration test due to a server name mismatch (`wc-tools` vs `wc-mcp`). With these resolved, the codebase is ready for npm publish.
+The wc-mcp codebase is well-architected with strong security fundamentals, consistent error handling patterns, and 100% schema validation coverage across all 28 MCP tools. Two items block an unconditional PASS: 8 ESLint errors (non-null assertions and an unused variable) that fail `pnpm run lint`, and 1 failing integration test due to a server name mismatch (`helixir` vs `wc-mcp`). With these resolved, the codebase is ready for npm publish.
 
 ---
 
@@ -102,7 +102,7 @@ src/handlers/story.ts:136:19    — @typescript-eslint/no-non-null-assertion
 FAIL  tests/integration/server.test.ts
   — "responds to initialize with server info and capabilities"
   — Expected serverInfo.name: "wc-mcp"
-  — Received serverInfo.name: "wc-tools"
+  — Received serverInfo.name: "helixir"
 ```
 
 **`pnpm run build`**: PASS (exit 0)
@@ -240,7 +240,7 @@ Note: Coverage report table did not render in this run. The `@vitest/coverage-v8
 
 **File**: `src/index.ts:79` vs `tests/integration/server.test.ts:106`
 
-The server is initialized with `name: 'wc-tools'` but the test expects `name: 'wc-mcp'`. One or the other needs to be updated. Given `package.json` names the package `wc-mcp`, the server name should likely match.
+The server is initialized with `name: 'helixir'` but the test expects `name: 'wc-mcp'`. One or the other needs to be updated. Given `package.json` names the package `wc-mcp`, the server name should likely match.
 
 **Fix**: Either update `src/index.ts` line 79 to `name: 'wc-mcp'` or update the test expectation. Decide which is the canonical name.
 
@@ -292,7 +292,7 @@ The wc-mcp codebase demonstrates strong engineering fundamentals:
 
 **Conditions for PASS (must fix before npm publish):**
 
-1. Resolve server name mismatch (`wc-tools` vs `wc-mcp`) — 1 line change
+1. Resolve server name mismatch (`helixir` vs `wc-mcp`) — 1 line change
 2. Fix 8 ESLint errors — ~15 minutes of work
 3. Verify test suite is fully green (565/565)
 

@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `wc-tools` will be documented in this file.
+All notable changes to `helixir` (formerly `wc-tools`) will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -16,7 +16,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 - Multi-library support: Shoelace, Lit, Stencil, FAST, Spectrum, Material, Vaadin, Carbon, Ionic, Lion, Fluent UI, and PatternFly.
 - CDN CEM resolution via `resolve_cdn_cem` — fetch and cache CEM files from unpkg/jsDelivr without a local install.
 - Watch mode (`--watch`) — automatically reloads the CEM when the source file changes.
-- `wc-tools init` CLI command — interactive setup wizard to generate a `mcpwc.config.json`.
+- `helixir init` CLI command — interactive setup wizard to generate a `mcpwc.config.json`.
 
 **Discovery tools**
 

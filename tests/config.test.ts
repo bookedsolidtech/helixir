@@ -148,9 +148,7 @@ describe('loadConfig', () => {
       try {
         expect(() => loadConfig()).not.toThrow();
         expect(stderrSpy).toHaveBeenCalledWith(
-          expect.stringContaining(
-            '[wc-tools] Warning: mcpwc.config.json is malformed. Using defaults.',
-          ),
+          '[helixir] Warning: mcpwc.config.json is malformed. Using defaults.\n',
         );
       } finally {
         stderrSpy.mockRestore();

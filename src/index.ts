@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Entry point for the wc-tools binary.
+ * Entry point for the helixir binary.
  * Dispatches to the MCP server or CLI subcommands based on argv.
  *
  * - No subcommand / `serve`: starts MCP stdio server (backwards compat)

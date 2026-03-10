@@ -1,5 +1,5 @@
 /**
- * @wc-tools/core — barrel exports for all handlers, shared utilities, and tool definitions.
+ * @helixir/core — barrel exports for all handlers, shared utilities, and tool definitions.
  *
  * Note: tools/discovery exports a `scoreComponent` search-scoring function that conflicts
  * with the health `scoreComponent` function from handlers. The handlers version is exported

@@ -349,7 +349,7 @@ Place this file at the root of your component library project (or wherever `MCP_
 | `healthHistoryDir` | `string`         | `".mcp-wc/health"`       | Directory where health snapshots are stored, relative to `projectRoot`.                                                                              |
 | `tsconfigPath`     | `string`         | `"tsconfig.json"`        | Path to the project's `tsconfig.json`, relative to `projectRoot`.                                                                                    |
 | `tokensPath`       | `string \| null` | `null`                   | Path to a design tokens JSON file. Set to `null` to disable token tools.                                                                             |
-| `cdnBase`          | `string \| null` | `null`                   | Base URL for CDN import snippets in `suggest_usage` output (e.g. for Shoelace via CDN). Does not affect `resolve_cdn_cem`. Set to `null` to disable. |
+| `cdnBase`          | `string \| null` | `null`                   | Base URL prepended to component paths when generating CDN `<script>` and `<link>` tags in `suggest_usage` output (e.g. `"https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2/cdn"`). Does not affect `resolve_cdn_cem`. Set to `null` to disable CDN suggestions. |
 | `watch`            | `boolean`        | `false`                  | When `true`, HELiXiR automatically reloads the CEM on file changes.                                                                                  |
 
 **Full example:**
@@ -362,7 +362,7 @@ Place this file at the root of your component library project (or wherever `MCP_
   "healthHistoryDir": ".mcp-wc/health",
   "tsconfigPath": "tsconfig.build.json",
   "tokensPath": "dist/tokens/tokens.json",
-  "cdnBase": null
+  "cdnBase": "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2/cdn"
 }
 ```
 

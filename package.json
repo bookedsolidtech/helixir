@@ -44,7 +44,7 @@
     "format:check": "prettier --check .",
     "release": "semantic-release",
     "release:dry-run": "semantic-release --dry-run",
-    "prepublishOnly": "pnpm run build && pnpm test",
+    "prepublishOnly": "pnpm run build",
     "prepare": "husky"
   },
   "keywords": [

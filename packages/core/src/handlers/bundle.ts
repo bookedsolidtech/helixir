@@ -88,8 +88,22 @@ interface NpmRegistryResponse {
 }
 
 /**
- * Derives an npm package name from the configured componentPrefix.
- * Returns null when no mapping can be determined.
+ * Derives an npm package name from the configured `componentPrefix`.
+ *
+ * Uses a built-in map of well-known prefixes to npm packages:
+ * - `"sl"` → `@shoelace-style/shoelace`
+ * - `"fluent-"` → `@fluentui/web-components`
+ * - `"mwc-"` → `@material/web`
+ * - `"ion-"` → `@ionic/core`
+ * - `"vaadin-"` → `@vaadin/components`
+ * - `"lion-"` → `@lion/ui`
+ * - `"pf-"` → `@patternfly/elements`
+ * - `"carbon-"` → `@carbon/web-components`
+ *
+ * Returns `null` when the prefix does not match any known mapping.
+ * In that case, callers should provide the npm package name explicitly
+ * via the `package` parameter.
+ *
  * Exported for testing.
  */
 export function derivePackageFromPrefix(prefix: string): string | null {
@@ -195,9 +209,16 @@ export async function fetchNpmRegistrySize(
 /**
  * Estimates the bundle size for a given web component tag name.
  *
+ * **Package name resolution order:**
+ * 1. If `packageOverride` is provided, it is used directly.
+ * 2. Otherwise, the package is derived from `config.componentPrefix` via
+ *    {@link derivePackageFromPrefix} (see that function for the full prefix→package map).
+ * 3. If neither resolves a package name, a `VALIDATION` error is thrown.
+ *
  * @param tagName - The custom element tag name (e.g. "sl-button")
- * @param config  - Loaded MCP config (used to derive the npm package name)
- * @param packageOverride - Optional explicit npm package name (skips auto-detection)
+ * @param config  - Loaded MCP config (used to derive the npm package name via `componentPrefix`)
+ * @param packageOverride - Optional explicit npm package name (e.g. "@shoelace-style/shoelace").
+ *                          When provided, skips the prefix-based auto-detection.
  * @param version - Package version to query; defaults to "latest"
  */
 export async function estimateBundleSize(

@@ -310,6 +310,23 @@ All tools are exposed over the [Model Context Protocol](https://modelcontextprot
 | ---------------------- | ------------------------------------------------------------------------------------------- | ------------- |
 | `estimate_bundle_size` | Estimates minified + gzipped bundle size for a component's npm package via bundlephobia/npm | `tagName`     |
 
+**`package` parameter derivation:**
+
+The `estimate_bundle_size` tool accepts an optional `package` argument — the npm package name to look up (e.g. `"@shoelace-style/shoelace"`). When omitted, the tool derives the package name from your `componentPrefix` config value using a built-in prefix-to-package map:
+
+| Prefix    | npm Package                |
+| --------- | -------------------------- |
+| `sl`      | `@shoelace-style/shoelace` |
+| `fluent-` | `@fluentui/web-components` |
+| `mwc-`    | `@material/web`            |
+| `ion-`    | `@ionic/core`              |
+| `vaadin-` | `@vaadin/components`       |
+| `lion-`   | `@lion/ui`                 |
+| `pf-`     | `@patternfly/elements`     |
+| `carbon-` | `@carbon/web-components`   |
+
+If your prefix is **not** in the list above and you omit `package`, the tool returns a `VALIDATION` error. In that case, pass the `package` argument explicitly.
+
 ### Benchmark
 
 | Tool                  | Description                                                                                                                  | Required Args |

@@ -608,4 +608,4 @@ Issues and feature requests are welcome on GitHub.
 
 ## License
 
-MIT © Jake Strawn
+MIT © 2025-2026 Clarity House LLC d/b/a Booked Solid Technology

@@ -79,8 +79,8 @@ export async function parseTokens(filePath: string): Promise<DesignToken[]> {
   if (!validated.success) {
     const issues = validated.error.issues.map((i) => i.message).join('; ');
     throw new MCPError(
-      `Tokens file has invalid structure: ${filePath} — ${issues}`,
-      ErrorCategory.VALIDATION,
+      `[INVALID_INPUT] Tokens file has invalid structure: ${filePath} — ${issues}`,
+      ErrorCategory.INVALID_INPUT,
     );
   }
 

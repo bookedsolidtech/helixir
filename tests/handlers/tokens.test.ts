@@ -1,18 +1,36 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterAll } from 'vitest';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
+import { writeFileSync, unlinkSync } from 'node:fs';
 import {
   parseTokens,
   getDesignTokens,
   findToken,
   findComponentsUsingToken,
 } from '../../packages/core/src/handlers/tokens.js';
+import { MCPError, ErrorCategory } from '../../packages/core/src/shared/error-handling.js';
 import type { McpWcConfig } from '../../packages/core/src/config.js';
 import type { Cem } from '../../packages/core/src/handlers/cem.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_TOKENS_PATH = resolve(__dirname, '../__fixtures__/tokens.json');
 const NONEXISTENT_PATH = resolve(__dirname, '../__fixtures__/does-not-exist.json');
+
+// Temporary malformed fixture files for validation tests
+const MALFORMED_ARRAY_PATH = resolve(__dirname, '../__fixtures__/tokens-malformed-array.json');
+const MALFORMED_PRIMITIVE_PATH = resolve(__dirname, '../__fixtures__/tokens-malformed-primitive.json');
+const MALFORMED_INVALID_JSON_PATH = resolve(__dirname, '../__fixtures__/tokens-malformed-invalid.json');
+
+// Create temporary malformed fixtures
+writeFileSync(MALFORMED_ARRAY_PATH, '[1, 2, 3]');
+writeFileSync(MALFORMED_PRIMITIVE_PATH, '"just a string"');
+writeFileSync(MALFORMED_INVALID_JSON_PATH, '{not valid json!!!');
+
+afterAll(() => {
+  try { unlinkSync(MALFORMED_ARRAY_PATH); } catch { /* ignore */ }
+  try { unlinkSync(MALFORMED_PRIMITIVE_PATH); } catch { /* ignore */ }
+  try { unlinkSync(MALFORMED_INVALID_JSON_PATH); } catch { /* ignore */ }
+});
 
 function makeConfig(tokensPath: string): McpWcConfig {
   return {
@@ -91,6 +109,43 @@ describe('parseTokens', () => {
 
   it('throws an error when the file does not exist', async () => {
     await expect(parseTokens(NONEXISTENT_PATH)).rejects.toThrow(/not found/i);
+  });
+
+  it('throws INVALID_INPUT error for a JSON array token file', async () => {
+    try {
+      await parseTokens(MALFORMED_ARRAY_PATH);
+      expect.fail('should have thrown');
+    } catch (err) {
+      expect(err).toBeInstanceOf(MCPError);
+      const mcpErr = err as MCPError;
+      expect(mcpErr.category).toBe(ErrorCategory.INVALID_INPUT);
+      expect(mcpErr.message).toContain('[INVALID_INPUT]');
+      expect(mcpErr.message).toContain('invalid structure');
+    }
+  });
+
+  it('throws INVALID_INPUT error for a JSON primitive token file', async () => {
+    try {
+      await parseTokens(MALFORMED_PRIMITIVE_PATH);
+      expect.fail('should have thrown');
+    } catch (err) {
+      expect(err).toBeInstanceOf(MCPError);
+      const mcpErr = err as MCPError;
+      expect(mcpErr.category).toBe(ErrorCategory.INVALID_INPUT);
+      expect(mcpErr.message).toContain('[INVALID_INPUT]');
+    }
+  });
+
+  it('throws VALIDATION error for invalid JSON syntax', async () => {
+    try {
+      await parseTokens(MALFORMED_INVALID_JSON_PATH);
+      expect.fail('should have thrown');
+    } catch (err) {
+      expect(err).toBeInstanceOf(MCPError);
+      const mcpErr = err as MCPError;
+      expect(mcpErr.category).toBe(ErrorCategory.VALIDATION);
+      expect(mcpErr.message).toContain('not valid JSON');
+    }
   });
 });
 

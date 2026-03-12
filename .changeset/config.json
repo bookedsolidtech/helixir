@@ -3,9 +3,9 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [],
-  "linked": [["helixir", "@helixir/core", "@helixir/github-action"]],
+  "linked": [],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": []
+  "ignore": ["@helixir/core", "@helixir/github-action"]
 }

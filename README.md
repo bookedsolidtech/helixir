@@ -362,7 +362,7 @@ Place this file at the root of your component library project (or wherever `MCP_
   "healthHistoryDir": ".mcp-wc/health",
   "tsconfigPath": "tsconfig.build.json",
   "tokensPath": "dist/tokens/tokens.json",
-  "cdnBase": "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2/cdn"
+  "cdnBase": "https://cdn.jsdelivr.net/npm"
 }
 ```
 

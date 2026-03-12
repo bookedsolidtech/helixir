@@ -1,6 +1,10 @@
+<div align="center">
+
 # HELiXiR
 
-> Give AI agents full situational awareness of any web component library.
+**Give AI agents full situational awareness of any web component library.**
+
+Stop AI hallucinations. Ground every component suggestion in your actual Custom Elements Manifest.
 
 [![npm version](https://img.shields.io/npm/v/helixir)](https://www.npmjs.com/package/helixir)
 [![npm downloads](https://img.shields.io/npm/dw/helixir)](https://www.npmjs.com/package/helixir)
@@ -9,6 +13,19 @@
 [![Build](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/helixir/build.yml?branch=main&label=build)](https://github.com/bookedsolidtech/helixir/actions/workflows/build.yml)
 [![Tests](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/helixir/test.yml?branch=main&label=tests)](https://github.com/bookedsolidtech/helixir/actions/workflows/test.yml)
 
+[Quick Start](#quick-start) · [Why HELiXiR](#why-helixir) · [Tools Reference](#tools-reference) · [Configuration](#configuration) · [AI Tool Configs](#ai-tool-configs)
+
+</div>
+
+---
+
+## Why HELiXiR
+
+- **No more hallucinations** — AI reads your real component API from the Custom Elements Manifest, not from training data. Every attribute, event, slot, and CSS part is sourced directly from your library.
+- **30+ MCP tools out of the box** — Component discovery, health scoring, design token lookup, TypeScript diagnostics, breaking-change detection, and Storybook story generation — all callable by any MCP-compatible AI agent.
+- **Works with any web component framework** — Shoelace, Lit, Stencil, FAST, Spectrum, Vaadin, and any library that produces a `custom-elements.json` CEM file.
+- **Any AI editor, zero lock-in** — Claude Code, Claude Desktop, Cursor, VS Code (Cline/Continue), Zed — one config, any tool.
+
 ---
 
 ## Quick Start
@@ -16,10 +33,12 @@
 **Under 60 seconds from zero to a component-aware AI agent.**
 
 ```bash
-# 1. Install globally (or use npx — no install required)
-npm install -g helixir
+npm install helixir
+```
 
-# 2. Generate a starter config in your component library
+Then generate a starter config in your component library:
+
+```bash
 npx helixir init
 # → writes mcpwc.config.json to the current directory
 ```
@@ -52,6 +71,12 @@ Add HELiXiR to your Claude Desktop config (see [AI Tool Configs](#ai-tool-config
 ```
 
 Restart Claude Desktop. Done — your AI agent now knows every property, event, slot, CSS part, and design token in your library.
+
+---
+
+## See It in Action
+
+> Once Claude Desktop is configured with HELiXiR, asking about any component returns verified, hallucination-free API documentation pulled directly from your `custom-elements.json`.
 
 ---
 

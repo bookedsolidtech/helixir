@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Gate: Auto-format (fix and commit any formatting drift)
+echo "Auto-formatting..."
+pnpm run format --silent 2>/dev/null || true
+if ! git diff --quiet; then
+  echo "Formatting applied — committing auto-format changes"
+  git add -u
+  git -c core.hooksPath=/dev/null commit -m "chore: auto-format"
+  echo "Format committed"
+else
+  echo "Format already clean"
+fi

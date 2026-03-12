@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.0
+
+### Minor Changes
+
+- 2308edf: - Migrate release pipeline from semantic-release to @changesets/cli for explicit per-PR version control
+  - Add Zod schema validation for design token files against the W3C DTCG spec
+  - Remove @semantic-release/\* dependencies; add @changesets/cli
+
+### Patch Changes
+
+- 03dabcf: Add root package to pnpm-workspace.yaml so changesets can resolve the helixir package during version and publish.
+
 All notable changes to `helixir` (formerly `wc-tools`) will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).

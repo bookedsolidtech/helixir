@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { buildNarrative } from '../../packages/core/src/handlers/narrative.js';
 import { handleComponentCall, isComponentTool } from '../../packages/core/src/tools/component.js';
 import type { McpWcConfig } from '../../packages/core/src/config.js';
+import { MCPError, ErrorCategory } from '../../packages/core/src/shared/error-handling.js';
 
 // Mock the CEM handler to avoid real file system reads
 vi.mock('../../packages/core/src/handlers/cem.js', () => ({
@@ -608,7 +609,7 @@ describe('handleComponentCall — get_prop_constraints', () => {
 
   it('returns error when component is not found', async () => {
     vi.mocked(parseCem).mockImplementation(() => {
-      throw new Error('Component "nonexistent-tag" not found in manifest.');
+      throw new MCPError('Component "nonexistent-tag" not found in CEM.', ErrorCategory.NOT_FOUND);
     });
 
     const result = await handleComponentCall(
@@ -618,6 +619,7 @@ describe('handleComponentCall — get_prop_constraints', () => {
       makeMockCem(),
     );
     expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('[NOT_FOUND]');
     expect(result.content[0].text).toContain('nonexistent-tag');
   });
 });
@@ -675,11 +677,7 @@ describe('handleComponentCall — find_components_by_token', () => {
   });
 
   it('returns multiple components when token matches several', async () => {
-    vi.mocked(findComponentsByToken).mockReturnValue([
-      'my-button',
-      'my-card',
-      'my-dialog',
-    ]);
+    vi.mocked(findComponentsByToken).mockReturnValue(['my-button', 'my-card', 'my-dialog']);
 
     const result = await handleComponentCall(
       'find_components_by_token',

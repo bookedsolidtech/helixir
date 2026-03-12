@@ -593,3 +593,113 @@ describe('generateImport — CDN mode for non-Shoelace library', () => {
     expect(result.cdnScriptLink).toContain('https://cdn.example.com/my-component-lib@1');
   });
 });
+
+// ---------------------------------------------------------------------------
+// suggestUsage — component with no members
+// ---------------------------------------------------------------------------
+
+describe('suggestUsage — component with no members', () => {
+  const noMembersCem = {
+    schemaVersion: '1.0.0',
+    modules: [
+      {
+        kind: 'javascript-module' as const,
+        path: 'src/x-empty.js',
+        declarations: [
+          {
+            kind: 'class' as const,
+            name: 'XEmpty',
+            tagName: 'x-empty',
+            members: [],
+            events: [],
+            slots: [],
+          },
+        ],
+      },
+    ],
+  };
+
+  it('returns empty requiredAttributes when component has no members', async () => {
+    const result = await suggestUsage('x-empty', makeConfig(), noMembersCem as never);
+    expect(result.requiredAttributes).toHaveLength(0);
+  });
+
+  it('returns empty optionalAttributes when component has no members', async () => {
+    const result = await suggestUsage('x-empty', makeConfig(), noMembersCem as never);
+    expect(result.optionalAttributes).toHaveLength(0);
+  });
+
+  it('returns empty variantOptions when component has no members', async () => {
+    const result = await suggestUsage('x-empty', makeConfig(), noMembersCem as never);
+    expect(Object.keys(result.variantOptions)).toHaveLength(0);
+  });
+
+  it('returns empty slots array when component has no slots', async () => {
+    const result = await suggestUsage('x-empty', makeConfig(), noMembersCem as never);
+    expect(result.slots).toHaveLength(0);
+  });
+
+  it('generates a simple open/close tag snippet with no attributes', async () => {
+    const result = await suggestUsage('x-empty', makeConfig(), noMembersCem as never);
+    expect(result.htmlSnippet).toBe('<x-empty></x-empty>');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// suggestUsage — component with no description (slots without descriptions)
+// ---------------------------------------------------------------------------
+
+describe('suggestUsage — component with no description', () => {
+  const noDescCem = {
+    schemaVersion: '1.0.0',
+    modules: [
+      {
+        kind: 'javascript-module' as const,
+        path: 'src/x-bare.js',
+        declarations: [
+          {
+            kind: 'class' as const,
+            name: 'XBare',
+            tagName: 'x-bare',
+            description: undefined,
+            members: [
+              {
+                kind: 'field' as const,
+                name: 'label',
+                type: { text: 'string' },
+              },
+            ],
+            events: [],
+            slots: [
+              { name: '', description: undefined },
+              { name: 'icon', description: undefined },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+
+  it('uses fallback "content" for default slot with no description', async () => {
+    const result = await suggestUsage('x-bare', makeConfig(), noDescCem as never);
+    expect(result.htmlSnippet).toContain('<!-- content -->');
+  });
+
+  it('uses slot name as fallback for named slot with no description', async () => {
+    const result = await suggestUsage('x-bare', makeConfig(), noDescCem as never);
+    expect(result.htmlSnippet).toContain('<!-- icon -->');
+  });
+
+  it('treats a required string field as a required attribute', async () => {
+    const result = await suggestUsage('x-bare', makeConfig(), noDescCem as never);
+    expect(result.requiredAttributes).toContain('label');
+    expect(result.htmlSnippet).toContain('label=""');
+  });
+
+  it('returns slot objects with empty description strings', async () => {
+    const result = await suggestUsage('x-bare', makeConfig(), noDescCem as never);
+    for (const slot of result.slots) {
+      expect(typeof slot.description).toBe('string');
+    }
+  });
+});

@@ -9,7 +9,7 @@
     "noUncheckedIndexedAccess": true,
     "declaration": true,
     "declarationMap": false,
-    "sourceMap": true,
+    "sourceMap": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true

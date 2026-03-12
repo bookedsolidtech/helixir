@@ -9,6 +9,7 @@ vi.mock('node:fs/promises', () => ({
 
 import { readdir } from 'node:fs/promises';
 import { getHealthTrend } from '../../packages/core/src/handlers/health.js';
+import { MCPError, ErrorCategory } from '../../packages/core/src/shared/error-handling.js';
 
 function makeConfig(): McpWcConfig {
   return {
@@ -33,10 +34,19 @@ describe('loadLatestHistoryFile — ENOENT vs non-ENOENT errors', () => {
     vi.mocked(readdir)
       .mockRejectedValueOnce(enoent) // namespaced dir → ENOENT → fall back
       .mockRejectedValueOnce(enoent); // legacy dir also missing → return null
-    // getHealthTrend throws "No health history found" (not a filesystem error) when null is returned
-    await expect(getHealthTrend(makeConfig(), 'my-button')).rejects.toThrow(
-      /No health history found for 'my-button'/,
-    );
+    // getHealthTrend throws MCPError with NOT_FOUND category when no history exists
+    const error = await getHealthTrend(makeConfig(), 'my-button').catch((e) => e);
+    expect(error).toBeInstanceOf(MCPError);
+    expect(error.category).toBe(ErrorCategory.NOT_FOUND);
+    expect(error.message).toMatch(/No health history found for 'my-button'/);
+  });
+
+  it('throws MCPError with NOT_FOUND when directory exists but has no history files', async () => {
+    vi.mocked(readdir).mockResolvedValueOnce([] as unknown as string[]);
+    const error = await getHealthTrend(makeConfig(), 'my-button').catch((e) => e);
+    expect(error).toBeInstanceOf(MCPError);
+    expect(error.category).toBe(ErrorCategory.NOT_FOUND);
+    expect(error.message).toMatch(/No health history files found for 'my-button'/);
   });
 
   it('surfaces EACCES error from namespaced dir without falling back to legacy path', async () => {

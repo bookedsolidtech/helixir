@@ -310,6 +310,23 @@ All tools are exposed over the [Model Context Protocol](https://modelcontextprot
 | ---------------------- | ------------------------------------------------------------------------------------------- | ------------- |
 | `estimate_bundle_size` | Estimates minified + gzipped bundle size for a component's npm package via bundlephobia/npm | `tagName`     |
 
+**`package` parameter derivation:**
+
+The `estimate_bundle_size` tool accepts an optional `package` argument — the npm package name to look up (e.g. `"@shoelace-style/shoelace"`). When omitted, the tool derives the package name from your `componentPrefix` config value using a built-in prefix-to-package map:
+
+| Prefix    | npm Package                |
+| --------- | -------------------------- |
+| `sl`      | `@shoelace-style/shoelace` |
+| `fluent-` | `@fluentui/web-components` |
+| `mwc-`    | `@material/web`            |
+| `ion-`    | `@ionic/core`              |
+| `vaadin-` | `@vaadin/components`       |
+| `lion-`   | `@lion/ui`                 |
+| `pf-`     | `@patternfly/elements`     |
+| `carbon-` | `@carbon/web-components`   |
+
+If your prefix is **not** in the list above and you omit `package`, the tool returns a `VALIDATION` error. In that case, pass the `package` argument explicitly.
+
 ### Benchmark
 
 | Tool                  | Description                                                                                                                  | Required Args |
@@ -341,16 +358,16 @@ Configuration is resolved in priority order: **environment variables > `mcpwc.co
 
 Place this file at the root of your component library project (or wherever `MCP_WC_PROJECT_ROOT` points).
 
-| Key                | Type             | Default                  | Description                                                                                                                                          |
-| ------------------ | ---------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `cemPath`          | `string`         | `"custom-elements.json"` | Path to the Custom Elements Manifest, relative to `projectRoot`. Auto-discovered if omitted.                                                         |
-| `projectRoot`      | `string`         | `process.cwd()`          | Absolute path to the component library project root.                                                                                                 |
-| `componentPrefix`  | `string`         | `""`                     | Optional tag-name prefix (e.g. `"sl-"`) to scope component discovery.                                                                                |
-| `healthHistoryDir` | `string`         | `".mcp-wc/health"`       | Directory where health snapshots are stored, relative to `projectRoot`.                                                                              |
-| `tsconfigPath`     | `string`         | `"tsconfig.json"`        | Path to the project's `tsconfig.json`, relative to `projectRoot`.                                                                                    |
-| `tokensPath`       | `string \| null` | `null`                   | Path to a design tokens JSON file. Set to `null` to disable token tools.                                                                             |
-| `cdnBase`          | `string \| null` | `null`                   | Base URL for CDN import snippets in `suggest_usage` output (e.g. for Shoelace via CDN). Does not affect `resolve_cdn_cem`. Set to `null` to disable. |
-| `watch`            | `boolean`        | `false`                  | When `true`, HELiXiR automatically reloads the CEM on file changes.                                                                                  |
+| Key                | Type             | Default                  | Description                                                                                                                                                                                                                                                           |
+| ------------------ | ---------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cemPath`          | `string`         | `"custom-elements.json"` | Path to the Custom Elements Manifest, relative to `projectRoot`. Auto-discovered if omitted.                                                                                                                                                                          |
+| `projectRoot`      | `string`         | `process.cwd()`          | Absolute path to the component library project root.                                                                                                                                                                                                                  |
+| `componentPrefix`  | `string`         | `""`                     | Optional tag-name prefix (e.g. `"sl-"`) to scope component discovery.                                                                                                                                                                                                 |
+| `healthHistoryDir` | `string`         | `".mcp-wc/health"`       | Directory where health snapshots are stored, relative to `projectRoot`.                                                                                                                                                                                               |
+| `tsconfigPath`     | `string`         | `"tsconfig.json"`        | Path to the project's `tsconfig.json`, relative to `projectRoot`.                                                                                                                                                                                                     |
+| `tokensPath`       | `string \| null` | `null`                   | Path to a design tokens JSON file. Set to `null` to disable token tools.                                                                                                                                                                                              |
+| `cdnBase`          | `string \| null` | `null`                   | Base URL prepended to component paths when generating CDN `<script>` and `<link>` tags in `suggest_usage` output (e.g. `"https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2/cdn"`). Does not affect `resolve_cdn_cem`. Set to `null` to disable CDN suggestions. |
+| `watch`            | `boolean`        | `false`                  | When `true`, HELiXiR automatically reloads the CEM on file changes.                                                                                                                                                                                                   |
 
 **Full example:**
 
@@ -362,7 +379,7 @@ Place this file at the root of your component library project (or wherever `MCP_
   "healthHistoryDir": ".mcp-wc/health",
   "tsconfigPath": "tsconfig.build.json",
   "tokensPath": "dist/tokens/tokens.json",
-  "cdnBase": null
+  "cdnBase": "https://cdn.jsdelivr.net/npm"
 }
 ```
 

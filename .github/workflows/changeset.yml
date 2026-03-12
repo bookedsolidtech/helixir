@@ -4,6 +4,10 @@ on:
   pull_request:
     branches: [main, dev, staging]
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   changeset:
     name: Changeset Required
@@ -16,7 +20,7 @@ jobs:
       - name: Check for changeset
         run: |
           LABELS='${{ toJson(github.event.pull_request.labels.*.name) }}'
-          if echo "$LABELS" | grep -q "skip-changeset"; then
+          if echo "$LABELS" | jq -e 'index("skip-changeset") != null' > /dev/null 2>&1; then
             echo "Label 'skip-changeset' found — bypassing."
             exit 0
           fi

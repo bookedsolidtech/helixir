@@ -18,8 +18,14 @@ const NONEXISTENT_PATH = resolve(__dirname, '../__fixtures__/does-not-exist.json
 
 // Temporary malformed fixture files for validation tests
 const MALFORMED_ARRAY_PATH = resolve(__dirname, '../__fixtures__/tokens-malformed-array.json');
-const MALFORMED_PRIMITIVE_PATH = resolve(__dirname, '../__fixtures__/tokens-malformed-primitive.json');
-const MALFORMED_INVALID_JSON_PATH = resolve(__dirname, '../__fixtures__/tokens-malformed-invalid.json');
+const MALFORMED_PRIMITIVE_PATH = resolve(
+  __dirname,
+  '../__fixtures__/tokens-malformed-primitive.json',
+);
+const MALFORMED_INVALID_JSON_PATH = resolve(
+  __dirname,
+  '../__fixtures__/tokens-malformed-invalid.json',
+);
 
 // Create temporary malformed fixtures
 writeFileSync(MALFORMED_ARRAY_PATH, '[1, 2, 3]');
@@ -27,9 +33,21 @@ writeFileSync(MALFORMED_PRIMITIVE_PATH, '"just a string"');
 writeFileSync(MALFORMED_INVALID_JSON_PATH, '{not valid json!!!');
 
 afterAll(() => {
-  try { unlinkSync(MALFORMED_ARRAY_PATH); } catch { /* ignore */ }
-  try { unlinkSync(MALFORMED_PRIMITIVE_PATH); } catch { /* ignore */ }
-  try { unlinkSync(MALFORMED_INVALID_JSON_PATH); } catch { /* ignore */ }
+  try {
+    unlinkSync(MALFORMED_ARRAY_PATH);
+  } catch {
+    /* ignore */
+  }
+  try {
+    unlinkSync(MALFORMED_PRIMITIVE_PATH);
+  } catch {
+    /* ignore */
+  }
+  try {
+    unlinkSync(MALFORMED_INVALID_JSON_PATH);
+  } catch {
+    /* ignore */
+  }
 });
 
 function makeConfig(tokensPath: string): McpWcConfig {

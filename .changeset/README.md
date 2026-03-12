@@ -11,6 +11,7 @@ npx changeset
 ```
 
 This will prompt you to:
+
 1. Select the affected packages (`helixir`, `@helixir/core`, `@helixir/github-action`)
 2. Choose the bump type (`patch`, `minor`, or `major`)
 3. Write a summary of the change

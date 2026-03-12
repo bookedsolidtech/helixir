@@ -579,6 +579,47 @@ describe('handleComponentCall — get_prop_constraints', () => {
     );
     expect(result.isError).toBe(true);
   });
+
+  it('returns constraints for a property with no constraints defined', async () => {
+    vi.mocked(parseCem).mockReturnValue({
+      tagName: 'my-button',
+      name: 'MyButton',
+      description: '',
+      members: [{ name: 'loading', kind: 'field' }],
+      events: [],
+      slots: [],
+      cssProperties: [],
+      cssParts: [],
+    });
+    vi.mocked(formatPropConstraints).mockReturnValue({
+      type: 'unknown',
+      values: [],
+    });
+
+    const result = await handleComponentCall(
+      'get_prop_constraints',
+      { tagName: 'my-button', attributeName: 'loading' },
+      makeConfig(),
+      makeMockCem(),
+    );
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text).toContain('unknown');
+  });
+
+  it('returns error when component is not found', async () => {
+    vi.mocked(parseCem).mockImplementation(() => {
+      throw new Error('Component "nonexistent-tag" not found in manifest.');
+    });
+
+    const result = await handleComponentCall(
+      'get_prop_constraints',
+      { tagName: 'nonexistent-tag', attributeName: 'variant' },
+      makeConfig(),
+      makeMockCem(),
+    );
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('nonexistent-tag');
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -618,6 +659,39 @@ describe('handleComponentCall — find_components_by_token', () => {
       makeMockCem(),
     );
     expect(result.isError).toBe(true);
+  });
+
+  it('returns empty result when token matches no components', async () => {
+    vi.mocked(findComponentsByToken).mockReturnValue([]);
+
+    const result = await handleComponentCall(
+      'find_components_by_token',
+      { tokenName: '--nonexistent-token', partialMatch: false },
+      makeConfig(),
+      makeMockCem(),
+    );
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text).toContain('[]');
+  });
+
+  it('returns multiple components when token matches several', async () => {
+    vi.mocked(findComponentsByToken).mockReturnValue([
+      'my-button',
+      'my-card',
+      'my-dialog',
+    ]);
+
+    const result = await handleComponentCall(
+      'find_components_by_token',
+      { tokenName: '--shared-color', partialMatch: true },
+      makeConfig(),
+      makeMockCem(),
+    );
+    expect(result.isError).toBeFalsy();
+    const text = result.content[0].text;
+    expect(text).toContain('my-button');
+    expect(text).toContain('my-card');
+    expect(text).toContain('my-dialog');
   });
 });
 

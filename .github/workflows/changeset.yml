@@ -1,0 +1,34 @@
+name: Changeset Required
+
+on:
+  pull_request:
+    branches: [main, dev, staging]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  changeset:
+    name: Changeset Required
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check for changeset
+        run: |
+          LABELS='${{ toJson(github.event.pull_request.labels.*.name) }}'
+          if echo "$LABELS" | jq -e 'index("skip-changeset") != null' > /dev/null 2>&1; then
+            echo "Label 'skip-changeset' found — bypassing."
+            exit 0
+          fi
+          CHANGED=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD" \
+            | grep '^\.changeset/.*\.md$' | grep -v 'README\.md' || true)
+          if [ -z "$CHANGED" ]; then
+            echo "::error::No changeset found. Run: npx changeset"
+            echo "Or add label 'skip-changeset' for infra-only changes."
+            exit 1
+          fi
+          echo "Changeset found: $CHANGED"

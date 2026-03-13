@@ -39,6 +39,7 @@ Save this as the **latest version**.
 ### 3. Compare versions
 
 - If the installed version equals the latest version, tell the user:
+
   > "helixir is already up to date (vX.Y.Z). No update needed."
 
   Then stop — do not run the update.

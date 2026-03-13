@@ -9,10 +9,10 @@ packages from this org), read this first.
 
 ## TL;DR — The Two Models
 
-| Project                    | Tool               | How it works                                                   |
-| -------------------------- | ------------------ | -------------------------------------------------------------- |
-| **HELiX** (`@helixui/*`)   | `@changesets/cli`  | Explicit per-PR changeset files → version PR → merge → publish |
-| **HELiXiR** (`helixir`) | `@changesets/cli` | Explicit per-PR changeset files → version PR → merge → publish |
+| Project                  | Tool              | How it works                                                   |
+| ------------------------ | ----------------- | -------------------------------------------------------------- |
+| **HELiX** (`@helixui/*`) | `@changesets/cli` | Explicit per-PR changeset files → version PR → merge → publish |
+| **HELiXiR** (`helixir`)  | `@changesets/cli` | Explicit per-PR changeset files → version PR → merge → publish |
 
 Both are valid. This doc covers **both**, with the hard-won lessons from HELiX applied to HELiXiR.
 

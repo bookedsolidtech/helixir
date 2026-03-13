@@ -3,6 +3,11 @@
  * source files to detect real accessibility implementations (ARIA bindings,
  * keyboard handlers, focus management, form internals, live regions).
  *
+ * Two scanning modes:
+ *   1. Single-file scan (Phase 2) — fast, reads only the component's own file
+ *   2. Deep chain scan (Phase 3) — follows CEM superclass/mixin declarations
+ *      and source imports to scan the full inheritance chain
+ *
  * Zero new dependencies. Works with ANY web component framework (Lit, FAST,
  * Stencil, vanilla) by scanning for framework-agnostic patterns.
  */
@@ -14,6 +19,7 @@ import type { McpWcConfig } from '../../config.js';
 import type { Cem, CemDeclaration } from '../cem.js';
 import { getDeclarationSourcePath } from '../cem.js';
 import type { SubMetric } from '../dimensions.js';
+import { resolveInheritanceChain } from './mixin-resolver.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -31,6 +37,23 @@ export interface SourceAccessibilityResult {
   score: number;
   confidence: 'heuristic';
   subMetrics: SubMetric[];
+}
+
+export interface DeepSourceAccessibilityResult extends SourceAccessibilityResult {
+  /** Number of source files scanned in the inheritance chain */
+  chainDepth: number;
+  /** Architecture style detected */
+  architecture: 'inline' | 'mixin-heavy' | 'controller-based' | 'hybrid';
+  /** Names of mixins/superclasses that contributed to the score */
+  contributors: string[];
+  /** Names of mixins/superclasses that could not be resolved */
+  unresolved: string[];
+  /** Per-source breakdown showing which file contributed which patterns */
+  sourceBreakdown: Array<{
+    name: string;
+    type: 'component' | 'superclass' | 'mixin' | 'import';
+    categories: string[];
+  }>;
 }
 
 // ─── Pattern Registry ────────────────────────────────────────────────────────
@@ -154,49 +177,56 @@ async function tryReadFile(filePath: string): Promise<string | null> {
 }
 
 /**
+ * Resolves the source file path for a component using multiple strategies.
+ * Returns the absolute path to the source file, or null if not found.
+ */
+export function resolveComponentSourceFilePath(
+  projectRoot: string,
+  modulePath: string,
+): string | null {
+  const baseName = modulePath.replace(/\.js$/, '');
+
+  const candidates = [
+    resolve(projectRoot, baseName + '.ts'),
+    resolve(projectRoot, modulePath),
+    resolve(projectRoot, 'src', baseName + '.component.ts'),
+    resolve(projectRoot, 'src', baseName + '.ts'),
+    resolve(projectRoot, 'src', modulePath),
+  ];
+
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) return candidate;
+  }
+  return null;
+}
+
+/**
  * Resolves and reads the source file for a component.
  * Tries multiple resolution strategies to find real source:
  *   1. Direct path with .ts extension
  *   2. Direct path as-is (.js)
- *   3. src/ prefix (for repos where CEM points to dist/ paths)
- *   4. src/ prefix with .component.ts suffix (Shoelace pattern)
+ *   3. src/ prefix + .component.ts (Shoelace convention)
+ *   4. src/ prefix with .ts
+ *   5. src/ prefix with .js
  */
 async function readComponentSource(
   config: McpWcConfig,
   cem: Cem,
   decl: CemDeclaration,
-): Promise<string | null> {
+): Promise<{ content: string; filePath: string } | null> {
   const tagName = decl.tagName;
   if (!tagName) return null;
 
   const modulePath = getDeclarationSourcePath(cem, tagName);
   if (!modulePath) return null;
 
-  const root = config.projectRoot;
-  const baseName = modulePath.replace(/\.js$/, '');
+  const filePath = resolveComponentSourceFilePath(config.projectRoot, modulePath);
+  if (!filePath) return null;
 
-  // Strategy 1: Direct .ts
-  const result1 = await tryReadFile(resolve(root, baseName + '.ts'));
-  if (result1) return result1;
+  const content = await tryReadFile(filePath);
+  if (!content) return null;
 
-  // Strategy 2: Direct .js
-  const result2 = await tryReadFile(resolve(root, modulePath));
-  if (result2) return result2;
-
-  // Strategy 3: src/ prefix + .component.ts (Shoelace convention — check before bare .ts
-  //   because src/X.ts is often a barrel re-export, while src/X.component.ts is the real source)
-  const result3 = await tryReadFile(resolve(root, 'src', baseName + '.component.ts'));
-  if (result3) return result3;
-
-  // Strategy 4: src/ prefix with .ts
-  const result4 = await tryReadFile(resolve(root, 'src', baseName + '.ts'));
-  if (result4) return result4;
-
-  // Strategy 5: src/ prefix with .js
-  const result5 = await tryReadFile(resolve(root, 'src', modulePath));
-  if (result5) return result5;
-
-  return null;
+  return { content, filePath };
 }
 
 // ─── Public API ──────────────────────────────────────────────────────────────
@@ -234,7 +264,7 @@ export function isInteractiveComponent(
 }
 
 /**
- * Analyzes source-level accessibility for a component.
+ * Analyzes source-level accessibility for a component (single-file mode).
  * Returns null if:
  * - Source file is not available (graceful degradation)
  * - Component is presentational/non-interactive (honest scoring — don't penalize
@@ -245,13 +275,92 @@ export async function analyzeSourceAccessibility(
   cem: Cem,
   decl: CemDeclaration,
 ): Promise<SourceAccessibilityResult | null> {
-  const source = await readComponentSource(config, cem, decl);
-  if (!source) return null;
+  const result = await readComponentSource(config, cem, decl);
+  if (!result) return null;
 
-  const markers = scanSourceForA11yPatterns(source);
+  const markers = scanSourceForA11yPatterns(result.content);
 
   // Don't score presentational components — they don't need a11y patterns
-  if (!isInteractiveComponent(markers, decl, source)) return null;
+  if (!isInteractiveComponent(markers, decl, result.content)) return null;
 
   return scoreSourceMarkers(markers);
+}
+
+/**
+ * Deep source-level accessibility analysis — follows the full inheritance chain
+ * (superclass, mixins, a11y-relevant imports) to score accessibility patterns
+ * across ALL source files that contribute to a component's behavior.
+ *
+ * This mode solves the blind spot where libraries like Lion and Vaadin implement
+ * accessibility in shared mixins/base classes rather than in each component file.
+ *
+ * Returns null if:
+ * - Source file is not available
+ * - Component is presentational/non-interactive
+ */
+export async function analyzeSourceAccessibilityDeep(
+  config: McpWcConfig,
+  cem: Cem,
+  decl: CemDeclaration,
+): Promise<DeepSourceAccessibilityResult | null> {
+  const result = await readComponentSource(config, cem, decl);
+  if (!result) return null;
+
+  // Resolve the full inheritance chain
+  const chain = await resolveInheritanceChain(
+    result.content,
+    result.filePath,
+    decl,
+    config.projectRoot,
+  );
+
+  // Use aggregated markers for interactivity check (chain-aware)
+  if (!isInteractiveComponent(chain.aggregatedMarkers, decl, result.content)) return null;
+
+  // Score using aggregated markers from the full chain
+  const scored = scoreSourceMarkers(chain.aggregatedMarkers);
+
+  // Build per-source breakdown
+  const sourceBreakdown = chain.sources.map((s) => ({
+    name: s.name,
+    type: s.type,
+    categories: Object.entries(s.markers)
+      .filter(([, v]) => v)
+      .map(([k]) => WEIGHTS[k as keyof SourceA11yMarkers]?.label ?? k),
+  }));
+
+  // Contributors = sources that actually had at least one a11y pattern
+  const contributors = chain.sources
+    .filter((s) => s.type !== 'component' && Object.values(s.markers).some(Boolean))
+    .map((s) => s.name);
+
+  // Enhance sub-metric notes with chain info
+  const enhancedSubMetrics = scored.subMetrics.map((m) => {
+    const markerKey = Object.keys(WEIGHTS).find(
+      (k) => WEIGHTS[k as keyof SourceA11yMarkers].label === m.name.replace('[Source] ', ''),
+    ) as keyof SourceA11yMarkers | undefined;
+
+    if (!markerKey || m.score === 0) return m;
+
+    // Find which sources contributed this pattern
+    const contributingSources = chain.sources
+      .filter((s) => s.markers[markerKey])
+      .map((s) => `${s.name} (${s.type})`);
+
+    return {
+      ...m,
+      note: `Found in: ${contributingSources.join(', ')}`,
+    };
+  });
+
+  return {
+    score: scored.score,
+    confidence: 'heuristic',
+    subMetrics: enhancedSubMetrics,
+    chainDepth: chain.resolvedCount,
+    architecture: chain.architecture,
+    contributors,
+    unresolved: chain.unresolved,
+    sourceBreakdown,
+  };
 }

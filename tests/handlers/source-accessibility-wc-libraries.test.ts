@@ -188,8 +188,8 @@ function printReport(name: string, totalDecls: number, results: ReturnType<typeo
 const LIBRARIES: LibraryConfig[] = [
   {
     name: 'PatternFly Elements',
-    cemPath: resolve(WC_LIBS_ROOT, 'patternfly-elements/elements/custom-elements.json'),
-    sourceRoot: resolve(WC_LIBS_ROOT, 'patternfly-elements/elements'),
+    cemPath: resolve(WC_LIBS_ROOT, 'patternfly/elements/custom-elements.json'),
+    sourceRoot: resolve(WC_LIBS_ROOT, 'patternfly/elements'),
     prefix: 'pf',
   },
   {
@@ -200,14 +200,14 @@ const LIBRARIES: LibraryConfig[] = [
   },
   {
     name: 'Vaadin Web Components',
-    cemPath: resolve(WC_LIBS_ROOT, 'web-components/custom-elements.json'),
-    sourceRoot: resolve(WC_LIBS_ROOT, 'web-components'),
+    cemPath: resolve(WC_LIBS_ROOT, 'vaadin/custom-elements.json'),
+    sourceRoot: resolve(WC_LIBS_ROOT, 'vaadin'),
     prefix: 'vaadin',
   },
   {
     name: 'Spectrum Web Components (Adobe)',
-    cemPath: resolve(WC_LIBS_ROOT, 'spectrum-web-components/custom-elements.json'),
-    sourceRoot: resolve(WC_LIBS_ROOT, 'spectrum-web-components'),
+    cemPath: resolve(WC_LIBS_ROOT, 'spectrum/custom-elements.json'),
+    sourceRoot: resolve(WC_LIBS_ROOT, 'spectrum'),
     prefix: 'sp',
   },
   {

@@ -50,7 +50,8 @@
 - No HTTP transport — stdio only
 
 ## Git & PRs
-- Branch from `main`, squash-merge only
+- Branch from `dev`, standard merge commits only (squash and rebase merges are disabled on GitHub)
+- Always use `gh pr merge --merge` — NEVER `--squash` or `--rebase`
 - PR title: imperative, under 70 chars
 - Never commit `build/` directory
 - Never commit `node_modules/`

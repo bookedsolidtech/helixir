@@ -74,12 +74,6 @@ Restart Claude Desktop. Done — your AI agent now knows every property, event, 
 
 ---
 
-## See It in Action
-
-> Once Claude Desktop is configured with HELiXiR, asking about any component returns verified, hallucination-free API documentation pulled directly from your `custom-elements.json`.
-
----
-
 ## What You Get
 
 ### Without HELiXiR

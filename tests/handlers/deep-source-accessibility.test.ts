@@ -91,6 +91,42 @@ const LIBRARIES: LibraryConfig[] = [
     sourceRoot: resolve(WC_LIBS_ROOT, 'shoelace'),
     prefix: 'sl',
   },
+  {
+    name: 'Material Web (Google)',
+    cemPath: resolve(WC_LIBS_ROOT, 'material/custom-elements.json'),
+    sourceRoot: resolve(WC_LIBS_ROOT, 'material'),
+    prefix: 'md',
+  },
+  {
+    name: 'Carbon (IBM)',
+    cemPath: resolve(WC_LIBS_ROOT, 'carbon/custom-elements.json'),
+    sourceRoot: resolve(WC_LIBS_ROOT, 'carbon'),
+    prefix: 'cds',
+  },
+  {
+    name: 'Fluent UI (Microsoft)',
+    cemPath: resolve(WC_LIBS_ROOT, 'fluentui/custom-elements.json'),
+    sourceRoot: resolve(WC_LIBS_ROOT, 'fluentui'),
+    prefix: 'fluent',
+  },
+  {
+    name: 'Wired Elements',
+    cemPath: resolve(WC_LIBS_ROOT, 'wired/custom-elements.json'),
+    sourceRoot: resolve(WC_LIBS_ROOT, 'wired'),
+    prefix: 'wired',
+  },
+  {
+    name: 'Ionic',
+    cemPath: resolve(WC_LIBS_ROOT, 'ionic/custom-elements.json'),
+    sourceRoot: resolve(WC_LIBS_ROOT, 'ionic'),
+    prefix: 'ion',
+  },
+  {
+    name: 'Porsche Design System',
+    cemPath: resolve(WC_LIBS_ROOT, 'porsche/custom-elements.json'),
+    sourceRoot: resolve(WC_LIBS_ROOT, 'porsche'),
+    prefix: 'p',
+  },
 ];
 
 // ─── CEM Inheritance Metadata Tests ─────────────────────────────────────────

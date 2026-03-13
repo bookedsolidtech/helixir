@@ -13,7 +13,7 @@ const CemInheritedFromSchema = z.object({
 
 const CemMemberSchema = z.object({
   kind: z.string(),
-  name: z.string(),
+  name: z.string().default(''),
   type: z.object({ text: z.string() }).optional(),
   description: z.string().optional(),
   attribute: z.string().optional(),

@@ -1,7 +1,6 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 # CodeRabbit Configuration
 # https://docs.coderabbit.ai/getting-started/configure-coderabbit
-
-version: '2'
 
 reviews:
   profile: 'assertive'

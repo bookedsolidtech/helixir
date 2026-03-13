@@ -4,8 +4,22 @@ import { z } from 'zod';
 import { GitOperations } from '../shared/git.js';
 import type { McpWcConfig } from '../config.js';
 import { CemSchema } from './cem.js';
-import type { CemDeclaration } from './cem.js';
+import type { Cem, CemDeclaration } from './cem.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
+import { analyzeAccessibility } from './accessibility.js';
+import { analyzeTypeCoverage } from './analyzers/type-coverage.js';
+import { analyzeApiSurface } from './analyzers/api-surface.js';
+import { analyzeCssArchitecture } from './analyzers/css-architecture.js';
+import { analyzeEventArchitecture } from './analyzers/event-architecture.js';
+import { analyzeSourceAccessibility } from './analyzers/source-accessibility.js';
+import {
+  DIMENSION_REGISTRY,
+  calculateGrade,
+  computeWeightedScore,
+  type ConfidenceLevel,
+  type DimensionResult,
+  type SubMetric,
+} from './dimensions.js';
 
 // ─── Return types ────────────────────────────────────────────────────────────
 
@@ -634,4 +648,262 @@ export async function getHealthSummary(
     componentsNeedingAttention,
     timestamp: new Date().toISOString(),
   };
+}
+
+// ─── Multi-Dimensional Health Scoring ─────────────────────────────────────────
+
+export interface MultiDimensionalHealth {
+  tagName: string;
+  score: number;
+  grade: 'A' | 'B' | 'C' | 'D' | 'F';
+  dimensions: DimensionResult[];
+  confidenceSummary: { verified: number; heuristic: number; untested: number };
+  gradingNotes: string[];
+  issues: string[];
+  timestamp: string;
+}
+
+/**
+ * Converts the existing CEM completeness scoring (scoreCemFallback sub-metrics)
+ * into a normalized 0-100 score with sub-metrics.
+ */
+function scoreCemCompleteness(decl: CemDeclaration): { score: number; subMetrics: SubMetric[] } {
+  const subMetrics: SubMetric[] = [];
+
+  const hasDesc = typeof decl.description === 'string' && decl.description.trim().length > 0;
+  subMetrics.push({ name: 'Description present', score: hasDesc ? 15 : 0, maxScore: 15 });
+
+  const fields = (decl.members ?? []).filter((m) => m.kind === 'field');
+  const fieldsWithDesc = fields.filter(
+    (m) => typeof m.description === 'string' && m.description.trim().length > 0,
+  );
+  subMetrics.push({
+    name: 'Property descriptions',
+    score: proportional(fieldsWithDesc.length, fields.length, 25),
+    maxScore: 25,
+    note: `${fieldsWithDesc.length}/${fields.length}`,
+  });
+
+  const events = decl.events ?? [];
+  const eventsWithType = events.filter(
+    (e) => e.type && e.type.text && e.type.text.trim().length > 0,
+  );
+  subMetrics.push({
+    name: 'Event types',
+    score: proportional(eventsWithType.length, events.length, 20),
+    maxScore: 20,
+    note: `${eventsWithType.length}/${events.length}`,
+  });
+
+  const eventsWithDesc = events.filter(
+    (e) => typeof e.description === 'string' && e.description.trim().length > 0,
+  );
+  subMetrics.push({
+    name: 'Event descriptions',
+    score: proportional(eventsWithDesc.length, events.length, 15),
+    maxScore: 15,
+    note: `${eventsWithDesc.length}/${events.length}`,
+  });
+
+  const cssParts = decl.cssParts ?? [];
+  const cssPartsWithDesc = cssParts.filter(
+    (p) => typeof p.description === 'string' && p.description.trim().length > 0,
+  );
+  subMetrics.push({
+    name: 'CSS parts documented',
+    score: proportional(cssPartsWithDesc.length, cssParts.length, 15),
+    maxScore: 15,
+    note: `${cssPartsWithDesc.length}/${cssParts.length}`,
+  });
+
+  const slots = decl.slots ?? [];
+  const slotsWithDesc = slots.filter(
+    (s) => typeof s.description === 'string' && s.description.trim().length > 0,
+  );
+  subMetrics.push({
+    name: 'Slots documented',
+    score: proportional(slotsWithDesc.length, slots.length, 10),
+    maxScore: 10,
+    note: `${slotsWithDesc.length}/${slots.length}`,
+  });
+
+  const score = subMetrics.reduce((sum, m) => sum + m.score, 0);
+  return { score, subMetrics };
+}
+
+/**
+ * Scores a component across all 11 dimensions using the enterprise grade algorithm.
+ * CEM-native dimensions are computed from the declaration.
+ * External dimensions are checked via history files (reported as untested if unavailable).
+ */
+export async function scoreComponentMultiDimensional(
+  config: McpWcConfig,
+  decl: CemDeclaration,
+  cem?: Cem,
+  libraryId = 'default',
+): Promise<MultiDimensionalHealth> {
+  const tagName = decl.tagName ?? '';
+  const issues: string[] = [];
+  const dimensions: DimensionResult[] = [];
+
+  // Read history file to check for external dimension scores
+  let historyBreakdown: Record<string, { score: number; weight?: number; confidence?: string }> =
+    {};
+  try {
+    const history = await readLatestHistoryFile(config, tagName, libraryId);
+    if (history) {
+      historyBreakdown = history.breakdown;
+    }
+  } catch {
+    // No history available — external dimensions will be untested
+  }
+
+  for (const def of DIMENSION_REGISTRY) {
+    if (def.source === 'cem-native') {
+      const result = await scoreCemNativeDimension(def.name, decl, issues, config, cem);
+      dimensions.push({
+        name: def.name,
+        score: result.score,
+        weight: def.weight,
+        tier: def.tier,
+        confidence: result.confidence,
+        measured: true,
+        subMetrics: result.subMetrics,
+      });
+    } else {
+      // External dimension — check history files
+      const historyEntry = historyBreakdown[def.name];
+      if (historyEntry) {
+        dimensions.push({
+          name: def.name,
+          score: historyEntry.score,
+          weight: def.weight,
+          tier: def.tier,
+          confidence: (historyEntry.confidence as 'verified' | 'heuristic') ?? 'verified',
+          measured: true,
+        });
+      } else {
+        dimensions.push({
+          name: def.name,
+          score: 0,
+          weight: def.weight,
+          tier: def.tier,
+          confidence: 'untested',
+          measured: false,
+        });
+      }
+    }
+  }
+
+  // Compute weighted score and enterprise grade
+  const weightedScore = computeWeightedScore(dimensions);
+  const { grade, gradingNotes } = calculateGrade(weightedScore, dimensions);
+
+  // Confidence summary
+  const confidenceSummary = { verified: 0, heuristic: 0, untested: 0 };
+  for (const d of dimensions) {
+    confidenceSummary[d.confidence]++;
+  }
+
+  return {
+    tagName,
+    score: weightedScore,
+    grade,
+    dimensions,
+    confidenceSummary,
+    gradingNotes,
+    issues,
+    timestamp: new Date().toISOString(),
+  };
+}
+
+/**
+ * Dispatches CEM-native dimension scoring to the appropriate analyzer.
+ */
+async function scoreCemNativeDimension(
+  name: string,
+  decl: CemDeclaration,
+  issues: string[],
+  config?: McpWcConfig,
+  cem?: Cem,
+): Promise<{ score: number; confidence: ConfidenceLevel; subMetrics?: SubMetric[] }> {
+  switch (name) {
+    case 'CEM Completeness': {
+      const { score, subMetrics } = scoreCemCompleteness(decl);
+      if (score < 70) {
+        issues.push(`CEM documentation completeness is low (${score}%)`);
+      }
+      return { score, confidence: 'verified', subMetrics };
+    }
+
+    case 'Accessibility': {
+      const a11y = analyzeAccessibility(decl);
+      const cemSubMetrics: SubMetric[] = Object.entries(a11y.dimensions).map(([key, dim]) => ({
+        name: key,
+        score: dim.points,
+        maxScore: dim.maxPoints,
+        note: dim.note,
+      }));
+
+      // Source-based scoring — if source file is available, blend 30% CEM + 70% source
+      if (config && cem) {
+        const sourceA11y = await analyzeSourceAccessibility(config, cem, decl);
+        if (sourceA11y) {
+          const blendedScore = Math.round(a11y.score * 0.3 + sourceA11y.score * 0.7);
+          const subMetrics = [...cemSubMetrics, ...sourceA11y.subMetrics];
+          if (blendedScore < 50) {
+            issues.push(`Accessibility score is low (${blendedScore}%)`);
+          }
+          return { score: blendedScore, confidence: 'heuristic', subMetrics };
+        }
+      }
+
+      // Fallback: CEM-only
+      if (a11y.score < 50) {
+        issues.push(`Accessibility score is low (${a11y.score}%)`);
+      }
+      return { score: a11y.score, confidence: 'heuristic', subMetrics: cemSubMetrics };
+    }
+
+    case 'Type Coverage': {
+      const tc = analyzeTypeCoverage(decl);
+      if (tc.score < 50) {
+        issues.push(`Type coverage is low (${tc.score}%)`);
+      }
+      return tc;
+    }
+
+    case 'API Surface Quality': {
+      const api = analyzeApiSurface(decl);
+      return api;
+    }
+
+    case 'CSS Architecture': {
+      const css = analyzeCssArchitecture(decl);
+      return css;
+    }
+
+    case 'Event Architecture': {
+      const evt = analyzeEventArchitecture(decl);
+      return evt;
+    }
+
+    default:
+      return { score: 0, confidence: 'heuristic' };
+  }
+}
+
+/**
+ * Scores all components using multi-dimensional scoring.
+ */
+export async function scoreAllComponentsMultiDimensional(
+  config: McpWcConfig,
+  cemDeclarations: CemDeclaration[],
+  cem?: Cem,
+  libraryId = 'default',
+): Promise<MultiDimensionalHealth[]> {
+  const withTag = cemDeclarations.filter((decl) => decl.tagName !== undefined);
+  return Promise.all(
+    withTag.map((decl) => scoreComponentMultiDimensional(config, decl, cem, libraryId)),
+  );
 }

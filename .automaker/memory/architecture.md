@@ -5,7 +5,7 @@ relevantTo: [architecture]
 importance: 0.7
 relatedFiles: []
 usageStats:
-  loaded: 15
+  loaded: 19
   referenced: 15
   successfulFeatures: 15
 ---
@@ -473,3 +473,24 @@ usageStats:
 - **Problem solved:** Preparing for multi-CEM (Component Experience Module) readiness by moving away from hardcoded 'default' libraryId to accept it as a parameter throughout the system.
 - **Why this works:** Enables future features to use different libraryIds without refactoring the entire call chain later. Reduces future breaking changes by establishing the infrastructure pattern now.
 - **Trade-offs:** Current code complexity increases (more parameters to pass), but implementation is simpler in the future. Parameter remains optional to preserve backward compatibility.
+
+### Replaced existsSync with async access() from fs/promises when converting file I/O to async (2026-03-12)
+- **Context:** Converting parseTokens from sync to async required eliminating all blocking calls, including file existence checks
+- **Why:** existsSync is synchronous and blocks the event loop; using async access() from fs/promises maintains the fully non-blocking I/O chain and is consistent with the async readFile usage
+- **Rejected:** Keeping existsSync for the existence check while making readFile async — this would have been a partial conversion leaving a blocking call in an otherwise async function
+- **Trade-offs:** Async access() requires try/catch or .catch() for error handling vs existsSync simple boolean return; slightly more verbose but non-blocking
+- **Breaking if changed:** Reverting to existsSync would reintroduce event loop blocking on file system checks, undermining the async conversion's purpose
+
+### existsSync is intentionally retained as the sole synchronous fs call despite the otherwise fully async file I/O pattern (2026-03-12)
+- **Context:** Node.js fs/promises does not expose an async exists() equivalent — fs.promises.access() is the idiomatic substitute but requires try/catch rather than a boolean return, complicating control flow
+- **Why:** existsSync provides a simple boolean guard with negligible blocking cost for existence checks on local paths; the ergonomic cost of wrapping fs.promises.access in try/catch outweighs the theoretical event loop benefit for this use case
+- **Rejected:** fs.promises.access() with try/catch was rejected due to increased boilerplate and error-path complexity for a low-cost synchronous operation
+- **Trade-offs:** Keeps guard logic readable and avoids exception-driven control flow; trades theoretical async purity for practical maintainability
+- **Breaking if changed:** Replacing existsSync with fs.promises.access would require restructuring all call sites to handle Promise rejection as the exists-false signal, increasing code complexity
+
+### CI pipeline is split into granular, purpose-specific workflow files (build.yml, test.yml, lint.yml, format.yml, security.yml, release.yml) rather than a single ci.yml (2026-03-12)
+- **Context:** Need to add security auditing to the CI pipeline without creating redundant or monolithic workflow definitions
+- **Why:** Separation of concerns allows individual workflows to be triggered, debugged, and maintained independently; security audits can be re-run or scoped without triggering unrelated CI steps
+- **Rejected:** A single ci.yml that runs all steps sequentially — rejected likely because it creates a single point of failure, slower feedback loops, and makes it harder to selectively re-run specific checks
+- **Trade-offs:** Easier to maintain and scale individual concerns; harder to discover what 'CI' means as a whole since there is no single entry point — feature tickets may incorrectly reference ci.yml
+- **Breaking if changed:** If someone creates a ci.yml expecting it to be the canonical pipeline, it would create confusion and potential duplicate runs or conflicts with existing granular workflows

@@ -5,7 +5,7 @@ relevantTo: [testing]
 importance: 0.7
 relatedFiles: []
 usageStats:
-  loaded: 10
+  loaded: 12
   referenced: 8
   successfulFeatures: 8
 ---

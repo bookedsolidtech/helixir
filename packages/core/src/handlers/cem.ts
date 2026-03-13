@@ -17,7 +17,7 @@ const CemMemberSchema = z.object({
 });
 
 const CemEventSchema = z.object({
-  name: z.string(),
+  name: z.string().default(''),
   type: z.object({ text: z.string() }).optional(),
   description: z.string().optional(),
 });
@@ -54,8 +54,8 @@ const CemDeclarationSchema = z.object({
   name: z.string(),
   tagName: z
     .string()
-    .regex(/^[a-z][a-z0-9]*(-[a-z0-9]+)+$/)
-    .optional(),
+    .optional()
+    .transform((v) => (v && /^[a-z][a-z0-9]*(-[a-z0-9]+)+$/.test(v) ? v : undefined)),
   description: z.string().optional(),
   members: z.array(CemMemberSchema).optional(),
   events: z.array(CemEventSchema).optional(),
@@ -109,6 +109,24 @@ export interface DiffResult {
   isNew: boolean;
   breaking: string[];
   additions: string[];
+}
+
+// --- Source path helpers ---
+
+/**
+ * Returns the module path for a declaration with the given tagName.
+ * CEM modules have `path` (e.g., "src/components/my-button.js").
+ * This helper finds the module containing the declaration and returns its path.
+ */
+export function getDeclarationSourcePath(cem: Cem, tagName: string): string | null {
+  for (const mod of cem.modules) {
+    for (const decl of mod.declarations ?? []) {
+      if (decl.tagName === tagName) {
+        return mod.path;
+      }
+    }
+  }
+  return null;
 }
 
 // --- Private helpers ---

@@ -61,20 +61,36 @@ function dim(
   };
 }
 
+// Tag-name patterns that imply an ARIA role
+const ARIA_ROLE_TAG_PATTERNS: RegExp[] = [
+  /-button$/i,
+  /-(dialog|modal)$/i,
+  /-checkbox$/i,
+  /-radio$/i,
+  /-(switch|toggle)$/i,
+  /-(tab|tabpanel)$/i,
+  /-(menu|menuitem)$/i,
+  /-(alert|toast)$/i,
+  /-(combobox|select)$/i,
+  /-(slider|range)$/i,
+  /-tooltip$/i,
+  /-(tree|treeitem)$/i,
+];
+
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 /**
  * Analyzes accessibility profile of a single CEM component declaration.
  *
  * Scoring weights (total: 100):
- *   hasAriaRole:             20 — ARIA role in cssProperties or description
- *   hasAriaAttributes:       15 — properties named aria-*
- *   hasFormAssociation:      10 — formAssociated field or internals property
- *   hasKeyboardEvents:       10 — keydown/keyup/keypress events listed
- *   hasFocusMethod:          15 — exposes focus() method
- *   hasDisabled:             15 — has disabled property
- *   hasLabelSupport:         10 — slot named "label" or property named "label"
- *   accessibilityDescription: 5 — description mentions accessibility terms
+ *   hasDisabled:             25 — most reliable a11y signal in CEM (primary)
+ *   hasLabelSupport:         20 — second most reliable (primary)
+ *   hasFocusMethod:          20 — broadened to catch setFocus() and focus-related names (primary)
+ *   accessibilityDescription:10 — description mentions accessibility terms (primary)
+ *   hasFormAssociation:      10 — broadened: name+value+disabled, form field, description (bonus)
+ *   hasAriaRole:              5 — bonus: CEM rarely captures; also infers from tag-name
+ *   hasAriaAttributes:        5 — bonus: properties named aria-*
+ *   hasKeyboardEvents:        5 — bonus: broadened to focus/blur events and key-named events
  */
 export function analyzeAccessibility(decl: CemDeclaration): AccessibilityProfile {
   const members = decl.members ?? [];
@@ -82,30 +98,44 @@ export function analyzeAccessibility(decl: CemDeclaration): AccessibilityProfile
   const slots = decl.slots ?? [];
   const cssProperties = decl.cssProperties ?? [];
   const description = decl.description ?? '';
+  const tagName = decl.tagName ?? '';
 
-  // 1. ARIA role: cssProperty named "role" or description mentions aria/role context
+  // 1. ARIA role: cssProperty named "role", description mentions aria/role, or tag-name inference
   const ariaRoleInCss = cssProperties.some((p) => p.name.toLowerCase().includes('role'));
   const ariaRoleInDesc = /\[role=|\baria-role\b|\brole\s*=\s*["']/i.test(description);
-  const hasAriaRole = ariaRoleInCss || ariaRoleInDesc;
+  const ariaRoleFromTagName = ARIA_ROLE_TAG_PATTERNS.some((p) => p.test(tagName));
+  const hasAriaRole = ariaRoleInCss || ariaRoleInDesc || ariaRoleFromTagName;
 
   // 2. aria-* attributes: member names starting with "aria-"
   const ariaMembers = members.filter((m) => m.name.toLowerCase().startsWith('aria-'));
   const hasAriaAttributes = ariaMembers.length > 0;
 
-  // 3. Form association: member named "formAssociated" or "internals"
+  // 3. Form association: member named "formAssociated" or "internals", form field,
+  //    name+value+disabled triple, or description mentioning form association
+  const memberNames = new Set(members.map((m) => m.name));
+  const hasNameValueDisabled =
+    memberNames.has('name') && memberNames.has('value') && memberNames.has('disabled');
+  const hasFormField = memberNames.has('form');
   const hasFormAssociation =
-    members.some((m) => m.name === 'formAssociated') ||
-    members.some((m) => m.name === 'internals') ||
-    /\bformAssociated\b/i.test(description);
+    memberNames.has('formAssociated') ||
+    memberNames.has('internals') ||
+    /\bformAssociated\b|\bform[-\s]?associat/i.test(description) ||
+    hasNameValueDisabled ||
+    hasFormField;
 
-  // 4. Keyboard events: keydown, keyup, or keypress event names
+  // 4. Keyboard events: keydown/keyup/keypress event names, events containing "key",
+  //    focus/blur events (proxy for keyboard handling), or description mentioning keyboard
   const keyboardEventNames = ['keydown', 'keyup', 'keypress'];
-  const hasKeyboardEvents = events.some((e) =>
-    keyboardEventNames.some((k) => e.name.toLowerCase().includes(k)),
-  );
+  const hasKeyboardEvents =
+    events.some((e) => keyboardEventNames.some((k) => e.name.toLowerCase().includes(k))) ||
+    events.some((e) => /key/i.test(e.name)) ||
+    events.some((e) => /focus|blur/i.test(e.name)) ||
+    /\bkeyboard\b|\bkeydown\b|\bkeyup\b|\bkeypress\b/i.test(description);
 
-  // 5. Focus method: method named "focus"
-  const hasFocusMethod = members.some((m) => m.kind === 'method' && m.name === 'focus');
+  // 5. Focus method: method named "focus", "setFocus", or any method with "focus" in name
+  const hasFocusMethod = members.some(
+    (m) => m.kind === 'method' && m.name.toLowerCase().includes('focus'),
+  );
 
   // 6. Disabled state: field named "disabled"
   const hasDisabled = members.some((m) => m.kind === 'field' && m.name === 'disabled');
@@ -118,16 +148,16 @@ export function analyzeAccessibility(decl: CemDeclaration): AccessibilityProfile
   const a11yTerms = /\b(aria|accessible|accessibility|keyboard|focus|screen.?reader|a11y|wcag)\b/i;
   const accessibilityDescription = a11yTerms.test(description);
 
-  // Weights
+  // Weights — primary signals first, bonus signals last; total = 100
   const W = {
-    hasAriaRole: 20,
-    hasAriaAttributes: 15,
+    hasDisabled: 25,
+    hasLabelSupport: 20,
+    hasFocusMethod: 20,
+    accessibilityDescription: 10,
     hasFormAssociation: 10,
-    hasKeyboardEvents: 10,
-    hasFocusMethod: 15,
-    hasDisabled: 15,
-    hasLabelSupport: 10,
-    accessibilityDescription: 5,
+    hasAriaRole: 5,
+    hasAriaAttributes: 5,
+    hasKeyboardEvents: 5,
   };
 
   const score =
@@ -146,7 +176,7 @@ export function analyzeAccessibility(decl: CemDeclaration): AccessibilityProfile
     hasAriaRole: dim(
       hasAriaRole,
       W.hasAriaRole,
-      'ARIA role documented in CEM',
+      'ARIA role documented or inferred from tag name',
       'No ARIA role documented in CEM',
     ),
     hasAriaAttributes: dim(
@@ -164,14 +194,14 @@ export function analyzeAccessibility(decl: CemDeclaration): AccessibilityProfile
     hasKeyboardEvents: dim(
       hasKeyboardEvents,
       W.hasKeyboardEvents,
-      'Keyboard events (keydown/keyup/keypress) documented',
-      'No keyboard events (keydown/keyup/keypress) documented',
+      'Keyboard/focus/blur events documented',
+      'No keyboard or focus events documented',
     ),
     hasFocusMethod: dim(
       hasFocusMethod,
       W.hasFocusMethod,
-      'Exposes focus() method',
-      'No focus() method documented',
+      'Exposes focus-related method',
+      'No focus method documented',
     ),
     hasDisabled: dim(hasDisabled, W.hasDisabled, 'Has disabled property', 'No disabled property'),
     hasLabelSupport: dim(

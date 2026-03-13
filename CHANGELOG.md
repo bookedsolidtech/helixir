@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+### Minor Changes
+
+- f5bbbe7: Add `/update-helixir` slash command skill that allows users to self-update the helixir MCP server from npm in one step, with version detection, update, verification, and restart instructions.
+
 ## [0.2.0] - 2026-03-13
 
 ### Minor Changes

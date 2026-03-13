@@ -13,9 +13,7 @@ reviews:
     enabled: true
     drafts: false
     base_branches:
-      - main
       - dev
-      - staging
     ignore_title_keywords:
       - 'AUDIT'
       - 'audit'

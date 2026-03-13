@@ -1,11 +1,8 @@
 {
   "name": "helixir",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "MCP server that gives AI agents full situational awareness of any web component library",
   "type": "module",
-  "workspaces": [
-    "packages/*"
-  ],
   "bin": {
     "helixir": "./build/src/index.js"
   },

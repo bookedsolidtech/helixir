@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Gate: Format check — fails push if code is unformatted.
+# Auto-formatting runs in the pre-commit hook (lint-staged).
+# This hook is enforcement: if you bypassed pre-commit, your push fails here.
+# CI format check is the final un-bypassable backstop.
+pnpm run format:check

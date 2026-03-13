@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0
+## [0.2.0] - 2026-03-13
 
 ### Minor Changes
 

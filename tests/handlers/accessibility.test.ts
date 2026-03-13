@@ -8,7 +8,7 @@ import type { CemDeclaration } from '../../packages/core/src/handlers/cem.js';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-/** sl-button from shoelace fixture — has disabled + focus() but no aria/keyboard/label/form */
+/** sl-button from shoelace fixture — has disabled + focus() + tag-name role inference + focus/blur events */
 const slButton: CemDeclaration = {
   kind: 'class',
   name: 'SlButton',
@@ -90,22 +90,28 @@ describe('analyzeAccessibility — sl-button', () => {
     expect(profile.tagName).toBe('sl-button');
   });
 
-  it('detects disabled property', () => {
+  it('detects disabled property (25pts)', () => {
     profile = analyzeAccessibility(slButton);
     expect(profile.dimensions.hasDisabled.passed).toBe(true);
-    expect(profile.dimensions.hasDisabled.points).toBe(15);
+    expect(profile.dimensions.hasDisabled.points).toBe(25);
   });
 
-  it('detects focus() method', () => {
+  it('detects focus() method (20pts)', () => {
     profile = analyzeAccessibility(slButton);
     expect(profile.dimensions.hasFocusMethod.passed).toBe(true);
-    expect(profile.dimensions.hasFocusMethod.points).toBe(15);
+    expect(profile.dimensions.hasFocusMethod.points).toBe(20);
   });
 
-  it('flags missing ARIA role', () => {
+  it('infers ARIA role from tag name sl-button (5pts)', () => {
     profile = analyzeAccessibility(slButton);
-    expect(profile.dimensions.hasAriaRole.passed).toBe(false);
-    expect(profile.dimensions.hasAriaRole.points).toBe(0);
+    expect(profile.dimensions.hasAriaRole.passed).toBe(true);
+    expect(profile.dimensions.hasAriaRole.points).toBe(5);
+  });
+
+  it('detects keyboard events via focus/blur event proxy (5pts)', () => {
+    profile = analyzeAccessibility(slButton);
+    expect(profile.dimensions.hasKeyboardEvents.passed).toBe(true);
+    expect(profile.dimensions.hasKeyboardEvents.points).toBe(5);
   });
 
   it('flags no aria-* attributes', () => {
@@ -120,12 +126,6 @@ describe('analyzeAccessibility — sl-button', () => {
     expect(profile.dimensions.hasFormAssociation.points).toBe(0);
   });
 
-  it('flags no keyboard events (sl-blur/sl-focus are not keyboard events)', () => {
-    profile = analyzeAccessibility(slButton);
-    expect(profile.dimensions.hasKeyboardEvents.passed).toBe(false);
-    expect(profile.dimensions.hasKeyboardEvents.points).toBe(0);
-  });
-
   it('flags no label slot or property', () => {
     profile = analyzeAccessibility(slButton);
     expect(profile.dimensions.hasLabelSupport.passed).toBe(false);
@@ -138,19 +138,19 @@ describe('analyzeAccessibility — sl-button', () => {
     expect(profile.dimensions.accessibilityDescription.points).toBe(0);
   });
 
-  it('computes total score as sum of passed dimensions (30 = disabled + focus)', () => {
+  it('computes total score as sum of passed dimensions (55 = disabled + focus + ariaRole + keyboard)', () => {
     profile = analyzeAccessibility(slButton);
-    expect(profile.score).toBe(30);
+    expect(profile.score).toBe(55);
   });
 
-  it('returns grade F for score 30', () => {
+  it('returns grade F for score 55', () => {
     profile = analyzeAccessibility(slButton);
     expect(profile.grade).toBe('F');
   });
 
   it('includes score in summary string', () => {
     profile = analyzeAccessibility(slButton);
-    expect(profile.summary).toContain('30/100');
+    expect(profile.summary).toContain('55/100');
   });
 });
 
@@ -305,5 +305,148 @@ describe('analyzeAllAccessibility', () => {
 
   it('returns empty array for empty input', () => {
     expect(analyzeAllAccessibility([])).toEqual([]);
+  });
+});
+
+// ─── broadened detection — new patterns ──────────────────────────────────────
+
+describe('broadened detection — focus method variants', () => {
+  it('detects setFocus() as a focus method (Ionic pattern)', () => {
+    const ionic: CemDeclaration = {
+      kind: 'class',
+      name: 'IonButton',
+      tagName: 'ion-button',
+      members: [{ kind: 'method', name: 'setFocus' }],
+    };
+    const profile = analyzeAccessibility(ionic);
+    expect(profile.dimensions.hasFocusMethod.passed).toBe(true);
+  });
+
+  it('detects focusInput() as a focus method (contains "focus")', () => {
+    const comp: CemDeclaration = {
+      kind: 'class',
+      name: 'MyComp',
+      tagName: 'my-comp',
+      members: [{ kind: 'method', name: 'focusInput' }],
+    };
+    const profile = analyzeAccessibility(comp);
+    expect(profile.dimensions.hasFocusMethod.passed).toBe(true);
+  });
+});
+
+describe('broadened detection — form association', () => {
+  it('detects form association via name+value+disabled triple', () => {
+    const formComp: CemDeclaration = {
+      kind: 'class',
+      name: 'MySelect',
+      tagName: 'my-select',
+      members: [
+        { kind: 'field', name: 'name' },
+        { kind: 'field', name: 'value' },
+        { kind: 'field', name: 'disabled' },
+      ],
+    };
+    const profile = analyzeAccessibility(formComp);
+    expect(profile.dimensions.hasFormAssociation.passed).toBe(true);
+  });
+
+  it('detects form association via "form" field (FAST pattern)', () => {
+    const fastComp: CemDeclaration = {
+      kind: 'class',
+      name: 'FastTextField',
+      tagName: 'fast-text-field',
+      members: [{ kind: 'field', name: 'form' }],
+    };
+    const profile = analyzeAccessibility(fastComp);
+    expect(profile.dimensions.hasFormAssociation.passed).toBe(true);
+  });
+});
+
+describe('broadened detection — keyboard events', () => {
+  it('detects keyboard events via events containing "key"', () => {
+    const comp: CemDeclaration = {
+      kind: 'class',
+      name: 'MyComp',
+      tagName: 'my-comp',
+      events: [{ name: 'my-keypress', description: 'custom key event' }],
+    };
+    const profile = analyzeAccessibility(comp);
+    expect(profile.dimensions.hasKeyboardEvents.passed).toBe(true);
+  });
+
+  it('detects keyboard events from description mentioning keyboard', () => {
+    const comp: CemDeclaration = {
+      kind: 'class',
+      name: 'MyComp',
+      tagName: 'my-comp',
+      description: 'Supports full keyboard navigation.',
+    };
+    const profile = analyzeAccessibility(comp);
+    expect(profile.dimensions.hasKeyboardEvents.passed).toBe(true);
+  });
+});
+
+describe('broadened detection — tag-name ARIA role inference', () => {
+  it.each([
+    ['my-button', true],
+    ['app-dialog', true],
+    ['ui-modal', true],
+    ['app-checkbox', true],
+    ['app-radio', true],
+    ['app-switch', true],
+    ['app-toggle', true],
+    ['app-tab', true],
+    ['app-tabpanel', true],
+    ['app-menu', true],
+    ['app-menuitem', true],
+    ['app-alert', true],
+    ['app-toast', true],
+    ['app-combobox', true],
+    ['app-select', true],
+    ['app-slider', true],
+    ['app-range', true],
+    ['app-tooltip', true],
+    ['app-tree', true],
+    ['app-treeitem', true],
+    ['my-card', false],
+    ['app-header', false],
+  ] as Array<[string, boolean]>)('tag-name "%s" → hasAriaRole=%s', (tagName, expected) => {
+    const comp: CemDeclaration = {
+      kind: 'class',
+      name: 'Comp',
+      tagName,
+      members: [],
+      events: [],
+      slots: [],
+      cssProperties: [],
+    };
+    const profile = analyzeAccessibility(comp);
+    expect(profile.dimensions.hasAriaRole.passed).toBe(expected);
+  });
+});
+
+describe('acceptance criteria', () => {
+  it('button component with disabled + label + focus method scores ≥50', () => {
+    const button: CemDeclaration = {
+      kind: 'class',
+      name: 'MyButton',
+      tagName: 'my-button',
+      members: [
+        { kind: 'field', name: 'disabled' },
+        { kind: 'field', name: 'label' },
+        { kind: 'method', name: 'focus' },
+      ],
+    };
+    const profile = analyzeAccessibility(button);
+    // disabled=25, label=20, focus=20, ariaRole=5 (tag-name) = 70
+    expect(profile.score).toBeGreaterThanOrEqual(50);
+  });
+
+  it('no dimension has 0% pass rate — at least some detection path works for each check', () => {
+    // Verify all 8 dimensions can be triggered
+    const profile = analyzeAccessibility(fullyAccessible);
+    for (const dim of Object.values(profile.dimensions)) {
+      expect(dim.passed).toBe(true);
+    }
   });
 });

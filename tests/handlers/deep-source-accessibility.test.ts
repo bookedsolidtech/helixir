@@ -127,6 +127,24 @@ const LIBRARIES: LibraryConfig[] = [
     sourceRoot: resolve(WC_LIBS_ROOT, 'porsche'),
     prefix: 'p',
   },
+  {
+    name: 'Calcite (Esri)',
+    cemPath: resolve(WC_LIBS_ROOT, 'calcite/custom-elements.json'),
+    sourceRoot: resolve(WC_LIBS_ROOT, 'calcite'),
+    prefix: 'calcite',
+  },
+  {
+    name: 'UI5 (SAP)',
+    cemPath: resolve(WC_LIBS_ROOT, 'ui5/custom-elements.json'),
+    sourceRoot: resolve(WC_LIBS_ROOT, 'ui5'),
+    prefix: 'ui5',
+  },
+  {
+    name: 'Elix',
+    cemPath: resolve(WC_LIBS_ROOT, 'elix/custom-elements.json'),
+    sourceRoot: resolve(WC_LIBS_ROOT, 'elix'),
+    prefix: 'elix',
+  },
 ];
 
 // ─── CEM Inheritance Metadata Tests ─────────────────────────────────────────

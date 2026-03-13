@@ -12,7 +12,7 @@ packages from this org), read this first.
 | Project                    | Tool               | How it works                                                   |
 | -------------------------- | ------------------ | -------------------------------------------------------------- |
 | **HELiX** (`@helixui/*`)   | `@changesets/cli`  | Explicit per-PR changeset files → version PR → merge → publish |
-| **HELiXiR** (`@helixir/*`) | `semantic-release` | Conventional commit messages → auto-version on merge to `main` |
+| **HELiXiR** (`helixir`) | `@changesets/cli` | Explicit per-PR changeset files → version PR → merge → publish |
 
 Both are valid. This doc covers **both**, with the hard-won lessons from HELiX applied to HELiXiR.
 
@@ -24,7 +24,7 @@ Both are valid. This doc covers **both**, with the hard-won lessons from HELiX a
 
 Publishing with `@changesets/cli` is **not** one step. It is always two pushes to `main`:
 
-```
+```text
 Step 1: Feature merges to main (with .changeset/*.md file)
          ↓
          publish.yml fires → sees pending changeset
@@ -129,7 +129,12 @@ Gate 4 for the exact implementation.
 
 ---
 
-## Part 2 — How Semantic-Release Works (HELiXiR Current Model)
+## Part 2 — How Semantic-Release Worked (Legacy — HELiXiR Migrated to Changesets)
+
+> **Note:** HELiXiR has migrated from semantic-release to `@changesets/cli` (completed in PR #44, March 2026).
+> The workflow below is preserved for historical reference. For the current publish process, see Part 1 above.
+> Active config: `.changeset/config.json`, scripts `changeset:version` / `changeset:publish` in `package.json`,
+> workflow `.github/workflows/publish.yml`.
 
 HELiXiR uses `semantic-release`. No changeset files — version is derived entirely from conventional
 commit messages on `main`.
@@ -147,7 +152,7 @@ commit messages on `main`.
 
 ### The Release Flow
 
-```
+```text
 Push to main → release.yml fires
               → semantic-release analyzes commits since last tag
               → if releasable commits exist:
@@ -260,7 +265,7 @@ env:
 **Symptom:** After a release, one linked package is at `0.3.0` on npm, the other is still at
 `0.2.0`. The publish log says:
 
-```
+```text
 🦋  warn @helixui/tokens is not being published because version 0.2.0 is already published on npm
 ```
 

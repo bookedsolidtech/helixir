@@ -11,8 +11,12 @@ import {
   getHealthTrend,
   getHealthDiff,
   getHealthSummary,
+  scoreComponentMultiDimensional,
+  scoreAllComponentsMultiDimensional,
 } from '../handlers/health.js';
 import { analyzeAccessibility, analyzeAllAccessibility } from '../handlers/accessibility.js';
+import { generateAuditReport } from '../handlers/audit-report.js';
+import { DIMENSION_REGISTRY } from '../handlers/dimensions.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -22,9 +26,12 @@ import { handleToolError } from '../shared/error-handling.js';
 const ScoreComponentArgsSchema = z.object({
   tagName: z.string(),
   libraryId: z.string().optional(),
+  multiDimensional: z.boolean().optional(),
 });
 
-const ScoreAllComponentsArgsSchema = z.object({});
+const ScoreAllComponentsArgsSchema = z.object({
+  multiDimensional: z.boolean().optional(),
+});
 
 const GetHealthTrendArgsSchema = z.object({
   tagName: z.string(),
@@ -38,8 +45,17 @@ const GetHealthDiffArgsSchema = z.object({
   libraryId: z.string().optional(),
 });
 
+const GetHealthSummaryArgsSchema = z.object({
+  libraryId: z.string().optional(),
+});
+
 const AnalyzeAccessibilityArgsSchema = z.object({
   tagName: z.string().optional(),
+});
+
+const AuditLibraryArgsSchema = z.object({
+  outputPath: z.string().optional(),
+  libraryId: z.string().optional(),
 });
 
 // ─── Tool definitions ─────────────────────────────────────────────────────────
@@ -48,7 +64,7 @@ export const HEALTH_TOOL_DEFINITIONS = [
   {
     name: 'score_component',
     description:
-      'Returns the latest health score for a single web component, including grade, dimension scores, and issues.',
+      'Returns the latest health score for a single web component, including grade, dimension scores, and issues. Set multiDimensional=true for the full 11-dimension enterprise scoring with tier gates.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -60,6 +76,11 @@ export const HEALTH_TOOL_DEFINITIONS = [
           type: 'string',
           description: 'The library ID to scope the health history lookup (default: "default").',
         },
+        multiDimensional: {
+          type: 'boolean',
+          description:
+            'When true, returns the full multi-dimensional health score with 11 dimensions, enterprise grade algorithm, and confidence levels. Default: false for backward compatibility.',
+        },
       },
       required: ['tagName'],
       additionalProperties: false,
@@ -68,10 +89,16 @@ export const HEALTH_TOOL_DEFINITIONS = [
   {
     name: 'score_all_components',
     description:
-      'Returns health scores for all components in the library. Maps over all CEM declarations.',
+      'Returns health scores for all components in the library. Set multiDimensional=true for full 11-dimension enterprise scoring.',
     inputSchema: {
       type: 'object' as const,
-      properties: {},
+      properties: {
+        multiDimensional: {
+          type: 'boolean',
+          description:
+            'When true, returns multi-dimensional scores with 11 dimensions per component. Default: false.',
+        },
+      },
       additionalProperties: false,
     },
   },
@@ -126,7 +153,7 @@ export const HEALTH_TOOL_DEFINITIONS = [
   {
     name: 'get_health_summary',
     description:
-      'Returns aggregate health statistics for all components: average score, grade distribution, total count, library-wide trend, and components needing attention (score below 70).',
+      'Returns aggregate health statistics for all components: average score, grade distribution, total count, library-wide trend, per-dimension averages, and components needing attention (score below 70).',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -155,12 +182,41 @@ export const HEALTH_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'audit_library',
+    description:
+      'Generates a JSONL audit report scoring every component across 11 dimensions. Returns file path (if outputPath given) and summary stats. Each line is valid JSON for one component.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        outputPath: {
+          type: 'string',
+          description:
+            'Optional file path (relative to project root) to write the JSONL report to. e.g. "audit/health.jsonl"',
+        },
+        libraryId: {
+          type: 'string',
+          description: 'The library ID to audit (default: "default").',
+        },
+      },
+      additionalProperties: false,
+    },
+  },
 ];
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
 
 function getAllDeclarations(cem: Cem): CemDeclaration[] {
   return cem.modules.flatMap((m) => m.declarations ?? []);
+}
+
+async function loadCemData(config: McpWcConfig, cem?: Cem): Promise<Cem> {
+  return (
+    cem ??
+    CemSchema.parse(
+      JSON.parse(String(await readFile(resolve(config.projectRoot, config.cemPath), 'utf-8'))),
+    )
+  );
 }
 
 // ─── Dispatcher ───────────────────────────────────────────────────────────────
@@ -177,24 +233,28 @@ export async function handleHealthCall(
 ): Promise<MCPToolResult> {
   try {
     if (name === 'score_component') {
-      const { tagName, libraryId } = ScoreComponentArgsSchema.parse(args);
-      // Pass the CEM declaration so scoreComponent can fall back to CEM-derived scoring
-      // when no pre-computed history files exist for this component.
+      const { tagName, libraryId, multiDimensional } = ScoreComponentArgsSchema.parse(args);
       const cemDecl = cem ? getAllDeclarations(cem).find((d) => d.tagName === tagName) : undefined;
+
+      if (multiDimensional && cemDecl) {
+        const result = await scoreComponentMultiDimensional(config, cemDecl, cem, libraryId);
+        return createSuccessResponse(JSON.stringify(result, null, 2));
+      }
+
       const result = await scoreComponent(config, tagName, cemDecl, libraryId);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 
     if (name === 'score_all_components') {
-      ScoreAllComponentsArgsSchema.parse(args);
-      // Use the in-memory CEM cache when available to avoid unnecessary disk reads
-      // and ensure consistency with the validated CEM loaded at startup.
-      const cemData =
-        cem ??
-        CemSchema.parse(
-          JSON.parse(String(await readFile(resolve(config.projectRoot, config.cemPath), 'utf-8'))),
-        );
-      const declarations = cemData.modules.flatMap((m) => m.declarations ?? []);
+      const { multiDimensional } = ScoreAllComponentsArgsSchema.parse(args);
+      const cemData = await loadCemData(config, cem);
+      const declarations = getAllDeclarations(cemData);
+
+      if (multiDimensional) {
+        const results = await scoreAllComponentsMultiDimensional(config, declarations);
+        return createSuccessResponse(JSON.stringify(results, null, 2));
+      }
+
       const results = await scoreAllComponents(config, declarations);
       return createSuccessResponse(JSON.stringify(results, null, 2));
     }
@@ -219,9 +279,60 @@ export async function handleHealthCall(
     }
 
     if (name === 'get_health_summary') {
-      const declarations = cem ? getAllDeclarations(cem) : [];
-      const result = await getHealthSummary(config, declarations);
-      return createSuccessResponse(JSON.stringify(result, null, 2));
+      const { libraryId } = GetHealthSummaryArgsSchema.parse(args);
+      const cemData = await loadCemData(config, cem);
+      const declarations = getAllDeclarations(cemData);
+
+      // Use multi-dimensional scoring for enriched summary
+      const allScores = await scoreAllComponentsMultiDimensional(
+        config,
+        declarations,
+        cem,
+        libraryId,
+      );
+
+      const totalComponents = allScores.length;
+      const averageScore =
+        totalComponents === 0
+          ? 0
+          : Math.round((allScores.reduce((sum, r) => sum + r.score, 0) / totalComponents) * 10) /
+            10;
+
+      const gradeDistribution = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+      for (const r of allScores) {
+        gradeDistribution[r.grade]++;
+      }
+
+      // Per-dimension averages
+      const dimensionAverages: Record<string, number> = {};
+      for (const def of DIMENSION_REGISTRY) {
+        const scores = allScores
+          .map((h) => h.dimensions.find((d) => d.name === def.name))
+          .filter((d) => d?.measured);
+        if (scores.length > 0) {
+          const avg = scores.reduce((sum, d) => sum + (d?.score ?? 0), 0) / scores.length;
+          dimensionAverages[def.name] = Math.round(avg * 10) / 10;
+        }
+      }
+
+      const componentsNeedingAttention = allScores
+        .filter((r) => r.score < 70)
+        .map((r) => r.tagName);
+
+      // Use the original getHealthSummary for trend calculation
+      const baseSummary = await getHealthSummary(config, declarations);
+
+      const enrichedSummary = {
+        totalComponents,
+        averageScore,
+        gradeDistribution,
+        dimensionAverages,
+        libraryTrend: baseSummary.libraryTrend,
+        componentsNeedingAttention,
+        timestamp: new Date().toISOString(),
+      };
+
+      return createSuccessResponse(JSON.stringify(enrichedSummary, null, 2));
     }
 
     if (name === 'analyze_accessibility') {
@@ -235,6 +346,23 @@ export async function handleHealthCall(
         return createSuccessResponse(JSON.stringify(analyzeAccessibility(decl), null, 2));
       }
       return createSuccessResponse(JSON.stringify(analyzeAllAccessibility(declarations), null, 2));
+    }
+
+    if (name === 'audit_library') {
+      const { outputPath, libraryId } = AuditLibraryArgsSchema.parse(args);
+      const cemData = await loadCemData(config, cem);
+      const declarations = getAllDeclarations(cemData);
+      const { lines, summary } = await generateAuditReport(config, declarations, {
+        outputPath,
+        libraryId,
+        cem: cemData,
+      });
+      const response: Record<string, unknown> = { summary };
+      if (outputPath) {
+        response.outputPath = resolve(config.projectRoot, outputPath);
+      }
+      response.lineCount = lines.length;
+      return createSuccessResponse(JSON.stringify(response, null, 2));
     }
 
     return createErrorResponse(`Unknown health tool: ${name}`);

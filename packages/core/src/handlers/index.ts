@@ -1,5 +1,7 @@
 /** Barrel export for all handler modules. */
 export * from './accessibility.js';
+export * from './analyzers/index.js';
+export * from './audit-report.js';
 export * from './benchmark.js';
 export * from './bundle.js';
 export * from './cdn.js';
@@ -8,6 +10,7 @@ export * from './compare.js';
 export * from './component.js';
 export * from './composition.js';
 export * from './dependencies.js';
+export * from './dimensions.js';
 export * from './framework.js';
 export * from './health.js';
 export * from './migration.js';

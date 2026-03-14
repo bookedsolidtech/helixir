@@ -5,19 +5,26 @@ import { MCPError, ErrorCategory } from '../shared/error-handling.js';
 
 // --- CEM Zod Schemas ---
 
+const CemInheritedFromSchema = z.object({
+  name: z.string(),
+  module: z.string().optional(),
+  package: z.string().optional(),
+});
+
 const CemMemberSchema = z.object({
   kind: z.string(),
-  name: z.string(),
+  name: z.string().default(''),
   type: z.object({ text: z.string() }).optional(),
   description: z.string().optional(),
   attribute: z.string().optional(),
   reflects: z.boolean().optional(),
   default: z.string().optional(),
   return: z.object({ type: z.object({ text: z.string() }) }).optional(),
+  inheritedFrom: CemInheritedFromSchema.optional(),
 });
 
 const CemEventSchema = z.object({
-  name: z.string(),
+  name: z.string().default(''),
   type: z.object({ text: z.string() }).optional(),
   description: z.string().optional(),
 });
@@ -49,14 +56,28 @@ const CemJsdocTagSchema = z.object({
   description: z.string().optional(),
 });
 
+const CemSuperclassSchema = z.object({
+  name: z.string().default(''),
+  package: z.string().optional(),
+  module: z.string().optional(),
+});
+
+const CemMixinSchema = z.object({
+  name: z.string().default(''),
+  package: z.string().optional(),
+  module: z.string().optional(),
+});
+
 const CemDeclarationSchema = z.object({
   kind: z.string(),
   name: z.string(),
   tagName: z
     .string()
-    .regex(/^[a-z][a-z0-9]*(-[a-z0-9]+)+$/)
-    .optional(),
+    .optional()
+    .transform((v) => (v && /^[a-z][a-z0-9]*(-[a-z0-9]+)+$/.test(v) ? v : undefined)),
   description: z.string().optional(),
+  superclass: CemSuperclassSchema.optional(),
+  mixins: z.array(CemMixinSchema).optional(),
   members: z.array(CemMemberSchema).optional(),
   events: z.array(CemEventSchema).optional(),
   slots: z.array(CemSlotSchema).optional(),
@@ -86,6 +107,9 @@ export type CemSlot = z.infer<typeof CemSlotSchema>;
 export type CemCssPart = z.infer<typeof CemCssPartSchema>;
 export type CemDeclaration = z.infer<typeof CemDeclarationSchema>;
 export type CemJsdocTag = z.infer<typeof CemJsdocTagSchema>;
+export type CemSuperclass = z.infer<typeof CemSuperclassSchema>;
+export type CemMixin = z.infer<typeof CemMixinSchema>;
+export type CemInheritedFrom = z.infer<typeof CemInheritedFromSchema>;
 
 // --- Public types ---
 
@@ -109,6 +133,71 @@ export interface DiffResult {
   isNew: boolean;
   breaking: string[];
   additions: string[];
+}
+
+// --- Source path helpers ---
+
+/**
+ * Returns the module path for a declaration with the given tagName.
+ * CEM modules have `path` (e.g., "src/components/my-button.js").
+ * This helper finds the module containing the declaration and returns its path.
+ */
+export function getDeclarationSourcePath(cem: Cem, tagName: string): string | null {
+  for (const mod of cem.modules) {
+    for (const decl of mod.declarations ?? []) {
+      if (decl.tagName === tagName) {
+        return mod.path;
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Returns the inheritance chain paths for a declaration: superclass + all mixins.
+ * These paths come from the CEM's `superclass.module`/`superclass.package` and
+ * `mixins[].module`/`mixins[].package` fields.
+ *
+ * Paths may be:
+ *   - Relative module paths: "/packages/accordion/src/vaadin-accordion-mixin.js"
+ *   - Package paths: "@vaadin/a11y-base/src/active-mixin.js"
+ *   - Undefined (no path info in CEM)
+ *
+ * Returns: Array of { name, modulePath } for all superclasses and mixins.
+ */
+export interface InheritanceEntry {
+  name: string;
+  modulePath: string | null;
+  type: 'superclass' | 'mixin';
+}
+
+export function getInheritanceChain(decl: CemDeclaration): InheritanceEntry[] {
+  const chain: InheritanceEntry[] = [];
+
+  // Add superclass (if not a platform class like HTMLElement, LitElement)
+  if (decl.superclass) {
+    const sc = decl.superclass;
+    const isFrameworkBase =
+      /^(HTMLElement|LitElement|FASTElement|PolymerElement|ReactiveElement)$/.test(sc.name);
+    if (!isFrameworkBase) {
+      chain.push({
+        name: sc.name,
+        modulePath: sc.module ?? sc.package ?? null,
+        type: 'superclass',
+      });
+    }
+  }
+
+  // Add all mixins
+  for (const mixin of decl.mixins ?? []) {
+    chain.push({
+      name: mixin.name,
+      modulePath: mixin.module ?? mixin.package ?? null,
+      type: 'mixin',
+    });
+  }
+
+  return chain;
 }
 
 // --- Private helpers ---

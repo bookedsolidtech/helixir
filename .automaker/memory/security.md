@@ -5,9 +5,9 @@ relevantTo: [security]
 importance: 0.7
 relatedFiles: []
 usageStats:
-  loaded: 26
-  referenced: 23
-  successfulFeatures: 23
+  loaded: 31
+  referenced: 24
+  successfulFeatures: 24
 ---
 # security
 
@@ -287,3 +287,25 @@ usageStats:
 - **Problem solved:** Health history reading attempts new path first, falls back to legacy path on failure. Original bug: all errors were silently caught, hiding permission denied (EACCES) issues.
 - **Why this works:** ENOENT is 'expected absence' (new feature doesn't exist), so fallback is safe. EACCES is 'unexpected access denial' (permission/security problem) that must not be silently hidden.
 - **Trade-offs:** Selective catching is more complex (requires error code inspection) but prevents silent failure of legitimate security issues
+
+#### [Pattern] SECURITY.md placed at repo root with dual reporting paths: GitHub Security Advisory (preferred) and email fallback (2026-03-12)
+- **Problem solved:** OSS npm package needing a standardized vulnerability disclosure policy that integrates with GitHub's private reporting infrastructure
+- **Why this works:** GitHub natively surfaces SECURITY.md in the repo UI and auto-links it from the Security tab; using GitHub Security Advisories keeps the vulnerability private until a coordinated patch is released, preventing premature disclosure
+- **Trade-offs:** Easier: GitHub tooling auto-discovers the file, reporters get a frictionless private channel. Harder: maintainers must monitor both GitHub advisory inbox and the security email alias
+
+### Response SLA tiered as 48h acknowledgment + 7-day status update rather than a single flat SLA (2026-03-12)
+- **Context:** Setting reporter expectations for an open-source project where maintainer bandwidth is limited
+- **Why:** A tiered SLA acknowledges receipt quickly (builds trust) while giving realistic time for triage and patch development; a single flat 'we will fix in N days' is often broken and erodes trust more than a missed status update
+- **Rejected:** Single flat SLA (e.g., '30-day fix guarantee') — rejected because fix timelines depend on severity and complexity, making guarantees unreliable
+- **Trade-offs:** Easier: reporters know when to expect feedback; reduces follow-up noise. Harder: maintainers must track two separate clock windows per report
+- **Breaking if changed:** Collapsing to a vague 'we will respond eventually' policy damages reporter trust and may cause researchers to skip private disclosure entirely
+
+#### [Gotcha] Supported versions table initially lists only 0.1.x — requires manual update on each major/minor release or it becomes misleading (2026-03-12)
+- **Situation:** Early-stage package (0.1.x) with a SECURITY.md committed before a stable release cadence is established
+- **Root cause:** The table was seeded with the current version at time of file creation, which is correct now but has no automated update mechanism
+- **How to avoid:** Easier: reporters immediately know patch support scope. Harder: the file becomes a maintenance liability if version bumps are not accompanied by a SECURITY.md update
+
+#### [Pattern] pnpm audit is run with --audit-level=high, intentionally allowing moderate vulnerabilities to pass CI without blocking (2026-03-12)
+- **Problem solved:** Balancing security enforcement with practical development velocity — moderate vulnerabilities are common and often have no immediate fix
+- **Why this works:** High and critical vulnerabilities represent genuine immediate risk; moderate vulnerabilities may have no upstream fix and blocking on them creates friction without proportional security benefit
+- **Trade-offs:** CI remains unblocked by moderate dependency issues, but moderate vulnerabilities require a separate triage process to avoid being silently ignored long-term

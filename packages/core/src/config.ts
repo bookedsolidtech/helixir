@@ -32,15 +32,34 @@ const defaults: McpWcConfig = {
 };
 
 function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
-  const configPath = resolve(projectRoot, 'mcpwc.config.json');
-  if (!existsSync(configPath)) return {};
-  try {
-    const raw = readFileSync(configPath, 'utf-8');
-    return JSON.parse(raw) as Partial<McpWcConfig>;
-  } catch {
-    process.stderr.write(`[helixir] Warning: mcpwc.config.json is malformed. Using defaults.\n`);
-    return {};
+  // Primary config file name
+  const primaryPath = resolve(projectRoot, 'helixir.mcp.json');
+  if (existsSync(primaryPath)) {
+    try {
+      const raw = readFileSync(primaryPath, 'utf-8');
+      return JSON.parse(raw) as Partial<McpWcConfig>;
+    } catch {
+      process.stderr.write(`[helixir] Warning: helixir.mcp.json is malformed. Using defaults.\n`);
+      return {};
+    }
   }
+
+  // Backward-compatible fallback to legacy config file name
+  const legacyPath = resolve(projectRoot, 'mcpwc.config.json');
+  if (existsSync(legacyPath)) {
+    process.stderr.write(
+      `[helixir] Warning: mcpwc.config.json is deprecated. Rename to helixir.mcp.json.\n`,
+    );
+    try {
+      const raw = readFileSync(legacyPath, 'utf-8');
+      return JSON.parse(raw) as Partial<McpWcConfig>;
+    } catch {
+      process.stderr.write(`[helixir] Warning: mcpwc.config.json is malformed. Using defaults.\n`);
+      return {};
+    }
+  }
+
+  return {};
 }
 
 export function loadConfig(): Readonly<McpWcConfig> {

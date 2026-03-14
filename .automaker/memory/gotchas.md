@@ -5,9 +5,9 @@ relevantTo: [gotchas]
 importance: 0.7
 relatedFiles: []
 usageStats:
-  loaded: 42
-  referenced: 36
-  successfulFeatures: 36
+  loaded: 68
+  referenced: 43
+  successfulFeatures: 43
 ---
 # gotchas
 
@@ -110,3 +110,43 @@ usageStats:
 - **Situation:** Need to distinguish ENOENT from other errors in catch block, but TypeScript doesn't know caught error has errno properties
 - **Root cause:** Strict TypeScript types catch variables as unknown to enforce type safety. Not all error types have .code property (only filesystem/syscall errors do). Must assert type to access errno-specific properties.
 - **How to avoid:** One-line cast adds safety guarantee: can only access .code if error is actually NodeJS.ErrnoException, preventing crashes on unexpected error types
+
+#### [Gotcha] A feature branch was created to fix a HUMAN TASK comment in README.md, but the fix had already been applied in a prior commit before the feature branch was picked up. (2026-03-12)
+- **Situation:** The feature 'fix: remove HUMAN TASK comment from README before npm publish' was implemented but the target artifact (HUMAN TASK comment) no longer existed in README.md. References remained only in audit/tracking docs (DX_REVIEW.md, AUDIT_SUMMARY.md).
+- **Root cause:** The fix was applied directly or in another branch/commit before this feature branch was started, leaving the feature branch with nothing to do.
+- **How to avoid:** By correctly scoping the fix to only README.md and not touching audit docs, historical tracking integrity is preserved. The risk is that documentation references to 'HUMAN TASK' could cause future confusion about whether the issue is still open.
+
+#### [Gotcha] Auto-generated features from audit snapshots can describe issues that no longer exist in the codebase, creating ghost work items. (2026-03-12)
+- **Situation:** A feature ticket was created to fix a 'your-org' placeholder CI badge URL in README.md, but the fix had already been applied in a prior commit (1708102) before the feature work began.
+- **Root cause:** Audit documents capture point-in-time snapshots. If the underlying issue is fixed between audit generation and feature execution, the feature becomes a no-op — but this isn't discoverable without reading both the code and the audit history.
+- **How to avoid:** Audit-driven development is efficient for surfacing issues at scale, but introduces lag between issue discovery and resolution that can generate duplicate/stale work items if fixes land out-of-band.
+
+#### [Gotcha] Historical audit and review documents (DX_REVIEW.md, AUDIT_SUMMARY.md, principal-review-*.md) describing old incorrect states should not be treated as actionable bugs — they are immutable snapshots, not living specifications. (2026-03-12)
+- **Situation:** After the 'your-org' placeholder was fixed in code, references to the old incorrect state persisted in docs/DX_REVIEW.md, docs/AUDIT_SUMMARY.md, and .automaker/reviews/, causing confusion about whether the issue was truly resolved.
+- **Root cause:** Audit docs represent the state at time of review, not current state. Updating them retroactively would destroy their value as historical records.
+- **How to avoid:** Preserving audit doc integrity means developers must cross-check code vs docs to determine actual current state, adding cognitive overhead during triage.
+
+#### [Gotcha] Repo name drift between feature description and actual codebase (wc-tools vs helixir) is a signal that a feature ticket was generated from a stale or wrong-repo audit context. (2026-03-12)
+- **Situation:** The feature description referenced 'bookedsolidtech/wc-tools' but the actual repo is 'bookedsolidtech/helixir', indicating the audit that generated the ticket was run against a different or renamed repo.
+- **Root cause:** Repo renames or forks can cause audit tooling to carry forward stale identifiers if not re-seeded after structural changes.
+- **How to avoid:** Catching this mismatch requires the implementer to read actual file content and compare against the ticket — automated feature execution without human review would have introduced a bug.
+
+#### [Gotcha] Feature branch was opened for work that was already completed in a prior commit — the codebase was already fully converted before the task ran (2026-03-12)
+- **Situation:** The implementation log shows all acceptance criteria (async parseTokens, fs/promises imports, awaited callers, no sync I/O) were already satisfied with a clean git diff
+- **Root cause:** Likely a timing issue — the fix was committed to the branch before the automated task was triggered, or the task was queued after a manual fix was already applied
+- **How to avoid:** Wasted CI/agent time verifying already-complete work; however, verification still provides confidence the implementation is correct
+
+#### [Gotcha] Feature branch described converting readFileSync at specific line numbers (~65, ~109) that no longer existed — the fix had already been applied in a prior commit (2026-03-12)
+- **Situation:** Feature ticket/branch name referenced a specific sync-to-async migration, but the target file already used async readFile with no readFileSync remaining
+- **Root cause:** Likely a race condition between the feature branch creation and a prior fix landing on the base branch, or the branch was created from a stale ref
+- **How to avoid:** Time spent investigating a completed task; highlights the risk of feature descriptions referencing specific line numbers which drift as code evolves
+
+#### [Gotcha] Feature branch was created to convert readFileSync to async but the code was already async, resulting in a no-op implementation (2026-03-12)
+- **Situation:** A feature ticket described converting buildSuggestedUsage to async and replacing readFileSync with readFile from fs/promises, but the codebase had already been updated prior to branch creation
+- **Root cause:** The divergence between the feature description and actual code state suggests the async conversion was completed in a prior commit or the feature description was written against an older version of the code
+- **How to avoid:** No-op feature branches waste CI time and developer effort but confirm correctness; the alternative of forcing unnecessary code changes would introduce churn and potential regression
+
+#### [Gotcha] Feature tickets referencing ci.yml may be written without awareness that the project uses split workflow files, causing implementation work to be scoped to the wrong file or duplicated (2026-03-12)
+- **Situation:** Chore ticket explicitly requested adding a pnpm audit step to ci.yml, but no ci.yml exists and the step was already present in security.yml
+- **Root cause:** Ticket authors likely assumed a standard single-file CI convention without auditing the actual workflow structure first
+- **How to avoid:** Granular workflows improve CI clarity but increase the chance of misalignment between ticket descriptions and actual file structure

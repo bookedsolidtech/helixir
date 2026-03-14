@@ -21,6 +21,15 @@ reviews:
       - 'deep-audit'
     path_filters:
       - '!**/AUDIT.md'
+      - '!.automaker/**'
+      - '!build/**'
+      - '!pnpm-lock.yaml'
+      - '!.changeset/**'
+      - '!.worktrees/**'
+      - '!.husky/**'
+      - '!coverage/**'
+      - '!node_modules/**'
+      - '!**/*.map'
 
   finishing_touches:
     docstrings:

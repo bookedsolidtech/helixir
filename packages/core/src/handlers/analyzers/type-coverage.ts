@@ -16,18 +16,27 @@ export interface TypeCoverageResult {
   subMetrics: SubMetric[];
 }
 
-export function analyzeTypeCoverage(decl: CemDeclaration): TypeCoverageResult {
+export function analyzeTypeCoverage(decl: CemDeclaration): TypeCoverageResult | null {
   const members = decl.members ?? [];
   const events = decl.events ?? [];
+
+  // 1. Collect data counts
+  const fields = members.filter((m) => m.kind === 'field');
+  const methods = members.filter((m) => m.kind === 'method');
+
+  // If there's nothing to score, this dimension is not applicable — don't inflate with 100/100
+  if (fields.length === 0 && events.length === 0 && methods.length === 0) {
+    return null;
+  }
+
   const subMetrics: SubMetric[] = [];
 
-  // 1. Properties with type annotations (40 points)
-  const fields = members.filter((m) => m.kind === 'field');
+  // 2. Properties with type annotations (40 points)
   const fieldsWithType = fields.filter(
     (m) => m.type && m.type.text && m.type.text.trim().length > 0,
   );
   const propScore =
-    fields.length === 0 ? 40 : Math.round((fieldsWithType.length / fields.length) * 40);
+    fields.length === 0 ? 0 : Math.round((fieldsWithType.length / fields.length) * 40);
   subMetrics.push({
     name: 'Property type annotations',
     score: propScore,
@@ -35,12 +44,12 @@ export function analyzeTypeCoverage(decl: CemDeclaration): TypeCoverageResult {
     note: `${fieldsWithType.length}/${fields.length} properties have type annotations`,
   });
 
-  // 2. Events with typed payloads (35 points)
+  // 3. Events with typed payloads (35 points)
   const eventsWithType = events.filter(
     (e) => e.type && e.type.text && e.type.text.trim().length > 0 && e.type.text !== 'Event',
   );
   const eventScore =
-    events.length === 0 ? 35 : Math.round((eventsWithType.length / events.length) * 35);
+    events.length === 0 ? 0 : Math.round((eventsWithType.length / events.length) * 35);
   subMetrics.push({
     name: 'Event typed payloads',
     score: eventScore,
@@ -48,13 +57,12 @@ export function analyzeTypeCoverage(decl: CemDeclaration): TypeCoverageResult {
     note: `${eventsWithType.length}/${events.length} events have typed payloads (not bare Event)`,
   });
 
-  // 3. Methods with return types (25 points)
-  const methods = members.filter((m) => m.kind === 'method');
+  // 4. Methods with return types (25 points)
   const methodsWithReturn = methods.filter(
     (m) => m.return && m.return.type && m.return.type.text && m.return.type.text.trim().length > 0,
   );
   const methodScore =
-    methods.length === 0 ? 25 : Math.round((methodsWithReturn.length / methods.length) * 25);
+    methods.length === 0 ? 0 : Math.round((methodsWithReturn.length / methods.length) * 25);
   subMetrics.push({
     name: 'Method return types',
     score: methodScore,
@@ -62,7 +70,11 @@ export function analyzeTypeCoverage(decl: CemDeclaration): TypeCoverageResult {
     note: `${methodsWithReturn.length}/${methods.length} methods have return type annotations`,
   });
 
-  const totalScore = propScore + eventScore + methodScore;
+  // Scale score proportionally to only the sub-metrics that had data
+  const applicableMax =
+    (fields.length > 0 ? 40 : 0) + (events.length > 0 ? 35 : 0) + (methods.length > 0 ? 25 : 0);
+  const rawScore = propScore + eventScore + methodScore;
+  const totalScore = applicableMax > 0 ? Math.round((rawScore / applicableMax) * 100) : 0;
 
   return {
     score: totalScore,

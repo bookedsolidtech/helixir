@@ -135,8 +135,8 @@ export async function compareLibraries(
   const absPathA = resolve(join(config.projectRoot, cemPathA));
   const absPathB = resolve(join(config.projectRoot, cemPathB));
 
-  const cemA = await fileOps.readJSON(absPathA, CemSchema);
-  const cemB = await fileOps.readJSON(absPathB, CemSchema);
+  const cemA = (await fileOps.readJSON(absPathA, CemSchema)) as Cem;
+  const cemB = (await fileOps.readJSON(absPathB, CemSchema)) as Cem;
 
   const tagsA = listAllComponents(cemA);
   const tagsB = listAllComponents(cemB);

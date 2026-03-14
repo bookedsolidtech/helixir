@@ -12,17 +12,25 @@ export interface ApiSurfaceResult {
   subMetrics: SubMetric[];
 }
 
-export function analyzeApiSurface(decl: CemDeclaration): ApiSurfaceResult {
+export function analyzeApiSurface(decl: CemDeclaration): ApiSurfaceResult | null {
   const members = decl.members ?? [];
+
+  const methods = members.filter((m) => m.kind === 'method');
+  const fields = members.filter((m) => m.kind === 'field');
+
+  // If there's nothing to score, this dimension is not applicable — don't inflate with 100/100
+  if (methods.length === 0 && fields.length === 0) {
+    return null;
+  }
+
   const subMetrics: SubMetric[] = [];
 
   // 1. Method documentation completeness (30 points)
-  const methods = members.filter((m) => m.kind === 'method');
   const methodsWithDesc = methods.filter(
     (m) => typeof m.description === 'string' && m.description.trim().length > 0,
   );
   const methodDocScore =
-    methods.length === 0 ? 30 : Math.round((methodsWithDesc.length / methods.length) * 30);
+    methods.length === 0 ? 0 : Math.round((methodsWithDesc.length / methods.length) * 30);
   subMetrics.push({
     name: 'Method documentation',
     score: methodDocScore,
@@ -31,16 +39,12 @@ export function analyzeApiSurface(decl: CemDeclaration): ApiSurfaceResult {
   });
 
   // 2. Attribute reflection declared (25 points)
-  // Fields that have an `attribute` binding declared
-  const fields = members.filter((m) => m.kind === 'field');
   const fieldsWithAttribute = fields.filter(
     (m) => typeof m.attribute === 'string' && m.attribute.length > 0,
   );
-  // Also count fields with reflects: true
   const fieldsReflecting = fields.filter((m) => m.reflects === true);
   const reflectedCount = Math.max(fieldsWithAttribute.length, fieldsReflecting.length);
-  // Only penalize if there are fields — some components are purely method-based
-  const attrScore = fields.length === 0 ? 25 : Math.round((reflectedCount / fields.length) * 25);
+  const attrScore = fields.length === 0 ? 0 : Math.round((reflectedCount / fields.length) * 25);
   subMetrics.push({
     name: 'Attribute reflection',
     score: attrScore,
@@ -53,7 +57,7 @@ export function analyzeApiSurface(decl: CemDeclaration): ApiSurfaceResult {
     (m) => m.default !== undefined && m.default !== null && String(m.default).trim().length > 0,
   );
   const defaultScore =
-    fields.length === 0 ? 25 : Math.round((fieldsWithDefault.length / fields.length) * 25);
+    fields.length === 0 ? 0 : Math.round((fieldsWithDefault.length / fields.length) * 25);
   subMetrics.push({
     name: 'Default values documented',
     score: defaultScore,
@@ -61,12 +65,12 @@ export function analyzeApiSurface(decl: CemDeclaration): ApiSurfaceResult {
     note: `${fieldsWithDefault.length}/${fields.length} fields have documented defaults`,
   });
 
-  // 4. Property descriptions (20 points) — complements CEM Completeness
+  // 4. Property descriptions (20 points)
   const fieldsWithDesc = fields.filter(
     (m) => typeof m.description === 'string' && m.description.trim().length > 0,
   );
   const propDescScore =
-    fields.length === 0 ? 20 : Math.round((fieldsWithDesc.length / fields.length) * 20);
+    fields.length === 0 ? 0 : Math.round((fieldsWithDesc.length / fields.length) * 20);
   subMetrics.push({
     name: 'Property descriptions',
     score: propDescScore,
@@ -74,7 +78,10 @@ export function analyzeApiSurface(decl: CemDeclaration): ApiSurfaceResult {
     note: `${fieldsWithDesc.length}/${fields.length} fields have descriptions`,
   });
 
-  const totalScore = methodDocScore + attrScore + defaultScore + propDescScore;
+  // Scale score proportionally to only the sub-metrics that had data
+  const applicableMax = (methods.length > 0 ? 30 : 0) + (fields.length > 0 ? 70 : 0);
+  const rawScore = methodDocScore + attrScore + defaultScore + propDescScore;
+  const totalScore = applicableMax > 0 ? Math.round((rawScore / applicableMax) * 100) : 0;
 
   return {
     score: totalScore,

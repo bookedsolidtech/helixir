@@ -20,14 +20,19 @@ function isKebabCase(name: string): boolean {
   return /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/.test(name);
 }
 
-export function analyzeEventArchitecture(decl: CemDeclaration): EventArchitectureResult {
+export function analyzeEventArchitecture(decl: CemDeclaration): EventArchitectureResult | null {
   const events = decl.events ?? [];
+
+  // If there are no events, this dimension is not applicable — don't inflate with 100/100
+  if (events.length === 0) {
+    return null;
+  }
+
   const subMetrics: SubMetric[] = [];
 
   // 1. Event naming conventions — kebab-case (35 points)
   const kebabEvents = events.filter((e) => isKebabCase(e.name));
-  const namingScore =
-    events.length === 0 ? 35 : Math.round((kebabEvents.length / events.length) * 35);
+  const namingScore = Math.round((kebabEvents.length / events.length) * 35);
   subMetrics.push({
     name: 'Kebab-case naming',
     score: namingScore,
@@ -39,8 +44,7 @@ export function analyzeEventArchitecture(decl: CemDeclaration): EventArchitectur
   const eventsWithType = events.filter(
     (e) => e.type && e.type.text && e.type.text.trim().length > 0 && e.type.text !== 'Event',
   );
-  const typeScore =
-    events.length === 0 ? 35 : Math.round((eventsWithType.length / events.length) * 35);
+  const typeScore = Math.round((eventsWithType.length / events.length) * 35);
   subMetrics.push({
     name: 'Typed event payloads',
     score: typeScore,
@@ -52,8 +56,7 @@ export function analyzeEventArchitecture(decl: CemDeclaration): EventArchitectur
   const eventsWithDesc = events.filter(
     (e) => typeof e.description === 'string' && e.description.trim().length > 0,
   );
-  const descScore =
-    events.length === 0 ? 30 : Math.round((eventsWithDesc.length / events.length) * 30);
+  const descScore = Math.round((eventsWithDesc.length / events.length) * 30);
   subMetrics.push({
     name: 'Event descriptions',
     score: descScore,

@@ -123,9 +123,9 @@ describe('analyzeTypeCoverage', () => {
     expect(result.subMetrics.map((m) => m.name)).toContain('Method return types');
   });
 
-  it('awards full marks for empty arrays (no members/events/methods)', () => {
+  it('returns null for empty arrays (no members/events/methods — not scorable)', () => {
     const result = analyzeTypeCoverage(EMPTY_DECL);
-    expect(result.score).toBe(100);
+    expect(result).toBeNull();
   });
 
   it('treats bare "Event" as untyped payload', () => {
@@ -168,9 +168,9 @@ describe('analyzeApiSurface', () => {
     expect(result.subMetrics).toHaveLength(4);
   });
 
-  it('awards full marks for empty component', () => {
+  it('returns null for empty component (no members — not scorable)', () => {
     const result = analyzeApiSurface(EMPTY_DECL);
-    expect(result.score).toBe(100);
+    expect(result).toBeNull();
   });
 
   it('checks method documentation', () => {
@@ -209,9 +209,9 @@ describe('analyzeCssArchitecture', () => {
     expect(result.score).toBe(100);
   });
 
-  it('returns full marks for component with no CSS properties or parts', () => {
+  it('returns null for component with no CSS properties or parts (not scorable)', () => {
     const result = analyzeCssArchitecture(EMPTY_DECL);
-    expect(result.score).toBe(100);
+    expect(result).toBeNull();
   });
 
   it('penalizes missing descriptions', () => {
@@ -249,9 +249,9 @@ describe('analyzeEventArchitecture', () => {
     expect(result.score).toBe(100);
   });
 
-  it('returns full marks for component with no events', () => {
+  it('returns null for component with no events (not scorable)', () => {
     const result = analyzeEventArchitecture(EMPTY_DECL);
-    expect(result.score).toBe(100);
+    expect(result).toBeNull();
   });
 
   it('penalizes non-kebab-case event names', () => {

@@ -55,8 +55,10 @@ export async function generateAuditReport(
       }
       if (dim.measured) {
         const entry = dimensionTotals[dim.name];
-        entry.sum += dim.score;
-        entry.count++;
+        if (entry) {
+          entry.sum += dim.score;
+          entry.count++;
+        }
       }
     }
 

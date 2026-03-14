@@ -12,9 +12,15 @@ export interface CssArchitectureResult {
   subMetrics: SubMetric[];
 }
 
-export function analyzeCssArchitecture(decl: CemDeclaration): CssArchitectureResult {
+export function analyzeCssArchitecture(decl: CemDeclaration): CssArchitectureResult | null {
   const cssProperties = decl.cssProperties ?? [];
   const cssParts = decl.cssParts ?? [];
+
+  // If there's no CSS metadata, this dimension is not applicable — don't inflate with 100/100
+  if (cssProperties.length === 0 && cssParts.length === 0) {
+    return null;
+  }
+
   const subMetrics: SubMetric[] = [];
 
   // 1. Custom properties with descriptions (35 points)
@@ -22,9 +28,7 @@ export function analyzeCssArchitecture(decl: CemDeclaration): CssArchitectureRes
     (p) => typeof p.description === 'string' && p.description.trim().length > 0,
   );
   const propDescScore =
-    cssProperties.length === 0
-      ? 35
-      : Math.round((propsWithDesc.length / cssProperties.length) * 35);
+    cssProperties.length === 0 ? 0 : Math.round((propsWithDesc.length / cssProperties.length) * 35);
   subMetrics.push({
     name: 'CSS property descriptions',
     score: propDescScore,
@@ -33,12 +37,11 @@ export function analyzeCssArchitecture(decl: CemDeclaration): CssArchitectureRes
   });
 
   // 2. Design token naming patterns (30 points)
-  // Check for consistent --prefix-* naming (e.g., --hx-button-*)
   const tokenPattern = /^--[a-z]+-[a-z]/;
   const wellNamedProps = cssProperties.filter((p) => tokenPattern.test(p.name));
   const tokenScore =
     cssProperties.length === 0
-      ? 30
+      ? 0
       : Math.round((wellNamedProps.length / cssProperties.length) * 30);
   subMetrics.push({
     name: 'Design token naming',
@@ -52,7 +55,7 @@ export function analyzeCssArchitecture(decl: CemDeclaration): CssArchitectureRes
     (p) => typeof p.description === 'string' && p.description.trim().length > 0,
   );
   const partsScore =
-    cssParts.length === 0 ? 35 : Math.round((partsWithDesc.length / cssParts.length) * 35);
+    cssParts.length === 0 ? 0 : Math.round((partsWithDesc.length / cssParts.length) * 35);
   subMetrics.push({
     name: 'CSS parts documentation',
     score: partsScore,
@@ -60,7 +63,10 @@ export function analyzeCssArchitecture(decl: CemDeclaration): CssArchitectureRes
     note: `${partsWithDesc.length}/${cssParts.length} CSS parts have descriptions`,
   });
 
-  const totalScore = propDescScore + tokenScore + partsScore;
+  // Scale score proportionally to only the sub-metrics that had data
+  const applicableMax = (cssProperties.length > 0 ? 65 : 0) + (cssParts.length > 0 ? 35 : 0);
+  const rawScore = propDescScore + tokenScore + partsScore;
+  const totalScore = applicableMax > 0 ? Math.round((rawScore / applicableMax) * 100) : 0;
 
   return {
     score: totalScore,

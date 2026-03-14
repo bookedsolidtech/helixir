@@ -1,7 +1,7 @@
 import { join, resolve } from 'node:path';
 import { z } from 'zod';
 import type { McpWcConfig } from '../config.js';
-import { CemSchema } from './cem.js';
+import { CemSchema, type Cem } from './cem.js';
 import { SafeFileOperations } from '../shared/file-ops.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
 import { FilePathSchema } from '../shared/validation.js';
@@ -215,7 +215,7 @@ export async function benchmarkLibraries(
       );
     }
     const absPath = resolve(join(config.projectRoot, lib.cemPath));
-    const cem = await fileOps.readJSON(absPath, CemSchema);
+    const cem = (await fileOps.readJSON(absPath, CemSchema)) as Cem;
     rawList.push(computeRawMetrics(lib.label, cem));
   }
 

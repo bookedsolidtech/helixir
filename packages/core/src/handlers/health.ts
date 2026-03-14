@@ -761,13 +761,14 @@ export async function scoreComponentMultiDimensional(
   for (const def of DIMENSION_REGISTRY) {
     if (def.source === 'cem-native') {
       const result = await scoreCemNativeDimension(def.name, decl, issues, config, cem);
+      const notApplicable = 'notApplicable' in result && result.notApplicable === true;
       dimensions.push({
         name: def.name,
         score: result.score,
         weight: def.weight,
         tier: def.tier,
         confidence: result.confidence,
-        measured: true,
+        measured: !notApplicable,
         subMetrics: result.subMetrics,
       });
     } else {
@@ -826,7 +827,12 @@ async function scoreCemNativeDimension(
   issues: string[],
   config?: McpWcConfig,
   cem?: Cem,
-): Promise<{ score: number; confidence: ConfidenceLevel; subMetrics?: SubMetric[] }> {
+): Promise<{
+  score: number;
+  confidence: ConfidenceLevel;
+  subMetrics?: SubMetric[];
+  notApplicable?: boolean;
+}> {
   switch (name) {
     case 'CEM Completeness': {
       const { score, subMetrics } = scoreCemCompleteness(decl);
@@ -867,6 +873,7 @@ async function scoreCemNativeDimension(
 
     case 'Type Coverage': {
       const tc = analyzeTypeCoverage(decl);
+      if (!tc) return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
       if (tc.score < 50) {
         issues.push(`Type coverage is low (${tc.score}%)`);
       }
@@ -875,16 +882,19 @@ async function scoreCemNativeDimension(
 
     case 'API Surface Quality': {
       const api = analyzeApiSurface(decl);
+      if (!api) return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
       return api;
     }
 
     case 'CSS Architecture': {
       const css = analyzeCssArchitecture(decl);
+      if (!css) return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
       return css;
     }
 
     case 'Event Architecture': {
       const evt = analyzeEventArchitecture(decl);
+      if (!evt) return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
       return evt;
     }
 

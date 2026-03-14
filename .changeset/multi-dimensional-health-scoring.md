@@ -1,5 +1,5 @@
 ---
-'@helixir/core': minor
+'helixir': minor
 ---
 
 Add multi-dimensional health scoring engine with source-level accessibility analysis

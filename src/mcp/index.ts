@@ -131,7 +131,7 @@ function startCemWatcher(cemAbsPath: string): void {
   });
 }
 
-const server = new Server({ name: 'helixir', version: '0.1.0' }, { capabilities: { tools: {} } });
+const server = new Server({ name: 'helixir', version: '0.4.0' }, { capabilities: { tools: {} } });
 
 export async function main(): Promise<void> {
   const config = loadConfig();
@@ -148,7 +148,7 @@ export async function main(): Promise<void> {
   if (!existsSync(cemAbsPath)) {
     const relPath = relative(resolvedProjectRoot, cemAbsPath);
     process.stderr.write(
-      `Fatal: CEM file not found at ${relPath}. Set MCP_WC_CEM_PATH or add cemPath to mcpwc.config.json\n`,
+      `Fatal: CEM file not found at ${relPath}. Set MCP_WC_CEM_PATH or add cemPath to helixir.mcp.json\n`,
     );
     process.exit(1);
   }
@@ -262,7 +262,7 @@ export async function main(): Promise<void> {
       if (isTokenTool(name)) {
         if (!config.tokensPath) {
           return createErrorResponse(
-            'Token tools are not enabled. Set tokensPath in mcpwc.config.json or MCP_WC_TOKENS_PATH.',
+            'Token tools are not enabled. Set tokensPath in helixir.mcp.json or MCP_WC_TOKENS_PATH.',
           );
         }
         return handleTokenCall(name, typedArgs, config);

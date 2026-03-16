@@ -325,29 +325,27 @@ describe('getHealthTrend', () => {
   it('dimensionTrends includes all dimensions from first and last data points', async () => {
     const config = makeConfig();
     const trend = await getHealthTrend(config, 'my-button', 10);
-    if (trend.dimensionTrends) {
-      // my-button fixture has: documentation, accessibility, completeness, consistency
-      expect(trend.dimensionTrends).toHaveProperty('documentation');
-      expect(trend.dimensionTrends).toHaveProperty('accessibility');
-      expect(trend.dimensionTrends).toHaveProperty('completeness');
-      expect(trend.dimensionTrends).toHaveProperty('consistency');
-    }
+    expect(trend.dimensionTrends).toBeDefined();
+    // my-button fixture has: documentation, accessibility, completeness, consistency
+    expect(trend.dimensionTrends).toHaveProperty('documentation');
+    expect(trend.dimensionTrends).toHaveProperty('accessibility');
+    expect(trend.dimensionTrends).toHaveProperty('completeness');
+    expect(trend.dimensionTrends).toHaveProperty('consistency');
   });
 
   it('dimensionTrends tracks per-dimension improvement', async () => {
     const config = makeConfig();
     const trend = await getHealthTrend(config, 'my-button', 10);
-    if (trend.dimensionTrends) {
-      for (const [dimension, dimTrend] of Object.entries(trend.dimensionTrends)) {
-        expect(['improving', 'declining', 'stable']).toContain(dimTrend.trend);
-        expect(typeof dimTrend.changePercent).toBe('number');
-        // changePercent is at most 2 decimal places due to Math.round(...) / 10
-        const str = dimTrend.changePercent.toString();
-        const decimalIndex = str.indexOf('.');
-        if (decimalIndex !== -1) {
-          const decimalPlaces = str.length - decimalIndex - 1;
-          expect(decimalPlaces).toBeLessThanOrEqual(1);
-        }
+    expect(trend.dimensionTrends).toBeDefined();
+    for (const [, dimTrend] of Object.entries(trend.dimensionTrends!)) {
+      expect(['improving', 'declining', 'stable']).toContain(dimTrend.trend);
+      expect(typeof dimTrend.changePercent).toBe('number');
+      // changePercent is at most 2 decimal places due to Math.round(...) / 10
+      const str = dimTrend.changePercent.toString();
+      const decimalIndex = str.indexOf('.');
+      if (decimalIndex !== -1) {
+        const decimalPlaces = str.length - decimalIndex - 1;
+        expect(decimalPlaces).toBeLessThanOrEqual(1);
       }
     }
   });
@@ -759,9 +757,8 @@ describe('getHealthSummary', () => {
 
     const summary = await getHealthSummary(config, components);
 
-    // Average should be between the two scores
-    expect(summary.averageScore).toBeGreaterThan(0);
-    expect(summary.averageScore).toBeLessThan(100);
+    // Perfect (100) + Undocumented (0) should average to ~50
+    expect(summary.averageScore).toBeCloseTo(50, 0);
   });
 
   it('handles components with no events or slots gracefully', async () => {

@@ -206,7 +206,7 @@ describe('handleHealthCall — score_component', () => {
 
 // ─── Grade calculation ────────────────────────────────────────────────────────
 
-describe('grade calculation (A=90+, B=80+, C=70+, D=60+, F=below 60)', () => {
+describe('grade passthrough (dispatcher preserves handler grades)', () => {
   const gradeTable: Array<[number, ComponentHealth['grade']]> = [
     [100, 'A'],
     [90, 'A'],

@@ -33,6 +33,7 @@ export {
 } from './tools/discovery.js';
 export * from './tools/framework.js';
 export * from './tools/health.js';
+export * from './tools/library.js';
 export * from './tools/safety.js';
 export * from './tools/story.js';
 export * from './tools/tokens.js';

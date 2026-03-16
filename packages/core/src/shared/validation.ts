@@ -18,11 +18,17 @@ export function TagNameSchema(componentPrefix: string): z.ZodString {
   }
 
   const escaped = componentPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  // If prefix already contains a hyphen (e.g. "my-"), the result is always a valid
+  // custom element name. If not (e.g. "hx"), we must require at least one hyphen-segment
+  // after the prefix so the result is a valid custom element name per HTML spec.
+  const suffix = componentPrefix.includes('-')
+    ? '[a-z0-9]+(-[a-z0-9]+)*'
+    : '[a-z0-9]*-[a-z0-9]+(-[a-z0-9]+)*';
   return z
     .string()
     .regex(
-      new RegExp(`^${escaped}[a-z0-9]+(-[a-z0-9]+)*$`),
-      `Tag name must start with "${componentPrefix}"`,
+      new RegExp(`^${escaped}${suffix}$`),
+      `Tag name must start with "${componentPrefix}" and be a valid custom element name (must contain a hyphen)`,
     );
 }
 

@@ -64,7 +64,7 @@ export function analyzeEventArchitecture(decl: CemDeclaration): EventArchitectur
     note: `${eventsWithDesc.length}/${events.length} events have descriptions`,
   });
 
-  const totalScore = namingScore + typeScore + descScore;
+  const totalScore = Math.min(100, namingScore + typeScore + descScore);
 
   return {
     score: totalScore,

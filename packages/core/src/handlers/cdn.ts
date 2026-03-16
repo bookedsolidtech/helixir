@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from 'fs';
 import { join, relative } from 'path';
 import type { McpWcConfig } from '../config.js';
-import { CemSchema, loadCdnCem } from './cem.js';
+import { CemSchema, loadLibrary } from './cem.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
 
 /**
@@ -216,7 +216,7 @@ export async function resolveCdnCem(
 
   // Load into in-memory CDN CEM registry when register=true.
   if (register) {
-    loadCdnCem(libraryId, cem);
+    loadLibrary(libraryId, cem, 'cdn');
   }
 
   const formatted = cacheWritten

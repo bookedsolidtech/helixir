@@ -727,9 +727,9 @@ export async function runInit(projectRoot: string = process.cwd()): Promise<void
       tokensPath,
     };
 
-    const configPath = resolve(projectRoot, 'mcpwc.config.json');
+    const configPath = resolve(projectRoot, 'helixir.mcp.json');
     writeFileSync(configPath, JSON.stringify(configObj, null, 2) + '\n');
-    process.stdout.write(`\u2713 Written: mcpwc.config.json\n`);
+    process.stdout.write(`\u2713 Written: helixir.mcp.json\n`);
 
     // Step 5: Print copy-paste snippets
     const snippet = {

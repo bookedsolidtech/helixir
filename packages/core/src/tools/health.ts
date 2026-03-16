@@ -20,6 +20,7 @@ import { DIMENSION_REGISTRY } from '../handlers/dimensions.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
+import { FilePathSchema } from '../shared/validation.js';
 
 // ─── Arg schemas ──────────────────────────────────────────────────────────────
 
@@ -54,7 +55,7 @@ const AnalyzeAccessibilityArgsSchema = z.object({
 });
 
 const AuditLibraryArgsSchema = z.object({
-  outputPath: z.string().optional(),
+  outputPath: FilePathSchema.optional(),
   libraryId: z.string().optional(),
 });
 

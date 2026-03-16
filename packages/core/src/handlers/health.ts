@@ -173,7 +173,7 @@ function historyToHealth(file: HistoryFileRaw): ComponentHealth {
  * Custom element tag names per HTML spec are [a-z0-9-], with optional "pkg:tag" notation.
  * Only lowercase alphanumeric, hyphens, colons, and underscores are allowed.
  */
-const TAG_NAME_ALLOWLIST_REGEX = /^[a-z0-9:_-]+$/i;
+const TAG_NAME_ALLOWLIST_REGEX = /^[a-z0-9:_-]+$/;
 
 function componentHistoryDir(config: McpWcConfig, tagName: string, libraryId = 'default'): string {
   // Use a positive allowlist to reject any tag name that doesn't match safe characters.
@@ -242,7 +242,8 @@ async function readLatestHistoryFile(
         .sort()
         .reverse();
       dir = legacyDir;
-    } catch {
+    } catch (legacyErr) {
+      if ((legacyErr as NodeJS.ErrnoException).code !== 'ENOENT') throw legacyErr;
       return null;
     }
   }
@@ -404,7 +405,8 @@ export async function getHealthTrend(
     try {
       allFiles = (await readdir(legacyDir)).filter((f) => f.endsWith('.json')).sort();
       dir = legacyDir;
-    } catch {
+    } catch (legacyErr) {
+      if ((legacyErr as NodeJS.ErrnoException).code !== 'ENOENT') throw legacyErr;
       throw new MCPError(`No health history found for '${tagName}'`, ErrorCategory.NOT_FOUND);
     }
   }

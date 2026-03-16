@@ -18,7 +18,7 @@
  */
 
 import { readFile } from 'node:fs/promises';
-import { resolve, dirname } from 'node:path';
+import { resolve, dirname, sep } from 'node:path';
 import { existsSync } from 'node:fs';
 import type { CemDeclaration } from '../cem.js';
 import { getInheritanceChain } from '../cem.js';
@@ -124,11 +124,13 @@ async function resolveModulePath(
     candidates.push(resolve(projectRoot, prefix, normalized.replace(/\.js$/, '.ts')));
   }
 
-  // Deduplicate and try each
+  // Deduplicate and try each — only allow paths within projectRoot
+  const resolvedRoot = resolve(projectRoot);
   const seen = new Set<string>();
   for (const candidate of candidates) {
     if (seen.has(candidate)) continue;
     seen.add(candidate);
+    if (!candidate.startsWith(resolvedRoot + sep)) continue;
     const content = await tryRead(candidate);
     if (content !== null) return candidate;
   }

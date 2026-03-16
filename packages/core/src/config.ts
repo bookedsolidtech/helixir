@@ -69,13 +69,18 @@ export function loadConfig(): Readonly<McpWcConfig> {
   // Build config: defaults → file → env vars
   const config: McpWcConfigMutable = { ...defaults, projectRoot: effectiveRoot };
 
-  // Merge config file values (override defaults, lower priority than env vars)
+  // Merge config file values (override defaults, lower priority than env vars).
+  // Exclude projectRoot from file config — it's already determined from env/cwd,
+  // and the config file is located relative to it (circular dependency).
   const fileConfig = readConfigFile(effectiveRoot);
-  Object.assign(config, fileConfig);
+  const fileCemPath = fileConfig.cemPath;
+  // Prevent config file from overriding projectRoot (circular dependency).
+  const safeFileConfig: Omit<Partial<McpWcConfig>, 'projectRoot'> = { ...fileConfig };
+  delete (safeFileConfig as Record<string, unknown>)['projectRoot'];
+  Object.assign(config, safeFileConfig);
 
   // Auto-discover cemPath if not explicitly configured via env var or config file
-  const cemPathExplicit =
-    process.env['MCP_WC_CEM_PATH'] !== undefined || fileConfig.cemPath !== undefined;
+  const cemPathExplicit = process.env['MCP_WC_CEM_PATH'] !== undefined || fileCemPath !== undefined;
 
   if (!cemPathExplicit) {
     const discovered = discoverCemPath(effectiveRoot);

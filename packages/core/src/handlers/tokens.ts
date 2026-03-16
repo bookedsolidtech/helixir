@@ -30,12 +30,16 @@ const TokenFileSchema = z
     message: 'Token file must be a JSON object at the top level',
   });
 
+const MAX_TOKEN_DEPTH = 50;
+
 function flattenNode(
   node: DtcgNode,
   path: string[],
   category: string,
   result: DesignToken[],
+  depth = 0,
 ): void {
+  if (depth > MAX_TOKEN_DEPTH) return;
   if (Object.prototype.hasOwnProperty.call(node, '$value')) {
     result.push({
       name: path.join('.'),
@@ -48,7 +52,7 @@ function flattenNode(
 
   for (const key of Object.keys(node)) {
     if (key.startsWith('$')) continue;
-    flattenNode(node[key] as DtcgNode, [...path, key], category, result);
+    flattenNode(node[key] as DtcgNode, [...path, key], category, result, depth + 1);
   }
 }
 

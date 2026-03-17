@@ -1,6 +1,7 @@
 {
   "name": "@helixir/github-action",
   "version": "0.1.0",
+  "private": true,
   "description": "GitHub Action that runs helixir CLI in PR workflows for web component quality gates",
   "type": "commonjs",
   "main": "dist/index.js",

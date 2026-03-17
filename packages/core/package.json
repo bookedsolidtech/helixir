@@ -1,6 +1,7 @@
 {
   "name": "@helixir/core",
   "version": "0.1.0",
+  "private": true,
   "description": "Core handlers, shared utilities, and tool definitions for helixir",
   "type": "module",
   "main": "./src/index.ts",

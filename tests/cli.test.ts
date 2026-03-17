@@ -203,7 +203,7 @@ describe('helixir CLI subcommands (requires build)', () => {
 });
 
 describe('helixir init', () => {
-  it('writes mcpwc.config.json and prints snippets when CEM is found', () => {
+  it('writes helixir.mcp.json and prints snippets when CEM is found', () => {
     const tmpDir = mkdtempSync(join(tmpdir(), 'helixir-init-'));
     try {
       // Create a package.json with lit to trigger framework detection
@@ -231,12 +231,12 @@ describe('helixir init', () => {
       expect(result.status).toBe(0);
       expect(result.stdout).toContain('Detected: Lit 3.x');
       expect(result.stdout).toContain('Found CEM: custom-elements.json');
-      expect(result.stdout).toContain('Written: mcpwc.config.json');
+      expect(result.stdout).toContain('Written: helixir.mcp.json');
       expect(result.stdout).toContain('claude_desktop_config.json');
       expect(result.stdout).toContain('"helixir"');
 
       // Verify config file was written
-      const configPath = join(tmpDir, 'mcpwc.config.json');
+      const configPath = join(tmpDir, 'helixir.mcp.json');
       expect(existsSync(configPath)).toBe(true);
       const config = JSON.parse(readFileSync(configPath, 'utf-8')) as Record<string, unknown>;
       expect(config['cemPath']).toBe('custom-elements.json');
@@ -266,7 +266,7 @@ describe('helixir init', () => {
       });
 
       expect(result.status).toBe(0);
-      const config = JSON.parse(readFileSync(join(tmpDir, 'mcpwc.config.json'), 'utf-8')) as Record<
+      const config = JSON.parse(readFileSync(join(tmpDir, 'helixir.mcp.json'), 'utf-8')) as Record<
         string,
         unknown
       >;
@@ -296,7 +296,7 @@ describe('helixir init', () => {
       });
 
       expect(result.status).toBe(0);
-      const config = JSON.parse(readFileSync(join(tmpDir, 'mcpwc.config.json'), 'utf-8')) as Record<
+      const config = JSON.parse(readFileSync(join(tmpDir, 'helixir.mcp.json'), 'utf-8')) as Record<
         string,
         unknown
       >;
@@ -322,7 +322,7 @@ describe('helixir init', () => {
       });
 
       expect(result.status).toBe(0);
-      const config = JSON.parse(readFileSync(join(tmpDir, 'mcpwc.config.json'), 'utf-8')) as Record<
+      const config = JSON.parse(readFileSync(join(tmpDir, 'helixir.mcp.json'), 'utf-8')) as Record<
         string,
         unknown
       >;

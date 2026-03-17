@@ -4,8 +4,9 @@
  */
 
 import { writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { resolve, sep } from 'node:path';
 import type { McpWcConfig } from '../config.js';
+import { MCPError, ErrorCategory } from '../shared/error-handling.js';
 import type { Cem, CemDeclaration } from './cem.js';
 import { scoreComponentMultiDimensional } from './health.js';
 
@@ -89,9 +90,16 @@ export async function generateAuditReport(
     timestamp: new Date().toISOString(),
   };
 
-  // Write to file if outputPath provided
+  // Write to file if outputPath provided — with path containment check
   if (options?.outputPath) {
-    const outputFile = resolve(config.projectRoot, options.outputPath);
+    const resolvedRoot = resolve(config.projectRoot);
+    const outputFile = resolve(resolvedRoot, options.outputPath);
+    if (!outputFile.startsWith(resolvedRoot + sep) && outputFile !== resolvedRoot) {
+      throw new MCPError(
+        'outputPath must resolve to a location within the project root.',
+        ErrorCategory.VALIDATION,
+      );
+    }
     await writeFile(outputFile, lines.join('\n') + '\n', 'utf-8');
   }
 

@@ -13,7 +13,7 @@
  */
 
 import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { resolve, sep } from 'node:path';
 import { existsSync } from 'node:fs';
 import type { McpWcConfig } from '../../config.js';
 import type { Cem, CemDeclaration } from '../cem.js';
@@ -194,7 +194,9 @@ export function resolveComponentSourceFilePath(
     resolve(projectRoot, 'src', modulePath),
   ];
 
+  const resolvedRoot = resolve(projectRoot);
   for (const candidate of candidates) {
+    if (!candidate.startsWith(resolvedRoot + sep)) continue;
     if (existsSync(candidate)) return candidate;
   }
   return null;

@@ -21,6 +21,20 @@ describe('TagNameSchema', () => {
     });
   });
 
+  describe('with prefix without trailing hyphen', () => {
+    const schema = TagNameSchema('hx');
+
+    it('accepts valid custom element names starting with prefix', () => {
+      expect(schema.safeParse('hx-button').success).toBe(true);
+      expect(schema.safeParse('hx-card-header').success).toBe(true);
+    });
+
+    it('rejects names without a hyphen (not valid custom elements)', () => {
+      expect(schema.safeParse('hxfoo').success).toBe(false);
+      expect(schema.safeParse('hx123').success).toBe(false);
+    });
+  });
+
   describe('with empty prefix', () => {
     const schema = TagNameSchema('');
 

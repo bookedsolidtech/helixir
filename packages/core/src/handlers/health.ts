@@ -13,6 +13,7 @@ import { analyzeCssArchitecture } from './analyzers/css-architecture.js';
 import { analyzeEventArchitecture } from './analyzers/event-architecture.js';
 import { analyzeSourceAccessibility } from './analyzers/source-accessibility.js';
 import { analyzeCemSourceFidelity } from './analyzers/cem-source-fidelity.js';
+import { analyzeSlotArchitecture } from './analyzers/slot-architecture.js';
 import {
   DIMENSION_REGISTRY,
   calculateGrade,
@@ -910,6 +911,14 @@ async function scoreCemNativeDimension(
         return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
       }
       return fidelity;
+    }
+
+    case 'Slot Architecture': {
+      const slotResult = analyzeSlotArchitecture(decl);
+      if (!slotResult) {
+        return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+      }
+      return slotResult;
     }
 
     default:

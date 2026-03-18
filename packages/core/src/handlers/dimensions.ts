@@ -118,6 +118,14 @@ export const DIMENSION_REGISTRY: DimensionDefinition[] = [
     source: 'cem-native',
     phase: 'cem-analysis',
   },
+  // Dimension 13: Slot Architecture — slot documentation, type constraints, coherence
+  {
+    name: 'Slot Architecture',
+    weight: 5,
+    tier: 'important',
+    source: 'cem-native',
+    phase: 'cem-analysis',
+  },
 ];
 
 export const DIMENSION_CLASSIFICATION = {
@@ -132,6 +140,7 @@ export const DIMENSION_CLASSIFICATION = {
     'API Surface Quality',
     'CSS Architecture',
     'Event Architecture',
+    'Slot Architecture',
     'Bundle Size',
     'Story Coverage',
   ],

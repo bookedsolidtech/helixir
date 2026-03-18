@@ -21,6 +21,12 @@ export {
   type InheritanceChainResult,
 } from './mixin-resolver.js';
 export {
+  analyzeSlotArchitecture,
+  type SlotArchitectureResult,
+  type SlotAnalysis,
+  type CoherencePair,
+} from './slot-architecture.js';
+export {
   analyzeCemSourceFidelity,
   extractSourceEvents,
   extractSourceProperties,

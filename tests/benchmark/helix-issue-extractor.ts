@@ -107,7 +107,12 @@ export function extractCemSourceFidelityFindings(
         dimension: 'CEM-Source Fidelity',
         score: fidelityDim.score,
         tier: fidelityDim.tier,
-        description: `CEM-Source Fidelity score: ${fidelityDim.score}/100. ${fidelityDim.subMetrics?.map((s) => s.note).filter(Boolean).join('; ') ?? 'Check source files for discrepancies.'}`,
+        description: `CEM-Source Fidelity score: ${fidelityDim.score}/100. ${
+          fidelityDim.subMetrics
+            ?.map((s) => s.note)
+            .filter(Boolean)
+            .join('; ') ?? 'Check source files for discrepancies.'
+        }`,
         severity: fidelityDim.score < 50 ? 'critical' : 'warning',
       });
     }

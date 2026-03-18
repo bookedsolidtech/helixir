@@ -56,8 +56,7 @@ export function generateComparisonTable(scorecards: LibraryScorecard[]): Compari
       rank: idx + 1,
     }));
 
-    const spread =
-      ranked.length > 0 ? ranked[0].average - ranked[ranked.length - 1].average : 0;
+    const spread = ranked.length > 0 ? ranked[0].average - ranked[ranked.length - 1].average : 0;
 
     return { dimension: dim, rankings: ranked, spread: Math.round(spread * 100) / 100 };
   });

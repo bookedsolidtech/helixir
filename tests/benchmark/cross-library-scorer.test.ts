@@ -89,10 +89,7 @@ beforeAll(async () => {
       comparisonTable,
       performance: perfMonitor.getResult(),
     };
-    writeFileSync(
-      resolve(RESULTS_DIR, 'latest-benchmark.json'),
-      JSON.stringify(output, null, 2),
-    );
+    writeFileSync(resolve(RESULTS_DIR, 'latest-benchmark.json'), JSON.stringify(output, null, 2));
   } catch {
     // Non-fatal: fixture writing is optional
   }
@@ -128,10 +125,7 @@ describe('Library Loading', () => {
 
   it('finds components in every library', () => {
     for (const lib of loadedLibraries) {
-      expect(
-        lib.componentCount,
-        `${lib.name} should have at least 1 component`,
-      ).toBeGreaterThan(0);
+      expect(lib.componentCount, `${lib.name} should have at least 1 component`).toBeGreaterThan(0);
     }
   });
 });
@@ -181,10 +175,7 @@ describe('Component Scoring', () => {
     if (helixCard) {
       const dist = helixCard.gradeDistribution;
       const gradesUsed = Object.values(dist).filter((v) => v > 0).length;
-      expect(
-        gradesUsed,
-        'helix should have at least 2 different grades',
-      ).toBeGreaterThanOrEqual(2);
+      expect(gradesUsed, 'helix should have at least 2 different grades').toBeGreaterThanOrEqual(2);
     }
 
     // Verify there's overall variation — not every library has the same avg score
@@ -274,10 +265,7 @@ describe('Performance Gate', () => {
     for (const phase of result.phases) {
       console.log(`  ${phase.name}: ${phase.durationMs}ms`);
     }
-    expect(
-      result.withinGate,
-      `Benchmark took ${result.totalMs}ms (limit: 60000ms)`,
-    ).toBe(true);
+    expect(result.withinGate, `Benchmark took ${result.totalMs}ms (limit: 60000ms)`).toBe(true);
   });
 });
 

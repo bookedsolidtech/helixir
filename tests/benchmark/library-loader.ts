@@ -10,8 +10,7 @@ import type { McpWcConfig } from '../../packages/core/src/config.js';
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 const WC_LIBRARIES_ROOT = '/Volumes/Development/booked/wc-libraries';
-const HELIX_CEM_PATH =
-  '/Volumes/Development/booked/helix/packages/hx-library/custom-elements.json';
+const HELIX_CEM_PATH = '/Volumes/Development/booked/helix/packages/hx-library/custom-elements.json';
 
 export const LIBRARY_NAMES = [
   'material',

@@ -105,9 +105,7 @@ export function generateScorecard(
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-function computeDimensionAverages(
-  results: MultiDimensionalHealth[],
-): Record<string, number> {
+function computeDimensionAverages(results: MultiDimensionalHealth[]): Record<string, number> {
   const sums: Record<string, { total: number; count: number }> = {};
 
   for (const r of results) {

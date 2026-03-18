@@ -77,10 +77,7 @@ beforeAll(async () => {
   // Write helix report as structured JSON
   try {
     mkdirSync(RESULTS_DIR, { recursive: true });
-    writeFileSync(
-      resolve(RESULTS_DIR, 'helix-report.json'),
-      JSON.stringify(deepDive, null, 2),
-    );
+    writeFileSync(resolve(RESULTS_DIR, 'helix-report.json'), JSON.stringify(deepDive, null, 2));
   } catch {
     // Non-fatal
   }

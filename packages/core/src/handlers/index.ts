@@ -12,6 +12,7 @@ export * from './composition.js';
 export * from './dependencies.js';
 export * from './dimensions.js';
 export * from './framework.js';
+export * from './generate-types.js';
 export * from './health.js';
 export * from './migration.js';
 export * from './narrative.js';

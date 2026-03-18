@@ -1,5 +1,5 @@
 /**
- * Dimension Registry — defines the 11 health dimensions, grade thresholds,
+ * Dimension Registry — defines the 12 health dimensions, grade thresholds,
  * and the enterprise-grade algorithm for multi-dimensional health scoring.
  */
 
@@ -110,10 +110,24 @@ export const DIMENSION_REGISTRY: DimensionDefinition[] = [
     source: 'external',
     phase: 'external-data',
   },
+  // Dimension 12: CEM-Source Fidelity — catches CEM vs source divergence
+  {
+    name: 'CEM-Source Fidelity',
+    weight: 10,
+    tier: 'critical',
+    source: 'cem-native',
+    phase: 'cem-analysis',
+  },
 ];
 
 export const DIMENSION_CLASSIFICATION = {
-  critical: ['CEM Completeness', 'Accessibility', 'Type Coverage', 'Test Coverage'],
+  critical: [
+    'CEM Completeness',
+    'Accessibility',
+    'Type Coverage',
+    'Test Coverage',
+    'CEM-Source Fidelity',
+  ],
   important: [
     'API Surface Quality',
     'CSS Architecture',

@@ -81,7 +81,7 @@ function renderEventsInterface(decl: CemDeclaration): string | null {
 
 // --- Public API ---
 
-export interface GenerateTypesResult {
+export interface TypegenerateResult {
   /** Full content of the generated .d.ts file. */
   content: string;
   /** Number of components included in the output. */
@@ -96,7 +96,7 @@ export interface GenerateTypesResult {
  * (the HTML attribute name), not the `name` field (the JS property name).
  * This is the root cause fix for the hx-tabs attribute name drift bug.
  */
-export function generateTypes(cem: Cem): GenerateTypesResult {
+export function generateTypes(cem: Cem): TypegenerateResult {
   const declarations = cem.modules.flatMap((m) => m.declarations ?? []).filter((d) => d.tagName);
 
   const blocks: string[] = [

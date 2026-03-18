@@ -485,6 +485,38 @@
         },
         {
           "kind": "js",
+          "name": "analyzeSlotArchitecture",
+          "declaration": {
+            "name": "analyzeSlotArchitecture",
+            "module": "./slot-architecture.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "SlotArchitectureResult",
+          "declaration": {
+            "name": "SlotArchitectureResult",
+            "module": "./slot-architecture.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "SlotAnalysis",
+          "declaration": {
+            "name": "SlotAnalysis",
+            "module": "./slot-architecture.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "CoherencePair",
+          "declaration": {
+            "name": "CoherencePair",
+            "module": "./slot-architecture.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "analyzeNamingConsistency",
           "declaration": {
             "name": "analyzeNamingConsistency",
@@ -933,6 +965,39 @@
           "declaration": {
             "name": "analyzeNamingConsistency",
             "module": "packages/core/src/handlers/analyzers/naming-consistency.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/analyzers/slot-architecture.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "analyzeSlotArchitecture",
+          "return": {
+            "type": {
+              "text": "SlotArchitectureResult | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "analyzeSlotArchitecture",
+          "declaration": {
+            "name": "analyzeSlotArchitecture",
+            "module": "packages/core/src/handlers/analyzers/slot-architecture.ts"
           }
         }
       ]
@@ -2435,15 +2500,15 @@
           "type": {
             "text": "DimensionDefinition[]"
           },
-          "default": "[ // CEM-native dimensions (helixir can score these) { name: 'CEM Completeness', weight: 15, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Accessibility', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Type Coverage', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'API Surface Quality', weight: 10, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'CSS Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Event Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, // External-data dimensions (reported as untested unless history provides scores) { name: 'Test Coverage', weight: 10, tier: 'critical', source: 'external', phase: 'external-data', }, { name: 'Bundle Size', weight: 5, tier: 'important', source: 'external', phase: 'external-data' }, { name: 'Story Coverage', weight: 5, tier: 'important', source: 'external', phase: 'external-data', }, { name: 'Performance', weight: 5, tier: 'advanced', source: 'external', phase: 'external-data' }, { name: 'Drupal Readiness', weight: 5, tier: 'advanced', source: 'external', phase: 'external-data', }, // Dimension 12: CEM-Source Fidelity — catches CEM vs source divergence { name: 'CEM-Source Fidelity', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, // Dimension 14: Naming Consistency — library-wide naming convention adherence { name: 'Naming Consistency', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, ]"
+          "default": "[ // CEM-native dimensions (helixir can score these) { name: 'CEM Completeness', weight: 15, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Accessibility', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Type Coverage', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'API Surface Quality', weight: 10, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'CSS Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Event Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, // External-data dimensions (reported as untested unless history provides scores) { name: 'Test Coverage', weight: 10, tier: 'critical', source: 'external', phase: 'external-data', }, { name: 'Bundle Size', weight: 5, tier: 'important', source: 'external', phase: 'external-data' }, { name: 'Story Coverage', weight: 5, tier: 'important', source: 'external', phase: 'external-data', }, { name: 'Performance', weight: 5, tier: 'advanced', source: 'external', phase: 'external-data' }, { name: 'Drupal Readiness', weight: 5, tier: 'advanced', source: 'external', phase: 'external-data', }, // Dimension 12: CEM-Source Fidelity — catches CEM vs source divergence { name: 'CEM-Source Fidelity', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, // Dimension 13: Slot Architecture — slot documentation, type constraints, coherence { name: 'Slot Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, // Dimension 14: Naming Consistency — library-wide naming convention adherence { name: 'Naming Consistency', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, ]"
         },
         {
           "kind": "variable",
           "name": "DIMENSION_CLASSIFICATION",
           "type": {
-            "text": "{\n  critical: [\n    'CEM Completeness',\n    'Accessibility',\n    'Type Coverage',\n    'Test Coverage',\n    'CEM-Source Fidelity',\n  ],\n  important: [\n    'API Surface Quality',\n    'CSS Architecture',\n    'Event Architecture',\n    'Bundle Size',\n    'Story Coverage',\n    'Naming Consistency',\n  ],\n  advanced: ['Performance', 'Drupal Readiness'],\n}"
+            "text": "{\n  critical: [\n    'CEM Completeness',\n    'Accessibility',\n    'Type Coverage',\n    'Test Coverage',\n    'CEM-Source Fidelity',\n  ],\n  important: [\n    'API Surface Quality',\n    'CSS Architecture',\n    'Event Architecture',\n    'Slot Architecture',\n    'Bundle Size',\n    'Story Coverage',\n    'Naming Consistency',\n  ],\n  advanced: ['Performance', 'Drupal Readiness'],\n}"
           },
-          "default": "{ critical: [ 'CEM Completeness', 'Accessibility', 'Type Coverage', 'Test Coverage', 'CEM-Source Fidelity', ], important: [ 'API Surface Quality', 'CSS Architecture', 'Event Architecture', 'Bundle Size', 'Story Coverage', 'Naming Consistency', ], advanced: ['Performance', 'Drupal Readiness'], }"
+          "default": "{ critical: [ 'CEM Completeness', 'Accessibility', 'Type Coverage', 'Test Coverage', 'CEM-Source Fidelity', ], important: [ 'API Surface Quality', 'CSS Architecture', 'Event Architecture', 'Slot Architecture', 'Bundle Size', 'Story Coverage', 'Naming Consistency', ], advanced: ['Performance', 'Drupal Readiness'], }"
         },
         {
           "kind": "variable",

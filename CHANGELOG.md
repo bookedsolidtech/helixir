@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.5.0
+
+### Minor Changes
+
+- 7f0b963: feat: add CEM-Source Fidelity analyzer to cross-reference CEM declarations against actual source code
+- 6b7c4fc: feat: add automated CEM sync CI gate to prevent stale published manifests
+- fc6c2b6: feat: add cross-library benchmark suite to validate scorer against 11 real WC libraries and generate helix report
+- a64cb50: feat: add Naming Consistency analyzer to measure library-wide naming convention adherence
+- 174b5e5: feat: add Slot Architecture analyzer to score slot documentation, type constraints, and slot-property coherence
+
+### Patch Changes
+
+- f037aa8: fix: correct CEM carousel event name from hx-slide-change to hx-slide
+- b2cbed9: fix: correct HxSkeletonAttributes and HxSpinnerAttributes property drift in helix.d.ts
+- 96f3e68: fix: correct HxTabsAttributes properties drift from CEM
+- b2cbed9: fix: correct HxSkeletonAttributes and HxSpinnerAttributes property drift from CEM
+
 ## 0.4.1
 
 ### Patch Changes

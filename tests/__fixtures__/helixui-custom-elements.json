@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "1.0.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-carousel/hx-carousel.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "HxCarousel",
+          "tagName": "hx-carousel",
+          "description": "A carousel component for cycling through a series of slides.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "currentIndex",
+              "attribute": "current-index",
+              "type": { "text": "number" },
+              "default": "0",
+              "description": "The zero-based index of the currently active slide.",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "autoplay",
+              "attribute": "autoplay",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "When true, automatically advances slides on an interval.",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "loop",
+              "attribute": "loop",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "When true, wraps from the last slide back to the first.",
+              "reflects": true
+            }
+          ],
+          "events": [
+            {
+              "name": "hx-slide",
+              "type": { "text": "CustomEvent<{ index: number, slide: HelixCarouselItem }>" },
+              "description": "Fired when the active slide changes. Detail contains the new index and slide element."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "Accepts hx-carousel-item elements as the slides."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "base",
+              "description": "The root wrapper element of the carousel."
+            },
+            {
+              "name": "slides",
+              "description": "The slides container."
+            },
+            {
+              "name": "navigation",
+              "description": "The previous/next navigation controls."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--hx-carousel-slide-gap",
+              "default": "0",
+              "description": "Gap between slides."
+            }
+          ],
+          "superclass": { "name": "LitElement", "package": "lit" }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-carousel",
+          "declaration": {
+            "name": "HxCarousel",
+            "module": "src/components/hx-carousel/hx-carousel.js"
+          }
+        }
+      ]
+    }
+  ]
+}

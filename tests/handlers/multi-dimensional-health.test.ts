@@ -161,7 +161,13 @@ describe('scoreComponentMultiDimensional', () => {
     const cemSourceFidelity = cemNative.find((d) => d.name === 'CEM-Source Fidelity');
     expect(cemSourceFidelity).toBeDefined();
     expect(cemSourceFidelity?.measured).toBe(false);
-    const measurableNative = cemNative.filter((d) => d.name !== 'CEM-Source Fidelity');
+    // Naming Consistency requires library-wide conventions (passed via scoreAllComponentsMultiDimensional)
+    const namingConsistency = cemNative.find((d) => d.name === 'Naming Consistency');
+    expect(namingConsistency).toBeDefined();
+    expect(namingConsistency?.measured).toBe(false);
+    const measurableNative = cemNative.filter(
+      (d) => d.name !== 'CEM-Source Fidelity' && d.name !== 'Naming Consistency',
+    );
     expect(measurableNative.every((d) => d.measured)).toBe(true);
   });
 
@@ -180,7 +186,7 @@ describe('scoreComponentMultiDimensional', () => {
     const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
     expect(result.confidenceSummary).toBeDefined();
     expect(result.confidenceSummary.verified).toBeGreaterThan(0);
-    expect(result.confidenceSummary.untested).toBe(6); // 5 external + CEM-Source Fidelity (no cem/source in unit tests)
+    expect(result.confidenceSummary.untested).toBe(7); // 5 external + CEM-Source Fidelity + Naming Consistency (no cem/conventions in unit tests)
   });
 
   it('includes a timestamp', async () => {

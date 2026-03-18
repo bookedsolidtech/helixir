@@ -64,9 +64,9 @@ describe('DIMENSION_REGISTRY', () => {
     expect(DIMENSION_REGISTRY).toHaveLength(14);
   });
 
-  it('has 8 cem-native dimensions', () => {
+  it('has 9 cem-native dimensions', () => {
     const cemNative = DIMENSION_REGISTRY.filter((d) => d.source === 'cem-native');
-    expect(cemNative).toHaveLength(8);
+    expect(cemNative).toHaveLength(9);
   });
 
   it('has 5 external dimensions', () => {

@@ -158,6 +158,9 @@ describe('scoreComponentMultiDimensional', () => {
       (d) => DIMENSION_REGISTRY.find((r) => r.name === d.name)?.source === 'cem-native',
     );
     // CEM-Source Fidelity requires a cem parameter and source files, so it's not measured in unit tests
+    const cemSourceFidelity = cemNative.find((d) => d.name === 'CEM-Source Fidelity');
+    expect(cemSourceFidelity).toBeDefined();
+    expect(cemSourceFidelity?.measured).toBe(false);
     const measurableNative = cemNative.filter((d) => d.name !== 'CEM-Source Fidelity');
     expect(measurableNative.every((d) => d.measured)).toBe(true);
   });

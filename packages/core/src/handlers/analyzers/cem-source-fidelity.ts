@@ -82,8 +82,8 @@ export function extractSourceEvents(source: string): string[] {
     if (match[1]) events.add(match[1]);
   }
 
-  // this.emit('name') or this.$emit('name')
-  const emitRegex = /(?:this\.)?(?:\$)?emit\s*\(\s*['"`]([^'"`]+)['"`]/g;
+  // this.emit('name') or this.$emit('name') — require `this.` to avoid matching unrelated emit() calls
+  const emitRegex = /this\.(?:\$)?emit\s*\(\s*['"`]([^'"`]+)['"`]/g;
   while ((match = emitRegex.exec(source)) !== null) {
     if (match[1]) events.add(match[1]);
   }
@@ -91,12 +91,6 @@ export function extractSourceEvents(source: string): string[] {
   // @event decorator: @event({ name: 'foo' }) or @event('foo')
   const eventDecoratorRegex = /@event\s*\(\s*(?:\{\s*name:\s*)?['"`]([^'"`]+)['"`]/g;
   while ((match = eventDecoratorRegex.exec(source)) !== null) {
-    if (match[1]) events.add(match[1]);
-  }
-
-  // FAST $emit('name')
-  const fastEmitRegex = /\$emit\s*\(\s*['"`]([^'"`]+)['"`]/g;
-  while ((match = fastEmitRegex.exec(source)) !== null) {
     if (match[1]) events.add(match[1]);
   }
 

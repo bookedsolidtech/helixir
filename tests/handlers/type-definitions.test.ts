@@ -202,7 +202,9 @@ describe('validateTypeDefinitions', () => {
       const result = validateTypeDefinitions(config, FIXTURE_CEM, dtsPath);
 
       const tabsMismatches = result.mismatches.filter((m) => m.component === 'hx-tabs');
-      expect(tabsMismatches.some((m) => m.name === 'selectedIndex' && m.issue === 'missing_in_dts')).toBe(true);
+      expect(
+        tabsMismatches.some((m) => m.name === 'selectedIndex' && m.issue === 'missing_in_dts'),
+      ).toBe(true);
     });
 
     it('detects hx-skeleton missing from HTMLElementTagNameMap', () => {
@@ -218,7 +220,9 @@ describe('validateTypeDefinitions', () => {
       const result = validateTypeDefinitions(config, FIXTURE_CEM, dtsPath);
 
       const spinnerMismatches = result.mismatches.filter((m) => m.component === 'hx-spinner');
-      expect(spinnerMismatches.some((m) => m.name === 'size' && m.issue === 'missing_in_dts')).toBe(true);
+      expect(spinnerMismatches.some((m) => m.name === 'size' && m.issue === 'missing_in_dts')).toBe(
+        true,
+      );
     });
 
     it('totalMismatches is non-zero for drifted definitions', () => {
@@ -263,7 +267,9 @@ describe('validateTypeDefinitions', () => {
 
   describe('extra types in d.ts', () => {
     it('reports components in d.ts that are not in CEM', () => {
-      const extraDts = SYNCED_DTS + `
+      const extraDts =
+        SYNCED_DTS +
+        `
 export declare class HxGhost extends HTMLElement {
   mode: string;
 }
@@ -283,9 +289,9 @@ declare global {
 
   describe('error handling', () => {
     it('throws FILESYSTEM error for missing d.ts file', () => {
-      expect(() =>
-        validateTypeDefinitions(config, FIXTURE_CEM, 'nonexistent.d.ts'),
-      ).toThrow('Cannot read type definitions file');
+      expect(() => validateTypeDefinitions(config, FIXTURE_CEM, 'nonexistent.d.ts')).toThrow(
+        'Cannot read type definitions file',
+      );
     });
   });
 

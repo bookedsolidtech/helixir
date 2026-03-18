@@ -192,14 +192,14 @@ export function validateTypeDefinitions(
 
   const componentsToCheck =
     tagNames && tagNames.length > 0
-      ? allCemComponents.filter((d) => tagNames.includes(d.tagName!))
+      ? allCemComponents.filter((d) => d.tagName != null && tagNames.includes(d.tagName))
       : allCemComponents;
 
   const mismatches: TypeDefinitionMismatch[] = [];
   let componentsWithIssues = 0;
 
   for (const decl of componentsToCheck) {
-    const tagName = decl.tagName!;
+    const tagName = decl.tagName ?? '';
     const className = tagMap.get(tagName);
     const dtsClass = className ? classes.get(className) : undefined;
     const componentMismatches: TypeDefinitionMismatch[] = [];
@@ -289,7 +289,7 @@ export function validateTypeDefinitions(
   // Report type definition entries that have no matching CEM component.
   // Use the full CEM (not the filtered subset) so that filtering by tagNames
   // doesn't incorrectly report unfiltered d.ts entries as missing from CEM.
-  const allCemTagNameSet = new Set(allCemComponents.map((d) => d.tagName!));
+  const allCemTagNameSet = new Set(allCemComponents.map((d) => d.tagName ?? ''));
   for (const [tagName, className] of tagMap) {
     if (!allCemTagNameSet.has(tagName)) {
       mismatches.push({

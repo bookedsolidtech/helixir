@@ -196,6 +196,8 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
         'load_library',
         'list_libraries',
         'unload_library',
+        // type definitions
+        'validate_type_definitions',
         // typescript
         'get_file_diagnostics',
         'get_project_diagnostics',

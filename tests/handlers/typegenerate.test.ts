@@ -181,8 +181,8 @@ describe('generateTypes', () => {
 
     it('emits HTMLElementTagNameMap augmentation with component tag names', () => {
       const { content } = generateTypes(HX_TABS_CEM);
-      expect(content).toContain("declare global {");
-      expect(content).toContain("interface HTMLElementTagNameMap {");
+      expect(content).toContain('declare global {');
+      expect(content).toContain('interface HTMLElementTagNameMap {');
       expect(content).toContain("'hx-tabs': HTMLElement & HxTabsAttributes;");
     });
   });
@@ -215,10 +215,7 @@ describe('generateTypes', () => {
     it('handles multi-component CEM correctly', () => {
       const { componentCount } = generateTypes({
         schemaVersion: '1.0.0',
-        modules: [
-          ...HX_TABS_CEM.modules,
-          ...NO_EVENT_TYPE_CEM.modules,
-        ],
+        modules: [...HX_TABS_CEM.modules, ...NO_EVENT_TYPE_CEM.modules],
       });
       expect(componentCount).toBe(2);
     });

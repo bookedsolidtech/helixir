@@ -97,9 +97,7 @@ export interface GenerateTypesResult {
  * This is the root cause fix for the hx-tabs attribute name drift bug.
  */
 export function generateTypes(cem: Cem): GenerateTypesResult {
-  const declarations = cem.modules
-    .flatMap((m) => m.declarations ?? [])
-    .filter((d) => d.tagName);
+  const declarations = cem.modules.flatMap((m) => m.declarations ?? []).filter((d) => d.tagName);
 
   const blocks: string[] = [
     '// Generated from custom-elements.json',

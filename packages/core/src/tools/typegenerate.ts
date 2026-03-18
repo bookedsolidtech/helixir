@@ -6,7 +6,7 @@ import { handleToolError } from '../shared/error-handling.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 
-const GenerateTypesArgsSchema = z.object({
+export const GenerateTypesArgsSchema = z.object({
   libraryId: z.string().optional(),
 });
 

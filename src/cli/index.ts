@@ -22,6 +22,7 @@ import { compareLibraries } from '../../packages/core/src/handlers/compare.js';
 import { benchmarkLibraries } from '../../packages/core/src/handlers/benchmark.js';
 import { validateUsage } from '../../packages/core/src/handlers/validate.js';
 import { resolveCdnCem } from '../../packages/core/src/handlers/cdn.js';
+import { generateTypeDefinitions } from '../../packages/core/src/handlers/generate-types.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -33,6 +34,7 @@ interface CliOptions {
   threshold: number;
   base: string;
   html: string | undefined;
+  output: string | undefined;
   registry: 'jsdelivr' | 'unpkg';
   config: string | undefined;
   trend: boolean;
@@ -102,6 +104,7 @@ Subcommands:
   benchmark <cem...>          Benchmark CEM libraries
   validate <tag> --html "..."  Validate HTML usage
   cdn <pkg> [version] [--registry]  Resolve CDN CEM for a package
+  generate-types [--output <path>]  Generate TypeScript definitions from CEM
   serve                       Start MCP server (stdio)
   init                        Interactive setup wizard
 
@@ -112,6 +115,7 @@ Options:
   --base <branch>               Base branch for diff/migrate (default: main)
   --html "<snippet>"            HTML snippet for validate command
   --registry jsdelivr|unpkg     CDN registry (default: jsdelivr)
+  --output <path>               Output file path for generate-types (default: stdout)
   --config <path>               Config file path override
   --trend                       Show health trend (with health command)
   -h, --help                    Show this help
@@ -466,6 +470,23 @@ async function cmdCdn(args: string[], opts: CliOptions): Promise<void> {
   }
 }
 
+async function cmdGenerateTypes(_args: string[], opts: CliOptions): Promise<void> {
+  const config = loadConfig();
+  const cem = loadCem(config.cemPath, config.projectRoot);
+  const result = generateTypeDefinitions(cem);
+
+  if (opts.output) {
+    const outPath = resolve(process.cwd(), opts.output);
+    writeFileSync(outPath, result.typescript, 'utf-8');
+    process.stdout.write(`Wrote TypeScript definitions to ${outPath}\n`);
+    process.stdout.write(result.formatted + '\n');
+  } else if (opts.format === 'json') {
+    output({ typescript: result.typescript, componentCount: result.componentCount }, 'json');
+  } else {
+    process.stdout.write(result.typescript);
+  }
+}
+
 // ─── Main CLI entry point ─────────────────────────────────────────────────────
 
 export async function runCli(): Promise<void> {
@@ -475,6 +496,7 @@ export async function runCli(): Promise<void> {
     threshold?: string;
     base?: string;
     html?: string;
+    output?: string;
     registry?: string;
     config?: string;
     trend?: boolean;
@@ -491,6 +513,7 @@ export async function runCli(): Promise<void> {
         threshold: { type: 'string' },
         base: { type: 'string' },
         html: { type: 'string' },
+        output: { type: 'string' },
         registry: { type: 'string' },
         config: { type: 'string' },
         trend: { type: 'boolean' },
@@ -518,6 +541,7 @@ export async function runCli(): Promise<void> {
     threshold: parseInt(values.threshold ?? '70', 10),
     base: values.base ?? 'main',
     html: values.html,
+    output: values.output,
     registry: values.registry === 'unpkg' ? 'unpkg' : 'jsdelivr',
     config: values.config,
     trend: values.trend ?? false,
@@ -575,6 +599,9 @@ export async function runCli(): Promise<void> {
         break;
       case 'cdn':
         await cmdCdn(args, opts);
+        break;
+      case 'generate-types':
+        await cmdGenerateTypes(args, opts);
         break;
       case 'init':
         await runInit();

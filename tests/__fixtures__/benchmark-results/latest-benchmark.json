@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-18T04:00:04.664Z",
+  "timestamp": "2026-03-18T04:16:51.961Z",
   "scorecards": {
     "material": {
       "library": "material",
@@ -171,7 +171,7 @@
         "heuristic": 329,
         "untested": 650
       },
-      "timestamp": "2026-03-18T04:00:04.662Z"
+      "timestamp": "2026-03-18T04:16:51.958Z"
     },
     "spectrum": {
       "library": "spectrum",
@@ -343,7 +343,7 @@
         "heuristic": 315,
         "untested": 575
       },
-      "timestamp": "2026-03-18T04:00:04.662Z"
+      "timestamp": "2026-03-18T04:16:51.958Z"
     },
     "vaadin": {
       "library": "vaadin",
@@ -515,7 +515,7 @@
         "heuristic": 343,
         "untested": 621
       },
-      "timestamp": "2026-03-18T04:00:04.662Z"
+      "timestamp": "2026-03-18T04:16:51.958Z"
     },
     "fluentui": {
       "library": "fluentui",
@@ -687,7 +687,7 @@
         "heuristic": 139,
         "untested": 274
       },
-      "timestamp": "2026-03-18T04:00:04.662Z"
+      "timestamp": "2026-03-18T04:16:51.958Z"
     },
     "carbon": {
       "library": "carbon",
@@ -859,7 +859,7 @@
         "heuristic": 397,
         "untested": 703
       },
-      "timestamp": "2026-03-18T04:00:04.663Z"
+      "timestamp": "2026-03-18T04:16:51.959Z"
     },
     "ui5": {
       "library": "ui5",
@@ -1031,7 +1031,7 @@
         "heuristic": 582,
         "untested": 1134
       },
-      "timestamp": "2026-03-18T04:00:04.663Z"
+      "timestamp": "2026-03-18T04:16:51.959Z"
     },
     "calcite": {
       "library": "calcite",
@@ -1203,7 +1203,7 @@
         "heuristic": 318,
         "untested": 742
       },
-      "timestamp": "2026-03-18T04:00:04.663Z"
+      "timestamp": "2026-03-18T04:16:51.960Z"
     },
     "porsche": {
       "library": "porsche",
@@ -1375,7 +1375,7 @@
         "heuristic": 304,
         "untested": 611
       },
-      "timestamp": "2026-03-18T04:00:04.663Z"
+      "timestamp": "2026-03-18T04:16:51.960Z"
     },
     "ionic": {
       "library": "ionic",
@@ -1547,7 +1547,7 @@
         "heuristic": 331,
         "untested": 647
       },
-      "timestamp": "2026-03-18T04:00:04.663Z"
+      "timestamp": "2026-03-18T04:16:51.960Z"
     },
     "wired": {
       "library": "wired",
@@ -1719,7 +1719,7 @@
         "heuristic": 78,
         "untested": 182
       },
-      "timestamp": "2026-03-18T04:00:04.663Z"
+      "timestamp": "2026-03-18T04:16:51.960Z"
     },
     "elix": {
       "library": "elix",
@@ -1891,7 +1891,7 @@
         "heuristic": 148,
         "untested": 666
       },
-      "timestamp": "2026-03-18T04:00:04.663Z"
+      "timestamp": "2026-03-18T04:16:51.960Z"
     },
     "helix": {
       "library": "helix",
@@ -2063,7 +2063,7 @@
         "heuristic": 407,
         "untested": 495
       },
-      "timestamp": "2026-03-18T04:00:04.663Z"
+      "timestamp": "2026-03-18T04:16:51.960Z"
     }
   },
   "comparisonTable": {
@@ -2954,74 +2954,74 @@
       "Event Architecture",
       "CEM-Source Fidelity"
     ],
-    "timestamp": "2026-03-18T04:00:04.664Z"
+    "timestamp": "2026-03-18T04:16:51.960Z"
   },
   "performance": {
-    "totalMs": 1483,
+    "totalMs": 2735,
     "phases": [
       {
         "name": "load-libraries",
-        "durationMs": 157
+        "durationMs": 305
       },
       {
         "name": "score-all-libraries",
-        "durationMs": 1323
+        "durationMs": 2424
       },
       {
         "name": "score-material",
-        "durationMs": 157
+        "durationMs": 283
       },
       {
         "name": "score-spectrum",
-        "durationMs": 141
+        "durationMs": 229
       },
       {
         "name": "score-vaadin",
-        "durationMs": 524
+        "durationMs": 782
       },
       {
         "name": "score-fluentui",
-        "durationMs": 20
+        "durationMs": 28
       },
       {
         "name": "score-carbon",
-        "durationMs": 50
+        "durationMs": 61
       },
       {
         "name": "score-ui5",
-        "durationMs": 99
+        "durationMs": 207
       },
       {
         "name": "score-calcite",
-        "durationMs": 133
+        "durationMs": 347
       },
       {
         "name": "score-porsche",
-        "durationMs": 36
+        "durationMs": 57
       },
       {
         "name": "score-ionic",
-        "durationMs": 44
+        "durationMs": 74
       },
       {
         "name": "score-wired",
-        "durationMs": 7
+        "durationMs": 20
       },
       {
         "name": "score-elix",
-        "durationMs": 78
+        "durationMs": 260
       },
       {
         "name": "score-helix",
-        "durationMs": 34
+        "durationMs": 76
       },
       {
         "name": "generate-scorecards",
-        "durationMs": 2
+        "durationMs": 5
       },
       {
         "name": "generate-comparison",
-        "durationMs": 1
+        "durationMs": 0
       }
     ],
     "withinGate": true

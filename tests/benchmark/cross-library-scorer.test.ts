@@ -173,24 +173,29 @@ describe('Component Scoring', () => {
     }
   });
 
-  it.skipIf(!BENCHMARK_AVAILABLE)('produces sensible grade distribution across the benchmark', () => {
-    // With external dimensions untested, many wc-libraries score all F — expected.
-    // Helix (with CEM-native dimensions well covered) should show grade variety,
-    // and the overall benchmark should show score variation across libraries.
-    const helixCard = scorecards.get('helix');
-    expect(helixCard, 'helix scorecard should exist').toBeDefined();
-    if (helixCard) {
-      const dist = helixCard.gradeDistribution;
-      const gradesUsed = Object.values(dist).filter((v) => v > 0).length;
-      expect(gradesUsed, 'helix should have at least 2 different grades').toBeGreaterThanOrEqual(2);
-    }
+  it.skipIf(!BENCHMARK_AVAILABLE)(
+    'produces sensible grade distribution across the benchmark',
+    () => {
+      // With external dimensions untested, many wc-libraries score all F — expected.
+      // Helix (with CEM-native dimensions well covered) should show grade variety,
+      // and the overall benchmark should show score variation across libraries.
+      const helixCard = scorecards.get('helix');
+      expect(helixCard, 'helix scorecard should exist').toBeDefined();
+      if (helixCard) {
+        const dist = helixCard.gradeDistribution;
+        const gradesUsed = Object.values(dist).filter((v) => v > 0).length;
+        expect(gradesUsed, 'helix should have at least 2 different grades').toBeGreaterThanOrEqual(
+          2,
+        );
+      }
 
-    // Verify there's overall variation — not every library has the same avg score
-    const averages = [...scorecards.values()].map((s) => s.averageScore);
-    const min = Math.min(...averages);
-    const max = Math.max(...averages);
-    expect(max - min, 'Libraries should show score variation').toBeGreaterThan(10);
-  });
+      // Verify there's overall variation — not every library has the same avg score
+      const averages = [...scorecards.values()].map((s) => s.averageScore);
+      const min = Math.min(...averages);
+      const max = Math.max(...averages);
+      expect(max - min, 'Libraries should show score variation').toBeGreaterThan(10);
+    },
+  );
 });
 
 // ─── Scorecard Tests ────────────────────────────────────────────────────────

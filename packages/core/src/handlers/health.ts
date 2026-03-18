@@ -15,6 +15,11 @@ import { analyzeSourceAccessibility } from './analyzers/source-accessibility.js'
 import { analyzeCemSourceFidelity } from './analyzers/cem-source-fidelity.js';
 import { analyzeSlotArchitecture } from './analyzers/slot-architecture.js';
 import {
+  analyzeNamingConsistency,
+  detectLibraryConventions,
+  type LibraryNamingConventions,
+} from './analyzers/naming-consistency.js';
+import {
   DIMENSION_REGISTRY,
   calculateGrade,
   computeWeightedScore,
@@ -745,6 +750,7 @@ export async function scoreComponentMultiDimensional(
   decl: CemDeclaration,
   cem?: Cem,
   libraryId = 'default',
+  namingConventions?: LibraryNamingConventions,
 ): Promise<MultiDimensionalHealth> {
   const tagName = decl.tagName ?? '';
   const issues: string[] = [];
@@ -764,7 +770,14 @@ export async function scoreComponentMultiDimensional(
 
   for (const def of DIMENSION_REGISTRY) {
     if (def.source === 'cem-native') {
-      const result = await scoreCemNativeDimension(def.name, decl, issues, config, cem);
+      const result = await scoreCemNativeDimension(
+        def.name,
+        decl,
+        issues,
+        config,
+        cem,
+        namingConventions,
+      );
       const notApplicable = 'notApplicable' in result && result.notApplicable === true;
       dimensions.push({
         name: def.name,
@@ -831,6 +844,7 @@ async function scoreCemNativeDimension(
   issues: string[],
   config?: McpWcConfig,
   cem?: Cem,
+  namingConventions?: LibraryNamingConventions,
 ): Promise<{
   score: number;
   confidence: ConfidenceLevel;
@@ -921,6 +935,17 @@ async function scoreCemNativeDimension(
       return slotResult;
     }
 
+    case 'Naming Consistency': {
+      if (!namingConventions) {
+        return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+      }
+      const naming = analyzeNamingConsistency(decl, namingConventions);
+      if (!naming) {
+        return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+      }
+      return naming;
+    }
+
     default:
       return { score: 0, confidence: 'heuristic' };
   }
@@ -936,7 +961,13 @@ export async function scoreAllComponentsMultiDimensional(
   libraryId = 'default',
 ): Promise<MultiDimensionalHealth[]> {
   const withTag = cemDeclarations.filter((decl) => decl.tagName !== undefined);
+
+  // Detect library-wide naming conventions once for all components
+  const namingConventions = detectLibraryConventions(cemDeclarations);
+
   return Promise.all(
-    withTag.map((decl) => scoreComponentMultiDimensional(config, decl, cem, libraryId)),
+    withTag.map((decl) =>
+      scoreComponentMultiDimensional(config, decl, cem, libraryId, namingConventions),
+    ),
   );
 }

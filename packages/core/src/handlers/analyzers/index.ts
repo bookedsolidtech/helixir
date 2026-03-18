@@ -27,6 +27,18 @@ export {
   type CoherencePair,
 } from './slot-architecture.js';
 export {
+  analyzeNamingConsistency,
+  detectLibraryConventions,
+  detectLibraryEventPrefix,
+  detectLibraryCssPrefix,
+  scoreEventPrefixCoherence,
+  scorePropertyNamingConsistency,
+  scoreCSSCustomPropertyPrefixing,
+  scoreAttributePropertyCoherence,
+  type NamingConsistencyResult,
+  type LibraryNamingConventions,
+} from './naming-consistency.js';
+export {
   analyzeCemSourceFidelity,
   extractSourceEvents,
   extractSourceProperties,

@@ -142,7 +142,7 @@ describe('scoreComponentMultiDimensional', () => {
   it('returns all 13 dimensions', async () => {
     const config = makeConfig();
     const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
-    expect(result.dimensions).toHaveLength(13);
+    expect(result.dimensions).toHaveLength(14);
   });
 
   it('includes tagName in result', async () => {
@@ -161,7 +161,13 @@ describe('scoreComponentMultiDimensional', () => {
     const cemSourceFidelity = cemNative.find((d) => d.name === 'CEM-Source Fidelity');
     expect(cemSourceFidelity).toBeDefined();
     expect(cemSourceFidelity?.measured).toBe(false);
-    const measurableNative = cemNative.filter((d) => d.name !== 'CEM-Source Fidelity');
+    // Naming Consistency requires library-wide conventions (passed via scoreAllComponentsMultiDimensional)
+    const namingConsistency = cemNative.find((d) => d.name === 'Naming Consistency');
+    expect(namingConsistency).toBeDefined();
+    expect(namingConsistency?.measured).toBe(false);
+    const measurableNative = cemNative.filter(
+      (d) => d.name !== 'CEM-Source Fidelity' && d.name !== 'Naming Consistency',
+    );
     expect(measurableNative.every((d) => d.measured)).toBe(true);
   });
 
@@ -180,7 +186,7 @@ describe('scoreComponentMultiDimensional', () => {
     const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
     expect(result.confidenceSummary).toBeDefined();
     expect(result.confidenceSummary.verified).toBeGreaterThan(0);
-    expect(result.confidenceSummary.untested).toBe(6); // 5 external + CEM-Source Fidelity (no cem/source in unit tests)
+    expect(result.confidenceSummary.untested).toBe(7); // 5 external + CEM-Source Fidelity + Naming Consistency (no cem/conventions in unit tests)
   });
 
   it('includes a timestamp', async () => {
@@ -265,7 +271,7 @@ describe('scoreComponentMultiDimensional', () => {
   it('minimal component still returns valid result', async () => {
     const config = makeConfig();
     const result = await scoreComponentMultiDimensional(config, MINIMAL_DECL);
-    expect(result.dimensions).toHaveLength(13);
+    expect(result.dimensions).toHaveLength(14);
     expect(typeof result.score).toBe('number');
     expect(['A', 'B', 'C', 'D', 'F']).toContain(result.grade);
   });
@@ -339,7 +345,7 @@ describe('scoreAllComponentsMultiDimensional', () => {
     const config = makeConfig();
     const results = await scoreAllComponentsMultiDimensional(config, [PERFECT_DECL, MINIMAL_DECL]);
     for (const result of results) {
-      expect(result.dimensions).toHaveLength(13);
+      expect(result.dimensions).toHaveLength(14);
     }
   });
 
@@ -359,7 +365,7 @@ describe('JSONL output shape', () => {
     const json = JSON.stringify(result);
     const parsed = JSON.parse(json) as MultiDimensionalHealth;
     expect(parsed.tagName).toBe('perfect-component');
-    expect(parsed.dimensions).toHaveLength(13);
+    expect(parsed.dimensions).toHaveLength(14);
   });
 
   it('each dimension in JSON has required fields', async () => {

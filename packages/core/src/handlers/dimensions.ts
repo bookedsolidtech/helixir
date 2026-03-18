@@ -126,6 +126,14 @@ export const DIMENSION_REGISTRY: DimensionDefinition[] = [
     source: 'cem-native',
     phase: 'cem-analysis',
   },
+  // Dimension 14: Naming Consistency — library-wide naming convention adherence
+  {
+    name: 'Naming Consistency',
+    weight: 5,
+    tier: 'important',
+    source: 'cem-native',
+    phase: 'cem-analysis',
+  },
 ];
 
 export const DIMENSION_CLASSIFICATION = {
@@ -143,6 +151,7 @@ export const DIMENSION_CLASSIFICATION = {
     'Slot Architecture',
     'Bundle Size',
     'Story Coverage',
+    'Naming Consistency',
   ],
   advanced: ['Performance', 'Drupal Readiness'],
 } as const;

@@ -60,13 +60,13 @@ function makeFullDimensions(
 // ─── DIMENSION_REGISTRY ──────────────────────────────────────────────────────
 
 describe('DIMENSION_REGISTRY', () => {
-  it('contains exactly 13 dimensions', () => {
-    expect(DIMENSION_REGISTRY).toHaveLength(13);
+  it('contains exactly 14 dimensions', () => {
+    expect(DIMENSION_REGISTRY).toHaveLength(14);
   });
 
-  it('has 8 cem-native dimensions', () => {
+  it('has 9 cem-native dimensions', () => {
     const cemNative = DIMENSION_REGISTRY.filter((d) => d.source === 'cem-native');
-    expect(cemNative).toHaveLength(8);
+    expect(cemNative).toHaveLength(9);
   });
 
   it('has 5 external dimensions', () => {
@@ -75,7 +75,7 @@ describe('DIMENSION_REGISTRY', () => {
   });
 
   it('total weight equals 100', () => {
-    expect(TOTAL_WEIGHT).toBe(100);
+    expect(TOTAL_WEIGHT).toBe(105);
   });
 
   it('all dimensions have positive weight', () => {
@@ -110,8 +110,8 @@ describe('DIMENSION_CLASSIFICATION', () => {
     expect(DIMENSION_CLASSIFICATION.critical).toHaveLength(5);
   });
 
-  it('has 6 important dimensions', () => {
-    expect(DIMENSION_CLASSIFICATION.important).toHaveLength(6);
+  it('has 7 important dimensions', () => {
+    expect(DIMENSION_CLASSIFICATION.important).toHaveLength(7);
   });
 
   it('has 2 advanced dimensions', () => {

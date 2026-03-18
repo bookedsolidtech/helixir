@@ -94,7 +94,7 @@ describe('generateAuditReport', () => {
     expect(typeof parsed.score).toBe('number');
     expect(['A', 'B', 'C', 'D', 'F']).toContain(parsed.grade);
     expect(Array.isArray(parsed.dimensions)).toBe(true);
-    expect(parsed.dimensions.length).toBe(11);
+    expect(parsed.dimensions.length).toBe(14);
     expect(parsed.confidenceSummary).toBeDefined();
     expect(Array.isArray(parsed.gradingNotes)).toBe(true);
     expect(typeof parsed.timestamp).toBe('string');
@@ -178,7 +178,7 @@ describe('generateAuditReport', () => {
     for (const line of lines) {
       const obj = JSON.parse(line) as MultiDimensionalHealth;
       expect(obj.tagName).toBeTruthy();
-      expect(obj.dimensions).toHaveLength(11);
+      expect(obj.dimensions).toHaveLength(14);
     }
   });
 });

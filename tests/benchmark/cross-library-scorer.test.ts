@@ -4,7 +4,7 @@
  * ui5, calcite, porsche, ionic, wired, elix) plus helix.
  */
 import { describe, it, expect, beforeAll } from 'vitest';
-import { writeFileSync, mkdirSync } from 'fs';
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import {
@@ -20,6 +20,13 @@ import {
   type ComparisonTable,
 } from './comparison-table-generator.js';
 import { PerformanceMonitor } from './performance-monitor.js';
+
+// Libraries require local /Volumes/Development/booked paths — skip in CI when absent
+const WC_LIBRARIES_AVAILABLE = existsSync('/Volumes/Development/booked/wc-libraries');
+const HELIX_AVAILABLE = existsSync(
+  '/Volumes/Development/booked/helix/packages/hx-library/custom-elements.json',
+);
+const BENCHMARK_AVAILABLE = WC_LIBRARIES_AVAILABLE && HELIX_AVAILABLE;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const RESULTS_DIR = resolve(__dirname, '../__fixtures__/benchmark-results');
@@ -98,7 +105,7 @@ beforeAll(async () => {
 // ─── Library Loading Tests ──────────────────────────────────────────────────
 
 describe('Library Loading', () => {
-  it('loads all 11 wc-libraries and helix successfully', () => {
+  it.skipIf(!BENCHMARK_AVAILABLE)('loads all 11 wc-libraries and helix successfully', () => {
     const expectedLibraries = [
       'material',
       'spectrum',
@@ -119,7 +126,7 @@ describe('Library Loading', () => {
     }
   });
 
-  it('parses all CEM files without errors', () => {
+  it.skipIf(!BENCHMARK_AVAILABLE)('parses all CEM files without errors', () => {
     expect(failedLibraries).toHaveLength(0);
   });
 
@@ -166,7 +173,7 @@ describe('Component Scoring', () => {
     }
   });
 
-  it('produces sensible grade distribution across the benchmark', () => {
+  it.skipIf(!BENCHMARK_AVAILABLE)('produces sensible grade distribution across the benchmark', () => {
     // With external dimensions untested, many wc-libraries score all F — expected.
     // Helix (with CEM-native dimensions well covered) should show grade variety,
     // and the overall benchmark should show score variation across libraries.
@@ -237,14 +244,14 @@ describe('Cross-Library Comparison', () => {
     }
   });
 
-  it('comparison table has per-dimension rankings', () => {
+  it.skipIf(!BENCHMARK_AVAILABLE)('comparison table has per-dimension rankings', () => {
     expect(comparisonTable.perDimensionRankings.length).toBeGreaterThan(0);
     for (const dimRanking of comparisonTable.perDimensionRankings) {
       expect(dimRanking.rankings.length).toBeGreaterThan(0);
     }
   });
 
-  it('identifies differentiating dimensions', () => {
+  it.skipIf(!BENCHMARK_AVAILABLE)('identifies differentiating dimensions', () => {
     expect(comparisonTable.differentiatingDimensions.length).toBeGreaterThan(0);
   });
 

@@ -4,9 +4,14 @@
  * an actionable issue list for the helix team.
  */
 import { describe, it, expect, beforeAll } from 'vitest';
-import { writeFileSync, mkdirSync } from 'fs';
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+
+// Helix report requires the local helix library path — skip in CI when absent
+const HELIX_REPORT_AVAILABLE = existsSync(
+  '/Volumes/Development/booked/helix/packages/hx-library/custom-elements.json',
+);
 import {
   scoreAllComponentsMultiDimensional,
   type MultiDimensionalHealth,
@@ -85,7 +90,7 @@ beforeAll(async () => {
 
 // ─── Helix Scoring Tests ───────────────────────────────────────────────────
 
-describe('Helix Component Scoring', () => {
+describe.skipIf(!HELIX_REPORT_AVAILABLE)('Helix Component Scoring', () => {
   it('scores all hx-library components successfully', () => {
     expect(helixResults.length).toBeGreaterThan(0);
     for (const r of helixResults) {
@@ -113,7 +118,7 @@ describe('Helix Component Scoring', () => {
 
 // ─── CEM-Source Fidelity Tests ──────────────────────────────────────────────
 
-describe('CEM-Source Fidelity', () => {
+describe.skipIf(!HELIX_REPORT_AVAILABLE)('CEM-Source Fidelity', () => {
   it('CEM-Source Fidelity dimension is scored for helix', () => {
     for (const r of helixResults) {
       const fidelity = r.dimensions.find((d) => d.name === 'CEM-Source Fidelity');
@@ -141,7 +146,7 @@ describe('CEM-Source Fidelity', () => {
 
 // ─── Gold Standard Comparison ───────────────────────────────────────────────
 
-describe('Gold Standard Comparison (Material Web & Carbon)', () => {
+describe.skipIf(!HELIX_REPORT_AVAILABLE)('Gold Standard Comparison (Material Web & Carbon)', () => {
   it('compares helix against Material Web and Carbon', () => {
     expect(deepDive.goldStandardComparison.length).toBeGreaterThan(0);
   });
@@ -188,7 +193,7 @@ describe('Gold Standard Comparison (Material Web & Carbon)', () => {
 
 // ─── Actionable Issues ──────────────────────────────────────────────────────
 
-describe('Actionable Issue List', () => {
+describe.skipIf(!HELIX_REPORT_AVAILABLE)('Actionable Issue List', () => {
   it('extracts actionable issues from helix scoring', () => {
     console.log(`\nTotal actionable issues: ${deepDive.actionableIssues.length}`);
     const critical = deepDive.actionableIssues.filter((i) => i.severity === 'critical');
@@ -215,7 +220,7 @@ describe('Actionable Issue List', () => {
 
 // ─── Report Output ──────────────────────────────────────────────────────────
 
-describe('Helix Report Output', () => {
+describe.skipIf(!HELIX_REPORT_AVAILABLE)('Helix Report Output', () => {
   it('prints helix report summary to stdout', () => {
     console.log('\n=== Helix Deep-Dive Report ===');
     console.log(`Total components: ${deepDive.totalComponents}`);

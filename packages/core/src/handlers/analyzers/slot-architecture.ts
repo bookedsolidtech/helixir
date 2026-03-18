@@ -39,38 +39,6 @@ export interface SlotArchitectureResult {
 }
 
 /**
- * Common slot names that often have matching properties.
- * Used for coherence pair detection.
- */
-const COHERENCE_SLOT_PATTERNS = [
-  'label',
-  'icon',
-  'header',
-  'footer',
-  'prefix',
-  'suffix',
-  'action',
-  'actions',
-  'trigger',
-  'content',
-  'description',
-  'title',
-  'subtitle',
-  'headline',
-  'leading',
-  'trailing',
-  'start',
-  'end',
-  'media',
-  'avatar',
-  'badge',
-  'caption',
-  'helper-text',
-  'error-text',
-  'supporting-text',
-];
-
-/**
  * Reserved/lifecycle property names to skip for coherence pairing.
  * These don't represent content composition patterns.
  */
@@ -80,7 +48,11 @@ const RESERVED_NAMES = new Set(['class', 'ref', 'style', 'id', 'slot', 'is']);
  * Detects whether a slot has type constraint information.
  * Checks slot description and component-level JSDoc @slot annotations for element type mentions.
  */
-function hasTypeConstraint(slotName: string, slotDescription: string, decl: CemDeclaration): boolean {
+function hasTypeConstraint(
+  slotName: string,
+  slotDescription: string,
+  decl: CemDeclaration,
+): boolean {
   // Check slot description for element type mentions
   if (slotDescription) {
     // Patterns like "<sp-icon>", "HTMLElement", "button element", "img elements"
@@ -135,8 +107,7 @@ export function analyzeSlotArchitecture(decl: CemDeclaration): SlotArchitectureR
   const fields = (decl.members ?? []).filter((m) => m.kind === 'field');
   const propertyNames = new Map<string, boolean>();
   for (const field of fields) {
-    const hasDesc =
-      typeof field.description === 'string' && field.description.trim().length > 0;
+    const hasDesc = typeof field.description === 'string' && field.description.trim().length > 0;
     propertyNames.set(field.name, hasDesc);
   }
 
@@ -228,9 +199,6 @@ export function analyzeSlotArchitecture(decl: CemDeclaration): SlotArchitectureR
   for (const analysis of slotAnalyses) {
     if (analysis.matchingProperty === null) continue;
 
-    const slotObj = slots.find(
-      (s) => s.name === analysis.name || (analysis.isDefault && (s.name === '' || s.name === 'default')),
-    );
     const slotDocumented = analysis.hasDescription;
     const propDocumented = propertyNames.get(analysis.matchingProperty) ?? false;
 
@@ -273,10 +241,7 @@ export function analyzeSlotArchitecture(decl: CemDeclaration): SlotArchitectureR
         : 'no coherence pairs detected',
   });
 
-  const totalScore = Math.min(
-    100,
-    defaultSlotScore + namedSlotScore + typeScore + coherenceScore,
-  );
+  const totalScore = Math.min(100, defaultSlotScore + namedSlotScore + typeScore + coherenceScore);
 
   return {
     score: totalScore,

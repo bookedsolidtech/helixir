@@ -50,7 +50,12 @@ const HX_DIALOG_DECL: CemDeclaration = {
       type: { text: 'string' },
       description: 'The dialog heading text.',
     },
-    { kind: 'field', name: 'open', type: { text: 'boolean' }, description: 'Whether dialog is open.' },
+    {
+      kind: 'field',
+      name: 'open',
+      type: { text: 'boolean' },
+      description: 'Whether dialog is open.',
+    },
     { kind: 'field', name: 'modal', type: { text: 'boolean' }, description: 'Modal behavior.' },
   ],
   slots: [
@@ -116,13 +121,11 @@ const SP_TEXTFIELD_DECL: CemDeclaration = {
   slots: [
     {
       name: 'help-text',
-      description:
-        'Default or non-negative help text to associate with your form element.',
+      description: 'Default or non-negative help text to associate with your form element.',
     },
     {
       name: 'negative-help-text',
-      description:
-        'Negative help text to associate with your form element when it is invalid.',
+      description: 'Negative help text to associate with your form element when it is invalid.',
     },
   ],
 };
@@ -194,12 +197,7 @@ const UNDOCUMENTED_SLOTS_DECL: CemDeclaration = {
     { kind: 'field', name: 'label', type: { text: 'string' } },
     { kind: 'field', name: 'icon', type: { text: 'string' } },
   ],
-  slots: [
-    { name: '' },
-    { name: 'label' },
-    { name: 'icon' },
-    { name: 'footer' },
-  ],
+  slots: [{ name: '' }, { name: 'label' }, { name: 'icon' }, { name: 'footer' }],
 };
 
 const PARTIAL_COHERENCE_DECL: CemDeclaration = {
@@ -268,9 +266,7 @@ describe('Slot Architecture Analyzer', () => {
     it('awards 25 points for default slot with description', () => {
       const result = analyzeSlotArchitecture(DEFAULT_ONLY_DECL);
       expect(result).not.toBeNull();
-      const defaultMetric = result!.subMetrics.find(
-        (m) => m.name === 'Default slot documentation',
-      );
+      const defaultMetric = result!.subMetrics.find((m) => m.name === 'Default slot documentation');
       expect(defaultMetric).toBeDefined();
       expect(defaultMetric!.score).toBe(25);
       expect(defaultMetric!.maxScore).toBe(25);
@@ -285,9 +281,7 @@ describe('Slot Architecture Analyzer', () => {
       };
       const result = analyzeSlotArchitecture(decl);
       expect(result).not.toBeNull();
-      const defaultMetric = result!.subMetrics.find(
-        (m) => m.name === 'Default slot documentation',
-      );
+      const defaultMetric = result!.subMetrics.find((m) => m.name === 'Default slot documentation');
       expect(defaultMetric!.score).toBe(15);
     });
 
@@ -303,9 +297,7 @@ describe('Slot Architecture Analyzer', () => {
       };
       const result = analyzeSlotArchitecture(decl);
       expect(result).not.toBeNull();
-      const defaultMetric = result!.subMetrics.find(
-        (m) => m.name === 'Default slot documentation',
-      );
+      const defaultMetric = result!.subMetrics.find((m) => m.name === 'Default slot documentation');
       expect(defaultMetric!.score).toBe(0);
     });
   });
@@ -314,9 +306,7 @@ describe('Slot Architecture Analyzer', () => {
     it('awards 30 points when all named slots are documented', () => {
       const result = analyzeSlotArchitecture(HX_CARD_DECL);
       expect(result).not.toBeNull();
-      const namedMetric = result!.subMetrics.find(
-        (m) => m.name === 'Named slot documentation',
-      );
+      const namedMetric = result!.subMetrics.find((m) => m.name === 'Named slot documentation');
       expect(namedMetric!.score).toBe(30);
     });
 
@@ -333,9 +323,7 @@ describe('Slot Architecture Analyzer', () => {
       };
       const result = analyzeSlotArchitecture(decl);
       expect(result).not.toBeNull();
-      const namedMetric = result!.subMetrics.find(
-        (m) => m.name === 'Named slot documentation',
-      );
+      const namedMetric = result!.subMetrics.find((m) => m.name === 'Named slot documentation');
       // 1 out of 3 named slots documented: round(1/3 * 30) = 10
       expect(namedMetric!.score).toBe(10);
     });
@@ -343,18 +331,14 @@ describe('Slot Architecture Analyzer', () => {
     it('awards full points when component has no named slots (trivially satisfied)', () => {
       const result = analyzeSlotArchitecture(DEFAULT_ONLY_DECL);
       expect(result).not.toBeNull();
-      const namedMetric = result!.subMetrics.find(
-        (m) => m.name === 'Named slot documentation',
-      );
+      const namedMetric = result!.subMetrics.find((m) => m.name === 'Named slot documentation');
       expect(namedMetric!.score).toBe(30);
     });
 
     it('awards 0 when no named slots are documented', () => {
       const result = analyzeSlotArchitecture(UNDOCUMENTED_SLOTS_DECL);
       expect(result).not.toBeNull();
-      const namedMetric = result!.subMetrics.find(
-        (m) => m.name === 'Named slot documentation',
-      );
+      const namedMetric = result!.subMetrics.find((m) => m.name === 'Named slot documentation');
       expect(namedMetric!.score).toBe(0);
     });
   });
@@ -364,9 +348,7 @@ describe('Slot Architecture Analyzer', () => {
       // hx-card has 'media' slot with "<img> or <video> element" in description
       const result = analyzeSlotArchitecture(HX_CARD_DECL);
       expect(result).not.toBeNull();
-      const typeMetric = result!.subMetrics.find(
-        (m) => m.name === 'Slot type constraints',
-      );
+      const typeMetric = result!.subMetrics.find((m) => m.name === 'Slot type constraints');
       expect(typeMetric!.score).toBeGreaterThan(0);
     });
 
@@ -398,9 +380,7 @@ describe('Slot Architecture Analyzer', () => {
       };
       const result = analyzeSlotArchitecture(decl);
       expect(result).not.toBeNull();
-      const typeMetric = result!.subMetrics.find(
-        (m) => m.name === 'Slot type constraints',
-      );
+      const typeMetric = result!.subMetrics.find((m) => m.name === 'Slot type constraints');
       expect(typeMetric!.score).toBe(0);
     });
   });
@@ -452,9 +432,7 @@ describe('Slot Architecture Analyzer', () => {
       expect(iconPair!.coherent).toBe(false);
 
       // Each pair gets 50% of (25/2) = 6.25, total = 12.5 → rounds to 13
-      const coherenceMetric = result!.subMetrics.find(
-        (m) => m.name === 'Slot-property coherence',
-      );
+      const coherenceMetric = result!.subMetrics.find((m) => m.name === 'Slot-property coherence');
       expect(coherenceMetric!.score).toBe(13);
     });
 
@@ -475,9 +453,7 @@ describe('Slot Architecture Analyzer', () => {
       const result = analyzeSlotArchitecture(SP_TEXTFIELD_DECL);
       expect(result).not.toBeNull();
       expect(result!.coherencePairs.length).toBe(0);
-      const coherenceMetric = result!.subMetrics.find(
-        (m) => m.name === 'Slot-property coherence',
-      );
+      const coherenceMetric = result!.subMetrics.find((m) => m.name === 'Slot-property coherence');
       expect(coherenceMetric!.score).toBe(25);
     });
   });
@@ -541,9 +517,7 @@ describe('Slot Architecture Analyzer', () => {
       expect(result).not.toBeNull();
       expect(result!.slots.length).toBe(5);
       // All named slots documented
-      const namedMetric = result!.subMetrics.find(
-        (m) => m.name === 'Named slot documentation',
-      );
+      const namedMetric = result!.subMetrics.find((m) => m.name === 'Named slot documentation');
       expect(namedMetric!.score).toBe(30);
     });
 
@@ -552,14 +526,10 @@ describe('Slot Architecture Analyzer', () => {
       expect(result).not.toBeNull();
       expect(result!.slots.length).toBe(2);
       // No default slot
-      const defaultMetric = result!.subMetrics.find(
-        (m) => m.name === 'Default slot documentation',
-      );
+      const defaultMetric = result!.subMetrics.find((m) => m.name === 'Default slot documentation');
       expect(defaultMetric!.score).toBe(0);
       // Both named slots documented
-      const namedMetric = result!.subMetrics.find(
-        (m) => m.name === 'Named slot documentation',
-      );
+      const namedMetric = result!.subMetrics.find((m) => m.name === 'Named slot documentation');
       expect(namedMetric!.score).toBe(30);
     });
   });

@@ -121,7 +121,13 @@ export const DIMENSION_REGISTRY: DimensionDefinition[] = [
 ];
 
 export const DIMENSION_CLASSIFICATION = {
-  critical: ['CEM Completeness', 'Accessibility', 'Type Coverage', 'Test Coverage', 'CEM-Source Fidelity'],
+  critical: [
+    'CEM Completeness',
+    'Accessibility',
+    'Type Coverage',
+    'Test Coverage',
+    'CEM-Source Fidelity',
+  ],
   important: [
     'API Surface Quality',
     'CSS Architecture',

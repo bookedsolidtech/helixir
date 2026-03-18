@@ -76,8 +76,7 @@ export function extractSourceEvents(source: string): string[] {
   const events = new Set<string>();
 
   // dispatchEvent(new CustomEvent('name')) or dispatchEvent(new Event('name'))
-  const dispatchRegex =
-    /dispatchEvent\s*\(\s*new\s+(?:Custom)?Event\s*\(\s*['"`]([^'"`]+)['"`]/g;
+  const dispatchRegex = /dispatchEvent\s*\(\s*new\s+(?:Custom)?Event\s*\(\s*['"`]([^'"`]+)['"`]/g;
   let match;
   while ((match = dispatchRegex.exec(source)) !== null) {
     if (match[1]) events.add(match[1]);
@@ -143,7 +142,8 @@ export function extractSourceProperties(source: string): SourceProperty[] {
   // static properties = { propName: { type: String, reflect: true } }
   // static get properties() { return { propName: { type: String } } }
   // Use a regex that allows one level of nested braces
-  const staticPropsRegex = /static\s+(?:get\s+)?properties\s*(?:=|\(\s*\)\s*\{[\s\S]*?return)\s*\{((?:[^{}]|\{[^{}]*\})*)\}/g;
+  const staticPropsRegex =
+    /static\s+(?:get\s+)?properties\s*(?:=|\(\s*\)\s*\{[\s\S]*?return)\s*\{((?:[^{}]|\{[^{}]*\})*)\}/g;
   while ((match = staticPropsRegex.exec(source)) !== null) {
     const block = match[1] ?? '';
     // Parse individual property entries: propName: { type: String }
@@ -202,7 +202,8 @@ export function extractSourceObservedAttributes(source: string): string[] {
   }
 
   // Also extract from attributeChangedCallback — attribute names referenced
-  const changedCallbackRegex = /attributeChangedCallback\s*\([^)]*\)\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}/g;
+  const changedCallbackRegex =
+    /attributeChangedCallback\s*\([^)]*\)\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}/g;
   while ((match = changedCallbackRegex.exec(source)) !== null) {
     const body = match[1] ?? '';
     const caseRegex = /case\s+['"`]([^'"`]+)['"`]/g;
@@ -234,10 +235,7 @@ const MISSING_EVENT_PENALTY = 10;
  * Phantom events (in CEM, not in source): -15 each
  * Missing events (in source, not in CEM): -10 each
  */
-function scoreEventFidelity(
-  cemEvents: string[],
-  sourceEvents: string[],
-): EventFidelityDetail {
+function scoreEventFidelity(cemEvents: string[], sourceEvents: string[]): EventFidelityDetail {
   if (cemEvents.length === 0 && sourceEvents.length === 0) {
     return {
       score: EVENT_MAX,
@@ -257,7 +255,8 @@ function scoreEventFidelity(
 
   const totalEvents = new Set([...cemSet, ...sourceSet]).size;
   const matchedEvents = totalEvents - phantomEvents.length - missingEvents.length;
-  const baseScore = totalEvents > 0 ? Math.round((matchedEvents / totalEvents) * EVENT_MAX) : EVENT_MAX;
+  const baseScore =
+    totalEvents > 0 ? Math.round((matchedEvents / totalEvents) * EVENT_MAX) : EVENT_MAX;
 
   const phantomPenalty = phantomEvents.length * PHANTOM_EVENT_PENALTY;
   const missingPenalty = missingEvents.length * MISSING_EVENT_PENALTY;

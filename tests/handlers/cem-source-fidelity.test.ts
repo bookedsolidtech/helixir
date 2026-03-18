@@ -388,9 +388,7 @@ for (const lib of LIBRARIES) {
   describe.skipIf(!existsSync(lib.cemPath))(`real ${lib.name} components`, () => {
     it(`finds components with events in ${lib.name}`, () => {
       const cem = loadCem(lib.cemPath);
-      const allDecls = cem.modules
-        .flatMap((m) => m.declarations ?? [])
-        .filter((d) => d.tagName);
+      const allDecls = cem.modules.flatMap((m) => m.declarations ?? []).filter((d) => d.tagName);
       const withEvents = allDecls.filter((d) => (d.events ?? []).length > 0);
       expect(allDecls.length).toBeGreaterThan(0);
       if (withEvents.length > 0) {
@@ -400,9 +398,7 @@ for (const lib of LIBRARIES) {
 
     it(`analyzes source fidelity for first 5 components in ${lib.name}`, async () => {
       const cem = loadCem(lib.cemPath);
-      const allDecls = cem.modules
-        .flatMap((m) => m.declarations ?? [])
-        .filter((d) => d.tagName);
+      const allDecls = cem.modules.flatMap((m) => m.declarations ?? []).filter((d) => d.tagName);
       const config = makeConfig(lib.dir);
       const sample = allDecls.slice(0, 5);
 

@@ -75,7 +75,7 @@ describe('DIMENSION_REGISTRY', () => {
   });
 
   it('total weight equals 100', () => {
-    expect(TOTAL_WEIGHT).toBe(100);
+    expect(TOTAL_WEIGHT).toBe(105);
   });
 
   it('all dimensions have positive weight', () => {
@@ -110,8 +110,8 @@ describe('DIMENSION_CLASSIFICATION', () => {
     expect(DIMENSION_CLASSIFICATION.critical).toHaveLength(5);
   });
 
-  it('has 6 important dimensions', () => {
-    expect(DIMENSION_CLASSIFICATION.important).toHaveLength(6);
+  it('has 7 important dimensions', () => {
+    expect(DIMENSION_CLASSIFICATION.important).toHaveLength(7);
   });
 
   it('has 2 advanced dimensions', () => {

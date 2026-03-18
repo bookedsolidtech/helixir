@@ -20,3 +20,32 @@ export {
   type ResolvedSource,
   type InheritanceChainResult,
 } from './mixin-resolver.js';
+export {
+  analyzeSlotArchitecture,
+  type SlotArchitectureResult,
+  type SlotAnalysis,
+  type CoherencePair,
+} from './slot-architecture.js';
+export {
+  analyzeNamingConsistency,
+  detectLibraryConventions,
+  detectLibraryEventPrefix,
+  detectLibraryCssPrefix,
+  scoreEventPrefixCoherence,
+  scorePropertyNamingConsistency,
+  scoreCSSCustomPropertyPrefixing,
+  scoreAttributePropertyCoherence,
+  type NamingConsistencyResult,
+  type LibraryNamingConventions,
+} from './naming-consistency.js';
+export {
+  analyzeCemSourceFidelity,
+  extractSourceEvents,
+  extractSourceProperties,
+  extractSourceObservedAttributes,
+  type CemSourceFidelityResult,
+  type EventFidelityDetail,
+  type PropertyFidelityDetail,
+  type AttributeFidelityDetail,
+  type SourceProperty,
+} from './cem-source-fidelity.js';

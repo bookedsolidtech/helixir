@@ -1,0 +1,37 @@
+name: CEM Validate
+
+on:
+  push:
+    branches: [main, dev, staging]
+  pull_request:
+    branches: [main, dev, staging]
+
+jobs:
+  cem-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '>=9'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Regenerate CEM from source
+        run: pnpm run cem:generate
+
+      - name: Verify CEM is up to date
+        run: |
+          if ! git diff --exit-code custom-elements.json; then
+            echo "::error::custom-elements.json is stale. Run 'pnpm run cem:generate' locally and commit the updated file."
+            exit 1
+          fi

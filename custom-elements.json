@@ -122,6 +122,130 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/core/src/handlers/analyzers/cem-source-fidelity.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "extractSourceEvents",
+          "return": {
+            "type": {
+              "text": "string[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "source",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Extracts dispatched event names from source code.\nHandles:\n  - dispatchEvent(new CustomEvent('name'))\n  - dispatchEvent(new Event('name'))\n  - this.dispatchEvent(new CustomEvent('name'))\n  - this.emit('name') / this.$emit('name')\n  -"
+        },
+        {
+          "kind": "function",
+          "name": "extractSourceProperties",
+          "return": {
+            "type": {
+              "text": "SourceProperty[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "source",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Extracts property declarations from source code.\nHandles:\n  -"
+        },
+        {
+          "kind": "function",
+          "name": "extractSourceObservedAttributes",
+          "return": {
+            "type": {
+              "text": "string[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "source",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Extracts observed attributes from source code.\nHandles:\n  - static observedAttributes = [...]\n  - static get observedAttributes() { return [...] }\n  - attributeChangedCallback references"
+        },
+        {
+          "kind": "function",
+          "name": "analyzeCemSourceFidelity",
+          "return": {
+            "type": {
+              "text": "Promise<CemSourceFidelityResult | null>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            },
+            {
+              "name": "decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            }
+          ],
+          "description": "Analyzes CEM-source fidelity for a component.\nReturns null if source code is unavailable.\n\nUses mixin-resolver to follow inheritance chains in deep mode,\naggregating events/properties/attributes from all source files."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "extractSourceEvents",
+          "declaration": {
+            "name": "extractSourceEvents",
+            "module": "packages/core/src/handlers/analyzers/cem-source-fidelity.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "extractSourceProperties",
+          "declaration": {
+            "name": "extractSourceProperties",
+            "module": "packages/core/src/handlers/analyzers/cem-source-fidelity.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "extractSourceObservedAttributes",
+          "declaration": {
+            "name": "extractSourceObservedAttributes",
+            "module": "packages/core/src/handlers/analyzers/cem-source-fidelity.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "analyzeCemSourceFidelity",
+          "declaration": {
+            "name": "analyzeCemSourceFidelity",
+            "module": "packages/core/src/handlers/analyzers/cem-source-fidelity.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/core/src/handlers/analyzers/css-architecture.ts",
       "declarations": [
         {
@@ -357,6 +481,78 @@
           "declaration": {
             "name": "InheritanceChainResult",
             "module": "./mixin-resolver.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "analyzeCemSourceFidelity",
+          "declaration": {
+            "name": "analyzeCemSourceFidelity",
+            "module": "./cem-source-fidelity.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "extractSourceEvents",
+          "declaration": {
+            "name": "extractSourceEvents",
+            "module": "./cem-source-fidelity.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "extractSourceProperties",
+          "declaration": {
+            "name": "extractSourceProperties",
+            "module": "./cem-source-fidelity.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "extractSourceObservedAttributes",
+          "declaration": {
+            "name": "extractSourceObservedAttributes",
+            "module": "./cem-source-fidelity.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "CemSourceFidelityResult",
+          "declaration": {
+            "name": "CemSourceFidelityResult",
+            "module": "./cem-source-fidelity.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "EventFidelityDetail",
+          "declaration": {
+            "name": "EventFidelityDetail",
+            "module": "./cem-source-fidelity.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "PropertyFidelityDetail",
+          "declaration": {
+            "name": "PropertyFidelityDetail",
+            "module": "./cem-source-fidelity.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "AttributeFidelityDetail",
+          "declaration": {
+            "name": "AttributeFidelityDetail",
+            "module": "./cem-source-fidelity.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "SourceProperty",
+          "declaration": {
+            "name": "SourceProperty",
+            "module": "./cem-source-fidelity.js"
           }
         }
       ]
@@ -1923,15 +2119,15 @@
           "type": {
             "text": "DimensionDefinition[]"
           },
-          "default": "[ // CEM-native dimensions (helixir can score these) { name: 'CEM Completeness', weight: 15, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Accessibility', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Type Coverage', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'API Surface Quality', weight: 10, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'CSS Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Event Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, // External-data dimensions (reported as untested unless history provides scores) { name: 'Test Coverage', weight: 10, tier: 'critical', source: 'external', phase: 'external-data', }, { name: 'Bundle Size', weight: 5, tier: 'important', source: 'external', phase: 'external-data' }, { name: 'Story Coverage', weight: 5, tier: 'important', source: 'external', phase: 'external-data', }, { name: 'Performance', weight: 5, tier: 'advanced', source: 'external', phase: 'external-data' }, { name: 'Drupal Readiness', weight: 5, tier: 'advanced', source: 'external', phase: 'external-data', }, ]"
+          "default": "[ // CEM-native dimensions (helixir can score these) { name: 'CEM Completeness', weight: 15, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Accessibility', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Type Coverage', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'API Surface Quality', weight: 10, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'CSS Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Event Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, // External-data dimensions (reported as untested unless history provides scores) { name: 'Test Coverage', weight: 10, tier: 'critical', source: 'external', phase: 'external-data', }, { name: 'Bundle Size', weight: 5, tier: 'important', source: 'external', phase: 'external-data' }, { name: 'Story Coverage', weight: 5, tier: 'important', source: 'external', phase: 'external-data', }, { name: 'Performance', weight: 5, tier: 'advanced', source: 'external', phase: 'external-data' }, { name: 'Drupal Readiness', weight: 5, tier: 'advanced', source: 'external', phase: 'external-data', }, // Dimension 12: CEM-Source Fidelity — catches CEM vs source divergence { name: 'CEM-Source Fidelity', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, ]"
         },
         {
           "kind": "variable",
           "name": "DIMENSION_CLASSIFICATION",
           "type": {
-            "text": "{\n  critical: ['CEM Completeness', 'Accessibility', 'Type Coverage', 'Test Coverage'],\n  important: [\n    'API Surface Quality',\n    'CSS Architecture',\n    'Event Architecture',\n    'Bundle Size',\n    'Story Coverage',\n  ],\n  advanced: ['Performance', 'Drupal Readiness'],\n}"
+            "text": "{\n  critical: [\n    'CEM Completeness',\n    'Accessibility',\n    'Type Coverage',\n    'Test Coverage',\n    'CEM-Source Fidelity',\n  ],\n  important: [\n    'API Surface Quality',\n    'CSS Architecture',\n    'Event Architecture',\n    'Bundle Size',\n    'Story Coverage',\n  ],\n  advanced: ['Performance', 'Drupal Readiness'],\n}"
           },
-          "default": "{ critical: ['CEM Completeness', 'Accessibility', 'Type Coverage', 'Test Coverage'], important: [ 'API Surface Quality', 'CSS Architecture', 'Event Architecture', 'Bundle Size', 'Story Coverage', ], advanced: ['Performance', 'Drupal Readiness'], }"
+          "default": "{ critical: [ 'CEM Completeness', 'Accessibility', 'Type Coverage', 'Test Coverage', 'CEM-Source Fidelity', ], important: [ 'API Surface Quality', 'CSS Architecture', 'Event Architecture', 'Bundle Size', 'Story Coverage', ], advanced: ['Performance', 'Drupal Readiness'], }"
         },
         {
           "kind": "variable",
@@ -2096,6 +2292,41 @@
           "declaration": {
             "name": "detectFramework",
             "module": "packages/core/src/handlers/framework.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/generate-types.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "generateTypeDefinitions",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              },
+              "description": "Parsed Custom Elements Manifest"
+            }
+          ],
+          "description": "Generate TypeScript declaration file content from a Custom Elements Manifest.\n\nFor each component with a `tagName`:\n - Generates an `${Name}Attributes` interface with optional attribute properties\n   and event handler properties\n - Generates a `HTMLElementTagNameMap` augmentation for IDE autocomplete"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "generateTypeDefinitions",
+          "declaration": {
+            "name": "generateTypeDefinitions",
+            "module": "packages/core/src/handlers/generate-types.ts"
           }
         }
       ]
@@ -2553,6 +2784,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "packages/core/src/handlers/generate-types.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "packages/core/src/handlers/health.js"
           }
         },
@@ -2594,6 +2833,14 @@
           "declaration": {
             "name": "*",
             "module": "packages/core/src/handlers/tokens.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/typegenerate.js"
           }
         },
         {
@@ -2998,6 +3245,40 @@
           "declaration": {
             "name": "findComponentsUsingToken",
             "module": "packages/core/src/handlers/tokens.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/typegenerate.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "generateTypes",
+          "return": {
+            "type": {
+              "text": "TypegenerateResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ],
+          "description": "Generates TypeScript type definitions (.d.ts content) for all custom elements\ndeclared in a CEM.\n\nAttribute interface property names are sourced from the CEM `attribute` field\n(the HTML attribute name), not the `name` field (the JS property name).\nThis is the root cause fix for the hx-tabs attribute name drift bug."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "generateTypes",
+          "declaration": {
+            "name": "generateTypes",
+            "module": "packages/core/src/handlers/typegenerate.ts"
           }
         }
       ]
@@ -5022,6 +5303,106 @@
           "declaration": {
             "name": "isTokenTool",
             "module": "packages/core/src/tools/tokens.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/tools/typegenerate.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "GenerateTypesArgsSchema"
+        },
+        {
+          "kind": "variable",
+          "name": "TYPEGENERATE_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'generate_types', description: 'Generates TypeScript type definitions (.d.ts content) for all custom elements in the CEM. ' + 'Attribute interface property names are sourced from the CEM `attribute` field (the HTML attribute name), ' + 'not the JavaScript property name, ensuring the output accurately reflects the component API. ' + 'Returns a string ready to save as helix.d.ts or similar.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, }, additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleTypegenerateCall",
+          "return": {
+            "type": {
+              "text": "MCPToolResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "_args",
+              "type": {
+                "text": "Record<string, unknown>"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ],
+          "description": "Dispatches a typegenerate tool call by name and returns an MCPToolResult."
+        },
+        {
+          "kind": "function",
+          "name": "isTypegenerateTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the typegenerate tool group."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "GenerateTypesArgsSchema",
+          "declaration": {
+            "name": "GenerateTypesArgsSchema",
+            "module": "packages/core/src/tools/typegenerate.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TYPEGENERATE_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "TYPEGENERATE_TOOL_DEFINITIONS",
+            "module": "packages/core/src/tools/typegenerate.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleTypegenerateCall",
+          "declaration": {
+            "name": "handleTypegenerateCall",
+            "module": "packages/core/src/tools/typegenerate.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isTypegenerateTool",
+          "declaration": {
+            "name": "isTypegenerateTool",
+            "module": "packages/core/src/tools/typegenerate.ts"
           }
         }
       ]

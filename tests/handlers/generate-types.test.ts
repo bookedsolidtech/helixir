@@ -73,7 +73,12 @@ const SKELETON_CEM: Cem = makeCem({
           name: 'HxSkeleton',
           tagName: 'hx-skeleton',
           members: [
-            { kind: 'field', name: 'variant', attribute: 'variant', type: { text: "'text' | 'rect' | 'circle'" } },
+            {
+              kind: 'field',
+              name: 'variant',
+              attribute: 'variant',
+              type: { text: "'text' | 'rect' | 'circle'" },
+            },
             { kind: 'field', name: 'width', attribute: 'width', type: { text: 'string' } },
             { kind: 'field', name: 'height', attribute: 'height', type: { text: 'string' } },
             { kind: 'field', name: 'animated', attribute: 'animated', type: { text: 'boolean' } },
@@ -203,10 +208,7 @@ describe('generateTypeDefinitions', () => {
 
   it('handles multi-component CEM', () => {
     const cem = makeCem({
-      modules: [
-        ...SKELETON_CEM.modules,
-        ...SPINNER_CEM.modules,
-      ],
+      modules: [...SKELETON_CEM.modules, ...SPINNER_CEM.modules],
     });
     const result = generateTypeDefinitions(cem);
     expect(result.componentCount).toBe(2);

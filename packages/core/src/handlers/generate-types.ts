@@ -119,10 +119,7 @@ function generateComponentInterface(decl: CemDeclaration): string {
  * Generate the HTMLElementTagNameMap augmentation block.
  */
 function generateTagNameMap(decls: CemDeclaration[]): string {
-  const lines: string[] = [
-    'declare global {',
-    '  interface HTMLElementTagNameMap {',
-  ];
+  const lines: string[] = ['declare global {', '  interface HTMLElementTagNameMap {'];
   for (const decl of decls) {
     if (!decl.tagName) continue;
     const interfaceName = `${tagNameToInterfaceName(decl.tagName)}Attributes`;

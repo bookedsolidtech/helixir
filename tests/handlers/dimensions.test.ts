@@ -60,8 +60,8 @@ function makeFullDimensions(
 // ─── DIMENSION_REGISTRY ──────────────────────────────────────────────────────
 
 describe('DIMENSION_REGISTRY', () => {
-  it('contains exactly 13 dimensions', () => {
-    expect(DIMENSION_REGISTRY).toHaveLength(13);
+  it('contains exactly 14 dimensions', () => {
+    expect(DIMENSION_REGISTRY).toHaveLength(14);
   });
 
   it('has 8 cem-native dimensions', () => {

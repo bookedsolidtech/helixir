@@ -142,7 +142,7 @@ describe('scoreComponentMultiDimensional', () => {
   it('returns all 13 dimensions', async () => {
     const config = makeConfig();
     const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
-    expect(result.dimensions).toHaveLength(13);
+    expect(result.dimensions).toHaveLength(14);
   });
 
   it('includes tagName in result', async () => {
@@ -271,7 +271,7 @@ describe('scoreComponentMultiDimensional', () => {
   it('minimal component still returns valid result', async () => {
     const config = makeConfig();
     const result = await scoreComponentMultiDimensional(config, MINIMAL_DECL);
-    expect(result.dimensions).toHaveLength(13);
+    expect(result.dimensions).toHaveLength(14);
     expect(typeof result.score).toBe('number');
     expect(['A', 'B', 'C', 'D', 'F']).toContain(result.grade);
   });
@@ -345,7 +345,7 @@ describe('scoreAllComponentsMultiDimensional', () => {
     const config = makeConfig();
     const results = await scoreAllComponentsMultiDimensional(config, [PERFECT_DECL, MINIMAL_DECL]);
     for (const result of results) {
-      expect(result.dimensions).toHaveLength(13);
+      expect(result.dimensions).toHaveLength(14);
     }
   });
 
@@ -365,7 +365,7 @@ describe('JSONL output shape', () => {
     const json = JSON.stringify(result);
     const parsed = JSON.parse(json) as MultiDimensionalHealth;
     expect(parsed.tagName).toBe('perfect-component');
-    expect(parsed.dimensions).toHaveLength(13);
+    expect(parsed.dimensions).toHaveLength(14);
   });
 
   it('each dimension in JSON has required fields', async () => {

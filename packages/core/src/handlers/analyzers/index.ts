@@ -20,3 +20,14 @@ export {
   type ResolvedSource,
   type InheritanceChainResult,
 } from './mixin-resolver.js';
+export {
+  analyzeCemSourceFidelity,
+  extractSourceEvents,
+  extractSourceProperties,
+  extractSourceObservedAttributes,
+  type CemSourceFidelityResult,
+  type EventFidelityDetail,
+  type PropertyFidelityDetail,
+  type AttributeFidelityDetail,
+  type SourceProperty,
+} from './cem-source-fidelity.js';

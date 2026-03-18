@@ -60,13 +60,13 @@ function makeFullDimensions(
 // ─── DIMENSION_REGISTRY ──────────────────────────────────────────────────────
 
 describe('DIMENSION_REGISTRY', () => {
-  it('contains exactly 11 dimensions', () => {
-    expect(DIMENSION_REGISTRY).toHaveLength(11);
+  it('contains exactly 12 dimensions', () => {
+    expect(DIMENSION_REGISTRY).toHaveLength(12);
   });
 
-  it('has 6 cem-native dimensions', () => {
+  it('has 7 cem-native dimensions', () => {
     const cemNative = DIMENSION_REGISTRY.filter((d) => d.source === 'cem-native');
-    expect(cemNative).toHaveLength(6);
+    expect(cemNative).toHaveLength(7);
   });
 
   it('has 5 external dimensions', () => {
@@ -74,8 +74,8 @@ describe('DIMENSION_REGISTRY', () => {
     expect(external).toHaveLength(5);
   });
 
-  it('total weight equals 85', () => {
-    expect(TOTAL_WEIGHT).toBe(85);
+  it('total weight equals 95', () => {
+    expect(TOTAL_WEIGHT).toBe(95);
   });
 
   it('all dimensions have positive weight', () => {
@@ -106,8 +106,8 @@ describe('DIMENSION_REGISTRY', () => {
 // ─── DIMENSION_CLASSIFICATION ────────────────────────────────────────────────
 
 describe('DIMENSION_CLASSIFICATION', () => {
-  it('has 4 critical dimensions', () => {
-    expect(DIMENSION_CLASSIFICATION.critical).toHaveLength(4);
+  it('has 5 critical dimensions', () => {
+    expect(DIMENSION_CLASSIFICATION.critical).toHaveLength(5);
   });
 
   it('has 5 important dimensions', () => {

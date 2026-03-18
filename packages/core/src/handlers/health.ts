@@ -12,6 +12,7 @@ import { analyzeApiSurface } from './analyzers/api-surface.js';
 import { analyzeCssArchitecture } from './analyzers/css-architecture.js';
 import { analyzeEventArchitecture } from './analyzers/event-architecture.js';
 import { analyzeSourceAccessibility } from './analyzers/source-accessibility.js';
+import { analyzeCemSourceFidelity } from './analyzers/cem-source-fidelity.js';
 import {
   DIMENSION_REGISTRY,
   calculateGrade,
@@ -898,6 +899,17 @@ async function scoreCemNativeDimension(
       const evt = analyzeEventArchitecture(decl);
       if (!evt) return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
       return evt;
+    }
+
+    case 'CEM-Source Fidelity': {
+      if (!config || !cem) {
+        return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+      }
+      const fidelity = await analyzeCemSourceFidelity(config, cem, decl);
+      if (!fidelity) {
+        return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+      }
+      return fidelity;
     }
 
     default:

@@ -14,7 +14,11 @@ import { analyzeEventArchitecture } from './analyzers/event-architecture.js';
 import { analyzeSourceAccessibility } from './analyzers/source-accessibility.js';
 import { analyzeCemSourceFidelity } from './analyzers/cem-source-fidelity.js';
 import { analyzeSlotArchitecture } from './analyzers/slot-architecture.js';
-import { analyzeNamingConsistency, detectLibraryConventions, type LibraryNamingConventions } from './analyzers/naming-consistency.js';
+import {
+  analyzeNamingConsistency,
+  detectLibraryConventions,
+  type LibraryNamingConventions,
+} from './analyzers/naming-consistency.js';
 import {
   DIMENSION_REGISTRY,
   calculateGrade,
@@ -766,7 +770,14 @@ export async function scoreComponentMultiDimensional(
 
   for (const def of DIMENSION_REGISTRY) {
     if (def.source === 'cem-native') {
-      const result = await scoreCemNativeDimension(def.name, decl, issues, config, cem, namingConventions);
+      const result = await scoreCemNativeDimension(
+        def.name,
+        decl,
+        issues,
+        config,
+        cem,
+        namingConventions,
+      );
       const notApplicable = 'notApplicable' in result && result.notApplicable === true;
       dimensions.push({
         name: def.name,
@@ -955,6 +966,8 @@ export async function scoreAllComponentsMultiDimensional(
   const namingConventions = detectLibraryConventions(cemDeclarations);
 
   return Promise.all(
-    withTag.map((decl) => scoreComponentMultiDimensional(config, decl, cem, libraryId, namingConventions)),
+    withTag.map((decl) =>
+      scoreComponentMultiDimensional(config, decl, cem, libraryId, namingConventions),
+    ),
   );
 }

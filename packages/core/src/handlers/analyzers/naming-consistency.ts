@@ -37,10 +37,6 @@ function isSnakeCase(name: string): boolean {
   return /^[a-z][a-z0-9]*(_[a-z0-9]+)+$/.test(name);
 }
 
-function isKebabCase(name: string): boolean {
-  return /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/.test(name);
-}
-
 /**
  * Converts a camelCase property name to its expected kebab-case attribute.
  * e.g. "maxLength" → "max-length", "disabled" → "disabled"
@@ -53,7 +49,10 @@ function camelToKebab(name: string): string {
  * Detects the most common prefix from a list of strings.
  * Returns the prefix and a confidence score (0-1) indicating how dominant it is.
  */
-function detectPrefix(names: string[], separator: string): { prefix: string | null; confidence: number } {
+function detectPrefix(
+  names: string[],
+  separator: string,
+): { prefix: string | null; confidence: number } {
   if (names.length === 0) return { prefix: null, confidence: 0 };
 
   // Extract potential prefixes (everything before the first separator occurrence after initial segment)
@@ -92,7 +91,10 @@ function detectPrefix(names: string[], separator: string): { prefix: string | nu
  * Detects the library-wide event prefix pattern by analyzing all declarations.
  * e.g., "hx-" for helix, "sl-" for Shoelace, "md-" for Material Web.
  */
-export function detectLibraryEventPrefix(declarations: CemDeclaration[]): { prefix: string | null; confidence: number } {
+export function detectLibraryEventPrefix(declarations: CemDeclaration[]): {
+  prefix: string | null;
+  confidence: number;
+} {
   const allEventNames: string[] = [];
   for (const decl of declarations) {
     for (const event of decl.events ?? []) {
@@ -106,7 +108,10 @@ export function detectLibraryEventPrefix(declarations: CemDeclaration[]): { pref
  * Detects the library-wide CSS custom property prefix pattern.
  * e.g., "--hx-" for helix, "--sl-" for Shoelace.
  */
-export function detectLibraryCssPrefix(declarations: CemDeclaration[]): { prefix: string | null; confidence: number } {
+export function detectLibraryCssPrefix(declarations: CemDeclaration[]): {
+  prefix: string | null;
+  confidence: number;
+} {
   const allCssNames: string[] = [];
   for (const decl of declarations) {
     for (const prop of decl.cssProperties ?? []) {
@@ -184,7 +189,10 @@ export function scoreEventPrefixCoherence(
  * Scores property naming consistency (25 points).
  * All public properties should use camelCase consistently.
  */
-export function scorePropertyNamingConsistency(decl: CemDeclaration): { score: number; subMetric: SubMetric } {
+export function scorePropertyNamingConsistency(decl: CemDeclaration): {
+  score: number;
+  subMetric: SubMetric;
+} {
   const fields = (decl.members ?? []).filter((m) => m.kind === 'field');
 
   if (fields.length === 0) {
@@ -261,7 +269,10 @@ export function scoreCSSCustomPropertyPrefixing(
  * Scores attribute-property naming coherence (20 points).
  * Attributes should be kebab-case versions of their camelCase property names.
  */
-export function scoreAttributePropertyCoherence(decl: CemDeclaration): { score: number; subMetric: SubMetric } {
+export function scoreAttributePropertyCoherence(decl: CemDeclaration): {
+  score: number;
+  subMetric: SubMetric;
+} {
   const fieldsWithAttributes = (decl.members ?? []).filter(
     (m) => m.kind === 'field' && typeof m.attribute === 'string' && m.attribute.length > 0,
   );

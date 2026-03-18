@@ -485,34 +485,82 @@
         },
         {
           "kind": "js",
-          "name": "analyzeSlotArchitecture",
+          "name": "analyzeNamingConsistency",
           "declaration": {
-            "name": "analyzeSlotArchitecture",
-            "module": "./slot-architecture.js"
+            "name": "analyzeNamingConsistency",
+            "module": "./naming-consistency.js"
           }
         },
         {
           "kind": "js",
-          "name": "SlotArchitectureResult",
+          "name": "detectLibraryConventions",
           "declaration": {
-            "name": "SlotArchitectureResult",
-            "module": "./slot-architecture.js"
+            "name": "detectLibraryConventions",
+            "module": "./naming-consistency.js"
           }
         },
         {
           "kind": "js",
-          "name": "SlotAnalysis",
+          "name": "detectLibraryEventPrefix",
           "declaration": {
-            "name": "SlotAnalysis",
-            "module": "./slot-architecture.js"
+            "name": "detectLibraryEventPrefix",
+            "module": "./naming-consistency.js"
           }
         },
         {
           "kind": "js",
-          "name": "CoherencePair",
+          "name": "detectLibraryCssPrefix",
           "declaration": {
-            "name": "CoherencePair",
-            "module": "./slot-architecture.js"
+            "name": "detectLibraryCssPrefix",
+            "module": "./naming-consistency.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "scoreEventPrefixCoherence",
+          "declaration": {
+            "name": "scoreEventPrefixCoherence",
+            "module": "./naming-consistency.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "scorePropertyNamingConsistency",
+          "declaration": {
+            "name": "scorePropertyNamingConsistency",
+            "module": "./naming-consistency.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "scoreCSSCustomPropertyPrefixing",
+          "declaration": {
+            "name": "scoreCSSCustomPropertyPrefixing",
+            "module": "./naming-consistency.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "scoreAttributePropertyCoherence",
+          "declaration": {
+            "name": "scoreAttributePropertyCoherence",
+            "module": "./naming-consistency.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "NamingConsistencyResult",
+          "declaration": {
+            "name": "NamingConsistencyResult",
+            "module": "./naming-consistency.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "LibraryNamingConventions",
+          "declaration": {
+            "name": "LibraryNamingConventions",
+            "module": "./naming-consistency.js"
           }
         },
         {
@@ -655,14 +703,92 @@
     },
     {
       "kind": "javascript-module",
-      "path": "packages/core/src/handlers/analyzers/slot-architecture.ts",
+      "path": "packages/core/src/handlers/analyzers/naming-consistency.ts",
       "declarations": [
         {
           "kind": "function",
-          "name": "analyzeSlotArchitecture",
+          "name": "detectLibraryEventPrefix",
           "return": {
             "type": {
-              "text": "SlotArchitectureResult | null"
+              "text": "{\n  prefix: string | null;\n  confidence: number;\n}"
+            }
+          },
+          "parameters": [
+            {
+              "name": "declarations",
+              "type": {
+                "text": "CemDeclaration[]"
+              }
+            }
+          ],
+          "description": "Detects the library-wide event prefix pattern by analyzing all declarations.\ne.g., \"hx-\" for helix, \"sl-\" for Shoelace, \"md-\" for Material Web."
+        },
+        {
+          "kind": "function",
+          "name": "detectLibraryCssPrefix",
+          "return": {
+            "type": {
+              "text": "{\n  prefix: string | null;\n  confidence: number;\n}"
+            }
+          },
+          "parameters": [
+            {
+              "name": "declarations",
+              "type": {
+                "text": "CemDeclaration[]"
+              }
+            }
+          ],
+          "description": "Detects the library-wide CSS custom property prefix pattern.\ne.g., \"--hx-\" for helix, \"--sl-\" for Shoelace."
+        },
+        {
+          "kind": "function",
+          "name": "detectLibraryConventions",
+          "return": {
+            "type": {
+              "text": "LibraryNamingConventions"
+            }
+          },
+          "parameters": [
+            {
+              "name": "declarations",
+              "type": {
+                "text": "CemDeclaration[]"
+              }
+            }
+          ],
+          "description": "Detects library-wide naming conventions from all declarations."
+        },
+        {
+          "kind": "function",
+          "name": "scoreEventPrefixCoherence",
+          "return": {
+            "type": {
+              "text": "{ score: number; subMetric: SubMetric } | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            },
+            {
+              "name": "expectedPrefix",
+              "type": {
+                "text": "string | null"
+              }
+            }
+          ],
+          "description": "Scores event prefix coherence for a single component (30 points).\nComponents with no events are excluded from scoring."
+        },
+        {
+          "kind": "function",
+          "name": "scorePropertyNamingConsistency",
+          "return": {
+            "type": {
+              "text": "{\n  score: number;\n  subMetric: SubMetric;\n}"
             }
           },
           "parameters": [
@@ -672,16 +798,141 @@
                 "text": "CemDeclaration"
               }
             }
-          ]
+          ],
+          "description": "Scores property naming consistency (25 points).\nAll public properties should use camelCase consistently."
+        },
+        {
+          "kind": "function",
+          "name": "scoreCSSCustomPropertyPrefixing",
+          "return": {
+            "type": {
+              "text": "{ score: number; subMetric: SubMetric } | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            },
+            {
+              "name": "expectedPrefix",
+              "type": {
+                "text": "string | null"
+              }
+            }
+          ],
+          "description": "Scores CSS custom property prefix consistency (25 points).\nComponents with no CSS custom properties are excluded."
+        },
+        {
+          "kind": "function",
+          "name": "scoreAttributePropertyCoherence",
+          "return": {
+            "type": {
+              "text": "{\n  score: number;\n  subMetric: SubMetric;\n}"
+            }
+          },
+          "parameters": [
+            {
+              "name": "decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            }
+          ],
+          "description": "Scores attribute-property naming coherence (20 points).\nAttributes should be kebab-case versions of their camelCase property names."
+        },
+        {
+          "kind": "function",
+          "name": "analyzeNamingConsistency",
+          "return": {
+            "type": {
+              "text": "NamingConsistencyResult | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "decl",
+              "type": {
+                "text": "CemDeclaration"
+              },
+              "description": "The component declaration to score."
+            },
+            {
+              "name": "conventions",
+              "type": {
+                "text": "LibraryNamingConventions"
+              },
+              "description": "Pre-detected library-wide naming conventions."
+            }
+          ],
+          "description": "Analyzes naming consistency for a single component against library-wide conventions."
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "analyzeSlotArchitecture",
+          "name": "detectLibraryEventPrefix",
           "declaration": {
-            "name": "analyzeSlotArchitecture",
-            "module": "packages/core/src/handlers/analyzers/slot-architecture.ts"
+            "name": "detectLibraryEventPrefix",
+            "module": "packages/core/src/handlers/analyzers/naming-consistency.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "detectLibraryCssPrefix",
+          "declaration": {
+            "name": "detectLibraryCssPrefix",
+            "module": "packages/core/src/handlers/analyzers/naming-consistency.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "detectLibraryConventions",
+          "declaration": {
+            "name": "detectLibraryConventions",
+            "module": "packages/core/src/handlers/analyzers/naming-consistency.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "scoreEventPrefixCoherence",
+          "declaration": {
+            "name": "scoreEventPrefixCoherence",
+            "module": "packages/core/src/handlers/analyzers/naming-consistency.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "scorePropertyNamingConsistency",
+          "declaration": {
+            "name": "scorePropertyNamingConsistency",
+            "module": "packages/core/src/handlers/analyzers/naming-consistency.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "scoreCSSCustomPropertyPrefixing",
+          "declaration": {
+            "name": "scoreCSSCustomPropertyPrefixing",
+            "module": "packages/core/src/handlers/analyzers/naming-consistency.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "scoreAttributePropertyCoherence",
+          "declaration": {
+            "name": "scoreAttributePropertyCoherence",
+            "module": "packages/core/src/handlers/analyzers/naming-consistency.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "analyzeNamingConsistency",
+          "declaration": {
+            "name": "analyzeNamingConsistency",
+            "module": "packages/core/src/handlers/analyzers/naming-consistency.ts"
           }
         }
       ]
@@ -2184,15 +2435,15 @@
           "type": {
             "text": "DimensionDefinition[]"
           },
-          "default": "[ // CEM-native dimensions (helixir can score these) { name: 'CEM Completeness', weight: 15, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Accessibility', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Type Coverage', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'API Surface Quality', weight: 10, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'CSS Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Event Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, // External-data dimensions (reported as untested unless history provides scores) { name: 'Test Coverage', weight: 10, tier: 'critical', source: 'external', phase: 'external-data', }, { name: 'Bundle Size', weight: 5, tier: 'important', source: 'external', phase: 'external-data' }, { name: 'Story Coverage', weight: 5, tier: 'important', source: 'external', phase: 'external-data', }, { name: 'Performance', weight: 5, tier: 'advanced', source: 'external', phase: 'external-data' }, { name: 'Drupal Readiness', weight: 5, tier: 'advanced', source: 'external', phase: 'external-data', }, // Dimension 12: CEM-Source Fidelity — catches CEM vs source divergence { name: 'CEM-Source Fidelity', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, // Dimension 13: Slot Architecture — slot documentation, type constraints, coherence { name: 'Slot Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, ]"
+          "default": "[ // CEM-native dimensions (helixir can score these) { name: 'CEM Completeness', weight: 15, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Accessibility', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Type Coverage', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'API Surface Quality', weight: 10, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'CSS Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Event Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, // External-data dimensions (reported as untested unless history provides scores) { name: 'Test Coverage', weight: 10, tier: 'critical', source: 'external', phase: 'external-data', }, { name: 'Bundle Size', weight: 5, tier: 'important', source: 'external', phase: 'external-data' }, { name: 'Story Coverage', weight: 5, tier: 'important', source: 'external', phase: 'external-data', }, { name: 'Performance', weight: 5, tier: 'advanced', source: 'external', phase: 'external-data' }, { name: 'Drupal Readiness', weight: 5, tier: 'advanced', source: 'external', phase: 'external-data', }, // Dimension 12: CEM-Source Fidelity — catches CEM vs source divergence { name: 'CEM-Source Fidelity', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, // Dimension 14: Naming Consistency — library-wide naming convention adherence { name: 'Naming Consistency', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, ]"
         },
         {
           "kind": "variable",
           "name": "DIMENSION_CLASSIFICATION",
           "type": {
-            "text": "{\n  critical: [\n    'CEM Completeness',\n    'Accessibility',\n    'Type Coverage',\n    'Test Coverage',\n    'CEM-Source Fidelity',\n  ],\n  important: [\n    'API Surface Quality',\n    'CSS Architecture',\n    'Event Architecture',\n    'Slot Architecture',\n    'Bundle Size',\n    'Story Coverage',\n  ],\n  advanced: ['Performance', 'Drupal Readiness'],\n}"
+            "text": "{\n  critical: [\n    'CEM Completeness',\n    'Accessibility',\n    'Type Coverage',\n    'Test Coverage',\n    'CEM-Source Fidelity',\n  ],\n  important: [\n    'API Surface Quality',\n    'CSS Architecture',\n    'Event Architecture',\n    'Bundle Size',\n    'Story Coverage',\n    'Naming Consistency',\n  ],\n  advanced: ['Performance', 'Drupal Readiness'],\n}"
           },
-          "default": "{ critical: [ 'CEM Completeness', 'Accessibility', 'Type Coverage', 'Test Coverage', 'CEM-Source Fidelity', ], important: [ 'API Surface Quality', 'CSS Architecture', 'Event Architecture', 'Slot Architecture', 'Bundle Size', 'Story Coverage', ], advanced: ['Performance', 'Drupal Readiness'], }"
+          "default": "{ critical: [ 'CEM Completeness', 'Accessibility', 'Type Coverage', 'Test Coverage', 'CEM-Source Fidelity', ], important: [ 'API Surface Quality', 'CSS Architecture', 'Event Architecture', 'Bundle Size', 'Story Coverage', 'Naming Consistency', ], advanced: ['Performance', 'Drupal Readiness'], }"
         },
         {
           "kind": "variable",
@@ -2628,6 +2879,13 @@
             {
               "name": "libraryId",
               "default": "'default'"
+            },
+            {
+              "name": "namingConventions",
+              "optional": true,
+              "type": {
+                "text": "LibraryNamingConventions"
+              }
             }
           ],
           "description": "Scores a component across all 11 dimensions using the enterprise grade algorithm.\nCEM-native dimensions are computed from the declaration.\nExternal dimensions are checked via history files (reported as untested if unavailable)."

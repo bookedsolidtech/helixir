@@ -36,10 +36,7 @@ function makeHelixLibrary(): CemDeclaration[] {
         { kind: 'field', name: 'variant', type: { text: 'string' }, attribute: 'variant' },
         { kind: 'field', name: 'isDisabled', type: { text: 'boolean' }, attribute: 'is-disabled' },
       ],
-      cssProperties: [
-        { name: '--hx-button-color' },
-        { name: '--hx-button-bg' },
-      ],
+      cssProperties: [{ name: '--hx-button-color' }, { name: '--hx-button-bg' }],
     }),
     makeDecl({
       name: 'HxInput',
@@ -52,10 +49,7 @@ function makeHelixLibrary(): CemDeclaration[] {
         { kind: 'field', name: 'value', type: { text: 'string' }, attribute: 'value' },
         { kind: 'field', name: 'maxLength', type: { text: 'number' }, attribute: 'max-length' },
       ],
-      cssProperties: [
-        { name: '--hx-input-border' },
-        { name: '--hx-input-padding' },
-      ],
+      cssProperties: [{ name: '--hx-input-border' }, { name: '--hx-input-padding' }],
     }),
     makeDecl({
       name: 'HxModal',
@@ -64,12 +58,8 @@ function makeHelixLibrary(): CemDeclaration[] {
         { name: 'hx-open', type: { text: 'CustomEvent' } },
         { name: 'hx-close', type: { text: 'CustomEvent' } },
       ],
-      members: [
-        { kind: 'field', name: 'isOpen', type: { text: 'boolean' }, attribute: 'is-open' },
-      ],
-      cssProperties: [
-        { name: '--hx-modal-backdrop' },
-      ],
+      members: [{ kind: 'field', name: 'isOpen', type: { text: 'boolean' }, attribute: 'is-open' }],
+      cssProperties: [{ name: '--hx-modal-backdrop' }],
     }),
   ];
 }
@@ -87,10 +77,7 @@ function makeShoelaceLibrary(): CemDeclaration[] {
         { kind: 'field', name: 'variant', type: { text: 'string' }, attribute: 'variant' },
         { kind: 'field', name: 'size', type: { text: 'string' }, attribute: 'size' },
       ],
-      cssProperties: [
-        { name: '--sl-button-color' },
-        { name: '--sl-spacing-small' },
-      ],
+      cssProperties: [{ name: '--sl-button-color' }, { name: '--sl-spacing-small' }],
     }),
     makeDecl({
       name: 'SlInput',
@@ -99,9 +86,7 @@ function makeShoelaceLibrary(): CemDeclaration[] {
         { name: 'sl-change', type: { text: 'CustomEvent' } },
         { name: 'sl-input', type: { text: 'InputEvent' } },
       ],
-      cssProperties: [
-        { name: '--sl-input-border-color' },
-      ],
+      cssProperties: [{ name: '--sl-input-border-color' }],
     }),
   ];
 }
@@ -111,23 +96,14 @@ function makeMaterialWebLibrary(): CemDeclaration[] {
     makeDecl({
       name: 'MdButton',
       tagName: 'md-button',
-      events: [
-        { name: 'md-click', type: { text: 'CustomEvent' } },
-      ],
-      cssProperties: [
-        { name: '--md-sys-color-primary' },
-        { name: '--md-sys-color-secondary' },
-      ],
+      events: [{ name: 'md-click', type: { text: 'CustomEvent' } }],
+      cssProperties: [{ name: '--md-sys-color-primary' }, { name: '--md-sys-color-secondary' }],
     }),
     makeDecl({
       name: 'MdTextField',
       tagName: 'md-text-field',
-      events: [
-        { name: 'md-change', type: { text: 'CustomEvent' } },
-      ],
-      cssProperties: [
-        { name: '--md-sys-typescale-body' },
-      ],
+      events: [{ name: 'md-change', type: { text: 'CustomEvent' } }],
+      cssProperties: [{ name: '--md-sys-typescale-body' }],
     }),
   ];
 }
@@ -137,12 +113,8 @@ function makeCarbonLibrary(): CemDeclaration[] {
     makeDecl({
       name: 'BxButton',
       tagName: 'bx-button',
-      events: [
-        { name: 'bx-click', type: { text: 'CustomEvent' } },
-      ],
-      cssProperties: [
-        { name: '--bx-button-primary' },
-      ],
+      events: [{ name: 'bx-click', type: { text: 'CustomEvent' } }],
+      cssProperties: [{ name: '--bx-button-primary' }],
     }),
     makeDecl({
       name: 'BxModal',
@@ -151,9 +123,7 @@ function makeCarbonLibrary(): CemDeclaration[] {
         { name: 'bx-modal-open', type: { text: 'CustomEvent' } },
         { name: 'bx-modal-close', type: { text: 'CustomEvent' } },
       ],
-      cssProperties: [
-        { name: '--bx-modal-bg' },
-      ],
+      cssProperties: [{ name: '--bx-modal-bg' }],
     }),
   ];
 }
@@ -167,20 +137,13 @@ function makeIonicLibrary(): CemDeclaration[] {
         { name: 'ion-click', type: { text: 'CustomEvent' } },
         { name: 'ion-focus', type: { text: 'FocusEvent' } },
       ],
-      cssProperties: [
-        { name: '--ion-color-primary' },
-        { name: '--ion-color-secondary' },
-      ],
+      cssProperties: [{ name: '--ion-color-primary' }, { name: '--ion-color-secondary' }],
     }),
     makeDecl({
       name: 'IonInput',
       tagName: 'ion-input',
-      events: [
-        { name: 'ion-change', type: { text: 'CustomEvent' } },
-      ],
-      cssProperties: [
-        { name: '--ion-input-bg' },
-      ],
+      events: [{ name: 'ion-change', type: { text: 'CustomEvent' } }],
+      cssProperties: [{ name: '--ion-input-bg' }],
     }),
   ];
 }
@@ -300,10 +263,7 @@ describe('naming-consistency / per-component scoring', () => {
   describe('event prefix coherence', () => {
     it('scores 30/30 when all events match prefix', () => {
       const decl = makeDecl({
-        events: [
-          { name: 'hx-click' },
-          { name: 'hx-focus' },
-        ],
+        events: [{ name: 'hx-click' }, { name: 'hx-focus' }],
       });
       const result = scoreEventPrefixCoherence(decl, 'hx-');
       expect(result).not.toBeNull();
@@ -312,10 +272,7 @@ describe('naming-consistency / per-component scoring', () => {
 
     it('scores 0/30 when no events match prefix', () => {
       const decl = makeDecl({
-        events: [
-          { name: 'custom-click' },
-          { name: 'custom-focus' },
-        ],
+        events: [{ name: 'custom-click' }, { name: 'custom-focus' }],
       });
       const result = scoreEventPrefixCoherence(decl, 'hx-');
       expect(result).not.toBeNull();
@@ -374,10 +331,7 @@ describe('naming-consistency / per-component scoring', () => {
   describe('CSS custom property prefixing', () => {
     it('scores 25/25 when all CSS properties match prefix', () => {
       const decl = makeDecl({
-        cssProperties: [
-          { name: '--hx-button-color' },
-          { name: '--hx-button-bg' },
-        ],
+        cssProperties: [{ name: '--hx-button-color' }, { name: '--hx-button-bg' }],
       });
       const result = scoreCSSCustomPropertyPrefixing(decl, '--hx-');
       expect(result).not.toBeNull();
@@ -386,10 +340,7 @@ describe('naming-consistency / per-component scoring', () => {
 
     it('scores 0/25 when no CSS properties match prefix', () => {
       const decl = makeDecl({
-        cssProperties: [
-          { name: '--custom-color' },
-          { name: '--custom-bg' },
-        ],
+        cssProperties: [{ name: '--custom-color' }, { name: '--custom-bg' }],
       });
       const result = scoreCSSCustomPropertyPrefixing(decl, '--hx-');
       expect(result).not.toBeNull();
@@ -409,7 +360,12 @@ describe('naming-consistency / per-component scoring', () => {
         members: [
           { kind: 'field', name: 'maxLength', attribute: 'max-length', type: { text: 'number' } },
           { kind: 'field', name: 'variant', attribute: 'variant', type: { text: 'string' } },
-          { kind: 'field', name: 'isDisabled', attribute: 'is-disabled', type: { text: 'boolean' } },
+          {
+            kind: 'field',
+            name: 'isDisabled',
+            attribute: 'is-disabled',
+            type: { text: 'boolean' },
+          },
         ],
       });
       const result = scoreAttributePropertyCoherence(decl);
@@ -430,9 +386,7 @@ describe('naming-consistency / per-component scoring', () => {
 
     it('gives full score for components with no attribute-mapped properties', () => {
       const decl = makeDecl({
-        members: [
-          { kind: 'field', name: 'value', type: { text: 'string' } },
-        ],
+        members: [{ kind: 'field', name: 'value', type: { text: 'string' } }],
       });
       const result = scoreAttributePropertyCoherence(decl);
       expect(result.score).toBe(20);
@@ -464,19 +418,13 @@ describe('naming-consistency / full analyzer', () => {
     };
 
     const inconsistent = makeDecl({
-      events: [
-        { name: 'custom-click' },
-        { name: 'random-event' },
-      ],
+      events: [{ name: 'custom-click' }, { name: 'random-event' }],
       members: [
         { kind: 'field', name: 'variant', type: { text: 'string' } },
         { kind: 'field', name: 'is_broken', type: { text: 'boolean' } },
         { kind: 'field', name: 'SHOUTING', type: { text: 'string' } },
       ],
-      cssProperties: [
-        { name: '--wrong-prefix-color' },
-        { name: '--another-wrong-bg' },
-      ],
+      cssProperties: [{ name: '--wrong-prefix-color' }, { name: '--another-wrong-bg' }],
     });
 
     const result = analyzeNamingConsistency(inconsistent, conventions);
@@ -504,11 +452,36 @@ describe('naming-consistency / full analyzer', () => {
 
   it('handles library conventions detection across 5+ libraries', () => {
     const libraries = [
-      { name: 'helix', decls: makeHelixLibrary(), expectedEventPrefix: 'hx-', expectedCssPrefix: '--hx-' },
-      { name: 'Shoelace', decls: makeShoelaceLibrary(), expectedEventPrefix: 'sl-', expectedCssPrefix: '--sl-' },
-      { name: 'Material Web', decls: makeMaterialWebLibrary(), expectedEventPrefix: 'md-', expectedCssPrefix: '--md-' },
-      { name: 'Carbon', decls: makeCarbonLibrary(), expectedEventPrefix: 'bx-', expectedCssPrefix: '--bx-' },
-      { name: 'Ionic', decls: makeIonicLibrary(), expectedEventPrefix: 'ion-', expectedCssPrefix: '--ion-' },
+      {
+        name: 'helix',
+        decls: makeHelixLibrary(),
+        expectedEventPrefix: 'hx-',
+        expectedCssPrefix: '--hx-',
+      },
+      {
+        name: 'Shoelace',
+        decls: makeShoelaceLibrary(),
+        expectedEventPrefix: 'sl-',
+        expectedCssPrefix: '--sl-',
+      },
+      {
+        name: 'Material Web',
+        decls: makeMaterialWebLibrary(),
+        expectedEventPrefix: 'md-',
+        expectedCssPrefix: '--md-',
+      },
+      {
+        name: 'Carbon',
+        decls: makeCarbonLibrary(),
+        expectedEventPrefix: 'bx-',
+        expectedCssPrefix: '--bx-',
+      },
+      {
+        name: 'Ionic',
+        decls: makeIonicLibrary(),
+        expectedEventPrefix: 'ion-',
+        expectedCssPrefix: '--ion-',
+      },
     ];
 
     for (const lib of libraries) {
@@ -536,13 +509,8 @@ describe('naming-consistency / full analyzer', () => {
     };
 
     const decl = makeDecl({
-      events: [
-        { name: 'hx-click' },
-        { name: 'hx-focus' },
-      ],
-      members: [
-        { kind: 'field', name: 'variant', attribute: 'variant', type: { text: 'string' } },
-      ],
+      events: [{ name: 'hx-click' }, { name: 'hx-focus' }],
+      members: [{ kind: 'field', name: 'variant', attribute: 'variant', type: { text: 'string' } }],
       cssProperties: [],
     });
 

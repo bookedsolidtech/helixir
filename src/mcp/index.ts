@@ -82,6 +82,11 @@ import {
   handleTypegenerateCall,
   isTypegenerateTool,
 } from '../../packages/core/src/tools/typegenerate.js';
+import {
+  TYPE_DEFINITIONS_TOOL_DEFINITIONS,
+  handleTypeDefinitionsCall,
+  isTypeDefinitionsTool,
+} from '../../packages/core/src/tools/type-definitions.js';
 import { createErrorResponse } from '../../packages/core/src/shared/mcp-helpers.js';
 import type { MCPToolResult } from '../../packages/core/src/shared/mcp-helpers.js';
 
@@ -187,6 +192,7 @@ export async function main(): Promise<void> {
     ...BENCHMARK_TOOL_DEFINITIONS,
     ...LIBRARY_TOOL_DEFINITIONS,
     ...TYPEGENERATE_TOOL_DEFINITIONS,
+    ...TYPE_DEFINITIONS_TOOL_DEFINITIONS,
     ...tsTools,
   ];
 
@@ -271,6 +277,13 @@ export async function main(): Promise<void> {
             'CEM not yet loaded — server is still initializing. Please retry.',
           );
         return handleTypegenerateCall(name, typedArgs, resolveCem(libraryId, cemCache));
+      }
+      if (isTypeDefinitionsTool(name)) {
+        if (cemCache === null || cemReloading)
+          return createErrorResponse(
+            'CEM not yet loaded — server is still initializing. Please retry.',
+          );
+        return handleTypeDefinitionsCall(name, typedArgs, config, resolveCem(libraryId, cemCache));
       }
       if (isTokenTool(name)) {
         if (!config.tokensPath) {

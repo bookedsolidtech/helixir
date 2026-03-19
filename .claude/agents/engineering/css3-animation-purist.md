@@ -1,0 +1,1 @@
+/Volumes/Development/booked/booked-solid-tech/.claude/agents/engineering/css3-animation-purist.md

@@ -13,6 +13,10 @@ jobs:
     name: Changeset Required
     runs-on: ubuntu-latest
     timeout-minutes: 2
+    # Skip changeset check on promotion PRs (dev→staging, staging→main)
+    if: |
+      github.event.pull_request.base.ref != 'staging' &&
+      github.event.pull_request.base.ref != 'main'
     steps:
       - uses: actions/checkout@v4
         with:

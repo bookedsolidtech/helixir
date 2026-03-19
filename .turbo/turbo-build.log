@@ -1,0 +1,4 @@
+
+> helixir@0.5.1 build /Volumes/Development/booked/helixir/.worktrees/feature-p3-004-standardize-package-manager
+> tsc && chmod 755 build/src/index.js
+

@@ -3,6 +3,7 @@
   "version": "0.5.1",
   "description": "MCP server that gives AI agents full situational awareness of any web component library",
   "type": "module",
+  "packageManager": "pnpm@9.15.9",
   "bin": {
     "helixir": "./build/src/index.js"
   },
@@ -38,6 +39,10 @@
     "type-check": "tsc --noEmit",
     "lint": "eslint src packages/core/src",
     "lint:fix": "eslint src packages/core/src --fix",
+    "build:all": "turbo run build",
+    "test:all": "turbo run test",
+    "lint:all": "turbo run lint",
+    "type-check:all": "turbo run type-check",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "cem:generate": "cem analyze && node scripts/normalize-cem.mjs",
@@ -95,6 +100,7 @@
     "eslint": "^9.39.3",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
+    "turbo": "^2.5.0",
     "lint-staged": "^16.2.7",
     "prettier": "^3.0.0",
     "typescript": "^5.7.2",

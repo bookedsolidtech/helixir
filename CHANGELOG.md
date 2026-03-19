@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.1
+
+### Patch Changes
+
+- 78e8748: fix: exempt promotion and bot PRs from Changeset Required CI check via skip-changeset label
+
 ## 0.5.0
 
 ### Minor Changes

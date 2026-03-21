@@ -27,6 +27,7 @@ import { checkCssShorthand } from '../handlers/shorthand-checker.js';
 import { checkColorContrast } from '../handlers/color-contrast-checker.js';
 import { checkTransitionAnimation } from '../handlers/transition-checker.js';
 import { checkShadowDomJs } from '../handlers/shadow-dom-js-checker.js';
+import { resolveCssApi } from '../handlers/css-api-resolver.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -157,6 +158,12 @@ const ValidateComponentCodeArgsSchema = z.object({
   code: z.string().optional(),
   tagName: z.string(),
   framework: z.enum(['react', 'vue', 'angular', 'html']).optional(),
+});
+
+const ResolveCssApiArgsSchema = z.object({
+  cssText: z.string(),
+  tagName: z.string(),
+  htmlText: z.string().optional(),
 });
 
 export const STYLING_TOOL_DEFINITIONS = [
@@ -752,6 +759,35 @@ export const STYLING_TOOL_DEFINITIONS = [
       required: ['codeText'],
     },
   },
+  {
+    name: 'resolve_css_api',
+    description:
+      'Resolves every ::part(), CSS custom property, and slot reference in agent-generated code against the actual component CEM data. Returns a structured report showing which references are valid, which are hallucinated, and suggests the closest valid alternatives. Call this BEFORE shipping any CSS to verify that every part name, token name, and slot name actually exists on the target component.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+        cssText: {
+          type: 'string',
+          description: 'The CSS code to resolve against the component API.',
+        },
+        tagName: {
+          type: 'string',
+          description: 'The custom element tag name (e.g. "sl-dialog").',
+        },
+        htmlText: {
+          type: 'string',
+          description:
+            'Optional HTML code to validate slot attribute references against the component API.',
+        },
+      },
+      required: ['cssText', 'tagName'],
+    },
+  },
 ];
 
 /**
@@ -928,6 +964,13 @@ export function handleStylingCall(
         cem,
         framework,
       });
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'resolve_css_api') {
+      const { cssText, tagName, htmlText } = ResolveCssApiArgsSchema.parse(args);
+      const meta = parseCem(tagName, cem);
+      const result = resolveCssApi(cssText, meta, htmlText);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

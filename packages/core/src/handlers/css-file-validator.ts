@@ -18,8 +18,15 @@ import { checkColorContrast } from './color-contrast-checker.js';
 import { checkCssShorthand } from './shorthand-checker.js';
 import { checkCssScopeFromMeta } from './scope-checker.js';
 import { checkTokenFallbacksFromMeta } from './token-fallback-checker.js';
+import { buildAntiPatternHints } from './quick-ref.js';
+import { suggestFix, type SuggestFixInput } from './suggest-fix.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
+
+export interface CssFileFix {
+  suggestion: string;
+  explanation: string;
+}
 
 export interface CssFileIssue {
   severity: 'error' | 'warning' | 'info';
@@ -28,6 +35,7 @@ export interface CssFileIssue {
   line?: number;
   suggestion?: string;
   component?: string;
+  fix?: CssFileFix;
 }
 
 export interface ComponentValidation {
@@ -35,6 +43,7 @@ export interface ComponentValidation {
   issues: CssFileIssue[];
   invalidParts: string[];
   invalidTokens: string[];
+  antiPatterns: string[];
 }
 
 export interface CssFileValidationResult {
@@ -165,11 +174,34 @@ export function validateCssFile(css: string, cem: Cem): CssFileValidationResult 
           });
         }
       });
+      // Generate inline fixes for actionable issues
+      for (const issue of issues) {
+        safeRun(() => {
+          const fixInput = mapIssueToFixInput(
+            issue,
+            css,
+            meta.tagName,
+            meta.cssParts.map((p) => p.name),
+          );
+          if (fixInput) {
+            const fixResult = suggestFix(fixInput);
+            if (fixResult.suggestion !== fixResult.original) {
+              issue.fix = {
+                suggestion: fixResult.suggestion,
+                explanation: fixResult.explanation,
+              };
+            }
+          }
+        });
+      }
+
+      // Build anti-patterns
+      const antiPatterns = buildAntiPatternHints(meta);
+      components[tagName] = { tagName, issues, invalidParts, invalidTokens, antiPatterns };
     } catch {
       // Tag not in CEM — skip per-component validation
+      components[tagName] = { tagName, issues, invalidParts, invalidTokens, antiPatterns: [] };
     }
-
-    components[tagName] = { tagName, issues, invalidParts, invalidTokens };
   }
 
   // Global CSS validation (not component-specific)
@@ -246,6 +278,54 @@ function safeRun(fn: () => void): void {
   } catch {
     // Individual checker failed — skip
   }
+}
+
+function mapIssueToFixInput(
+  issue: CssFileIssue,
+  css: string,
+  tagName: string,
+  partNames: string[],
+): SuggestFixInput | null {
+  const original = issue.line ? extractLineContent(css, issue.line) : '';
+  if (!original && issue.category !== 'specificity') return null;
+
+  switch (issue.category) {
+    case 'shadowDom':
+      return {
+        type: 'shadow-dom',
+        issue: 'descendant-piercing',
+        original,
+        tagName,
+        partNames,
+      };
+    case 'themeCompat':
+      return {
+        type: 'theme-compat',
+        issue: 'hardcoded-color',
+        original,
+        tagName,
+      };
+    case 'specificity':
+      if (issue.message.includes('!important')) {
+        const importantOriginal = original || extractImportantRule(css);
+        if (!importantOriginal) return null;
+        return { type: 'specificity', issue: 'important', original: importantOriginal, tagName };
+      }
+      return null;
+    default:
+      return null;
+  }
+}
+
+function extractLineContent(css: string, lineNum: number): string {
+  const lines = css.split('\n');
+  if (lineNum < 1 || lineNum > lines.length) return '';
+  return (lines[lineNum - 1] ?? '').trim();
+}
+
+function extractImportantRule(css: string): string {
+  const match = css.match(/[^{}]*!important[^}]*/);
+  return match ? match[0].trim() : '';
 }
 
 function buildVerdict(

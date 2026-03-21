@@ -138,3 +138,65 @@ describe('buildNarrative — tailored Shadow DOM constraints', () => {
     expect(result).toContain(':host');
   });
 });
+
+// ---------------------------------------------------------------------------
+// buildNarrative — common mistakes section
+// ---------------------------------------------------------------------------
+
+describe('buildNarrative — common mistakes', () => {
+  it('lists valid part names when component has parts', () => {
+    const result = getComponentNarrative('my-button', FIXTURE_CEM);
+    expect(result).toContain('Common mistakes');
+    expect(result).toContain('`base`');
+    expect(result).toContain('silently fail');
+  });
+
+  it('warns about no CSS parts when component has only properties', () => {
+    const meta: ComponentMetadata = {
+      tagName: 'my-test',
+      description: 'Test',
+      members: [],
+      events: [],
+      slots: [],
+      cssParts: [],
+      cssProperties: [{ name: '--test-color', description: '' }],
+    };
+    const result = buildNarrative(meta);
+    expect(result).toContain('NO CSS parts');
+    expect(result).toContain('::part()');
+  });
+
+  it('warns about no CSS API when component has neither', () => {
+    const meta: ComponentMetadata = {
+      tagName: 'my-bare',
+      description: 'Bare',
+      members: [],
+      events: [],
+      slots: [],
+      cssParts: [],
+      cssProperties: [],
+    };
+    const result = buildNarrative(meta);
+    expect(result).toContain('NO CSS API');
+  });
+
+  it('warns about custom events and React onXxx props', () => {
+    const meta: ComponentMetadata = {
+      tagName: 'my-dialog',
+      description: 'Dialog',
+      members: [],
+      events: [{ name: 'my-close', type: 'CustomEvent', description: '' }],
+      slots: [],
+      cssParts: [],
+      cssProperties: [],
+    };
+    const result = buildNarrative(meta);
+    expect(result).toContain('React');
+    expect(result).toContain('addEventListener');
+  });
+
+  it('includes styling_preflight reminder', () => {
+    const result = getComponentNarrative('my-button', FIXTURE_CEM);
+    expect(result).toContain('styling_preflight');
+  });
+});

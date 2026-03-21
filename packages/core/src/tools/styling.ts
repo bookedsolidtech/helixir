@@ -30,6 +30,7 @@ import { checkShadowDomJs } from '../handlers/shadow-dom-js-checker.js';
 import { resolveCssApi } from '../handlers/css-api-resolver.js';
 import { runStylingPreflight } from '../handlers/styling-preflight.js';
 import { validateCssFile } from '../handlers/css-file-validator.js';
+import { checkDarkModePatterns } from '../handlers/dark-mode-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -178,6 +179,10 @@ const ValidateCssFileArgsSchema = z.object({
   cssText: z.string(),
 });
 
+const CheckDarkModePatternsArgsSchema = z.object({
+  cssText: z.string(),
+});
+
 export const STYLING_TOOL_DEFINITIONS = [
   {
     name: 'diagnose_styling',
@@ -285,7 +290,7 @@ export const STYLING_TOOL_DEFINITIONS = [
   {
     name: 'get_component_quick_ref',
     description:
-      'Returns a complete quick reference for a web component — all attributes with types and valid enum values, methods, events, slots, CSS custom properties with examples, CSS parts with ::part() selectors, a ready-to-use CSS snippet, and Shadow DOM warnings. Use this as the FIRST call when working with any web component to get the complete API surface.',
+      'Returns a complete quick reference for a web component — all attributes with types and valid enum values, methods, events, slots, CSS custom properties with examples, CSS parts with ::part() selectors, a ready-to-use CSS snippet, Shadow DOM warnings, and antiPatterns (component-specific "don\'t do this" negative examples using real tag/part/token names). Use this as the FIRST call when working with any web component to get the complete API surface and avoid common mistakes.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -445,7 +450,7 @@ export const STYLING_TOOL_DEFINITIONS = [
   {
     name: 'validate_component_code',
     description:
-      'ALL-IN-ONE validator — runs 14 anti-hallucination sub-validators on agent-generated code in a single call. Validates HTML attributes, slot children, attribute conflicts, a11y patterns, Shadow DOM CSS, custom properties, token fallbacks, theme compatibility, CSS specificity, layout patterns, inline styles, event bindings, method calls, composition patterns, and component imports. Use this as the FINAL check before submitting any code that uses web components.',
+      'ALL-IN-ONE validator — runs 19 anti-hallucination sub-validators on agent-generated code in a single call. Validates HTML attributes, slot children, attribute conflicts, a11y patterns, Shadow DOM CSS, custom properties, token fallbacks, theme compatibility, CSS specificity, layout patterns, inline styles, event bindings, method calls, composition patterns, component imports, color contrast, CSS scope, shorthand safety, and transition/animation patterns. Returns antiPatterns (component-specific negative examples) and auto-generated fix suggestions on issues. Use this as the FINAL check before submitting any code that uses web components.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -591,7 +596,7 @@ export const STYLING_TOOL_DEFINITIONS = [
   {
     name: 'suggest_fix',
     description:
-      'Generates concrete, copy-pasteable code fixes for validation issues. Pass the issue type (shadow-dom, token-fallback, theme-compat, method-call, event-usage, specificity, layout), the specific issue kind, and the original code — returns a corrected code snippet with an explanation. Use this after any validator flags an issue to get the exact fix.',
+      'Generates concrete, copy-pasteable code fixes for validation issues. Pass the issue type (shadow-dom, token-fallback, theme-compat, method-call, event-usage, specificity, layout), the specific issue kind, and the original code — returns a corrected code snippet with an explanation. NOTE: styling_preflight and validate_css_file now embed fixes inline in each issue — only call suggest_fix directly for issues from other validators or when you need a fix for code not already validated.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -803,7 +808,7 @@ export const STYLING_TOOL_DEFINITIONS = [
   {
     name: 'styling_preflight',
     description:
-      "Single-call styling validation that combines component API discovery, CSS reference resolution, and anti-pattern detection. Returns: the component's full style API surface (parts, tokens, slots), valid/invalid status for every ::part() and token reference, Shadow DOM and theme validation issues, a correct CSS snippet, and a pass/fail verdict. Call this ONCE before finalizing any component CSS to prevent hallucinated part names, invalid tokens, and Shadow DOM mistakes.",
+      "Single-call styling validation that combines component API discovery, CSS reference resolution, and anti-pattern detection. Returns: the component's full style API surface (parts, tokens, slots), valid/invalid status for every ::part() and token reference, Shadow DOM and theme validation issues with inline fix suggestions (each issue includes a `fix` object with corrected code + explanation), antiPatterns (component-specific negative examples), a correct CSS snippet, and a pass/fail verdict. Call this ONCE before finalizing any component CSS — fixes are embedded in each issue so you don't need a separate suggest_fix call.",
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -832,7 +837,7 @@ export const STYLING_TOOL_DEFINITIONS = [
   {
     name: 'validate_css_file',
     description:
-      'Validates an entire CSS file targeting multiple web components in one call. Auto-detects all web component tag names in selectors, runs per-component validation (Shadow DOM, ::part() resolution, token validation, scope checks), and global validation (theme compatibility, color contrast, specificity, shorthand). Returns issues grouped by component plus global issues. Use this when reviewing a CSS file that styles multiple components — no need to know which components are used.',
+      'Validates an entire CSS file targeting multiple web components in one call. Auto-detects all web component tag names in selectors, runs per-component validation (Shadow DOM, ::part() resolution, token validation, scope checks) and global validation (theme compatibility, color contrast, specificity, shorthand). Each component result includes antiPatterns (negative examples) and each issue includes an inline `fix` object with corrected code + explanation. Returns issues grouped by component plus global issues. Use this when reviewing a CSS file that styles multiple components — no need to know which components are used.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -844,6 +849,21 @@ export const STYLING_TOOL_DEFINITIONS = [
         cssText: {
           type: 'string',
           description: 'The full CSS file content to validate.',
+        },
+      },
+      required: ['cssText'],
+    },
+  },
+  {
+    name: 'check_dark_mode_patterns',
+    description:
+      "Detects dark mode styling anti-patterns specific to web components with Shadow DOM. Catches: (1) theme-scoped selectors (.dark, [data-theme], @media prefers-color-scheme) setting standard CSS properties on web component hosts — these won't reach shadow DOM internals, (2) descendant selectors inside theme scopes trying to pierce shadow boundaries. Suggests using CSS custom properties to communicate theme changes through shadow DOM. Run this on any CSS that implements dark mode or theming for web components.",
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        cssText: {
+          type: 'string',
+          description: 'The CSS code to check for dark mode anti-patterns.',
         },
       },
       required: ['cssText'],
@@ -1045,6 +1065,12 @@ export function handleStylingCall(
     if (name === 'validate_css_file') {
       const { cssText } = ValidateCssFileArgsSchema.parse(args);
       const result = validateCssFile(cssText, cem);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_dark_mode_patterns') {
+      const { cssText } = CheckDarkModePatternsArgsSchema.parse(args);
+      const result = checkDarkModePatterns(cssText);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

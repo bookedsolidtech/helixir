@@ -20,6 +20,7 @@ import { checkCssScopeFromMeta } from './scope-checker.js';
 import { checkTokenFallbacksFromMeta } from './token-fallback-checker.js';
 import { buildAntiPatternHints } from './quick-ref.js';
 import { suggestFix, type SuggestFixInput } from './suggest-fix.js';
+import { checkDarkModePatterns } from './dark-mode-checker.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -247,6 +248,19 @@ export function validateCssFile(css: string, cem: Cem): CssFileValidationResult 
       globalIssues.push({
         severity: 'warning',
         category: 'shorthand',
+        message: issue.message,
+        line: issue.line,
+        suggestion: issue.suggestion,
+      });
+    }
+  });
+
+  safeRun(() => {
+    const darkResult = checkDarkModePatterns(css);
+    for (const issue of darkResult.issues) {
+      globalIssues.push({
+        severity: 'warning',
+        category: 'darkMode',
         message: issue.message,
         line: issue.line,
         suggestion: issue.suggestion,

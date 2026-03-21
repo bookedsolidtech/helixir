@@ -206,3 +206,46 @@ describe('validateComponentCode — result structure', () => {
     expect(result.eventUsage).toBeDefined();
   });
 });
+
+// ─── Anti-Patterns ──────────────────────────────────────────────────────────
+
+describe('validateComponentCode — antiPatterns', () => {
+  it('includes antiPatterns array in result', () => {
+    const result = validateComponentCode({
+      html: '<my-button>Click</my-button>',
+      tagName: 'my-button',
+      cem: fixture,
+    });
+    expect(Array.isArray(result.antiPatterns)).toBe(true);
+    expect(result.antiPatterns.length).toBeGreaterThan(0);
+  });
+
+  it('antiPatterns reference the component tag name', () => {
+    const result = validateComponentCode({
+      html: '<my-button>Click</my-button>',
+      tagName: 'my-button',
+      cem: fixture,
+    });
+    expect(result.antiPatterns.some((p) => p.includes('my-button'))).toBe(true);
+  });
+
+  it('includes shadow DOM warning', () => {
+    const result = validateComponentCode({
+      html: '<my-button>Click</my-button>',
+      tagName: 'my-button',
+      cem: fixture,
+    });
+    expect(result.antiPatterns.some((p) => p.includes('shadow') || p.includes('Shadow'))).toBe(
+      true,
+    );
+  });
+
+  it('returns empty antiPatterns for unknown tag', () => {
+    const result = validateComponentCode({
+      html: '<unknown-tag>X</unknown-tag>',
+      tagName: 'unknown-tag',
+      cem: fixture,
+    });
+    expect(result.antiPatterns).toEqual([]);
+  });
+});

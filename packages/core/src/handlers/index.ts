@@ -7,6 +7,7 @@ export * from './benchmark.js';
 export * from './bundle.js';
 export * from './cdn.js';
 export * from './cem.js';
+export * from './code-validator.js';
 export * from './compare.js';
 export * from './css-var-checker.js';
 export * from './component.js';

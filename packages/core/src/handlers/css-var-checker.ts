@@ -91,27 +91,33 @@ interface CssDeclaration {
 
 /**
  * Extract custom property declarations from CSS text.
- * Looks for lines like: --my-button-color: red;
+ * Handles both multi-line and single-line CSS (e.g. `my-button { --color: red; }`).
  */
 function extractCustomPropertyDeclarations(css: string): CssDeclaration[] {
   const declarations: CssDeclaration[] = [];
-  const lines = css.split('\n');
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i] ?? '';
-    // Match custom property declarations: --name: value;
-    const match = /^\s*(--[a-z][a-z0-9-]*)\s*:\s*(.+?)\s*;?\s*$/i.exec(line);
-    if (match) {
-      const property = match[1] ?? '';
-      const rawValue = match[2] ?? '';
-      const hasImportant = /!important/.test(rawValue);
-      declarations.push({
-        property,
-        value: rawValue.replace(/\s*!important\s*/, '').trim(),
-        hasImportant,
-        line: i + 1,
-      });
-    }
+  // Match CSS custom property declarations anywhere in CSS
+  const declPattern = /(?:^|[{;])\s*(--[a-z][a-z0-9-]*)\s*:\s*([^;{}]+)/gi;
+  let match: RegExpExecArray | null;
+
+  while ((match = declPattern.exec(css)) !== null) {
+    const property = (match[1] ?? '').trim();
+    const rawValue = (match[2] ?? '').trim();
+    if (!property || !rawValue) continue;
+
+    const hasImportant = /!important/.test(rawValue);
+
+    // Line number from position of the property name in source
+    const propStart = match.index + match[0].indexOf(property);
+    const preceding = css.slice(0, propStart);
+    const line = (preceding.match(/\n/g) ?? []).length + 1;
+
+    declarations.push({
+      property,
+      value: rawValue.replace(/\s*!important\s*/, '').trim(),
+      hasImportant,
+      line,
+    });
   }
 
   return declarations;

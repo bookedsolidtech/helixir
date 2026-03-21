@@ -29,6 +29,7 @@ export * from './narrative.js';
 export * from './quick-ref.js';
 export * from './recommend-checks.js';
 export * from './scope-checker.js';
+export * from './shorthand-checker.js';
 export * from './specificity-checker.js';
 export * from './suggest-fix.js';
 export * from './story.js';

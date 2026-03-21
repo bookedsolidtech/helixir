@@ -109,9 +109,10 @@ export function recommendChecks(code: string): RecommendChecksResult {
     recommended.push('check_layout_patterns');
     recommended.push('check_css_scope');
 
-    // Token fallback check when var() is used
+    // Token fallback and shorthand checks when var() is used
     if (/var\s*\(/.test(code)) {
       recommended.push('check_token_fallbacks');
+      recommended.push('check_css_shorthand');
     }
   }
 

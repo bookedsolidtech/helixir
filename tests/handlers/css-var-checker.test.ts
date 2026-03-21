@@ -154,6 +154,12 @@ describe('checkCssVars — result structure', () => {
     expect(result.issues[0]?.line).toBe(2);
   });
 
+  it('handles single-line CSS', () => {
+    const css = 'my-button { --my-button-unknown: red; }';
+    const result = checkCssVars(css, 'my-button', fixture);
+    expect(result.issues.some((i) => i.rule === 'unknown-property')).toBe(true);
+  });
+
   it('includes default values when known', () => {
     const css = `my-button { --my-button-border-radius: 8px; }`;
     const result = checkCssVars(css, 'my-button', fixture);

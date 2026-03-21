@@ -82,6 +82,11 @@ import {
   handleTypegenerateCall,
   isTypegenerateTool,
 } from '../../packages/core/src/tools/typegenerate.js';
+import {
+  STYLING_TOOL_DEFINITIONS,
+  handleStylingCall,
+  isStylingTool,
+} from '../../packages/core/src/tools/styling.js';
 import { createErrorResponse } from '../../packages/core/src/shared/mcp-helpers.js';
 import type { MCPToolResult } from '../../packages/core/src/shared/mcp-helpers.js';
 
@@ -187,6 +192,7 @@ export async function main(): Promise<void> {
     ...BENCHMARK_TOOL_DEFINITIONS,
     ...LIBRARY_TOOL_DEFINITIONS,
     ...TYPEGENERATE_TOOL_DEFINITIONS,
+    ...STYLING_TOOL_DEFINITIONS,
     ...tsTools,
   ];
 
@@ -263,6 +269,13 @@ export async function main(): Promise<void> {
             'CEM not yet loaded — server is still initializing. Please retry.',
           );
         return handleValidateCall(name, typedArgs, resolveCem(libraryId, cemCache));
+      }
+      if (isStylingTool(name)) {
+        if (cemCache === null || cemReloading)
+          return createErrorResponse(
+            'CEM not yet loaded — server is still initializing. Please retry.',
+          );
+        return handleStylingCall(name, typedArgs, resolveCem(libraryId, cemCache));
       }
       if (isBenchmarkTool(name)) return handleBenchmarkCall(name, typedArgs, config);
       if (isTypegenerateTool(name)) {

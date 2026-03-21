@@ -17,6 +17,8 @@ export * from './health.js';
 export * from './migration.js';
 export * from './narrative.js';
 export * from './story.js';
+export * from './shadow-dom-checker.js';
+export * from './styling-diagnostics.js';
 export * from './suggest.js';
 export * from './tokens.js';
 export * from './typegenerate.js';

@@ -5,6 +5,7 @@ import type { Cem } from '../handlers/cem.js';
 import { diagnoseStyling } from '../handlers/styling-diagnostics.js';
 import { checkShadowDomUsage } from '../handlers/shadow-dom-checker.js';
 import { checkHtmlUsage } from '../handlers/html-usage-checker.js';
+import { checkEventUsage } from '../handlers/event-usage-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -21,6 +22,12 @@ const CheckShadowDomUsageArgsSchema = z.object({
 const CheckHtmlUsageArgsSchema = z.object({
   htmlText: z.string(),
   tagName: z.string(),
+});
+
+const CheckEventUsageArgsSchema = z.object({
+  codeText: z.string(),
+  tagName: z.string(),
+  framework: z.enum(['react', 'vue', 'angular', 'html']).optional(),
 });
 
 export const STYLING_TOOL_DEFINITIONS = [
@@ -96,6 +103,37 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'check_event_usage',
+    description:
+      "Validates event listener patterns against a component CEM — catches React onXxx props for custom events (won't work), unknown event names, misspelled events, and framework-specific binding mistakes. Supports React, Vue, and Angular patterns.",
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+        codeText: {
+          type: 'string',
+          description: 'The code (JSX, template, etc.) to validate event usage in.',
+        },
+        tagName: {
+          type: 'string',
+          description: 'The custom element tag name to validate against (e.g. "sl-button").',
+        },
+        framework: {
+          type: 'string',
+          enum: ['react', 'vue', 'angular', 'html'],
+          description:
+            'Optional framework hint. Enables framework-specific checks (e.g. React onXxx prop detection).',
+        },
+      },
+      required: ['codeText', 'tagName'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -132,6 +170,13 @@ export function handleStylingCall(
       const { htmlText, tagName } = CheckHtmlUsageArgsSchema.parse(args);
       const meta = parseCem(tagName, cem);
       const result = checkHtmlUsage(htmlText, meta);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_event_usage') {
+      const { codeText, tagName, framework } = CheckEventUsageArgsSchema.parse(args);
+      const meta = parseCem(tagName, cem);
+      const result = checkEventUsage(codeText, meta, framework);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

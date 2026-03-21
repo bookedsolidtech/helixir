@@ -13,6 +13,7 @@ export * from './dependencies.js';
 export * from './dimensions.js';
 export * from './framework.js';
 export * from './generate-types.js';
+export * from './event-usage-checker.js';
 export * from './health.js';
 export * from './html-usage-checker.js';
 export * from './migration.js';

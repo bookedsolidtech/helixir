@@ -124,6 +124,33 @@ describe('handleStylingCall — check_method_calls', () => {
   });
 });
 
+// ─── handleStylingCall — check_css_specificity ──────────────────────────────
+
+describe('handleStylingCall — check_css_specificity', () => {
+  it('dispatches CSS specificity check', () => {
+    const result = handleStylingCall(
+      'check_css_specificity',
+      { code: 'sl-button { color: red !important; }' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+    const parsed = JSON.parse((result.content as Array<{ text: string }>)[0].text);
+    expect(parsed.issues.length).toBeGreaterThan(0);
+    expect(parsed.issues[0].type).toBe('important');
+  });
+
+  it('dispatches HTML mode for inline styles', () => {
+    const result = handleStylingCall(
+      'check_css_specificity',
+      { code: '<sl-button style="color: red;">Click</sl-button>', mode: 'html' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+    const parsed = JSON.parse((result.content as Array<{ text: string }>)[0].text);
+    expect(parsed.issues.some((i: { type: string }) => i.type === 'inline-style')).toBe(true);
+  });
+});
+
 // ─── handleStylingCall — suggest_fix ────────────────────────────────────────
 
 describe('handleStylingCall — suggest_fix', () => {

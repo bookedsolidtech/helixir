@@ -20,6 +20,7 @@ import { checkMethodCalls } from '../handlers/method-checker.js';
 import { checkThemeCompatibility } from '../handlers/theme-checker.js';
 import { recommendChecks } from '../handlers/recommend-checks.js';
 import { suggestFix } from '../handlers/suggest-fix.js';
+import { checkCssSpecificity } from '../handlers/specificity-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -88,6 +89,11 @@ const CheckThemeCompatibilityArgsSchema = z.object({
 
 const RecommendChecksArgsSchema = z.object({
   codeText: z.string(),
+});
+
+const CheckCssSpecificityArgsSchema = z.object({
+  code: z.string(),
+  mode: z.enum(['css', 'html']).optional(),
 });
 
 const SuggestFixArgsSchema = z.object({
@@ -571,6 +577,28 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'check_css_specificity',
+    description:
+      'Detects CSS specificity anti-patterns that cause styling issues with web components — catches !important usage, ID selectors targeting components, deeply nested selectors (4+ levels), and inline style attributes. Supports both CSS and HTML mode. Run this on any CSS or HTML to prevent specificity wars.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        code: {
+          type: 'string',
+          description: 'The CSS or HTML code to analyze for specificity issues.',
+        },
+        mode: {
+          type: 'string',
+          enum: ['css', 'html'],
+          description:
+            'Analysis mode — "css" checks stylesheets for !important/ID/nesting issues, "html" checks for inline style attributes on web components. Defaults to "css".',
+        },
+      },
+      required: ['code'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -686,6 +714,12 @@ export function handleStylingCall(
     if (name === 'suggest_fix') {
       const input = SuggestFixArgsSchema.parse(args);
       const result = suggestFix(input);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_css_specificity') {
+      const { code, mode } = CheckCssSpecificityArgsSchema.parse(args);
+      const result = checkCssSpecificity(code, mode ? { mode } : undefined);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

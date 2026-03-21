@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-03-18T04:16:51.961Z",
+  "timestamp": "2026-03-21T03:11:27.862Z",
   "scorecards": {
     "material": {
       "library": "material",
       "componentCount": 97,
-      "averageScore": 51.9,
+      "averageScore": 55.71,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -24,59 +24,61 @@
         "Story Coverage": 0,
         "Performance": 0,
         "Drupal Readiness": 0,
-        "CEM-Source Fidelity": 59.36
+        "CEM-Source Fidelity": 59.36,
+        "Slot Architecture": 0,
+        "Naming Consistency": 97.88
       },
       "top5": [
         {
           "tagName": "md-divider",
-          "score": 75.9,
-          "grade": "F"
-        },
-        {
-          "tagName": "hct-slider",
-          "score": 72.1,
+          "score": 77.9,
           "grade": "F"
         },
         {
           "tagName": "md-elevation",
-          "score": 71.4,
+          "score": 75,
           "grade": "F"
         },
         {
           "tagName": "catalog-component-header-title",
-          "score": 71.4,
+          "score": 75,
           "grade": "F"
         },
         {
           "tagName": "catalog-component-header",
-          "score": 71.4,
+          "score": 75,
+          "grade": "F"
+        },
+        {
+          "tagName": "hct-slider",
+          "score": 74.2,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
+          "tagName": "test-element-internals",
+          "score": 37.8,
+          "grade": "F"
+        },
+        {
           "tagName": "md-sub-menu",
-          "score": 35.2,
+          "score": 39.8,
           "grade": "F"
         },
         {
           "tagName": "md-checkbox",
-          "score": 35.3,
+          "score": 40.3,
           "grade": "F"
         },
         {
           "tagName": "md-slider",
-          "score": 36.2,
+          "score": 40.8,
           "grade": "F"
         },
         {
-          "tagName": "test-element-internals",
-          "score": 37.3,
-          "grade": "F"
-        },
-        {
-          "tagName": "test-chip-set",
-          "score": 39.5,
+          "tagName": "test-custom-state-set",
+          "score": 41.7,
           "grade": "F"
         }
       ],
@@ -86,42 +88,49 @@
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (22). Major drag on scores."
+          "note": "Significantly below average (26). Major drag on scores."
         },
         {
           "dimension": "Test Coverage",
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (22). Major drag on scores."
+          "note": "Significantly below average (26). Major drag on scores."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (22). Major drag on scores."
+          "note": "Significantly below average (26). Major drag on scores."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (22). Major drag on scores."
+          "note": "Significantly below average (26). Major drag on scores."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (22). Major drag on scores."
+          "note": "Significantly below average (26). Major drag on scores."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (22). Major drag on scores."
+          "note": "Significantly below average (26). Major drag on scores."
+        },
+        {
+          "dimension": "Slot Architecture",
+          "average": 0,
+          "tier": "important",
+          "confidence": "untested",
+          "note": "Significantly below average (26). Major drag on scores."
         },
         {
           "dimension": "Accessibility",
@@ -135,7 +144,7 @@
           "average": 34.28,
           "tier": "important",
           "confidence": "untested",
-          "note": "Above average. Strong dimension."
+          "note": "Near average."
         },
         {
           "dimension": "API Surface Quality",
@@ -164,91 +173,100 @@
           "tier": "critical",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
+        },
+        {
+          "dimension": "Naming Consistency",
+          "average": 97.88,
+          "tier": "important",
+          "confidence": "heuristic",
+          "note": "Above average. Strong dimension."
         }
       ],
       "confidenceBreakdown": {
         "verified": 185,
-        "heuristic": 329,
-        "untested": 650
+        "heuristic": 426,
+        "untested": 747
       },
-      "timestamp": "2026-03-18T04:16:51.958Z"
+      "timestamp": "2026-03-21T03:11:27.860Z"
     },
     "spectrum": {
       "library": "spectrum",
       "componentCount": 89,
-      "averageScore": 49.03,
+      "averageScore": 54.37,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
         "C": 0,
-        "D": 0,
-        "F": 89
+        "D": 1,
+        "F": 88
       },
       "dimensionAverages": {
         "CEM Completeness": 60.11,
         "Accessibility": 30.27,
         "Type Coverage": 80.31,
         "API Surface Quality": 18.33,
-        "CSS Architecture": 1.12,
+        "CSS Architecture": 0.76,
         "Event Architecture": 32.66,
         "Test Coverage": 0,
         "Bundle Size": 0,
         "Story Coverage": 0,
         "Performance": 0,
         "Drupal Readiness": 0,
-        "CEM-Source Fidelity": 46.3
+        "CEM-Source Fidelity": 46.3,
+        "Slot Architecture": 57.67,
+        "Naming Consistency": 98
       },
       "top5": [
         {
-          "tagName": "sp-contextual-help",
-          "score": 61.6,
-          "grade": "F"
-        },
-        {
           "tagName": "sp-table-checkbox-cell",
-          "score": 61.5,
+          "score": 64.8,
           "grade": "F"
         },
         {
           "tagName": "sp-accordion-item",
-          "score": 60.5,
+          "score": 64.7,
+          "grade": "F"
+        },
+        {
+          "tagName": "sp-contextual-help",
+          "score": 64.1,
           "grade": "F"
         },
         {
           "tagName": "sp-tab-panel",
-          "score": 59.3,
+          "score": 64,
           "grade": "F"
         },
         {
           "tagName": "sp-toast",
-          "score": 59,
+          "score": 63.8,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
-          "tagName": "sp-switch",
-          "score": 33.9,
-          "grade": "F"
-        },
-        {
           "tagName": "overlay-trigger",
-          "score": 34.8,
+          "score": 39.9,
           "grade": "F"
         },
         {
           "tagName": "sp-slider-handle",
-          "score": 36,
-          "grade": "F"
-        },
-        {
-          "tagName": "sp-dropzone",
-          "score": 36.7,
+          "score": 40.6,
           "grade": "F"
         },
         {
           "tagName": "sp-table-row",
-          "score": 37.1,
+          "score": 41.9,
+          "grade": "F"
+        },
+        {
+          "tagName": "sp-switch",
+          "score": 41.9,
+          "grade": "F"
+        },
+        {
+          "tagName": "sp-dropzone",
+          "score": 43.9,
           "grade": "F"
         }
       ],
@@ -258,49 +276,49 @@
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (22). Major drag on scores."
+          "note": "Significantly below average (30). Major drag on scores."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (22). Major drag on scores."
+          "note": "Significantly below average (30). Major drag on scores."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (22). Major drag on scores."
+          "note": "Significantly below average (30). Major drag on scores."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (22). Major drag on scores."
+          "note": "Significantly below average (30). Major drag on scores."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (22). Major drag on scores."
+          "note": "Significantly below average (30). Major drag on scores."
         },
         {
           "dimension": "CSS Architecture",
-          "average": 1.12,
+          "average": 0.76,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (22). Major drag on scores."
+          "note": "Significantly below average (30). Major drag on scores."
         },
         {
           "dimension": "API Surface Quality",
           "average": 18.33,
           "tier": "important",
           "confidence": "heuristic",
-          "note": "Near average."
+          "note": "Below average (30). Room for improvement."
         },
         {
           "dimension": "Accessibility",
@@ -314,13 +332,20 @@
           "average": 32.66,
           "tier": "important",
           "confidence": "heuristic",
-          "note": "Above average. Strong dimension."
+          "note": "Near average."
         },
         {
           "dimension": "CEM-Source Fidelity",
           "average": 46.3,
           "tier": "critical",
           "confidence": "heuristic",
+          "note": "Above average. Strong dimension."
+        },
+        {
+          "dimension": "Slot Architecture",
+          "average": 57.67,
+          "tier": "important",
+          "confidence": "verified",
           "note": "Above average. Strong dimension."
         },
         {
@@ -336,19 +361,26 @@
           "tier": "critical",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
+        },
+        {
+          "dimension": "Naming Consistency",
+          "average": 98,
+          "tier": "important",
+          "confidence": "heuristic",
+          "note": "Above average. Strong dimension."
         }
       ],
       "confidenceBreakdown": {
-        "verified": 178,
-        "heuristic": 315,
-        "untested": 575
+        "verified": 241,
+        "heuristic": 404,
+        "untested": 601
       },
-      "timestamp": "2026-03-18T04:16:51.958Z"
+      "timestamp": "2026-03-21T03:11:27.860Z"
     },
     "vaadin": {
       "library": "vaadin",
       "componentCount": 96,
-      "averageScore": 64.94,
+      "averageScore": 67.81,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -368,59 +400,61 @@
         "Story Coverage": 0,
         "Performance": 0,
         "Drupal Readiness": 0,
-        "CEM-Source Fidelity": 34.91
+        "CEM-Source Fidelity": 34.91,
+        "Slot Architecture": 0,
+        "Naming Consistency": 100
       },
       "top5": [
         {
           "tagName": "vaadin-master-detail-layout",
-          "score": 75.8,
+          "score": 77.7,
           "grade": "D"
         },
         {
           "tagName": "vaadin-popover",
-          "score": 74.5,
+          "score": 76.5,
           "grade": "F"
         },
         {
           "tagName": "vaadin-rich-text-editor",
-          "score": 74.5,
+          "score": 76.5,
           "grade": "F"
         },
         {
           "tagName": "vaadin-select",
-          "score": 73.7,
+          "score": 75.7,
           "grade": "F"
         },
         {
           "tagName": "vaadin-crud",
-          "score": 73.5,
+          "score": 75.5,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "vaadin-map",
-          "score": 38.4,
+          "score": 43.5,
           "grade": "F"
         },
         {
           "tagName": "vaadin-field-highlighter",
-          "score": 45.5,
+          "score": 50,
           "grade": "F"
         },
         {
           "tagName": "vaadin-virtual-list",
-          "score": 51.1,
+          "score": 55.2,
           "grade": "F"
         },
         {
           "tagName": "vaadin-board",
-          "score": 51.8,
+          "score": 55.8,
           "grade": "F"
         },
         {
           "tagName": "vaadin-board-row",
-          "score": 51.8,
+          "score": 55.8,
           "grade": "F"
         }
       ],
@@ -430,49 +464,56 @@
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (29). Major drag on scores."
+          "note": "Significantly below average (32). Major drag on scores."
         },
         {
           "dimension": "Test Coverage",
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (29). Major drag on scores."
+          "note": "Significantly below average (32). Major drag on scores."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (29). Major drag on scores."
+          "note": "Significantly below average (32). Major drag on scores."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (29). Major drag on scores."
+          "note": "Significantly below average (32). Major drag on scores."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (29). Major drag on scores."
+          "note": "Significantly below average (32). Major drag on scores."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (29). Major drag on scores."
+          "note": "Significantly below average (32). Major drag on scores."
+        },
+        {
+          "dimension": "Slot Architecture",
+          "average": 0,
+          "tier": "important",
+          "confidence": "untested",
+          "note": "Significantly below average (32). Major drag on scores."
         },
         {
           "dimension": "Accessibility",
           "average": 16,
           "tier": "critical",
           "confidence": "heuristic",
-          "note": "Below average (29). Room for improvement."
+          "note": "Below average (32). Room for improvement."
         },
         {
           "dimension": "CEM-Source Fidelity",
@@ -508,19 +549,26 @@
           "tier": "critical",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
+        },
+        {
+          "dimension": "Naming Consistency",
+          "average": 100,
+          "tier": "important",
+          "confidence": "heuristic",
+          "note": "Above average. Strong dimension."
         }
       ],
       "confidenceBreakdown": {
         "verified": 188,
-        "heuristic": 343,
-        "untested": 621
+        "heuristic": 439,
+        "untested": 717
       },
-      "timestamp": "2026-03-18T04:16:51.958Z"
+      "timestamp": "2026-03-21T03:11:27.861Z"
     },
     "fluentui": {
       "library": "fluentui",
       "componentCount": 41,
-      "averageScore": 61.58,
+      "averageScore": 64.67,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -533,66 +581,68 @@
         "Accessibility": 18.02,
         "Type Coverage": 71.83,
         "API Surface Quality": 37.41,
-        "CSS Architecture": 29.27,
+        "CSS Architecture": 20.8,
         "Event Architecture": 11.1,
         "Test Coverage": 0,
         "Bundle Size": 0,
         "Story Coverage": 0,
         "Performance": 0,
         "Drupal Readiness": 0,
-        "CEM-Source Fidelity": 58.17
+        "CEM-Source Fidelity": 58.17,
+        "Slot Architecture": 42.44,
+        "Naming Consistency": 100
       },
       "top5": [
         {
           "tagName": "fluent-radio-group",
-          "score": 77.5,
+          "score": 79.4,
           "grade": "C"
         },
         {
           "tagName": "fluent-dropdown-option",
-          "score": 76.1,
+          "score": 78.2,
           "grade": "F"
         },
         {
           "tagName": "fluent-listbox",
-          "score": 73.2,
+          "score": 75.8,
           "grade": "F"
         },
         {
           "tagName": "fluent-text",
-          "score": 71.5,
+          "score": 73.8,
           "grade": "F"
         },
         {
           "tagName": "fluent-toggle-button",
-          "score": 70.4,
+          "score": 70.7,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "fluent-tabs",
-          "score": 45.2,
+          "score": 49.7,
           "grade": "F"
         },
         {
           "tagName": "fluent-drawer",
-          "score": 50.1,
+          "score": 53.6,
           "grade": "F"
         },
         {
           "tagName": "fluent-dialog",
-          "score": 52.4,
+          "score": 56.3,
           "grade": "F"
         },
         {
           "tagName": "fluent-tablist",
-          "score": 52.9,
+          "score": 56.8,
           "grade": "F"
         },
         {
-          "tagName": "fluent-accordion",
-          "score": 53,
+          "tagName": "fluent-field",
+          "score": 57.5,
           "grade": "F"
         }
       ],
@@ -602,62 +652,69 @@
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (26). Major drag on scores."
+          "note": "Significantly below average (32). Major drag on scores."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (26). Major drag on scores."
+          "note": "Significantly below average (32). Major drag on scores."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (26). Major drag on scores."
+          "note": "Significantly below average (32). Major drag on scores."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (26). Major drag on scores."
+          "note": "Significantly below average (32). Major drag on scores."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (26). Major drag on scores."
+          "note": "Significantly below average (32). Major drag on scores."
         },
         {
           "dimension": "Event Architecture",
           "average": 11.1,
           "tier": "important",
           "confidence": "heuristic",
-          "note": "Below average (26). Room for improvement."
+          "note": "Significantly below average (32). Major drag on scores."
         },
         {
           "dimension": "Accessibility",
           "average": 18.02,
           "tier": "critical",
           "confidence": "heuristic",
-          "note": "Near average."
+          "note": "Below average (32). Room for improvement."
         },
         {
           "dimension": "CSS Architecture",
-          "average": 29.27,
+          "average": 20.8,
           "tier": "important",
           "confidence": "untested",
-          "note": "Near average."
+          "note": "Below average (32). Room for improvement."
         },
         {
           "dimension": "API Surface Quality",
           "average": 37.41,
           "tier": "important",
           "confidence": "heuristic",
+          "note": "Near average."
+        },
+        {
+          "dimension": "Slot Architecture",
+          "average": 42.44,
+          "tier": "important",
+          "confidence": "verified",
           "note": "Above average. Strong dimension."
         },
         {
@@ -680,19 +737,26 @@
           "tier": "critical",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
+        },
+        {
+          "dimension": "Naming Consistency",
+          "average": 100,
+          "tier": "important",
+          "confidence": "verified",
+          "note": "Above average. Strong dimension."
         }
       ],
       "confidenceBreakdown": {
-        "verified": 79,
+        "verified": 142,
         "heuristic": 139,
-        "untested": 274
+        "untested": 293
       },
-      "timestamp": "2026-03-18T04:16:51.958Z"
+      "timestamp": "2026-03-21T03:11:27.861Z"
     },
     "carbon": {
       "library": "carbon",
       "componentCount": 110,
-      "averageScore": 50.13,
+      "averageScore": 52.86,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -705,66 +769,68 @@
         "Accessibility": 19.55,
         "Type Coverage": 30.74,
         "API Surface Quality": 39.55,
-        "CSS Architecture": 27.27,
+        "CSS Architecture": 23.09,
         "Event Architecture": 18.78,
         "Test Coverage": 0,
         "Bundle Size": 0,
         "Story Coverage": 0,
         "Performance": 0,
         "Drupal Readiness": 0,
-        "CEM-Source Fidelity": 50.33
+        "CEM-Source Fidelity": 50.33,
+        "Slot Architecture": 10.18,
+        "Naming Consistency": 87.59
       },
       "top5": [
         {
           "tagName": "bx-select-item-group",
-          "score": 73.3,
+          "score": 75.5,
           "grade": "F"
         },
         {
           "tagName": "bx-select-item",
-          "score": 73.3,
+          "score": 75.5,
           "grade": "F"
         },
         {
           "tagName": "bx-header-menu",
-          "score": 68.4,
+          "score": 69.3,
           "grade": "F"
         },
         {
           "tagName": "bx-content-switcher-item",
-          "score": 66,
+          "score": 68.8,
           "grade": "D"
         },
         {
           "tagName": "bx-code-snippet",
-          "score": 65.1,
+          "score": 66.3,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "bx-accordion",
-          "score": 34.8,
+          "score": 40.3,
           "grade": "F"
         },
         {
           "tagName": "bx-side-nav-items",
-          "score": 36.8,
+          "score": 42.1,
           "grade": "F"
         },
         {
           "tagName": "bx-header",
-          "score": 36.8,
+          "score": 42.1,
           "grade": "F"
         },
         {
           "tagName": "bx-tile-group",
-          "score": 36.8,
+          "score": 42.1,
           "grade": "F"
         },
         {
           "tagName": "bx-structured-list-header-cell",
-          "score": 36.8,
+          "score": 42.1,
           "grade": "F"
         }
       ],
@@ -774,35 +840,42 @@
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (23). Major drag on scores."
+          "note": "Significantly below average (26). Major drag on scores."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (23). Major drag on scores."
+          "note": "Significantly below average (26). Major drag on scores."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (23). Major drag on scores."
+          "note": "Significantly below average (26). Major drag on scores."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (23). Major drag on scores."
+          "note": "Significantly below average (26). Major drag on scores."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (23). Major drag on scores."
+          "note": "Significantly below average (26). Major drag on scores."
+        },
+        {
+          "dimension": "Slot Architecture",
+          "average": 10.18,
+          "tier": "important",
+          "confidence": "untested",
+          "note": "Below average (26). Room for improvement."
         },
         {
           "dimension": "Event Architecture",
@@ -820,7 +893,7 @@
         },
         {
           "dimension": "CSS Architecture",
-          "average": 27.27,
+          "average": 23.09,
           "tier": "important",
           "confidence": "heuristic",
           "note": "Near average."
@@ -852,19 +925,26 @@
           "tier": "critical",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
+        },
+        {
+          "dimension": "Naming Consistency",
+          "average": 87.59,
+          "tier": "important",
+          "confidence": "verified",
+          "note": "Above average. Strong dimension."
         }
       ],
       "confidenceBreakdown": {
-        "verified": 220,
+        "verified": 350,
         "heuristic": 397,
-        "untested": 703
+        "untested": 793
       },
-      "timestamp": "2026-03-18T04:16:51.959Z"
+      "timestamp": "2026-03-21T03:11:27.861Z"
     },
     "ui5": {
       "library": "ui5",
       "componentCount": 170,
-      "averageScore": 37.35,
+      "averageScore": 42.01,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -884,59 +964,61 @@
         "Story Coverage": 0,
         "Performance": 0,
         "Drupal Readiness": 0,
-        "CEM-Source Fidelity": 76.98
+        "CEM-Source Fidelity": 76.98,
+        "Slot Architecture": 0,
+        "Naming Consistency": 93.74
       },
       "top5": [
         {
           "tagName": "ui5-navigation-menu",
-          "score": 66.4,
+          "score": 70.6,
           "grade": "F"
         },
         {
           "tagName": "ui5-search-item-group",
-          "score": 65,
+          "score": 69.4,
           "grade": "F"
         },
         {
           "tagName": "ui5-user-menu-item",
-          "score": 65,
+          "score": 69.4,
           "grade": "F"
         },
         {
           "tagName": "ui5-user-menu-item-group",
-          "score": 65,
+          "score": 69.4,
           "grade": "F"
         },
         {
           "tagName": "ui5-user-settings-appearance-view-group",
-          "score": 65,
+          "score": 69.4,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
+          "tagName": "ui5-time-selection-clocks",
+          "score": 30.5,
+          "grade": "F"
+        },
+        {
+          "tagName": "ui5-side-navigation-item",
+          "score": 32.9,
+          "grade": "F"
+        },
+        {
           "tagName": "ui5-menu-item-group",
-          "score": 27.3,
+          "score": 33.3,
           "grade": "F"
         },
         {
           "tagName": "ui5-user-settings-account-view",
-          "score": 27.3,
+          "score": 33.3,
           "grade": "F"
         },
         {
           "tagName": "ui5-dialog",
-          "score": 28.2,
-          "grade": "F"
-        },
-        {
-          "tagName": "ui5-time-selection-clocks",
-          "score": 29.3,
-          "grade": "F"
-        },
-        {
-          "tagName": "ui5-popover",
-          "score": 29.3,
+          "score": 34.2,
           "grade": "F"
         }
       ],
@@ -946,49 +1028,56 @@
           "average": 0,
           "tier": "important",
           "confidence": "heuristic",
-          "note": "Below average (15). Room for improvement."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (15). Room for improvement."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "Test Coverage",
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Below average (15). Room for improvement."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (15). Room for improvement."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (15). Room for improvement."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Below average (15). Room for improvement."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Below average (15). Room for improvement."
+          "note": "Below average (20). Room for improvement."
+        },
+        {
+          "dimension": "Slot Architecture",
+          "average": 0,
+          "tier": "important",
+          "confidence": "untested",
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "Accessibility",
@@ -1024,19 +1113,26 @@
           "tier": "critical",
           "confidence": "heuristic",
           "note": "Above average. Strong dimension."
+        },
+        {
+          "dimension": "Naming Consistency",
+          "average": 93.74,
+          "tier": "important",
+          "confidence": "verified",
+          "note": "Above average. Strong dimension."
         }
       ],
       "confidenceBreakdown": {
-        "verified": 324,
+        "verified": 494,
         "heuristic": 582,
-        "untested": 1134
+        "untested": 1304
       },
-      "timestamp": "2026-03-18T04:16:51.959Z"
+      "timestamp": "2026-03-21T03:11:27.861Z"
     },
     "calcite": {
       "library": "calcite",
       "componentCount": 106,
-      "averageScore": 35.31,
+      "averageScore": 40.7,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -1056,59 +1152,61 @@
         "Story Coverage": 0,
         "Performance": 0,
         "Drupal Readiness": 0,
-        "CEM-Source Fidelity": 71.55
+        "CEM-Source Fidelity": 71.55,
+        "Slot Architecture": 0,
+        "Naming Consistency": 99.98
       },
       "top5": [
         {
           "tagName": "calcite-combobox",
-          "score": 43.6,
+          "score": 48.3,
           "grade": "F"
         },
         {
           "tagName": "calcite-input-time-picker",
-          "score": 43.3,
+          "score": 48,
           "grade": "F"
         },
         {
           "tagName": "calcite-input-date-picker",
-          "score": 42.9,
+          "score": 47.7,
           "grade": "F"
         },
         {
           "tagName": "calcite-autocomplete",
-          "score": 42.7,
+          "score": 47.5,
           "grade": "F"
         },
         {
           "tagName": "calcite-carousel",
-          "score": 41.6,
+          "score": 46.5,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "calcite-accordion",
-          "score": 22.7,
+          "score": 29.2,
           "grade": "F"
         },
         {
           "tagName": "calcite-shell",
-          "score": 25.1,
+          "score": 31.3,
           "grade": "F"
         },
         {
           "tagName": "calcite-tab",
-          "score": 25.6,
+          "score": 31.8,
           "grade": "F"
         },
         {
           "tagName": "calcite-stack",
-          "score": 26.4,
+          "score": 32.5,
           "grade": "F"
         },
         {
           "tagName": "calcite-scrim",
-          "score": 27.5,
+          "score": 33.5,
           "grade": "F"
         }
       ],
@@ -1118,63 +1216,70 @@
           "average": 0,
           "tier": "critical",
           "confidence": "verified",
-          "note": "Below average (14). Room for improvement."
+          "note": "Below average (19). Room for improvement."
         },
         {
           "dimension": "API Surface Quality",
           "average": 0,
           "tier": "important",
           "confidence": "heuristic",
-          "note": "Below average (14). Room for improvement."
+          "note": "Below average (19). Room for improvement."
         },
         {
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (14). Room for improvement."
+          "note": "Below average (19). Room for improvement."
         },
         {
           "dimension": "Event Architecture",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (14). Room for improvement."
+          "note": "Below average (19). Room for improvement."
         },
         {
           "dimension": "Test Coverage",
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Below average (14). Room for improvement."
+          "note": "Below average (19). Room for improvement."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (14). Room for improvement."
+          "note": "Below average (19). Room for improvement."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (14). Room for improvement."
+          "note": "Below average (19). Room for improvement."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Below average (14). Room for improvement."
+          "note": "Below average (19). Room for improvement."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Below average (14). Room for improvement."
+          "note": "Below average (19). Room for improvement."
+        },
+        {
+          "dimension": "Slot Architecture",
+          "average": 0,
+          "tier": "important",
+          "confidence": "untested",
+          "note": "Below average (19). Room for improvement."
         },
         {
           "dimension": "Accessibility",
@@ -1196,19 +1301,26 @@
           "tier": "critical",
           "confidence": "heuristic",
           "note": "Above average. Strong dimension."
+        },
+        {
+          "dimension": "Naming Consistency",
+          "average": 99.98,
+          "tier": "important",
+          "confidence": "verified",
+          "note": "Above average. Strong dimension."
         }
       ],
       "confidenceBreakdown": {
-        "verified": 212,
+        "verified": 318,
         "heuristic": 318,
-        "untested": 742
+        "untested": 848
       },
-      "timestamp": "2026-03-18T04:16:51.960Z"
+      "timestamp": "2026-03-21T03:11:27.861Z"
     },
     "porsche": {
       "library": "porsche",
       "componentCount": 91,
-      "averageScore": 45.9,
+      "averageScore": 50.31,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -1228,59 +1340,61 @@
         "Story Coverage": 0,
         "Performance": 0,
         "Drupal Readiness": 0,
-        "CEM-Source Fidelity": 49.1
+        "CEM-Source Fidelity": 49.1,
+        "Slot Architecture": 0,
+        "Naming Consistency": 100
       },
       "top5": [
         {
           "tagName": "p-table-body",
-          "score": 65,
+          "score": 69.4,
           "grade": "F"
         },
         {
           "tagName": "p-table-head-row",
-          "score": 65,
+          "score": 69.4,
           "grade": "F"
         },
         {
           "tagName": "p-table-head",
-          "score": 65,
+          "score": 69.4,
           "grade": "F"
         },
         {
           "tagName": "p-table-row",
-          "score": 65,
+          "score": 69.4,
           "grade": "F"
         },
         {
           "tagName": "p-text-list-item",
-          "score": 65,
+          "score": 69.4,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "p-toast-item",
-          "score": 37.9,
+          "score": 42.7,
           "grade": "F"
         },
         {
           "tagName": "p-table",
-          "score": 37.9,
+          "score": 42.7,
           "grade": "F"
         },
         {
           "tagName": "p-stepper-horizontal",
-          "score": 37.9,
+          "score": 42.7,
           "grade": "F"
         },
         {
           "tagName": "p-link-tile-product",
-          "score": 37.9,
+          "score": 42.7,
           "grade": "F"
         },
         {
           "tagName": "p-inline-notification",
-          "score": 37.9,
+          "score": 42.7,
           "grade": "F"
         }
       ],
@@ -1290,56 +1404,63 @@
           "average": 0,
           "tier": "important",
           "confidence": "heuristic",
-          "note": "Below average (20). Room for improvement."
+          "note": "Significantly below average (24). Major drag on scores."
         },
         {
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "note": "Significantly below average (24). Major drag on scores."
         },
         {
           "dimension": "Test Coverage",
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "note": "Significantly below average (24). Major drag on scores."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "note": "Significantly below average (24). Major drag on scores."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "note": "Significantly below average (24). Major drag on scores."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "note": "Significantly below average (24). Major drag on scores."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "note": "Significantly below average (24). Major drag on scores."
+        },
+        {
+          "dimension": "Slot Architecture",
+          "average": 0,
+          "tier": "important",
+          "confidence": "untested",
+          "note": "Significantly below average (24). Major drag on scores."
         },
         {
           "dimension": "Accessibility",
           "average": 12.88,
           "tier": "critical",
           "confidence": "heuristic",
-          "note": "Near average."
+          "note": "Below average (24). Room for improvement."
         },
         {
           "dimension": "Event Architecture",
@@ -1368,25 +1489,32 @@
           "tier": "critical",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
+        },
+        {
+          "dimension": "Naming Consistency",
+          "average": 100,
+          "tier": "important",
+          "confidence": "verified",
+          "note": "Above average. Strong dimension."
         }
       ],
       "confidenceBreakdown": {
-        "verified": 177,
+        "verified": 268,
         "heuristic": 304,
-        "untested": 611
+        "untested": 702
       },
-      "timestamp": "2026-03-18T04:16:51.960Z"
+      "timestamp": "2026-03-21T03:11:27.862Z"
     },
     "ionic": {
       "library": "ionic",
       "componentCount": 97,
-      "averageScore": 47.49,
+      "averageScore": 51.8,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
         "C": 0,
-        "D": 0,
-        "F": 97
+        "D": 1,
+        "F": 96
       },
       "dimensionAverages": {
         "CEM Completeness": 54.74,
@@ -1400,59 +1528,61 @@
         "Story Coverage": 0,
         "Performance": 0,
         "Drupal Readiness": 0,
-        "CEM-Source Fidelity": 58.06
+        "CEM-Source Fidelity": 58.06,
+        "Slot Architecture": 0,
+        "Naming Consistency": 100
       },
       "top5": [
         {
           "tagName": "ion-app",
-          "score": 68.1,
-          "grade": "F"
-        },
-        {
-          "tagName": "ion-picker",
-          "score": 65.7,
+          "score": 72.1,
           "grade": "F"
         },
         {
           "tagName": "ion-avatar",
-          "score": 65,
+          "score": 69.4,
           "grade": "F"
         },
         {
           "tagName": "ion-card-content",
-          "score": 65,
+          "score": 69.4,
           "grade": "F"
         },
         {
           "tagName": "ion-item-group",
-          "score": 65,
+          "score": 69.4,
+          "grade": "F"
+        },
+        {
+          "tagName": "ion-reorder",
+          "score": 69.4,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "ion-tabs",
-          "score": 35,
+          "score": 40,
           "grade": "F"
         },
         {
           "tagName": "ion-route",
-          "score": 35,
+          "score": 40,
           "grade": "F"
         },
         {
           "tagName": "ion-route-redirect",
-          "score": 35,
+          "score": 40,
           "grade": "F"
         },
         {
           "tagName": "ion-breadcrumbs",
-          "score": 36.2,
+          "score": 41.1,
           "grade": "F"
         },
         {
           "tagName": "ion-content",
-          "score": 36.3,
+          "score": 41.2,
           "grade": "F"
         }
       ],
@@ -1462,49 +1592,56 @@
           "average": 0,
           "tier": "important",
           "confidence": "heuristic",
-          "note": "Significantly below average (20). Major drag on scores."
+          "note": "Significantly below average (24). Major drag on scores."
         },
         {
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (20). Major drag on scores."
+          "note": "Significantly below average (24). Major drag on scores."
         },
         {
           "dimension": "Test Coverage",
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (20). Major drag on scores."
+          "note": "Significantly below average (24). Major drag on scores."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (20). Major drag on scores."
+          "note": "Significantly below average (24). Major drag on scores."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (20). Major drag on scores."
+          "note": "Significantly below average (24). Major drag on scores."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (20). Major drag on scores."
+          "note": "Significantly below average (24). Major drag on scores."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (20). Major drag on scores."
+          "note": "Significantly below average (24). Major drag on scores."
+        },
+        {
+          "dimension": "Slot Architecture",
+          "average": 0,
+          "tier": "important",
+          "confidence": "untested",
+          "note": "Significantly below average (24). Major drag on scores."
         },
         {
           "dimension": "Event Architecture",
@@ -1540,19 +1677,26 @@
           "tier": "critical",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
+        },
+        {
+          "dimension": "Naming Consistency",
+          "average": 100,
+          "tier": "important",
+          "confidence": "verified",
+          "note": "Above average. Strong dimension."
         }
       ],
       "confidenceBreakdown": {
-        "verified": 186,
+        "verified": 283,
         "heuristic": 331,
-        "untested": 647
+        "untested": 744
       },
-      "timestamp": "2026-03-18T04:16:51.960Z"
+      "timestamp": "2026-03-21T03:11:27.862Z"
     },
     "wired": {
       "library": "wired",
       "componentCount": 26,
-      "averageScore": 50.17,
+      "averageScore": 54.31,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -1572,59 +1716,61 @@
         "Story Coverage": 0,
         "Performance": 0,
         "Drupal Readiness": 0,
-        "CEM-Source Fidelity": 78.96
+        "CEM-Source Fidelity": 78.96,
+        "Slot Architecture": 0,
+        "Naming Consistency": 99.85
       },
       "top5": [
         {
           "tagName": "wired-dialog",
-          "score": 60.4,
+          "score": 63.7,
           "grade": "F"
         },
         {
           "tagName": "wired-calendar",
-          "score": 55.8,
+          "score": 59.2,
           "grade": "F"
         },
         {
           "tagName": "wired-combo",
-          "score": 54.9,
+          "score": 58.7,
           "grade": "F"
         },
         {
           "tagName": "wired-input",
-          "score": 54.4,
+          "score": 58.2,
           "grade": "F"
         },
         {
           "tagName": "wired-listbox",
-          "score": 54,
+          "score": 57.8,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "wired-divider",
-          "score": 43.6,
+          "score": 48.3,
           "grade": "F"
         },
         {
           "tagName": "wired-card",
-          "score": 44.5,
+          "score": 49.2,
           "grade": "F"
         },
         {
           "tagName": "wired-image",
-          "score": 45.3,
+          "score": 49.8,
           "grade": "F"
         },
         {
           "tagName": "wired-spinner",
-          "score": 45.6,
+          "score": 50.2,
           "grade": "F"
         },
         {
           "tagName": "wired-fab",
-          "score": 46.2,
+          "score": 50.7,
           "grade": "F"
         }
       ],
@@ -1634,49 +1780,56 @@
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (20). Major drag on scores."
+          "note": "Significantly below average (25). Major drag on scores."
         },
         {
           "dimension": "Event Architecture",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (20). Major drag on scores."
+          "note": "Significantly below average (25). Major drag on scores."
         },
         {
           "dimension": "Test Coverage",
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (20). Major drag on scores."
+          "note": "Significantly below average (25). Major drag on scores."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (20). Major drag on scores."
+          "note": "Significantly below average (25). Major drag on scores."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (20). Major drag on scores."
+          "note": "Significantly below average (25). Major drag on scores."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (20). Major drag on scores."
+          "note": "Significantly below average (25). Major drag on scores."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (20). Major drag on scores."
+          "note": "Significantly below average (25). Major drag on scores."
+        },
+        {
+          "dimension": "Slot Architecture",
+          "average": 0,
+          "tier": "important",
+          "confidence": "untested",
+          "note": "Significantly below average (25). Major drag on scores."
         },
         {
           "dimension": "Accessibility",
@@ -1712,19 +1865,26 @@
           "tier": "critical",
           "confidence": "heuristic",
           "note": "Above average. Strong dimension."
+        },
+        {
+          "dimension": "Naming Consistency",
+          "average": 99.85,
+          "tier": "important",
+          "confidence": "verified",
+          "note": "Above average. Strong dimension."
         }
       ],
       "confidenceBreakdown": {
-        "verified": 52,
+        "verified": 78,
         "heuristic": 78,
-        "untested": 182
+        "untested": 208
       },
-      "timestamp": "2026-03-18T04:16:51.960Z"
+      "timestamp": "2026-03-21T03:11:27.862Z"
     },
     "elix": {
       "library": "elix",
       "componentCount": 74,
-      "averageScore": 63.4,
+      "averageScore": 67.98,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -1744,59 +1904,61 @@
         "Story Coverage": 0,
         "Performance": 0,
         "Drupal Readiness": 0,
-        "CEM-Source Fidelity": 93.24
+        "CEM-Source Fidelity": 93.24,
+        "Slot Architecture": 0,
+        "Naming Consistency": 100
       },
       "top5": [
         {
           "tagName": "elix-arrow-direction-button",
-          "score": 66.4,
+          "score": 70.6,
           "grade": "F"
         },
         {
           "tagName": "elix-border-button",
-          "score": 66.4,
+          "score": 70.6,
           "grade": "F"
         },
         {
           "tagName": "elix-button",
-          "score": 66.4,
+          "score": 70.6,
           "grade": "F"
         },
         {
           "tagName": "elix-calendar-day-button",
-          "score": 66.4,
+          "score": 70.6,
           "grade": "F"
         },
         {
           "tagName": "elix-expand-collapse-toggle",
-          "score": 66.4,
+          "score": 70.6,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "elix-popup-source",
-          "score": 57.9,
+          "score": 63.1,
           "grade": "F"
         },
         {
           "tagName": "elix-popup",
-          "score": 57.9,
+          "score": 63.1,
           "grade": "F"
         },
         {
           "tagName": "elix-overlay",
-          "score": 57.9,
+          "score": 63.1,
           "grade": "F"
         },
         {
           "tagName": "elix-multi-select-list-box",
-          "score": 57.9,
+          "score": 63.1,
           "grade": "F"
         },
         {
           "tagName": "elix-menu-item",
-          "score": 57.9,
+          "score": 63.1,
           "grade": "F"
         }
       ],
@@ -1806,70 +1968,77 @@
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Below average (15). Room for improvement."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "API Surface Quality",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (15). Room for improvement."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (15). Room for improvement."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "Event Architecture",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (15). Room for improvement."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "Test Coverage",
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Below average (15). Room for improvement."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (15). Room for improvement."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (15). Room for improvement."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Below average (15). Room for improvement."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Below average (15). Room for improvement."
+          "note": "Below average (20). Room for improvement."
+        },
+        {
+          "dimension": "Slot Architecture",
+          "average": 0,
+          "tier": "important",
+          "confidence": "untested",
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "Accessibility",
           "average": 1.15,
           "tier": "critical",
           "confidence": "heuristic",
-          "note": "Below average (15). Room for improvement."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "CEM Completeness",
@@ -1884,91 +2053,100 @@
           "tier": "critical",
           "confidence": "heuristic",
           "note": "Above average. Strong dimension."
+        },
+        {
+          "dimension": "Naming Consistency",
+          "average": 100,
+          "tier": "important",
+          "confidence": "verified",
+          "note": "Above average. Strong dimension."
         }
       ],
       "confidenceBreakdown": {
-        "verified": 74,
+        "verified": 148,
         "heuristic": 148,
-        "untested": 666
+        "untested": 740
       },
-      "timestamp": "2026-03-18T04:16:51.960Z"
+      "timestamp": "2026-03-21T03:11:27.862Z"
     },
     "helix": {
       "library": "helix",
-      "componentCount": 90,
-      "averageScore": 79.89,
+      "componentCount": 98,
+      "averageScore": 80.06,
       "gradeDistribution": {
         "A": 0,
-        "B": 11,
-        "C": 15,
-        "D": 13,
-        "F": 51
+        "B": 0,
+        "C": 6,
+        "D": 26,
+        "F": 66
       },
       "dimensionAverages": {
-        "CEM Completeness": 93.52,
-        "Accessibility": 47.19,
-        "Type Coverage": 91.52,
-        "API Surface Quality": 62.72,
-        "CSS Architecture": 95.22,
-        "Event Architecture": 57.83,
+        "CEM Completeness": 97.01,
+        "Accessibility": 44.81,
+        "Type Coverage": 89.86,
+        "API Surface Quality": 65.91,
+        "CSS Architecture": 88.18,
+        "Event Architecture": 56.12,
         "Test Coverage": 0,
         "Bundle Size": 0,
         "Story Coverage": 0,
         "Performance": 0,
         "Drupal Readiness": 0,
-        "CEM-Source Fidelity": 79.96
+        "CEM-Source Fidelity": 67.87,
+        "Slot Architecture": 72.71,
+        "Naming Consistency": 94.93
       },
       "top5": [
         {
-          "tagName": "hx-textarea",
-          "score": 94.2,
-          "grade": "B"
+          "tagName": "hx-field",
+          "score": 91.6,
+          "grade": "C"
         },
         {
-          "tagName": "hx-toast",
-          "score": 92.9,
+          "tagName": "hx-step",
+          "score": 90.7,
           "grade": "D"
         },
         {
-          "tagName": "hx-text-input",
-          "score": 91.3,
-          "grade": "B"
+          "tagName": "hx-tr",
+          "score": 89.6,
+          "grade": "F"
         },
         {
-          "tagName": "hx-switch",
-          "score": 90.9,
-          "grade": "B"
-        },
-        {
-          "tagName": "hx-accordion-item",
-          "score": 89.8,
+          "tagName": "hx-tooltip",
+          "score": 89.1,
           "grade": "C"
+        },
+        {
+          "tagName": "hx-carousel-item",
+          "score": 88.6,
+          "grade": "F"
         }
       ],
       "bottom5": [
         {
-          "tagName": "hx-accordion",
-          "score": 61.4,
-          "grade": "F"
-        },
-        {
-          "tagName": "hx-breadcrumb",
-          "score": 67.8,
+          "tagName": "hx-progress-bar",
+          "score": 68.3,
           "grade": "F"
         },
         {
           "tagName": "hx-prose",
-          "score": 68,
+          "score": 69.6,
           "grade": "F"
         },
         {
-          "tagName": "hx-date-picker",
-          "score": 68.1,
-          "grade": "D"
+          "tagName": "hx-counter",
+          "score": 70.5,
+          "grade": "F"
         },
         {
           "tagName": "hx-grid-item",
-          "score": 68.5,
+          "score": 71.8,
+          "grade": "F"
+        },
+        {
+          "tagName": "hx-dialog",
+          "score": 71.9,
           "grade": "F"
         }
       ],
@@ -1978,92 +2156,106 @@
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (44). Major drag on scores."
+          "note": "Significantly below average (48). Major drag on scores."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (44). Major drag on scores."
+          "note": "Significantly below average (48). Major drag on scores."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (44). Major drag on scores."
+          "note": "Significantly below average (48). Major drag on scores."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (44). Major drag on scores."
+          "note": "Significantly below average (48). Major drag on scores."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (44). Major drag on scores."
+          "note": "Significantly below average (48). Major drag on scores."
         },
         {
           "dimension": "Accessibility",
-          "average": 47.19,
+          "average": 44.81,
           "tier": "critical",
           "confidence": "heuristic",
           "note": "Near average."
         },
         {
           "dimension": "Event Architecture",
-          "average": 57.83,
+          "average": 56.12,
           "tier": "important",
           "confidence": "heuristic",
-          "note": "Above average. Strong dimension."
+          "note": "Near average."
         },
         {
           "dimension": "API Surface Quality",
-          "average": 62.72,
+          "average": 65.91,
           "tier": "important",
           "confidence": "heuristic",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "CEM-Source Fidelity",
-          "average": 79.96,
+          "average": 67.87,
           "tier": "critical",
           "confidence": "heuristic",
           "note": "Above average. Strong dimension."
         },
         {
-          "dimension": "Type Coverage",
-          "average": 91.52,
-          "tier": "critical",
-          "confidence": "verified",
-          "note": "Above average. Strong dimension."
-        },
-        {
-          "dimension": "CEM Completeness",
-          "average": 93.52,
-          "tier": "critical",
+          "dimension": "Slot Architecture",
+          "average": 72.71,
+          "tier": "important",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "CSS Architecture",
-          "average": 95.22,
+          "average": 88.18,
           "tier": "important",
           "confidence": "heuristic",
+          "note": "Above average. Strong dimension."
+        },
+        {
+          "dimension": "Type Coverage",
+          "average": 89.86,
+          "tier": "critical",
+          "confidence": "verified",
+          "note": "Above average. Strong dimension."
+        },
+        {
+          "dimension": "Naming Consistency",
+          "average": 94.93,
+          "tier": "important",
+          "confidence": "verified",
+          "note": "Above average. Strong dimension."
+        },
+        {
+          "dimension": "CEM Completeness",
+          "average": 97.01,
+          "tier": "critical",
+          "confidence": "verified",
           "note": "Above average. Strong dimension."
         }
       ],
       "confidenceBreakdown": {
-        "verified": 178,
-        "heuristic": 407,
-        "untested": 495
+        "verified": 377,
+        "heuristic": 440,
+        "untested": 555
       },
-      "timestamp": "2026-03-18T04:16:51.960Z"
+      "timestamp": "2026-03-21T03:11:27.862Z"
     }
   },
   "comparisonTable": {
@@ -2071,84 +2263,84 @@
       {
         "rank": 1,
         "library": "helix",
-        "averageScore": 79.89,
-        "componentCount": 90,
-        "grade": "C"
+        "averageScore": 80.06,
+        "componentCount": 98,
+        "grade": "B"
       },
       {
         "rank": 2,
-        "library": "vaadin",
-        "averageScore": 64.94,
-        "componentCount": 96,
+        "library": "elix",
+        "averageScore": 67.98,
+        "componentCount": 74,
         "grade": "D"
       },
       {
         "rank": 3,
-        "library": "elix",
-        "averageScore": 63.4,
-        "componentCount": 74,
+        "library": "vaadin",
+        "averageScore": 67.81,
+        "componentCount": 96,
         "grade": "D"
       },
       {
         "rank": 4,
         "library": "fluentui",
-        "averageScore": 61.58,
+        "averageScore": 64.67,
         "componentCount": 41,
         "grade": "D"
       },
       {
         "rank": 5,
         "library": "material",
-        "averageScore": 51.9,
+        "averageScore": 55.71,
         "componentCount": 97,
         "grade": "F"
       },
       {
         "rank": 6,
-        "library": "wired",
-        "averageScore": 50.17,
-        "componentCount": 26,
+        "library": "spectrum",
+        "averageScore": 54.37,
+        "componentCount": 89,
         "grade": "F"
       },
       {
         "rank": 7,
-        "library": "carbon",
-        "averageScore": 50.13,
-        "componentCount": 110,
+        "library": "wired",
+        "averageScore": 54.31,
+        "componentCount": 26,
         "grade": "F"
       },
       {
         "rank": 8,
-        "library": "spectrum",
-        "averageScore": 49.03,
-        "componentCount": 89,
+        "library": "carbon",
+        "averageScore": 52.86,
+        "componentCount": 110,
         "grade": "F"
       },
       {
         "rank": 9,
         "library": "ionic",
-        "averageScore": 47.49,
+        "averageScore": 51.8,
         "componentCount": 97,
         "grade": "F"
       },
       {
         "rank": 10,
         "library": "porsche",
-        "averageScore": 45.9,
+        "averageScore": 50.31,
         "componentCount": 91,
         "grade": "F"
       },
       {
         "rank": 11,
         "library": "ui5",
-        "averageScore": 37.35,
+        "averageScore": 42.01,
         "componentCount": 170,
         "grade": "F"
       },
       {
         "rank": 12,
         "library": "calcite",
-        "averageScore": 35.31,
+        "averageScore": 40.7,
         "componentCount": 106,
         "grade": "F"
       }
@@ -2164,7 +2356,7 @@
           },
           {
             "library": "helix",
-            "average": 93.52,
+            "average": 97.01,
             "rank": 2
           },
           {
@@ -2225,7 +2417,7 @@
         "rankings": [
           {
             "library": "helix",
-            "average": 47.19,
+            "average": 44.81,
             "rank": 1
           },
           {
@@ -2284,7 +2476,7 @@
             "rank": 12
           }
         ],
-        "spread": 46.04
+        "spread": 43.66
       },
       {
         "dimension": "Type Coverage",
@@ -2301,7 +2493,7 @@
           },
           {
             "library": "helix",
-            "average": 91.52,
+            "average": 89.86,
             "rank": 3
           },
           {
@@ -2357,7 +2549,7 @@
         "rankings": [
           {
             "library": "helix",
-            "average": 62.72,
+            "average": 65.91,
             "rank": 1
           },
           {
@@ -2416,29 +2608,29 @@
             "rank": 12
           }
         ],
-        "spread": 62.72
+        "spread": 65.91
       },
       {
         "dimension": "CSS Architecture",
         "rankings": [
           {
             "library": "helix",
-            "average": 95.22,
+            "average": 88.18,
             "rank": 1
           },
           {
-            "library": "fluentui",
-            "average": 29.27,
+            "library": "carbon",
+            "average": 23.09,
             "rank": 2
           },
           {
-            "library": "carbon",
-            "average": 27.27,
+            "library": "fluentui",
+            "average": 20.8,
             "rank": 3
           },
           {
             "library": "spectrum",
-            "average": 1.12,
+            "average": 0.76,
             "rank": 4
           },
           {
@@ -2482,7 +2674,7 @@
             "rank": 12
           }
         ],
-        "spread": 95.22
+        "spread": 88.18
       },
       {
         "dimension": "Event Architecture",
@@ -2494,7 +2686,7 @@
           },
           {
             "library": "helix",
-            "average": 57.83,
+            "average": 56.12,
             "rank": 2
           },
           {
@@ -2889,23 +3081,23 @@
             "rank": 1
           },
           {
-            "library": "helix",
-            "average": 79.96,
-            "rank": 2
-          },
-          {
             "library": "wired",
             "average": 78.96,
-            "rank": 3
+            "rank": 2
           },
           {
             "library": "ui5",
             "average": 76.98,
-            "rank": 4
+            "rank": 3
           },
           {
             "library": "calcite",
             "average": 71.55,
+            "rank": 4
+          },
+          {
+            "library": "helix",
+            "average": 67.87,
             "rank": 5
           },
           {
@@ -2945,79 +3137,211 @@
           }
         ],
         "spread": 58.33
+      },
+      {
+        "dimension": "Slot Architecture",
+        "rankings": [
+          {
+            "library": "helix",
+            "average": 72.71,
+            "rank": 1
+          },
+          {
+            "library": "spectrum",
+            "average": 57.67,
+            "rank": 2
+          },
+          {
+            "library": "fluentui",
+            "average": 42.44,
+            "rank": 3
+          },
+          {
+            "library": "carbon",
+            "average": 10.18,
+            "rank": 4
+          },
+          {
+            "library": "material",
+            "average": 0,
+            "rank": 5
+          },
+          {
+            "library": "vaadin",
+            "average": 0,
+            "rank": 6
+          },
+          {
+            "library": "ui5",
+            "average": 0,
+            "rank": 7
+          },
+          {
+            "library": "calcite",
+            "average": 0,
+            "rank": 8
+          },
+          {
+            "library": "porsche",
+            "average": 0,
+            "rank": 9
+          },
+          {
+            "library": "ionic",
+            "average": 0,
+            "rank": 10
+          },
+          {
+            "library": "wired",
+            "average": 0,
+            "rank": 11
+          },
+          {
+            "library": "elix",
+            "average": 0,
+            "rank": 12
+          }
+        ],
+        "spread": 72.71
+      },
+      {
+        "dimension": "Naming Consistency",
+        "rankings": [
+          {
+            "library": "vaadin",
+            "average": 100,
+            "rank": 1
+          },
+          {
+            "library": "fluentui",
+            "average": 100,
+            "rank": 2
+          },
+          {
+            "library": "porsche",
+            "average": 100,
+            "rank": 3
+          },
+          {
+            "library": "ionic",
+            "average": 100,
+            "rank": 4
+          },
+          {
+            "library": "elix",
+            "average": 100,
+            "rank": 5
+          },
+          {
+            "library": "calcite",
+            "average": 99.98,
+            "rank": 6
+          },
+          {
+            "library": "wired",
+            "average": 99.85,
+            "rank": 7
+          },
+          {
+            "library": "spectrum",
+            "average": 98,
+            "rank": 8
+          },
+          {
+            "library": "material",
+            "average": 97.88,
+            "rank": 9
+          },
+          {
+            "library": "helix",
+            "average": 94.93,
+            "rank": 10
+          },
+          {
+            "library": "ui5",
+            "average": 93.74,
+            "rank": 11
+          },
+          {
+            "library": "carbon",
+            "average": 87.59,
+            "rank": 12
+          }
+        ],
+        "spread": 12.41
       }
     ],
     "differentiatingDimensions": [
-      "CSS Architecture",
       "Type Coverage",
+      "CSS Architecture",
+      "Slot Architecture",
       "API Surface Quality",
-      "Event Architecture",
-      "CEM-Source Fidelity"
+      "Event Architecture"
     ],
-    "timestamp": "2026-03-18T04:16:51.960Z"
+    "timestamp": "2026-03-21T03:11:27.862Z"
   },
   "performance": {
-    "totalMs": 2735,
+    "totalMs": 980,
     "phases": [
       {
         "name": "load-libraries",
-        "durationMs": 305
+        "durationMs": 91
       },
       {
         "name": "score-all-libraries",
-        "durationMs": 2424
+        "durationMs": 887
       },
       {
         "name": "score-material",
-        "durationMs": 283
+        "durationMs": 82
       },
       {
         "name": "score-spectrum",
-        "durationMs": 229
+        "durationMs": 62
       },
       {
         "name": "score-vaadin",
-        "durationMs": 782
+        "durationMs": 270
       },
       {
         "name": "score-fluentui",
-        "durationMs": 28
+        "durationMs": 19
       },
       {
         "name": "score-carbon",
-        "durationMs": 61
+        "durationMs": 48
       },
       {
         "name": "score-ui5",
-        "durationMs": 207
+        "durationMs": 93
       },
       {
         "name": "score-calcite",
-        "durationMs": 347
+        "durationMs": 124
       },
       {
         "name": "score-porsche",
-        "durationMs": 57
+        "durationMs": 35
       },
       {
         "name": "score-ionic",
-        "durationMs": 74
+        "durationMs": 41
       },
       {
         "name": "score-wired",
-        "durationMs": 20
+        "durationMs": 7
       },
       {
         "name": "score-elix",
-        "durationMs": 260
+        "durationMs": 68
       },
       {
         "name": "score-helix",
-        "durationMs": 76
+        "durationMs": 38
       },
       {
         "name": "generate-scorecards",
-        "durationMs": 5
+        "durationMs": 2
       },
       {
         "name": "generate-comparison",

@@ -203,10 +203,48 @@ describe('analyzeApiSurface', () => {
 
 // ─── analyzeCssArchitecture ──────────────────────────────────────────────────
 
+const SHADOW_DOM_RICH_DECL: CemDeclaration = {
+  kind: 'class',
+  name: 'ShadowDomRich',
+  tagName: 'shadow-dom-rich',
+  members: [
+    { kind: 'field', name: 'variant', type: { text: 'string' }, description: 'Visual variant.' },
+    { kind: 'field', name: 'size', type: { text: 'string' }, description: 'Component size.' },
+    { kind: 'field', name: 'disabled', type: { text: 'boolean' }, description: 'Disabled state.' },
+  ],
+  slots: [
+    { name: '', description: 'Default content.' },
+    { name: 'prefix', description: 'Prefix content.' },
+  ],
+  cssParts: [
+    { name: 'base', description: 'Root element.' },
+    { name: 'label', description: 'Label text.' },
+    { name: 'prefix', description: 'Prefix container.' },
+  ],
+  cssProperties: [
+    { name: '--sdr-color-primary', default: 'blue', description: 'Primary color.' },
+    { name: '--sdr-color-secondary', default: 'gray', description: 'Secondary color.' },
+    { name: '--sdr-spacing-m', default: '8px', description: 'Medium spacing.' },
+    { name: '--sdr-font-size', default: '16px', description: 'Font size.' },
+    { name: '--sdr-border-radius', default: '4px', description: 'Border radius.' },
+  ],
+};
+
+const SHADOW_DOM_POOR_DECL: CemDeclaration = {
+  kind: 'class',
+  name: 'ShadowDomPoor',
+  tagName: 'shadow-dom-poor',
+  cssProperties: [
+    { name: '--a-color', description: 'A color.' },
+    { name: '--b-spacing', description: 'B spacing.' },
+    { name: '--c-font' }, // no description
+  ],
+};
+
 describe('analyzeCssArchitecture', () => {
-  it('returns 100 for component with well-documented CSS', () => {
+  it('returns high score for component with well-documented CSS', () => {
     const result = analyzeCssArchitecture(WELL_TYPED_DECL);
-    expect(result.score).toBe(100);
+    expect(result.score).toBeGreaterThanOrEqual(70);
   });
 
   it('returns null for component with no CSS properties or parts (not scorable)', () => {
@@ -230,14 +268,69 @@ describe('analyzeCssArchitecture', () => {
     expect(tokenMetric!.score).toBeLessThan(tokenMetric!.maxScore);
   });
 
-  it('has 3 sub-metrics', () => {
+  it('has 6 sub-metrics', () => {
     const result = analyzeCssArchitecture(WELL_TYPED_DECL);
-    expect(result.subMetrics).toHaveLength(3);
+    expect(result.subMetrics).toHaveLength(6);
   });
 
   it('confidence is heuristic', () => {
     const result = analyzeCssArchitecture(WELL_TYPED_DECL);
     expect(result.confidence).toBe('heuristic');
+  });
+
+  it('includes CSS parts coverage ratio sub-metric', () => {
+    const result = analyzeCssArchitecture(SHADOW_DOM_RICH_DECL);
+    const metric = result.subMetrics.find((m) => m.name === 'CSS parts coverage ratio');
+    expect(metric).toBeDefined();
+    expect(metric!.maxScore).toBe(15);
+    expect(metric!.score).toBeGreaterThan(0);
+  });
+
+  it('CSS parts coverage ratio rewards more exposed parts relative to component size', () => {
+    const richResult = analyzeCssArchitecture(SHADOW_DOM_RICH_DECL);
+    const poorResult = analyzeCssArchitecture(SHADOW_DOM_POOR_DECL);
+    const richMetric = richResult.subMetrics.find((m) => m.name === 'CSS parts coverage ratio');
+    const poorMetric = poorResult.subMetrics.find((m) => m.name === 'CSS parts coverage ratio');
+    expect(richMetric!.score).toBeGreaterThan(poorMetric!.score);
+  });
+
+  it('includes token namespace consistency sub-metric', () => {
+    const result = analyzeCssArchitecture(SHADOW_DOM_RICH_DECL);
+    const metric = result.subMetrics.find((m) => m.name === 'Token namespace consistency');
+    expect(metric).toBeDefined();
+    expect(metric!.maxScore).toBe(15);
+    // All properties share --sdr- prefix → full score
+    expect(metric!.score).toBe(15);
+  });
+
+  it('penalizes mixed namespaces in token namespace consistency', () => {
+    const result = analyzeCssArchitecture(SHADOW_DOM_POOR_DECL);
+    const metric = result.subMetrics.find((m) => m.name === 'Token namespace consistency');
+    expect(metric).toBeDefined();
+    // --a-, --b-, --c- are all different prefixes → low score
+    expect(metric!.score).toBeLessThan(15);
+  });
+
+  it('includes theming completeness sub-metric', () => {
+    const result = analyzeCssArchitecture(SHADOW_DOM_RICH_DECL);
+    const metric = result.subMetrics.find((m) => m.name === 'Theming completeness');
+    expect(metric).toBeDefined();
+    expect(metric!.maxScore).toBe(15);
+    // covers color, spacing, typography, border → full score
+    expect(metric!.score).toBe(15);
+  });
+
+  it('penalizes narrow theming coverage', () => {
+    const result = analyzeCssArchitecture(SHADOW_DOM_POOR_DECL);
+    const metric = result.subMetrics.find((m) => m.name === 'Theming completeness');
+    expect(metric).toBeDefined();
+    expect(metric!.score).toBeLessThan(metric!.maxScore);
+  });
+
+  it('well-documented multi-category component scores higher than poor one', () => {
+    const richResult = analyzeCssArchitecture(SHADOW_DOM_RICH_DECL);
+    const poorResult = analyzeCssArchitecture(SHADOW_DOM_POOR_DECL);
+    expect(richResult.score).toBeGreaterThan(poorResult.score);
   });
 });
 

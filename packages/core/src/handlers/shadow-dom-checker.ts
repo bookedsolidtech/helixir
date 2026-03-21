@@ -5,11 +5,17 @@
  * Scans CSS text and flags:
  * 1. Descendant selectors trying to reach shadow internals
  * 2. ::slotted() used in consumer CSS (only valid inside shadow DOM)
- * 3. ::part() with descendant selectors (invalid chaining)
- * 4. !important on CSS custom properties (unnecessary)
- * 5. Direct class/ID selectors targeting probable shadow internals
- * 6. CEM-based: unknown ::part() names
- * 7. CEM-based: fuzzy-matched misspelled CSS custom properties
+ * 3. ::slotted() with descendant/child selectors (can't style slotted children)
+ * 4. ::slotted() with compound selectors (only simple selectors allowed)
+ * 5. :host/:host-context() in consumer CSS (only valid inside shadow DOM)
+ * 6. ::part() with descendant selectors (invalid chaining)
+ * 7. ::part() with class/attribute selectors (parts are in different DOM tree)
+ * 8. ::part()::part() chaining (parts don't forward through nested shadows)
+ * 9. Deprecated /deep/, >>>, ::deep selectors
+ * 10. !important on CSS custom properties (unnecessary)
+ * 11. display: contents on component host (breaks shadow DOM)
+ * 12. CEM-based: unknown ::part() names
+ * 13. CEM-based: fuzzy-matched misspelled CSS custom properties
  */
 
 import type { ComponentMetadata } from './cem.js';
@@ -251,6 +257,98 @@ function checkDisplayContentsOnHost(lines: string[], tagName: string): ShadowDom
   return issues;
 }
 
+function checkHostMisuse(lines: string[]): ShadowDomIssue[] {
+  const issues: ShadowDomIssue[] = [];
+  // :host, :host(), :host-context() — only work inside shadow DOM stylesheets
+  const pattern =
+    /(?:^|[{},;\s])(:host(?:-context)?\s*(?:\([^)]*\))?\s*\{|:host(?:-context)?\s*\()/;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] ?? '';
+    const match = pattern.exec(line);
+    if (match) {
+      issues.push({
+        line: i + 1,
+        column: (match.index ?? 0) + 1,
+        severity: 'error',
+        rule: 'no-external-host',
+        message:
+          ':host and :host-context() only work inside a shadow root stylesheet, not in consumer CSS.',
+        suggestion:
+          'Target the component tag name directly instead (e.g., "my-button { display: block; }").',
+        code: line.trim(),
+      });
+    }
+  }
+
+  return issues;
+}
+
+function checkSlottedDescendant(lines: string[]): ShadowDomIssue[] {
+  const issues: ShadowDomIssue[] = [];
+  // ::slotted(selector) followed by whitespace then another selector (descendant/child)
+  const pattern = /::slotted\([^)]+\)\s+(?:>?\s*)?[a-zA-Z.#[*]/;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] ?? '';
+    const match = pattern.exec(line);
+    if (match) {
+      issues.push({
+        line: i + 1,
+        column: match.index + 1,
+        severity: 'error',
+        rule: 'no-slotted-descendant',
+        message:
+          '::slotted() cannot target descendants of slotted content. It only styles the direct slotted element itself.',
+        suggestion:
+          'Style only the slotted element: "::slotted(div) { ... }". To style children, use light DOM CSS outside the component.',
+        code: line.trim(),
+      });
+    }
+  }
+
+  return issues;
+}
+
+function checkSlottedCompound(lines: string[]): ShadowDomIssue[] {
+  const issues: ShadowDomIssue[] = [];
+  // ::slotted() only accepts simple selectors (one element, class, or attribute — not compounds)
+  // Invalid: ::slotted(div.foo), ::slotted(div span), ::slotted(.a.b)
+  // Valid: ::slotted(div), ::slotted(.foo), ::slotted([attr]), ::slotted(*)
+  const slottedPattern = /::slotted\(([^)]+)\)/g;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] ?? '';
+    let match: RegExpExecArray | null;
+    slottedPattern.lastIndex = 0;
+    while ((match = slottedPattern.exec(line)) !== null) {
+      const inner = (match[1] ?? '').trim();
+      // A simple selector is: a single tag, class, id, attribute, or *
+      // Compound has multiple parts: "div.foo", "div span", ".a.b", "div > span"
+      const isCompound =
+        /\s/.test(inner) || // space (descendant)
+        /[>+~]/.test(inner) || // combinators
+        /^[a-zA-Z][a-zA-Z0-9-]*[.#[]/.test(inner) || // tag + class/id/attr
+        /^\.[a-zA-Z][a-zA-Z0-9-]*\./.test(inner); // .class.class
+
+      if (isCompound) {
+        issues.push({
+          line: i + 1,
+          column: match.index + 1,
+          severity: 'error',
+          rule: 'no-slotted-compound',
+          message: `::slotted() only accepts simple selectors. "${inner}" is a compound selector.`,
+          suggestion:
+            'Use a single simple selector inside ::slotted(), e.g., "::slotted(div)" or "::slotted(.my-class)".',
+          code: line.trim(),
+        });
+      }
+    }
+  }
+
+  return issues;
+}
+
 function checkImportantOnTokens(lines: string[]): ShadowDomIssue[] {
   const issues: ShadowDomIssue[] = [];
   const pattern = /--[\w-]+\s*:\s*[^;]*!important/;
@@ -387,6 +485,9 @@ export function checkShadowDomUsage(
   const issues: ShadowDomIssue[] = [];
 
   issues.push(...checkSlottedMisuse(lines));
+  issues.push(...checkSlottedDescendant(lines));
+  issues.push(...checkSlottedCompound(lines));
+  issues.push(...checkHostMisuse(lines));
   issues.push(...checkPartDescendants(lines));
   issues.push(...checkPartStructural(lines));
   issues.push(...checkPartChaining(lines));

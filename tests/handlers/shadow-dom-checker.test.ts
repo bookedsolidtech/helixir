@@ -255,6 +255,80 @@ describe('checkShadowDomUsage', () => {
     });
   });
 
+  describe(':host pseudo-class misuse', () => {
+    it('detects :host in consumer CSS', () => {
+      const css = `:host { display: block; }`;
+      const result = checkShadowDomUsage(css);
+      expect(result.issues.some((i) => i.rule === 'no-external-host')).toBe(true);
+    });
+
+    it('detects :host() with selector in consumer CSS', () => {
+      const css = `:host(.active) { background: blue; }`;
+      const result = checkShadowDomUsage(css);
+      expect(result.issues.some((i) => i.rule === 'no-external-host')).toBe(true);
+    });
+
+    it('detects :host-context() in consumer CSS', () => {
+      const css = `:host-context(.dark-theme) { color: white; }`;
+      const result = checkShadowDomUsage(css);
+      expect(result.issues.some((i) => i.rule === 'no-external-host')).toBe(true);
+    });
+
+    it('does not flag :host when inside a comment-like context', () => {
+      // Just the word "host" in a class name should not trigger
+      const css = `.my-host { display: block; }`;
+      const result = checkShadowDomUsage(css);
+      const hostIssues = result.issues.filter((i) => i.rule === 'no-external-host');
+      expect(hostIssues).toHaveLength(0);
+    });
+  });
+
+  describe('::slotted() compound selector misuse', () => {
+    it('detects ::slotted() with descendant selector', () => {
+      const css = `::slotted(div) span { color: red; }`;
+      const result = checkShadowDomUsage(css);
+      expect(result.issues.some((i) => i.rule === 'no-slotted-descendant')).toBe(true);
+    });
+
+    it('detects ::slotted() with child combinator', () => {
+      const css = `::slotted(div) > span { color: red; }`;
+      const result = checkShadowDomUsage(css);
+      expect(result.issues.some((i) => i.rule === 'no-slotted-descendant')).toBe(true);
+    });
+
+    it('detects compound selector inside ::slotted()', () => {
+      const css = `::slotted(div.foo) { color: red; }`;
+      const result = checkShadowDomUsage(css);
+      expect(result.issues.some((i) => i.rule === 'no-slotted-compound')).toBe(true);
+    });
+
+    it('detects descendant selector inside ::slotted()', () => {
+      const css = `::slotted(div span) { color: red; }`;
+      const result = checkShadowDomUsage(css);
+      expect(result.issues.some((i) => i.rule === 'no-slotted-compound')).toBe(true);
+    });
+
+    it('allows simple ::slotted() selector', () => {
+      // Note: ::slotted() still triggers no-external-slotted in consumer CSS,
+      // but should NOT trigger compound/descendant issues
+      const css = `::slotted(div) { color: red; }`;
+      const result = checkShadowDomUsage(css);
+      const compoundIssues = result.issues.filter(
+        (i) => i.rule === 'no-slotted-compound' || i.rule === 'no-slotted-descendant',
+      );
+      expect(compoundIssues).toHaveLength(0);
+    });
+
+    it('allows ::slotted(*) universal selector', () => {
+      const css = `::slotted(*) { margin: 0; }`;
+      const result = checkShadowDomUsage(css);
+      const compoundIssues = result.issues.filter(
+        (i) => i.rule === 'no-slotted-compound' || i.rule === 'no-slotted-descendant',
+      );
+      expect(compoundIssues).toHaveLength(0);
+    });
+  });
+
   describe('clean CSS', () => {
     it('reports clean for valid CSS', () => {
       const css = [

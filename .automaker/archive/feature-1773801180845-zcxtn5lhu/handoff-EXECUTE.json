@@ -1,0 +1,159 @@
+{
+  "phase": "EXECUTE",
+  "summary": "Agent completed execution. PR: #86",
+  "discoveries": [],
+  "modifiedFiles": [],
+  "outstandingQuestions": [],
+  "scopeLimits": [],
+  "testCoverage": "Tests mentioned in output",
+  "verdict": "APPROVE",
+  "createdAt": "2026-03-18T03:42:43.314Z",
+  "structuredPlan": {
+    "goal": "Create a Slot Architecture analyzer dimension that scores component slot documentation, default slots, and slot-property coherence as a dedicated 100-point dimension with weight 5.",
+    "acceptanceCriteria": [
+      {
+        "description": "Default slot presence and documentation scores correctly (up to 25 points: 15 for presence, 10 for description)",
+        "verifyCommand": "grep -n 'defaultSlot' packages/core/src/handlers/analyzers/slot-architecture.ts && npm test -- --testNamePattern='default slot'"
+      },
+      {
+        "description": "Named slot documentation scored proportionally (up to 30 points) based on documented slots / total named slots",
+        "verifyCommand": "grep -n 'namedSlots\\|proportional' packages/core/src/handlers/analyzers/slot-architecture.ts && npm test -- --testNamePattern='named slot'"
+      },
+      {
+        "description": "Slot type constraints detected and scored (up to 20 points) from @slot JSDoc annotations and descriptions",
+        "verifyCommand": "grep -n 'typeConstraint\\|@slot' packages/core/src/handlers/analyzers/slot-architecture.ts && npm test -- --testNamePattern='constraint'"
+      },
+      {
+        "description": "Slot-property coherence pairs identified and scored (up to 25 points) for matching documentation between slots and properties",
+        "verifyCommand": "grep -n 'coherence\\|slot.*property' packages/core/src/handlers/analyzers/slot-architecture.ts && npm test -- --testNamePattern='coherence'"
+      },
+      {
+        "description": "Analyzer returns null for components with no slots (presentational/leaf components) rather than zero score",
+        "verifyCommand": "npm test -- --testNamePattern='slot.*less\\|presentational'"
+      },
+      {
+        "description": "Slot Architecture registered as dimension 13 in dimensions configuration with weight 5 and tier 'important'",
+        "verifyCommand": "grep -n 'dimension.*13\\|slotArchitecture' packages/core/src/handlers/dimensions.ts | grep -E 'weight.*5|important'"
+      },
+      {
+        "description": "Analyzer wired into scoreComponentMultiDimensional() function in health.ts with proper integration",
+        "verifyCommand": "grep -n 'analyzeSlotArchitecture\\|slotArchitecture' packages/core/src/handlers/health.ts"
+      },
+      {
+        "description": "Test suite uses real CEM fixtures from helix (hx-card, hx-dialog, hx-drawer), Spectrum, and Material components",
+        "verifyCommand": "grep -n 'hx-card\\|hx-dialog\\|hx-drawer\\|Spectrum\\|Material' tests/handlers/slot-architecture.test.ts"
+      },
+      {
+        "description": "All existing tests pass after integration of slot architecture dimension",
+        "verifyCommand": "npm test"
+      }
+    ],
+    "tasks": [
+      {
+        "title": "Create slot-architecture.ts analyzer with core framework",
+        "description": "Create packages/core/src/handlers/analyzers/slot-architecture.ts with export for analyzeSlotArchitecture function. Define interfaces for SlotArchitectureScore, SlotAnalysis, and CoherencePair. Implement logic to return null for slot-less components and calculated scores for components with slots.",
+        "files": [
+          "packages/core/src/handlers/analyzers/slot-architecture.ts"
+        ],
+        "verifyCommand": "test -f packages/core/src/handlers/analyzers/slot-architecture.ts"
+      },
+      {
+        "title": "Implement default slot scoring (0-25 points)",
+        "description": "Extract default slot from CEM definition. Award 15 points if default slot declared, additional 10 points if it has description. Return proportional score for components with default slots.",
+        "files": [
+          "packages/core/src/handlers/analyzers/slot-architecture.ts"
+        ]
+      },
+      {
+        "title": "Implement named slot documentation scoring (0-30 points)",
+        "description": "Identify all named slots in CEM. Calculate score as (slots_with_descriptions / total_named_slots) * 30. Award full 30 points only if all named slots are documented.",
+        "files": [
+          "packages/core/src/handlers/analyzers/slot-architecture.ts"
+        ]
+      },
+      {
+        "title": "Implement slot type constraints scoring (0-20 points)",
+        "description": "Detect slot type constraints by parsing @slot JSDoc annotations and description fields for element type mentions. Calculate score as (slots_with_type_info / total_slots) * 20. Award points proportional to documented type constraints.",
+        "files": [
+          "packages/core/src/handlers/analyzers/slot-architecture.ts"
+        ]
+      },
+      {
+        "title": "Implement slot-property coherence scoring (0-25 points)",
+        "description": "Cross-reference slots against component properties. Identify coherence pairs (e.g., slot='label' + property.label). Check if both are documented and relationship explained. Common patterns: label, icon, header, footer, prefix, suffix. Score as (coherent_pairs / total_pairs) * 25.",
+        "files": [
+          "packages/core/src/handlers/analyzers/slot-architecture.ts"
+        ]
+      },
+      {
+        "title": "Register Slot Architecture as dimension 13",
+        "description": "Add new dimension entry to packages/core/src/handlers/dimensions.ts with id 13, name 'slotArchitecture', weight 5, tier 'important', max 100 points, and confidence 'verified'.",
+        "files": [
+          "packages/core/src/handlers/dimensions.ts"
+        ],
+        "verifyCommand": "grep -A 5 'dimension.*13' packages/core/src/handlers/dimensions.ts"
+      },
+      {
+        "title": "Wire analyzer into health.ts scoring function",
+        "description": "Import analyzeSlotArchitecture in packages/core/src/handlers/health.ts. Call it within scoreComponentMultiDimensional() for each component. Include result in multi-dimensional score calculation with weight 5. Handle null returns for slot-less components.",
+        "files": [
+          "packages/core/src/handlers/health.ts"
+        ],
+        "verifyCommand": "grep -n 'analyzeSlotArchitecture' packages/core/src/handlers/health.ts"
+      },
+      {
+        "title": "Create comprehensive test suite",
+        "description": "Create tests/handlers/slot-architecture.test.ts with test cases for: default slot presence/description, named slot documentation coverage, slot type constraints, slot-property coherence pairs, null return for presentational components, and integration with real CEM fixtures.",
+        "files": [
+          "tests/handlers/slot-architecture.test.ts"
+        ],
+        "verifyCommand": "test -f tests/handlers/slot-architecture.test.ts && npm test -- --testPathPattern='slot-architecture'"
+      },
+      {
+        "title": "Add tests with helix component fixtures",
+        "description": "Add test cases using real CEM data from helix components (hx-card with slot variations, hx-dialog with header/footer slots, hx-drawer with named slots) to verify analyzer handles rich slot architecture correctly.",
+        "files": [
+          "tests/handlers/slot-architecture.test.ts"
+        ]
+      },
+      {
+        "title": "Add tests with Spectrum and Material fixtures",
+        "description": "Add test cases using Spectrum and Material Design CEM fixtures to validate analyzer on extensive slot usage patterns and type constraints.",
+        "files": [
+          "tests/handlers/slot-architecture.test.ts"
+        ]
+      },
+      {
+        "title": "Verify integration and all tests pass",
+        "description": "Run full test suite to ensure slot architecture analyzer integrates cleanly with existing health scoring, dimensions configuration, and component analysis without breaking any tests.",
+        "files": [
+          "tests/handlers/health.test.ts",
+          "tests/handlers/dimensions.test.ts"
+        ],
+        "verifyCommand": "npm test"
+      }
+    ],
+    "deviationRules": [
+      {
+        "condition": "A component has both a slot and a property with same name but only one is documented",
+        "action": "Count as partial coherence pair and award 50% of pair points (12.5 for one out of two documented). Document in test comments."
+      },
+      {
+        "condition": "CEM lacks explicit slot definitions but JSDoc @slot annotations exist in description field",
+        "action": "Parse JSDoc annotations from description text as fallback source for slot detection and type constraint identification."
+      },
+      {
+        "condition": "Component uses context-based slots not captured in CEM slot definitions",
+        "action": "Return null and document in comments that slot architecture only scores explicit slot definitions per CEM specification."
+      },
+      {
+        "condition": "Test coverage reveals point distribution between categories needs adjustment for better signal",
+        "action": "Adjust point allocation between default/named/constraints/coherence categories but maintain 100-point total. Document rationale in code comments and update test expectations."
+      },
+      {
+        "condition": "A slot name collides with reserved/lifecycle property names (e.g., 'class', 'ref')",
+        "action": "Skip coherence pairing for these slots as they don't represent content composition patterns."
+      }
+    ]
+  }
+}

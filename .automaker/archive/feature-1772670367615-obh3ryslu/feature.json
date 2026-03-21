@@ -1,0 +1,65 @@
+{
+  "category": "Uncategorized",
+  "description": "Standard practice for OSS npm packages — a `SECURITY.md` file explaining how to report vulnerabilities. Currently missing.\n\n**Fix:** Create `SECURITY.md` at the repo root with standard vulnerability disclosure policy. Reference GitHub's security advisory feature and provide a contact email or GitHub security reporting URL.\n\n**Acceptance criteria:**\n- `SECURITY.md` exists at repo root\n- Documents how to report a vulnerability privately (GitHub security advisory or email)\n- Mentions response time expectations\n- File is clean markdown with no placeholders",
+  "title": "chore: add SECURITY.md for vulnerability reporting",
+  "status": "done",
+  "complexity": "small",
+  "priority": 4,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "7591c27b-6293-4764-837a-9e7a050b4056",
+  "id": "feature-1772670367615-obh3ryslu",
+  "branchName": "feature/chore-add-securitymd-for-vulnerability",
+  "descriptionHistory": [
+    {
+      "description": "Standard practice for OSS npm packages — a `SECURITY.md` file explaining how to report vulnerabilities. Currently missing.\n\n**Fix:** Create `SECURITY.md` at the repo root with standard vulnerability disclosure policy. Reference GitHub's security advisory feature and provide a contact email or GitHub security reporting URL.\n\n**Acceptance criteria:**\n- `SECURITY.md` exists at repo root\n- Documents how to report a vulnerability privately (GitHub security advisory or email)\n- Mentions response time expectations\n- File is clean markdown with no placeholders",
+      "timestamp": "2026-03-05T00:26:07.615Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-05T00:26:07.615Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-05T00:26:07.615Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T06:13:43.251Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T06:14:43.298Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-12T16:53:22.225Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-12T06:14:43.298Z",
+  "costUsd": 0.11906675,
+  "lastSessionId": "74b47843-5487-400d-a9ba-b5221192e7f0",
+  "executionHistory": [
+    {
+      "id": "53f3b549-f1c8-4749-8df1-22fb3c756ae3",
+      "startedAt": "2026-03-12T06:13:48.123Z",
+      "completedAt": "2026-03-12T06:14:15.003Z",
+      "durationMs": 26880,
+      "costUsd": 0.11906675,
+      "model": "claude-opus-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Standard practice for OSS npm packages — SECURITY.md\n\n### Changes Implemented\n- No changes needed — `SECURITY.md` already exists at the repo root with complete content\n\n### Files Modified\n- None (feature was already implemented)\n\n### Acceptance Criteria Verification\n- `SECURITY.md` exists at repo root — **PASS**\n- Documents private reporting via GitHub Security Advisory (preferred) and email — **PASS**\n- Response time expectations: 48h acknowledgment, 7-day status update, coordinated patch release — **PASS**\n- Clean markdown with no placeholders — **PASS**\n\n### Verification Status\n- Playwright verification not applicable — this is a static markdown file, not a code feature\n- File content verified by direct read; all acceptance criteria met\n\n### Risks/Blockers Encountered\n- None\n\n### Notes for Developer\n- The file references `https://github.com/bookedsolidtech/helixir/security` for GitHub's private vulnerability reporting\n- Supported versions table currently lists `0.1.x` — update when new major versions are released",
+  "reviewStartedAt": "2026-03-12T06:14:43.298Z",
+  "completedAt": "2026-03-12T16:53:22.225Z"
+}

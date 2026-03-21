@@ -1,0 +1,134 @@
+{
+  "category": "Uncategorized",
+  "description": "## Context\n\nJake has decided: **pnpm is the org-wide standard.** Helixir is already using pnpm (lockfile, CI workflows, workspace), but the setup is incomplete compared to the helix reference implementation. This feature standardizes helixir's pnpm monorepo configuration to match the org pattern.\n\n## Reference: Helix pnpm Setup (gold standard)\n- `packageManager: \"pnpm@9.15.9\"` in package.json (exact pin)\n- `.npmrc`: `shamefully-hoist=true` (required for Lit/Vite compatibility)\n- `pnpm-workspace.yaml`: `apps/*`, `apps/mcp-servers/*`, `packages/*`\n- `turbo.json`: Full build orchestration with task dependencies, output caching\n- CI: `pnpm/action-setup@v4` → `actions/setup-node@v4` with `cache: 'pnpm'` → `pnpm install --frozen-lockfile`\n- Changesets: linked packages, ignored non-publishable packages\n\n## Current Helixir State (gaps identified)\n- **Already using pnpm** with pnpm-lock.yaml and pnpm-workspace.yaml\n- **Missing `packageManager` field** in package.json — must pin exact version (use `pnpm@9.15.9` to match helix)\n- **`.npmrc` has `engine-strict=true`** but missing `shamefully-hoist=true` — add it (helix needs it for Lit; helixir may need it for similar web component tooling)\n- **No turbo.json** — add Turborepo for build orchestration across packages/core and packages/github-action\n- **CI workflows specify `version: '>=9'`** — should infer from packageManager field instead (remove explicit version, let pnpm/action-setup@v4 read packageManager)\n- **pnpm-workspace.yaml includes root (`.`)** — this was re-added after a changesets issue; verify it's still needed and align with helix pattern\n- **No corepack enable** — consider adding to CI for packageManager enforcement\n\n## Changes Required\n\n### 1. package.json\n- Add `\"packageManager\": \"pnpm@9.15.9\"`\n- Keep existing `\"engines\": { \"node\": \">=20.0.0\", \"pnpm\": \">=9\" }`\n- Keep existing `\"pnpm\": { \"overrides\": {...} }` section\n\n### 2. .npmrc\n- Add `shamefully-hoist=true` alongside existing `engine-strict=true`\n\n### 3. turbo.json (new file)\nCreate turbo.json with task graph for the monorepo:\n```json\n{\n  \"$schema\": \"https://turbo.build/schema.json\",\n  \"globalDependencies\": [\"**/.env.*local\"],\n  \"tasks\": {\n    \"build\": { \"dependsOn\": [\"^build\"], \"outputs\": [\"dist/**\"] },\n    \"test\": { \"dependsOn\": [\"build\"] },\n    \"lint\": {},\n    \"type-check\": { \"dependsOn\": [\"^build\"] }\n  }\n}\n```\nAdd `turbo` as a devDependency.\n\n### 4. CI Workflows (all 8 files in .github/workflows/)\n- Remove explicit `version:` from `pnpm/action-setup@v4` — let it read `packageManager` field\n- Ensure all workflows use `pnpm install --frozen-lockfile`\n- Verify `cache: 'pnpm'` is set on all `actions/setup-node@v4` steps\n\n### 5. pnpm-workspace.yaml\n- Evaluate whether root `.` entry is still needed for changesets\n- If not needed, remove it to match helix pattern (helix doesn't include root)\n\n### 6. Root scripts (package.json)\n- Update build/test/lint scripts to use `turbo run` where appropriate\n- Add `turbo` to devDependencies\n\n## History Note\npnpm workspace was removed in commit e282c55 (Mar 12, 2026) due to changesets resolution issues, then restored in commit 5a7d40d. The root `.` entry in pnpm-workspace.yaml is critical for changesets to find the root package — test carefully before removing.\n\n## Acceptance Criteria\n- [ ] `packageManager` field pinned in package.json\n- [ ] `.npmrc` includes `shamefully-hoist=true`\n- [ ] turbo.json created with correct task graph\n- [ ] `turbo` added as devDependency\n- [ ] CI workflows infer pnpm version from packageManager field\n- [ ] All CI checks pass (build, test, lint, format, cem-validate, security)\n- [ ] `pnpm install --frozen-lockfile` works cleanly\n- [ ] Changesets still resolve the root package correctly",
+  "title": "Standardize pnpm monorepo setup to match helix org pattern",
+  "status": "done",
+  "complexity": "architectural",
+  "assignee": null,
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "6f00a5ac-ff53-4058-9ff7-fb16e417b4c4",
+  "id": "feature-1773276893746-d7j69dx84",
+  "branchName": "feature/p3-004-standardize-package-manager",
+  "descriptionHistory": [
+    {
+      "description": "**Source:** CTO report P3-004 (P3 — LOW, fix within 90 days)\n**Assigned to Jake for review before agent pickup.**\n**Status: BLOCKED on Discussion Item D-003 (package manager standardization decision).**\n\n**Problem:** HELiXiR uses pnpm while HELiX and BST use npm. This creates contributor friction and blocks potential monorepo unification.\n\n**Action (once decision is made):** HELiXiR already uses pnpm. If pnpm is chosen as the standard, this repo is already compliant — just ensure CI and docs are consistent. If npm is chosen, migrate away from pnpm.\n\n**Jake must decide (D-003):** npm vs pnpm as the org-wide standard. HELiXiR currently uses pnpm.\n\n**Acceptance Criteria:**\n- [ ] Repo uses the standardized package manager\n- [ ] CI/CD updated to match\n- [ ] Documentation reflects the standard",
+      "timestamp": "2026-03-12T00:54:53.747Z",
+      "source": "initial"
+    },
+    {
+      "description": "## Context\n\nJake has decided: **pnpm is the org-wide standard.** Helixir is already using pnpm (lockfile, CI workflows, workspace), but the setup is incomplete compared to the helix reference implementation. This feature standardizes helixir's pnpm monorepo configuration to match the org pattern.\n\n## Reference: Helix pnpm Setup (gold standard)\n- `packageManager: \"pnpm@9.15.9\"` in package.json (exact pin)\n- `.npmrc`: `shamefully-hoist=true` (required for Lit/Vite compatibility)\n- `pnpm-workspace.yaml`: `apps/*`, `apps/mcp-servers/*`, `packages/*`\n- `turbo.json`: Full build orchestration with task dependencies, output caching\n- CI: `pnpm/action-setup@v4` → `actions/setup-node@v4` with `cache: 'pnpm'` → `pnpm install --frozen-lockfile`\n- Changesets: linked packages, ignored non-publishable packages\n\n## Current Helixir State (gaps identified)\n- **Already using pnpm** with pnpm-lock.yaml and pnpm-workspace.yaml\n- **Missing `packageManager` field** in package.json — must pin exact version (use `pnpm@9.15.9` to match helix)\n- **`.npmrc` has `engine-strict=true`** but missing `shamefully-hoist=true` — add it (helix needs it for Lit; helixir may need it for similar web component tooling)\n- **No turbo.json** — add Turborepo for build orchestration across packages/core and packages/github-action\n- **CI workflows specify `version: '>=9'`** — should infer from packageManager field instead (remove explicit version, let pnpm/action-setup@v4 read packageManager)\n- **pnpm-workspace.yaml includes root (`.`)** — this was re-added after a changesets issue; verify it's still needed and align with helix pattern\n- **No corepack enable** — consider adding to CI for packageManager enforcement\n\n## Changes Required\n\n### 1. package.json\n- Add `\"packageManager\": \"pnpm@9.15.9\"`\n- Keep existing `\"engines\": { \"node\": \">=20.0.0\", \"pnpm\": \">=9\" }`\n- Keep existing `\"pnpm\": { \"overrides\": {...} }` section\n\n### 2. .npmrc\n- Add `shamefully-hoist=true` alongside existing `engine-strict=true`\n\n### 3. turbo.json (new file)\nCreate turbo.json with task graph for the monorepo:\n```json\n{\n  \"$schema\": \"https://turbo.build/schema.json\",\n  \"globalDependencies\": [\"**/.env.*local\"],\n  \"tasks\": {\n    \"build\": { \"dependsOn\": [\"^build\"], \"outputs\": [\"dist/**\"] },\n    \"test\": { \"dependsOn\": [\"build\"] },\n    \"lint\": {},\n    \"type-check\": { \"dependsOn\": [\"^build\"] }\n  }\n}\n```\nAdd `turbo` as a devDependency.\n\n### 4. CI Workflows (all 8 files in .github/workflows/)\n- Remove explicit `version:` from `pnpm/action-setup@v4` — let it read `packageManager` field\n- Ensure all workflows use `pnpm install --frozen-lockfile`\n- Verify `cache: 'pnpm'` is set on all `actions/setup-node@v4` steps\n\n### 5. pnpm-workspace.yaml\n- Evaluate whether root `.` entry is still needed for changesets\n- If not needed, remove it to match helix pattern (helix doesn't include root)\n\n### 6. Root scripts (package.json)\n- Update build/test/lint scripts to use `turbo run` where appropriate\n- Add `turbo` to devDependencies\n\n## History Note\npnpm workspace was removed in commit e282c55 (Mar 12, 2026) due to changesets resolution issues, then restored in commit 5a7d40d. The root `.` entry in pnpm-workspace.yaml is critical for changesets to find the root package — test carefully before removing.\n\n## Acceptance Criteria\n- [ ] `packageManager` field pinned in package.json\n- [ ] `.npmrc` includes `shamefully-hoist=true`\n- [ ] turbo.json created with correct task graph\n- [ ] `turbo` added as devDependency\n- [ ] CI workflows infer pnpm version from packageManager field\n- [ ] All CI checks pass (build, test, lint, format, cem-validate, security)\n- [ ] `pnpm install --frozen-lockfile` works cleanly\n- [ ] Changesets still resolve the root package correctly",
+      "timestamp": "2026-03-19T17:34:15.667Z",
+      "source": "edit"
+    }
+  ],
+  "createdAt": "2026-03-12T00:54:53.747Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-12T00:54:53.747Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "blocked",
+      "timestamp": "2026-03-12T23:50:22.439Z",
+      "reason": "Blocked on D-003: Jake must decide npm vs pnpm as org-wide standard. Note: pnpm workspace was removed in v0.2.0 release work, so this decision may already be partially made."
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-19T17:34:15.667Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in-progress",
+      "timestamp": "2026-03-19T17:34:21.068Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-19T18:08:33.799Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-19T18:12:49.285Z",
+      "reason": "Max agent retries exceeded (3)"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-19T18:16:49.057Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-19T18:20:05.394Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-19T18:20:06.163Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "done",
+      "timestamp": "2026-03-19T18:21:18.184Z"
+    }
+  ],
+  "featureType": "code",
+  "statusChangeReason": "Max agent retries exceeded (3)",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-19T18:20:06.163Z",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max agent retries exceeded (3)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-19T18:12:49.285Z"
+  },
+  "costUsd": 2.1595075,
+  "lastSessionId": "5cd155cd-7e20-4b00-b061-071130537787",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/98",
+  "prNumber": 98,
+  "prCreatedAt": "2026-03-19T18:16:47.590Z",
+  "reviewStartedAt": "2026-03-19T18:16:49.507Z",
+  "prTrackedSince": "2026-03-19T18:16:49.077Z",
+  "prLastPolledAt": "2026-03-19T20:29:09.592Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 1**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@package.json`:\n- Around line 42-45: CI workflows still invoke individual scripts (build,\ntest:coverage, lint, type-check) instead of the new Turbo orchestration scripts\n(build:all, test:all, lint:all, type-check:all), so CI and local runs behave\ndifferently; update each workflow job that currently runs the direct scripts to\ncall the corresponding turbo entrypoint (replace usages of \"build\" ->\n\"build:all\", \"test:coverage\" -> \"test:all\" or \"test:all\" as appropriate, \"lint\"\n-> \"lint:all\", \"type-check\" -> \"type-check:all\") and ensure publish workflow\ninvokes \"build:all\" before publish, keeping step names and environment/config\nintact.\n```\n\n</details>\n\n---\n\n<details>\n<summary>ℹ️ Review info</summary>\n\n<details>\n<summary>⚙️ Run configuration</summary>\n\n**Configuration used**: Path: .coderabbit.yaml\n\n**Review profile**: ASSERTIVE\n\n**Plan**: Pro\n\n**Run ID**: `6362dddf-3525-4a6a-aea8-f411d364c997`\n\n</details>\n\n<details>\n<summary>📥 Commits</summary>\n\nReviewing files that changed from the base of the PR and between 553aefe9677554d966c7845c6fdbb8311179e5be and abe5af0500150a52d26ddbabdedf420addb42447.\n\n</details>\n\n<details>\n<summary>⛔ Files ignored due to path filters (3)</summary>\n\n* `.turbo/turbo-build.log` is excluded by `!**/*.log`\n* `packages/github-action/.turbo/turbo-build.log` is excluded by `!**/*.log`\n* `pnpm-lock.yaml` is excluded by `!**/pnpm-lock.yaml`\n\n</details>\n\n<details>\n<summary>📒 Files selected for processing (10)</summary>\n\n* `.github/workflows/build.yml`\n* `.github/workflows/cem-validate.yml`\n* `.github/workflows/format.yml`\n* `.github/workflows/lint.yml`\n* `.github/workflows/publish.yml`\n* `.github/workflows/security.yml`\n* `.github/workflows/test.yml`\n* `.npmrc`\n* `package.json`\n* `turbo.json`\n\n</details>\n\n<details>\n<summary>💤 Fi",
+  "prIterationCount": 1,
+  "reviewRemediationCount": 1,
+  "remediationCycleCount": 1,
+  "workItemState": "in_progress",
+  "executionHistory": [
+    {
+      "id": "a69e3acf-e7f1-4fce-b915-a8a9c71513cf",
+      "startedAt": "2026-03-19T18:20:05.421Z",
+      "completedAt": "2026-03-19T18:20:53.047Z",
+      "durationMs": 47627,
+      "costUsd": 0.2856224999999999,
+      "model": "claude-opus-4-6",
+      "success": true,
+      "trigger": "retry"
+    }
+  ],
+  "prMergedAt": "2026-03-19T18:21:18.179Z",
+  "completedAt": "2026-03-19T18:21:18.184Z",
+  "threadFeedback": [
+    {
+      "threadId": "PRRT_kwDORa2Z0851ijUX",
+      "status": "denied",
+      "agentReasoning": "This feedback misunderstands the monorepo structure and the intentional design decision documented in the PR summary.\n\n1. **Root build already covers everything**: The root `tsconfig.json` includes both `src/**/*` and `packages/core/src/**/*`. Running `pnpm run build` (which calls `tsc`) already compiles all TypeScript in the monorepo. Using `build:all` via turbo would add unnecessary overhead (turbo daemon startup, cache management) for no additional coverage.\n\n2. **test:coverage cannot be replaced by test:all**: CI runs `test:coverage` (vitest with coverage reporting). The turbo `test:all` script runs `turbo run test` which maps to plain `vitest run` without coverage. Switching would lose coverage reporting in CI.\n\n3. **publish.yml must build the root package specifically**: The publish workflow builds the root package before running changesets publish. Using `build:all` would unnecessarily build the github-action package and add turbo overhead to the publish pipeline.\n\n4. **Turbo :all scripts are developer convenience**: They exist for local development when you want turbo's caching and parallel orchestration. CI workflows are intentionally running direct commands because they need specific behavior (coverage, targeted builds) and don't benefit from turbo caching (clean CI environments).\n\n5. **The \"inconsistency\" is by design**: This was explicitly documented as a deviation in the PR description. Root is a workspace member (required for changesets), so turbo wrapping root scripts causes infinite recursion. The `:all` variants are additive convenience scripts, not replacements.",
+      "resolvedAt": "2026-03-19T18:21:18.280Z"
+    }
+  ],
+  "remediationHistory": []
+}

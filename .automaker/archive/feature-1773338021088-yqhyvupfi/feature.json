@@ -1,0 +1,59 @@
+{
+  "category": "Uncategorized",
+  "description": "## Problem\n\nUnformatted code is reaching GitHub and failing CI checks. The root cause: pre-commit hooks (lint-staged, prettier) are bypassed in automated workflows via `HUSKY=0` (server) and `core.hooksPath=/dev/null` (agents). The pre-push hook is the last line of defense — but if it only *checks* formatting without *fixing* it, code still lands unformatted.\n\n## Solution: Auto-format + auto-commit in the pre-push hook\n\nThe fix is to change the format gate in your pre-push script from **detect-only** to **auto-fix + auto-commit**. This was implemented in Helix (`/Volumes/Development/booked/helix`) and it guarantees formatted code on every push regardless of how the original commit was made.\n\n### Reference Implementation (from `helix/scripts/pre-push-check.sh`)\n\n```bash\n# Gate 2: Auto-format (fix and commit any formatting drift)\necho \"Auto-formatting...\"\nnpm run format --silent 2>/dev/null || true\nif ! git diff --quiet; then\n  echo \"Formatting applied — committing auto-format changes\"\n  git add -u\n  git -c core.hooksPath=/dev/null commit -m \"chore: auto-format\"\n  echo \"Format committed\"\nelse\n  echo \"Format already clean\"\nfi\n```\n\n### What to adapt for your project\n\n1. **Format command**: Replace `npm run format` with whatever your formatter command is (e.g., `pnpm run format`, `npx prettier --write .`, `npm run lint:fix`, etc.)\n2. **Hook location**: If you don't have a `scripts/pre-push-check.sh`, find your `.husky/pre-push` hook or equivalent and add this block there\n3. **Commit message**: `chore: auto-format` is fine as-is, but update to match your commit convention\n4. **`git add -u`**: This only stages *modified* tracked files — if your formatter creates new files, use `git add .` instead\n5. **`core.hooksPath=/dev/null`**: This bypasses the pre-commit hook on the auto-format commit to avoid infinite loops — keep this\n\n### Why not just fix the pre-commit hook?\n\nThe pre-commit hook IS your first line of defense, but it's bypassed in:\n- Automated workflows (`HUSKY=0` env var)\n- Agent commits (`-c core.hooksPath=/dev/null`)\n- Direct `git commit --no-verify`\n\nThe pre-push hook runs in more contexts and is harder to accidentally bypass. Making it auto-fix (not just detect) means unformatted code *cannot* reach GitHub.\n\n## Acceptance Criteria\n\n- [ ] Pre-push hook runs formatter automatically before push\n- [ ] If formatter makes changes, they are committed automatically\n- [ ] Push proceeds with formatted code\n- [ ] No CI failures due to formatting drift\n",
+  "title": "Enforce auto-format before push (prevent unformatted code reaching GitHub)",
+  "status": "done",
+  "complexity": "small",
+  "assignee": null,
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "2ca524e4-9721-471c-b0bc-b987a74f298b",
+  "id": "feature-1773338021088-yqhyvupfi",
+  "branchName": "feature/enforce-auto-format-before-push-prevent",
+  "descriptionHistory": [
+    {
+      "description": "## Problem\n\nUnformatted code is reaching GitHub and failing CI checks. The root cause: pre-commit hooks (lint-staged, prettier) are bypassed in automated workflows via `HUSKY=0` (server) and `core.hooksPath=/dev/null` (agents). The pre-push hook is the last line of defense — but if it only *checks* formatting without *fixing* it, code still lands unformatted.\n\n## Solution: Auto-format + auto-commit in the pre-push hook\n\nThe fix is to change the format gate in your pre-push script from **detect-only** to **auto-fix + auto-commit**. This was implemented in Helix (`/Volumes/Development/booked/helix`) and it guarantees formatted code on every push regardless of how the original commit was made.\n\n### Reference Implementation (from `helix/scripts/pre-push-check.sh`)\n\n```bash\n# Gate 2: Auto-format (fix and commit any formatting drift)\necho \"Auto-formatting...\"\nnpm run format --silent 2>/dev/null || true\nif ! git diff --quiet; then\n  echo \"Formatting applied — committing auto-format changes\"\n  git add -u\n  git -c core.hooksPath=/dev/null commit -m \"chore: auto-format\"\n  echo \"Format committed\"\nelse\n  echo \"Format already clean\"\nfi\n```\n\n### What to adapt for your project\n\n1. **Format command**: Replace `npm run format` with whatever your formatter command is (e.g., `pnpm run format`, `npx prettier --write .`, `npm run lint:fix`, etc.)\n2. **Hook location**: If you don't have a `scripts/pre-push-check.sh`, find your `.husky/pre-push` hook or equivalent and add this block there\n3. **Commit message**: `chore: auto-format` is fine as-is, but update to match your commit convention\n4. **`git add -u`**: This only stages *modified* tracked files — if your formatter creates new files, use `git add .` instead\n5. **`core.hooksPath=/dev/null`**: This bypasses the pre-commit hook on the auto-format commit to avoid infinite loops — keep this\n\n### Why not just fix the pre-commit hook?\n\nThe pre-commit hook IS your first line of defense, but it's bypassed in:\n- Automated workflows (`HUSKY=0` env var)\n- Agent commits (`-c core.hooksPath=/dev/null`)\n- Direct `git commit --no-verify`\n\nThe pre-push hook runs in more contexts and is harder to accidentally bypass. Making it auto-fix (not just detect) means unformatted code *cannot* reach GitHub.\n\n## Acceptance Criteria\n\n- [ ] Pre-push hook runs formatter automatically before push\n- [ ] If formatter makes changes, they are committed automatically\n- [ ] Push proceeds with formatted code\n- [ ] No CI failures due to formatting drift\n",
+      "timestamp": "2026-03-12T17:53:41.088Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-12T17:53:41.089Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-12T17:53:41.089Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T23:53:59.786Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T23:54:46.120Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-13T00:27:08.486Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-12T23:54:05.006Z",
+  "costUsd": 0.34177225,
+  "lastSessionId": "1687904d-f765-4248-919b-c81f1bc74cdf",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/56",
+  "prNumber": 56,
+  "prCreatedAt": "2026-03-12T23:54:45.474Z",
+  "reviewStartedAt": "2026-03-12T23:54:46.120Z",
+  "prTrackedSince": "2026-03-12T23:54:46.122Z",
+  "prLastPolledAt": "2026-03-13T00:29:46.235Z",
+  "prMergedAt": "2026-03-13T00:26:56Z",
+  "completedAt": "2026-03-13T00:27:08.486Z"
+}

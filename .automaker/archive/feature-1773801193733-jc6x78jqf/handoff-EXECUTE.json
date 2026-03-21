@@ -1,0 +1,105 @@
+{
+  "phase": "EXECUTE",
+  "summary": "Agent completed execution. PR: #87",
+  "discoveries": [],
+  "modifiedFiles": [],
+  "outstandingQuestions": [],
+  "scopeLimits": [],
+  "testCoverage": "Tests mentioned in output",
+  "verdict": "APPROVE",
+  "createdAt": "2026-03-18T03:44:38.331Z",
+  "structuredPlan": {
+    "goal": "Create a library-wide naming convention consistency analyzer that scores component adherence to library-wide naming patterns for events, properties, CSS custom properties, and attributes.",
+    "acceptanceCriteria": [
+      {
+        "description": "Library-wide prefix detection works across 5+ libraries (helix, Material Web, Carbon, Ionic, Shoelace)",
+        "verifyCommand": "npm test -- naming-consistency.test.ts --grep 'prefix detection'"
+      },
+      {
+        "description": "Per-component scoring reflects adherence to library conventions",
+        "verifyCommand": "npm test -- naming-consistency.test.ts --grep 'per-component'"
+      },
+      {
+        "description": "Event, property, CSS, and attribute naming all scored with correct point allocations"
+      },
+      {
+        "description": "Graceful handling of libraries with no clear prefix pattern",
+        "verifyCommand": "npm test -- naming-consistency.test.ts --grep 'no prefix'"
+      },
+      {
+        "description": "Analyzer registered as dimension 14 in dimensions.ts with weight 5 and tier 'important'",
+        "verifyCommand": "grep -A2 'dimension.*14\\|namingConsistency' packages/core/src/handlers/dimensions.ts"
+      },
+      {
+        "description": "Tests cover real library CEMs and deliberately inconsistent mock CEMs",
+        "verifyCommand": "npm test -- naming-consistency.test.ts"
+      },
+      {
+        "description": "All existing tests pass",
+        "verifyCommand": "npm test"
+      }
+    ],
+    "tasks": [
+      {
+        "title": "Implement naming-consistency.ts analyzer core",
+        "description": "Create packages/core/src/handlers/analyzers/naming-consistency.ts with methods for: detectLibraryEventPrefix(), scoreEventPrefixCoherence(), scorePropertyNamingConsistency(), scoreCSSCustomPropertyPrefixing(), scoreAttributePropertyCoherence(). Implement library-level prefix detection that analyzes all components before per-component scoring.",
+        "files": [
+          "packages/core/src/handlers/analyzers/naming-consistency.ts"
+        ],
+        "verifyCommand": "npm run build -- packages/core/src/handlers/analyzers/naming-consistency.ts && grep -c 'scoreEventPrefixCoherence\\|scorePropertyNaming\\|scoreCSSCustomProperty\\|scoreAttributeProperty' packages/core/src/handlers/analyzers/naming-consistency.ts"
+      },
+      {
+        "title": "Register analyzer as dimension 14",
+        "description": "Add naming-consistency analyzer to dimensions.ts as dimension 14 with weight 5, tier 'important', and confidence 'verified'. Ensure it appears in the dimensions export.",
+        "files": [
+          "packages/core/src/handlers/dimensions.ts"
+        ],
+        "verifyCommand": "grep -n 'namingConsistency\\|naming.*consistency' packages/core/src/handlers/dimensions.ts | head -5"
+      },
+      {
+        "title": "Wire analyzer into health.ts pipeline",
+        "description": "Import and integrate the naming-consistency analyzer into the health.ts scoring pipeline. Call it with the full library CEM to enable library-wide prefix detection, then apply per-component scoring.",
+        "files": [
+          "packages/core/src/handlers/health.ts"
+        ],
+        "verifyCommand": "grep -n 'namingConsistency\\|naming.*consistency' packages/core/src/handlers/health.ts"
+      },
+      {
+        "title": "Create test suite with multi-library coverage",
+        "description": "Develop tests/handlers/naming-consistency.test.ts covering: prefix detection for helix (hx-), Material Web (md-), Carbon (bx-), Ionic (ion-), and Shoelace (sl-); per-component scoring validation; edge cases (no events, no CSS properties); deliberately inconsistent mock CEMs; and confidence verification.",
+        "files": [
+          "tests/handlers/naming-consistency.test.ts"
+        ],
+        "verifyCommand": "npm test -- naming-consistency.test.ts"
+      },
+      {
+        "title": "Verify integration and no regressions",
+        "description": "Run full test suite to confirm naming-consistency analyzer integrates correctly, all acceptance criteria pass, and no existing tests are broken.",
+        "files": [],
+        "verifyCommand": "npm test 2>&1 | tail -10"
+      }
+    ],
+    "deviationRules": [
+      {
+        "condition": "Library has no clear naming prefix pattern across components",
+        "action": "Detect dominant pattern or fall back to consistency-only scoring; return reduced confidence if pattern ambiguous"
+      },
+      {
+        "condition": "Component has no events",
+        "action": "Exclude component from event prefix coherence denominator; do not penalize for missing events"
+      },
+      {
+        "condition": "Component has no CSS custom properties",
+        "action": "Exclude component from CSS custom property prefix denominator; do not penalize for missing CSS properties"
+      },
+      {
+        "condition": "Attribute-property mapping has Web Component standard deviations (e.g., boolean attributes)",
+        "action": "Apply lenient scoring rules for standard Web Component attribute patterns"
+      },
+      {
+        "condition": "Library uses non-kebab-case attributes or non-camelCase properties",
+        "action": "Skip attribute-property coherence scoring for that library with low confidence flag"
+      }
+    ]
+  }
+}

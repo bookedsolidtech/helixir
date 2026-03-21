@@ -1,0 +1,59 @@
+{
+  "category": "Uncategorized",
+  "description": "**Source:** CMO report P2-001 (P2 — MEDIUM, fix within 60 days)\n**Assigned to Jake for review before agent pickup.**\n\n**Problem:** GitHub README is the first touchpoint for most developers. Current README lacks visual polish and quick-start clarity needed to convert visitors into users.\n\n**Action:**\n1. Add hero banner/logo at top\n2. Add badge row (npm version, build status, license, bundle size)\n3. Add 1-command quick-start install (`npm install helixir`)\n4. Add screenshot or GIF showing the tooling in action\n5. Add clear link to documentation\n6. Add \"Why HELiXiR\" section with 3-4 bullet differentiators\n\n**Acceptance Criteria:**\n- [ ] README has visual hierarchy (banner, badges, quick-start, docs link)\n- [ ] Quick-start is copy-paste functional (tested)\n- [ ] Links to documentation work\n- [ ] Badge row reflects real npm package data",
+  "title": "P2-001: Optimize HELiXiR GitHub README as a landing page",
+  "status": "done",
+  "complexity": "medium",
+  "assignee": null,
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "9653f063-770e-4642-b750-64c44b87bad6",
+  "id": "feature-1773276882771-1x0vqerg0",
+  "branchName": "feature/p2-001-optimize-helixir-github-readme",
+  "descriptionHistory": [
+    {
+      "description": "**Source:** CMO report P2-001 (P2 — MEDIUM, fix within 60 days)\n**Assigned to Jake for review before agent pickup.**\n\n**Problem:** GitHub README is the first touchpoint for most developers. Current README lacks visual polish and quick-start clarity needed to convert visitors into users.\n\n**Action:**\n1. Add hero banner/logo at top\n2. Add badge row (npm version, build status, license, bundle size)\n3. Add 1-command quick-start install (`npm install helixir`)\n4. Add screenshot or GIF showing the tooling in action\n5. Add clear link to documentation\n6. Add \"Why HELiXiR\" section with 3-4 bullet differentiators\n\n**Acceptance Criteria:**\n- [ ] README has visual hierarchy (banner, badges, quick-start, docs link)\n- [ ] Quick-start is copy-paste functional (tested)\n- [ ] Links to documentation work\n- [ ] Badge row reflects real npm package data",
+      "timestamp": "2026-03-12T00:54:42.772Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-12T00:54:42.772Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-12T00:54:42.772Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T23:52:06.813Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T23:53:54.247Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-13T00:27:08.484Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-12T23:52:09.795Z",
+  "costUsd": 0.5413605,
+  "lastSessionId": "2494a26f-275c-43a1-88e7-4b23ffd575ed",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/55",
+  "prNumber": 55,
+  "prCreatedAt": "2026-03-12T23:53:53.466Z",
+  "reviewStartedAt": "2026-03-12T23:53:54.247Z",
+  "prTrackedSince": "2026-03-12T23:53:54.248Z",
+  "prLastPolledAt": "2026-03-13T00:29:45.804Z",
+  "prMergedAt": "2026-03-13T00:26:54Z",
+  "completedAt": "2026-03-13T00:27:08.484Z"
+}

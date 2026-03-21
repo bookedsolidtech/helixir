@@ -325,3 +325,44 @@ describe('runStylingPreflight — antiPatterns', () => {
     );
   });
 });
+
+// ─── Inline Fix Suggestions ─────────────────────────────────────────────────
+
+describe('runStylingPreflight — inline fixes', () => {
+  it('shadow DOM issue has fix with ::part() suggestion', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button .inner { color: red; }',
+      meta: buttonMeta,
+    });
+    const shadowIssue = result.issues.find((i) => i.category === 'shadowDom');
+    expect(shadowIssue?.fix).toBeDefined();
+    expect(shadowIssue?.fix?.suggestion).toContain('::part(');
+  });
+
+  it('!important issue has fix removing !important', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button { color: red !important; }',
+      meta: buttonMeta,
+    });
+    const specIssue = result.issues.find((i) => i.category === 'specificity');
+    expect(specIssue?.fix).toBeDefined();
+    expect(specIssue?.fix?.suggestion).not.toContain('!important');
+  });
+
+  it('clean CSS has no issues and no fixes', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button::part(base) { --hx-button-bg: var(--theme, blue); }',
+      meta: buttonMeta,
+    });
+    expect(result.issues).toHaveLength(0);
+  });
+
+  it('fix includes explanation', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button .inner { color: red; }',
+      meta: buttonMeta,
+    });
+    const shadowIssue = result.issues.find((i) => i.category === 'shadowDom');
+    expect(shadowIssue?.fix?.explanation).toBeTruthy();
+  });
+});

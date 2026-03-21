@@ -1,0 +1,58 @@
+{
+  "category": "Uncategorized",
+  "description": "The release pipeline has failed on every run since v0.1.0 was published. Three fixes are required across two files.\n\n## Root Causes\n\n### 1. OIDC provenance causes 404 on every publish\n`NPM_CONFIG_PROVENANCE: 'true'` was added in PR #31. npm OIDC provenance for unscoped packages requires the package maintainer to link the GitHub repo in npmjs.com → Package Settings → Provenance. That setup was never done. Result: every release fails with:\n```\nOIDC token exchange with the npm registry failed: 404 OIDC token exchange error - package not found\n```\n**Fix:** Remove `NPM_CONFIG_PROVENANCE: 'true'` from `.github/workflows/release.yml`. Provenance can be re-enabled after the npm trust relationship is configured.\n\n### 2. `prepublishOnly` runs build + tests during publish\n`package.json` has `\"prepublishOnly\": \"pnpm run build && pnpm test\"`. This fires during `semantic-release`'s publish step, re-running tests in the release environment. If any test flakes, the release dies after the version bump but before the npm push — leaving the repo in a broken half-released state. Helix explicitly avoids re-running tests in their publish pipeline.\n**Fix:** Change `prepublishOnly` to `\"pnpm run build\"` only (remove `&& pnpm test`).\n\n### 3. No explicit build step in release workflow\nThe workflow relies entirely on `prepublishOnly` to produce build artifacts. If that script is ever skipped (e.g., `--ignore-scripts`), there are no artifacts to publish.\n**Fix:** Add an explicit `- name: Build` step (`pnpm run build`) in `.github/workflows/release.yml` before the Release step.\n\n## Files to Change\n\n### `.github/workflows/release.yml`\n1. Add build step after `pnpm install`:\n```yaml\n      - name: Build\n        run: pnpm run build\n```\n2. Remove `NPM_CONFIG_PROVENANCE: 'true'` from the Release step env block.\n\n### `package.json`\nChange line:\n```json\n\"prepublishOnly\": \"pnpm run build && pnpm test\",\n```\nTo:\n```json\n\"prepublishOnly\": \"pnpm run build\",\n```\n\n## Acceptance Criteria\n- [ ] `.github/workflows/release.yml` has an explicit `Build` step before `Release`\n- [ ] `NPM_CONFIG_PROVENANCE: 'true'` is removed from release.yml\n- [ ] `package.json` `prepublishOnly` only runs build (not tests)\n- [ ] `pnpm run format:check` passes on all changed files\n- [ ] No other files modified",
+  "title": "fix: harden release pipeline for reliable unattended npm publish",
+  "status": "done",
+  "complexity": "small",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "8fc10384-6ae4-45a0-8450-114eb1041305",
+  "id": "feature-1773339119651-1xjcrl511",
+  "branchName": "feature/fix-harden-release-pipeline-for",
+  "descriptionHistory": [
+    {
+      "description": "The release pipeline has failed on every run since v0.1.0 was published. Three fixes are required across two files.\n\n## Root Causes\n\n### 1. OIDC provenance causes 404 on every publish\n`NPM_CONFIG_PROVENANCE: 'true'` was added in PR #31. npm OIDC provenance for unscoped packages requires the package maintainer to link the GitHub repo in npmjs.com → Package Settings → Provenance. That setup was never done. Result: every release fails with:\n```\nOIDC token exchange with the npm registry failed: 404 OIDC token exchange error - package not found\n```\n**Fix:** Remove `NPM_CONFIG_PROVENANCE: 'true'` from `.github/workflows/release.yml`. Provenance can be re-enabled after the npm trust relationship is configured.\n\n### 2. `prepublishOnly` runs build + tests during publish\n`package.json` has `\"prepublishOnly\": \"pnpm run build && pnpm test\"`. This fires during `semantic-release`'s publish step, re-running tests in the release environment. If any test flakes, the release dies after the version bump but before the npm push — leaving the repo in a broken half-released state. Helix explicitly avoids re-running tests in their publish pipeline.\n**Fix:** Change `prepublishOnly` to `\"pnpm run build\"` only (remove `&& pnpm test`).\n\n### 3. No explicit build step in release workflow\nThe workflow relies entirely on `prepublishOnly` to produce build artifacts. If that script is ever skipped (e.g., `--ignore-scripts`), there are no artifacts to publish.\n**Fix:** Add an explicit `- name: Build` step (`pnpm run build`) in `.github/workflows/release.yml` before the Release step.\n\n## Files to Change\n\n### `.github/workflows/release.yml`\n1. Add build step after `pnpm install`:\n```yaml\n      - name: Build\n        run: pnpm run build\n```\n2. Remove `NPM_CONFIG_PROVENANCE: 'true'` from the Release step env block.\n\n### `package.json`\nChange line:\n```json\n\"prepublishOnly\": \"pnpm run build && pnpm test\",\n```\nTo:\n```json\n\"prepublishOnly\": \"pnpm run build\",\n```\n\n## Acceptance Criteria\n- [ ] `.github/workflows/release.yml` has an explicit `Build` step before `Release`\n- [ ] `NPM_CONFIG_PROVENANCE: 'true'` is removed from release.yml\n- [ ] `package.json` `prepublishOnly` only runs build (not tests)\n- [ ] `pnpm run format:check` passes on all changed files\n- [ ] No other files modified",
+      "timestamp": "2026-03-12T18:11:59.651Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-12T18:11:59.651Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "in-progress",
+      "timestamp": "2026-03-12T18:11:59.651Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T18:12:38.384Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T18:13:52.297Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-12T18:15:58.062Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-12T18:12:41.041Z",
+  "costUsd": 0.259131,
+  "lastSessionId": "307dbeed-c543-43f0-b73b-3451cf00c001",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/41",
+  "prNumber": 41,
+  "prCreatedAt": "2026-03-12T18:13:51.538Z",
+  "reviewStartedAt": "2026-03-12T18:13:52.297Z",
+  "prTrackedSince": "2026-03-12T18:13:52.300Z",
+  "prLastPolledAt": "2026-03-12T21:34:27.154Z",
+  "prMergedAt": "2026-03-12T18:15:48Z",
+  "completedAt": "2026-03-12T18:15:58.062Z"
+}

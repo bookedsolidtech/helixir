@@ -1,0 +1,87 @@
+{
+  "category": "Uncategorized",
+  "description": "In `packages/core/src/handlers/tokens.ts`, `parseTokens` does not validate the structure of the token file. Malformed token files (wrong shape, missing required fields) cause silent data loss or confusing downstream errors.\n\n**Fix:** Define a Zod schema for the W3C DTCG token format and run `TokenSchema.parse(...)` on the loaded JSON before returning. Throw a structured `MCPError(INVALID_INPUT, ...)` if validation fails.\n\n**Acceptance criteria:**\n- A Zod schema validates the token file structure\n- Malformed token file produces a clear `[INVALID_INPUT]` error with a helpful message\n- Valid token files continue to parse correctly\n- Tests cover the malformed-file error path",
+  "title": "fix: validate design token files against a Zod schema",
+  "status": "done",
+  "complexity": "small",
+  "priority": 4,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "7cf51458-d732-4e71-af55-20121aaa2a48",
+  "id": "feature-1772670375494-sgp75plnz",
+  "branchName": "feature/fix-validate-design-token-files-against",
+  "descriptionHistory": [
+    {
+      "description": "In `packages/core/src/handlers/tokens.ts`, `parseTokens` does not validate the structure of the token file. Malformed token files (wrong shape, missing required fields) cause silent data loss or confusing downstream errors.\n\n**Fix:** Define a Zod schema for the W3C DTCG token format and run `TokenSchema.parse(...)` on the loaded JSON before returning. Throw a structured `MCPError(INVALID_INPUT, ...)` if validation fails.\n\n**Acceptance criteria:**\n- A Zod schema validates the token file structure\n- Malformed token file produces a clear `[INVALID_INPUT]` error with a helpful message\n- Valid token files continue to parse correctly\n- Tests cover the malformed-file error path",
+      "timestamp": "2026-03-05T00:26:15.495Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-05T00:26:15.495Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-05T00:26:15.495Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T06:14:48.945Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T06:18:11.285Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-12T06:22:44.769Z",
+      "reason": "Max remediation cycles exceeded (4)"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-12T06:23:04.617Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-12T18:05:57.792Z"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [
+    "feature-1772670339649-4zudcnl72"
+  ],
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-12T06:14:54.350Z",
+  "costUsd": 0.52522375,
+  "lastSessionId": "86a97f55-ea33-4d59-9535-5cee9ebbb0fb",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/39",
+  "prNumber": 39,
+  "prCreatedAt": "2026-03-12T06:18:10.498Z",
+  "reviewStartedAt": "2026-03-12T06:18:11.285Z",
+  "prTrackedSince": "2026-03-12T06:18:11.286Z",
+  "prLastPolledAt": "2026-03-12T21:34:23.701Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 2**\n\n> [!CAUTION]\n> Some comments are outside the diff and can’t be posted inline due to platform limitations.\n> \n> \n> \n> <details>\n> <summary>⚠️ Outside diff range comments (1)</summary><blockquote>\n> \n> <details>\n> <summary>packages/core/src/handlers/tokens.ts (1)</summary><blockquote>\n> \n> `78-85`: _🧹 Nitpick_ | _🔵 Trivial_\n> \n> **Consider removing the `[INVALID_INPUT]` prefix from the error message.**\n> \n> The category is already conveyed via `ErrorCategory.INVALID_INPUT`. Including it in the message creates redundancy and couples the message format to the category enum. Error handlers that need the category can access `mcpError.category` directly.\n> \n> <details>\n> <summary>♻️ Suggested simplification</summary>\n> \n> ```diff\n>      throw new MCPError(\n> -      `[INVALID_INPUT] Tokens file has invalid structure: ${filePath} — ${issues}`,\n> +      `Tokens file has invalid structure: ${filePath} — ${issues}`,\n>        ErrorCategory.INVALID_INPUT,\n>      );\n> ```\n> </details>\n> \n> <details>\n> <summary>🤖 Prompt for AI Agents</summary>\n> \n> ```\n> Verify each finding against the current code and only fix it if needed.\n> \n> In `@packages/core/src/handlers/tokens.ts` around lines 78 - 85, Remove the\n> redundant \"[INVALID_INPUT]\" prefix from the thrown MCPError message in the\n> TokenFileSchema validation block: after TokenFileSchema.safeParse(parsed) when\n> !validated.success, build the error message using only the filePath and the\n> issues string (the variable issues derived from validated.error.issues) and\n> throw new MCPError with that message and ErrorCategory.INVALID_INPUT as before;\n> keep using MCPError and ErrorCategory.INVALID_INPUT but avoid coupling the\n> textual message to the enum value.\n> ```\n> \n> </details>\n> \n> </blockquote></details>\n> \n> </blockquote></details>\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if ne",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1,
+  "statusChangeReason": "Max remediation cycles exceeded (4)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max remediation cycles exceeded (4)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-12T06:22:44.770Z"
+  },
+  "prMergedAt": "2026-03-12T18:05:44Z",
+  "completedAt": "2026-03-12T18:05:57.792Z"
+}

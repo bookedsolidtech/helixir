@@ -1,0 +1,76 @@
+{
+  "category": "Uncategorized",
+  "description": "**Source:** CLO/CTO report P0-001 (P0 — BLOCKING)\n**Assigned to Jake for review before agent pickup.**\n\n**Problem:** LICENSE file currently reads \"Copyright 2025 Jake Strawn\" — a personal name on a business asset creates ownership ambiguity and weakens IP claims.\n\n**Action:** Update the LICENSE file copyright line to:\n```\nCopyright 2025-2026 Clarity House LLC d/b/a Booked Solid Technology\n```\n\n**Acceptance Criteria:**\n- [ ] LICENSE copyright holder reads \"Clarity House LLC d/b/a Booked Solid Technology\"\n- [ ] Year range is \"2025-2026\"\n- [ ] No other references to personal name as copyright holder exist in the repo",
+  "title": "P0-001: Fix HELiXiR LICENSE copyright holder",
+  "status": "done",
+  "complexity": "small",
+  "assignee": null,
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "af50d79c-baf4-4eda-a4f6-302585e68f56",
+  "id": "feature-1773276834298-7ccaf0fjk",
+  "branchName": "feature/p0-001-fix-helixir-license-copyright",
+  "descriptionHistory": [
+    {
+      "description": "**Source:** CLO/CTO report P0-001 (P0 — BLOCKING)\n**Assigned to Jake for review before agent pickup.**\n\n**Problem:** LICENSE file currently reads \"Copyright 2025 Jake Strawn\" — a personal name on a business asset creates ownership ambiguity and weakens IP claims.\n\n**Action:** Update the LICENSE file copyright line to:\n```\nCopyright 2025-2026 Clarity House LLC d/b/a Booked Solid Technology\n```\n\n**Acceptance Criteria:**\n- [ ] LICENSE copyright holder reads \"Clarity House LLC d/b/a Booked Solid Technology\"\n- [ ] Year range is \"2025-2026\"\n- [ ] No other references to personal name as copyright holder exist in the repo",
+      "timestamp": "2026-03-12T00:53:54.298Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-12T00:53:54.299Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-12T00:53:54.299Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T23:51:25.944Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T23:52:04.150Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-12T23:57:06.167Z",
+      "reason": "Merge failed: Command failed: gh pr merge 53 --squash\nGraphQL: Squash merges are not allowed on this repository. (mergePullRequest)\n"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-12T23:58:37.724Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-12T23:51:28.110Z",
+  "costUsd": 0.32877149999999994,
+  "lastSessionId": "4e85e0c0-f358-4521-9093-22f89a73719b",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/53",
+  "prNumber": 53,
+  "prCreatedAt": "2026-03-12T23:52:03.360Z",
+  "reviewStartedAt": "2026-03-12T23:52:04.150Z",
+  "prTrackedSince": "2026-03-12T23:52:04.153Z",
+  "prLastPolledAt": "2026-03-12T23:56:43.751Z",
+  "statusChangeReason": "Merge failed: Command failed: gh pr merge 53 --squash\nGraphQL: Squash merges are not allowed on this repository. (mergePullRequest)\n",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Merge failed: Command failed: gh pr merge 53 --squash\nGraphQL: Squash merges are not allowed on this repository. (mergePullRequest)\n"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-12T23:57:06.169Z"
+  },
+  "completedAt": "2026-03-12T23:58:37.724Z"
+}

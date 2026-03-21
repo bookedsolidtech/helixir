@@ -1,0 +1,11 @@
+{
+  "phase": "PLAN",
+  "summary": "Feature: feat: Naming Convention Consistency analyzer — library-wide naming pattern scoring\n\n## Context\n\nIndividual component scoring misses library-wide patterns. A well-designed component library has consistent naming: events match component prefix, properties use consistent casing, CSS custom properties use consistent prefixes. Inconsistency is a smell — it makes the library harder to learn.\n\n## Implementation\n\nCreate `packages/core/src/handlers/analyzers/naming-consistency.ts`:\n\n### Key Desi",
+  "discoveries": [],
+  "modifiedFiles": [],
+  "outstandingQuestions": [],
+  "scopeLimits": [],
+  "testCoverage": "N/A — plan phase",
+  "verdict": "APPROVE",
+  "createdAt": "2026-03-18T03:36:31.030Z"
+}

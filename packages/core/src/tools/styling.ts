@@ -28,6 +28,7 @@ import { checkColorContrast } from '../handlers/color-contrast-checker.js';
 import { checkTransitionAnimation } from '../handlers/transition-checker.js';
 import { checkShadowDomJs } from '../handlers/shadow-dom-js-checker.js';
 import { resolveCssApi } from '../handlers/css-api-resolver.js';
+import { runStylingPreflight } from '../handlers/styling-preflight.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -161,6 +162,12 @@ const ValidateComponentCodeArgsSchema = z.object({
 });
 
 const ResolveCssApiArgsSchema = z.object({
+  cssText: z.string(),
+  tagName: z.string(),
+  htmlText: z.string().optional(),
+});
+
+const StylingPreflightArgsSchema = z.object({
   cssText: z.string(),
   tagName: z.string(),
   htmlText: z.string().optional(),
@@ -788,6 +795,35 @@ export const STYLING_TOOL_DEFINITIONS = [
       required: ['cssText', 'tagName'],
     },
   },
+  {
+    name: 'styling_preflight',
+    description:
+      "Single-call styling validation that combines component API discovery, CSS reference resolution, and anti-pattern detection. Returns: the component's full style API surface (parts, tokens, slots), valid/invalid status for every ::part() and token reference, Shadow DOM and theme validation issues, a correct CSS snippet, and a pass/fail verdict. Call this ONCE before finalizing any component CSS to prevent hallucinated part names, invalid tokens, and Shadow DOM mistakes.",
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+        cssText: {
+          type: 'string',
+          description: 'The CSS code to validate against the component API.',
+        },
+        tagName: {
+          type: 'string',
+          description: 'The custom element tag name (e.g. "hx-button").',
+        },
+        htmlText: {
+          type: 'string',
+          description:
+            'Optional HTML code to validate slot attribute references against the component API.',
+        },
+      },
+      required: ['cssText', 'tagName'],
+    },
+  },
 ];
 
 /**
@@ -971,6 +1007,13 @@ export function handleStylingCall(
       const { cssText, tagName, htmlText } = ResolveCssApiArgsSchema.parse(args);
       const meta = parseCem(tagName, cem);
       const result = resolveCssApi(cssText, meta, htmlText);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'styling_preflight') {
+      const { cssText, tagName, htmlText } = StylingPreflightArgsSchema.parse(args);
+      const meta = parseCem(tagName, cem);
+      const result = runStylingPreflight({ css: cssText, html: htmlText, meta });
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

@@ -4,7 +4,7 @@ When writing code that uses web components, follow this workflow to prevent Shad
 
 ## Quick Start: One-Call Validation
 
-After generating any code that uses web components, call `validate_component_code` with your HTML, CSS, and JS. It runs 17 sub-validators in one shot:
+After generating any code that uses web components, call `validate_component_code` with your HTML, CSS, and JS. It runs 20 sub-validators in one shot:
 
 ```
 validate_component_code({
@@ -38,7 +38,7 @@ Run `validate_component_code` (all-in-one) OR individual validators:
 ### CSS Validators
 | Tool | What it catches |
 |---|---|
-| `check_shadow_dom_usage` | 12 patterns: descendant piercing, ::part() misuse (chaining, structural combining, descendant selectors), deprecated /deep/>>>/::deep, ::slotted() in consumer CSS, !important on tokens, display:contents on host, unknown parts, misspelled tokens |
+| `check_shadow_dom_usage` | 15 patterns: descendant piercing, ::part() misuse (chaining, structural combining, descendant selectors), deprecated /deep/>>>/::deep, ::slotted() in consumer CSS + compound/descendant misuse, :host/:host-context() in consumer CSS, !important on tokens, display:contents on host, unknown parts, misspelled tokens |
 | `check_css_vars` | Unknown CSS custom properties, typos |
 | `check_token_fallbacks` | Missing var() fallbacks, hardcoded colors |
 | `check_theme_compatibility` | Dark mode failures, contrast issues |
@@ -46,12 +46,15 @@ Run `validate_component_code` (all-in-one) OR individual validators:
 | `check_layout_patterns` | Display/dimension/position overrides on host elements |
 | `check_css_scope` | Component tokens placed on :root/html/body instead of the component host |
 | `check_css_shorthand` | Risky shorthand + var() combinations (border, background, font, etc.) |
+| `check_color_contrast` | Low-contrast hardcoded color pairs, mixed token/hardcoded sources, low opacity on text |
+| `check_transition_animation` | CSS transitions/animations on component hosts targeting standard properties (won't affect shadow internals) |
 
 ### JavaScript Validators
 | Tool | What it catches |
 |---|---|
 | `check_event_usage` | React onXxx props on custom events, unknown events |
 | `check_method_calls` | Hallucinated methods, property-as-method confusion |
+| `check_shadow_dom_js` | shadowRoot.querySelector() bypass, attachShadow() on existing components, innerHTML on web components, style.cssText instead of CSS custom properties |
 
 ## When Fixes Are Needed
 
@@ -76,6 +79,9 @@ suggest_fix({
 | `part-structural` | ::part() combined with .class or [attr] selectors |
 | `part-chain` | ::part()::part() chaining through nested shadows |
 | `display-contents-host` | display:contents destroying the shadow root |
+| `external-host` | :host/:host-context() used in consumer CSS |
+| `slotted-descendant` | ::slotted(div) span — can't style descendants of slotted content |
+| `slotted-compound` | ::slotted(div.foo) — only simple selectors allowed |
 
 ### Other fix types
 | type | issue variants |
@@ -105,3 +111,9 @@ Call `recommend_checks` with your code — it analyzes the content type and retu
 10. **Don't set `display: contents` on component hosts** — it destroys the shadow root attachment
 11. **Put component tokens on the component host, not `:root`** — `:root` tokens can't reach through shadow boundaries
 12. **Don't mix `var()` with literals in CSS shorthands** — if the var() is undefined, the entire shorthand fails
+13. **`:host` and `:host-context()` only work inside shadow DOM** — in consumer CSS, target the tag name directly
+14. **`::slotted()` only accepts simple selectors** — no compound selectors like `::slotted(div.foo)`, no descendants like `::slotted(div) span`
+15. **Never access `.shadowRoot.querySelector()`** — component internals are private; use the public API (properties, methods, events, slots, CSS parts)
+16. **Don't set `innerHTML` on web components** — use slot content or the component's properties/methods
+17. **Don't transition standard CSS properties on component hosts** — transitions on `color`, `background`, etc. only affect the host box, not shadow internals. Transition CSS custom properties instead.
+18. **Don't hardcode colors alongside design tokens** — if background uses a token but text color is hardcoded, theme changes will break contrast

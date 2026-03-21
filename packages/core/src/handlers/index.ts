@@ -27,6 +27,7 @@ export * from './migration.js';
 export * from './narrative.js';
 export * from './quick-ref.js';
 export * from './recommend-checks.js';
+export * from './specificity-checker.js';
 export * from './suggest-fix.js';
 export * from './story.js';
 export * from './shadow-dom-checker.js';

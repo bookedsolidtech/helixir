@@ -148,6 +148,7 @@ const SuggestFixArgsSchema = z.object({
   memberName: z.string().optional(),
   suggestedName: z.string().optional(),
   eventName: z.string().optional(),
+  tokenPrefix: z.string().optional(),
 });
 
 const ValidateComponentCodeArgsSchema = z.object({
@@ -621,6 +622,11 @@ export const STYLING_TOOL_DEFINITIONS = [
         eventName: {
           type: 'string',
           description: 'Optional event name for event usage fixes.',
+        },
+        tokenPrefix: {
+          type: 'string',
+          description:
+            'Optional token prefix from the component library (e.g. "--hx-", "--fast-", "--md-"). When provided, suggested replacement tokens use this prefix. Get this from diagnose_styling.',
         },
       },
       required: ['type', 'issue', 'original'],

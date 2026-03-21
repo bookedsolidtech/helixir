@@ -3,4 +3,4 @@
 '@helixir/core': minor
 ---
 
-feat: add Shadow DOM styling diagnostic tools — diagnose_styling and check_shadow_dom_usage MCP tools with anti-pattern detection, token prefix analysis, dark mode heuristics, and CSS usage snippet generation
+feat: add 5 anti-hallucination MCP tools — diagnose_styling, check_shadow_dom_usage, check_html_usage, check_event_usage with Shadow DOM diagnostics, HTML validation, and event pattern checking. Enhanced suggest_usage and narrative with styling guidance.

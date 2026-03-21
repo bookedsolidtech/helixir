@@ -60,6 +60,7 @@ export interface ComponentQuickRef {
   cssParts: QuickRefCssPart[];
   cssSnippet: string;
   shadowDomWarnings: string[];
+  antiPatterns: string[];
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -118,6 +119,61 @@ function guessDefaultValue(propName: string): string {
   if (/spacing|padding|margin|gap/.test(lower)) return '1rem';
   if (/shadow/.test(lower)) return '0 1px 2px rgba(0,0,0,.1)';
   return '#value';
+}
+
+// ─── Anti-Pattern Builder ──────────────────────────────────────────────────
+
+function buildAntiPatterns(meta: ComponentMetadata): string[] {
+  const tag = meta.tagName;
+  const patterns: string[] = [];
+
+  // Universal: Shadow DOM piercing
+  patterns.push(
+    `Shadow DOM: \`${tag} .inner { ... }\` — descendant selectors cannot pierce shadow boundaries. ` +
+      `Use \`${tag}::part(name)\` or CSS custom properties instead.`,
+  );
+
+  // Components with CSS parts
+  if (meta.cssParts.length > 0) {
+    const firstPart = meta.cssParts[0]?.name ?? 'base';
+    patterns.push(
+      `Never chain ::part() with classes or attributes: \`${tag}::part(${firstPart}).active\` — ` +
+        `this is invalid CSS. Use separate ::part() selectors or state attributes on the host.`,
+    );
+  }
+
+  // Components with CSS custom properties
+  if (meta.cssProperties.length > 0) {
+    const firstToken = meta.cssProperties[0]?.name ?? `--${tag}-bg`;
+    patterns.push(
+      `:root scope: \`:root { ${firstToken}: blue; }\` — component tokens set on :root have no ` +
+        `effect through Shadow DOM. Set them on the host: \`${tag} { ${firstToken}: blue; }\``,
+    );
+    patterns.push(
+      `Hardcoded colors: \`${tag} { ${firstToken}: #hex; }\` — use \`var()\` with a theme ` +
+        `token and fallback: \`${tag} { ${firstToken}: var(--theme-primary, blue); }\``,
+    );
+  }
+
+  // Components with named slots
+  const namedSlots = meta.slots.filter((s) => s.name !== '');
+  if (namedSlots.length > 0) {
+    const validNames = namedSlots.map((s) => `"${s.name}"`).join(', ');
+    patterns.push(
+      `Invalid slot names: only these slot names exist: ${validNames}. ` +
+        `Using \`slot="nonexistent"\` silently hides the content.`,
+    );
+  }
+
+  // Components with NO CSS API
+  if (meta.cssParts.length === 0 && meta.cssProperties.length === 0 && meta.slots.length === 0) {
+    patterns.push(
+      `<${tag}> has no CSS style API (no parts, no custom properties, no slots). ` +
+        `Attempting \`${tag}::part(...)\` or setting \`--${tag}-*\` tokens will have no effect.`,
+    );
+  }
+
+  return patterns;
 }
 
 // ─── Main Entry Point ───────────────────────────────────────────────────────
@@ -180,6 +236,8 @@ export function getComponentQuickRef(meta: ComponentMetadata): ComponentQuickRef
     );
   }
 
+  const antiPatterns = buildAntiPatterns(meta);
+
   return {
     tagName: meta.tagName,
     description: meta.description,
@@ -191,5 +249,6 @@ export function getComponentQuickRef(meta: ComponentMetadata): ComponentQuickRef
     cssParts,
     cssSnippet,
     shadowDomWarnings,
+    antiPatterns,
   };
 }

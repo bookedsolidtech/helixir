@@ -219,3 +219,69 @@ describe('getComponentQuickRef — bare component', () => {
     expect(ref.cssSnippet).toBe('');
   });
 });
+
+// ─── Anti-Patterns ──────────────────────────────────────────────────────────
+
+describe('getComponentQuickRef — antiPatterns', () => {
+  it('returns an array', () => {
+    const ref = getComponentQuickRef(buttonMeta);
+    expect(Array.isArray(ref.antiPatterns)).toBe(true);
+  });
+
+  it('includes shadow DOM piercing warning for components with parts', () => {
+    const ref = getComponentQuickRef(buttonMeta);
+    expect(ref.antiPatterns.some((p) => p.includes('.inner') || p.includes('descendant'))).toBe(
+      true,
+    );
+  });
+
+  it('includes ::part() chaining warning for components with parts', () => {
+    const ref = getComponentQuickRef(buttonMeta);
+    expect(ref.antiPatterns.some((p) => /::part\(.*\)\./.test(p) || p.includes('chain'))).toBe(
+      true,
+    );
+  });
+
+  it('includes :root scope warning for components with CSS properties', () => {
+    const ref = getComponentQuickRef(buttonMeta);
+    expect(ref.antiPatterns.some((p) => p.includes(':root'))).toBe(true);
+  });
+
+  it('includes hardcoded color warning for components with CSS properties', () => {
+    const ref = getComponentQuickRef(buttonMeta);
+    expect(ref.antiPatterns.some((p) => p.includes('hardcoded') || p.includes('#hex'))).toBe(true);
+  });
+
+  it('includes slot name accuracy warning for components with named slots', () => {
+    const ref = getComponentQuickRef(buttonMeta);
+    expect(ref.antiPatterns.some((p) => p.includes('slot'))).toBe(true);
+  });
+
+  it('includes no-style-api warning for bare components', () => {
+    const ref = getComponentQuickRef(bareComponent);
+    expect(ref.antiPatterns.some((p) => p.includes('no CSS') || p.includes('no style'))).toBe(true);
+  });
+
+  it('bare components still get shadow DOM warning', () => {
+    const ref = getComponentQuickRef(bareComponent);
+    expect(ref.antiPatterns.some((p) => p.includes('Shadow DOM') || p.includes('shadow'))).toBe(
+      true,
+    );
+  });
+
+  it('uses actual tag name in examples', () => {
+    const ref = getComponentQuickRef(buttonMeta);
+    expect(ref.antiPatterns.some((p) => p.includes('my-button'))).toBe(true);
+  });
+
+  it('uses actual part names in bad examples', () => {
+    const ref = getComponentQuickRef(buttonMeta);
+    // Should reference actual part names to show what NOT to combine them with
+    expect(ref.antiPatterns.some((p) => p.includes('base') || p.includes('label'))).toBe(true);
+  });
+
+  it('uses actual token names in bad examples', () => {
+    const ref = getComponentQuickRef(buttonMeta);
+    expect(ref.antiPatterns.some((p) => p.includes('--my-button-'))).toBe(true);
+  });
+});

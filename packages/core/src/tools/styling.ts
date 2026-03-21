@@ -29,6 +29,7 @@ import { checkTransitionAnimation } from '../handlers/transition-checker.js';
 import { checkShadowDomJs } from '../handlers/shadow-dom-js-checker.js';
 import { resolveCssApi } from '../handlers/css-api-resolver.js';
 import { runStylingPreflight } from '../handlers/styling-preflight.js';
+import { validateCssFile } from '../handlers/css-file-validator.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -171,6 +172,10 @@ const StylingPreflightArgsSchema = z.object({
   cssText: z.string(),
   tagName: z.string(),
   htmlText: z.string().optional(),
+});
+
+const ValidateCssFileArgsSchema = z.object({
+  cssText: z.string(),
 });
 
 export const STYLING_TOOL_DEFINITIONS = [
@@ -824,6 +829,26 @@ export const STYLING_TOOL_DEFINITIONS = [
       required: ['cssText', 'tagName'],
     },
   },
+  {
+    name: 'validate_css_file',
+    description:
+      'Validates an entire CSS file targeting multiple web components in one call. Auto-detects all web component tag names in selectors, runs per-component validation (Shadow DOM, ::part() resolution, token validation, scope checks), and global validation (theme compatibility, color contrast, specificity, shorthand). Returns issues grouped by component plus global issues. Use this when reviewing a CSS file that styles multiple components — no need to know which components are used.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+        cssText: {
+          type: 'string',
+          description: 'The full CSS file content to validate.',
+        },
+      },
+      required: ['cssText'],
+    },
+  },
 ];
 
 /**
@@ -1014,6 +1039,12 @@ export function handleStylingCall(
       const { cssText, tagName, htmlText } = StylingPreflightArgsSchema.parse(args);
       const meta = parseCem(tagName, cem);
       const result = runStylingPreflight({ css: cssText, html: htmlText, meta });
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'validate_css_file') {
+      const { cssText } = ValidateCssFileArgsSchema.parse(args);
+      const result = validateCssFile(cssText, cem);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

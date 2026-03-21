@@ -21,6 +21,7 @@ import { checkThemeCompatibility } from '../handlers/theme-checker.js';
 import { recommendChecks } from '../handlers/recommend-checks.js';
 import { suggestFix } from '../handlers/suggest-fix.js';
 import { checkCssSpecificity } from '../handlers/specificity-checker.js';
+import { checkLayoutPatterns } from '../handlers/layout-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -89,6 +90,10 @@ const CheckThemeCompatibilityArgsSchema = z.object({
 
 const RecommendChecksArgsSchema = z.object({
   codeText: z.string(),
+});
+
+const CheckLayoutPatternsArgsSchema = z.object({
+  cssText: z.string(),
 });
 
 const CheckCssSpecificityArgsSchema = z.object({
@@ -599,6 +604,22 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'check_layout_patterns',
+    description:
+      'Detects layout anti-patterns when styling web component host elements — catches display overrides (components manage their own display), fixed pixel dimensions (breaks responsive), position absolute/fixed (conflicts with component positioning), and overflow: hidden (clips shadow DOM popups/tooltips). Run this on any CSS that sets layout properties on web components.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        cssText: {
+          type: 'string',
+          description: 'The CSS code to check for layout anti-patterns on web component hosts.',
+        },
+      },
+      required: ['cssText'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -720,6 +741,12 @@ export function handleStylingCall(
     if (name === 'check_css_specificity') {
       const { code, mode } = CheckCssSpecificityArgsSchema.parse(args);
       const result = checkCssSpecificity(code, mode ? { mode } : undefined);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_layout_patterns') {
+      const { cssText } = CheckLayoutPatternsArgsSchema.parse(args);
+      const result = checkLayoutPatterns(cssText);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

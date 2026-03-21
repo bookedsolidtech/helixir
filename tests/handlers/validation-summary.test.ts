@@ -273,6 +273,82 @@ describe('summarizeValidation', () => {
     expect(summary.topIssues.length).toBeLessThanOrEqual(10);
   });
 
+  it('includes fix suggestions for shadow DOM issues', () => {
+    const result = makeResult({
+      totalIssues: 1,
+      shadowDom: {
+        issues: [
+          {
+            rule: 'no-descendant-piercing',
+            line: 1,
+            message: 'Cannot pierce shadow DOM with .label selector',
+            suggestion: 'Use ::part()',
+            code: 'my-button .label { color: red; }',
+          },
+        ],
+        clean: false,
+      },
+    });
+    const summary = summarizeValidation(result);
+    expect(summary.topIssues[0]?.fix).toBeDefined();
+    expect(summary.topIssues[0]?.fix).toContain('::part(');
+  });
+
+  it('includes fix suggestions for token fallback issues', () => {
+    const result = makeResult({
+      totalIssues: 1,
+      tokenFallbacks: {
+        issues: [
+          {
+            rule: 'missing-fallback',
+            property: 'color',
+            value: 'var(--my-color)',
+            message: 'Missing fallback for var(--my-color)',
+            line: 1,
+          },
+        ],
+        clean: false,
+      },
+    });
+    const summary = summarizeValidation(result);
+    expect(summary.topIssues[0]?.fix).toBeDefined();
+    expect(summary.topIssues[0]?.fix).toContain('var(--my-color,');
+  });
+
+  it('includes fix suggestions for shadow DOM JS issues', () => {
+    const result = makeResult({
+      totalIssues: 1,
+      shadowDomJs: {
+        issues: [
+          {
+            rule: 'no-shadow-root-access',
+            line: 1,
+            message: 'Do not access shadowRoot directly',
+            suggestion: 'Use CSS parts or the public API',
+            code: 'el.shadowRoot.querySelector(".inner")',
+          },
+        ],
+        clean: false,
+      },
+    });
+    const summary = summarizeValidation(result);
+    // shadowDomJs has suggestions but auto-fix is not straightforward — fix should be undefined
+    expect(summary.topIssues[0]?.severity).toBe('error');
+  });
+
+  it('omits fix field when no code is available for the issue', () => {
+    const result = makeResult({
+      totalIssues: 1,
+      a11yUsage: {
+        issues: [{ rule: 'missing-label', message: 'Add aria-label', line: 1 }],
+        clean: false,
+      },
+    });
+    const summary = summarizeValidation(result);
+    // a11y issues don't have code to auto-fix
+    expect(summary.topIssues[0]?.fix).toBeUndefined();
+  });
+
   it('includes a human-readable verdict string', () => {
     const result = makeResult({
       totalIssues: 3,

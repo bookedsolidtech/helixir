@@ -172,6 +172,14 @@ export function getComponentQuickRef(meta: ComponentMetadata): ComponentQuickRef
 
   const shadowDomWarnings = getShadowDomWarnings(meta.tagName);
 
+  // Add validation nudge when component has a CSS API
+  if (cssParts.length > 0 || cssProperties.length > 0) {
+    shadowDomWarnings.push(
+      `After writing CSS for ${meta.tagName}, call \`styling_preflight\` to validate ` +
+        `your ::part() and custom property names against the actual component API.`,
+    );
+  }
+
   return {
     tagName: meta.tagName,
     description: meta.description,

@@ -23,6 +23,7 @@ coverage/
 .automaker/ledger/
 .automaker/notifications.json
 .automaker/recovery/
+.automaker/memory/
 .automaker/self-review/
 .automaker/trajectory/
 .automaker/authority/

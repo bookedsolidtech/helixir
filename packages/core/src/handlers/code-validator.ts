@@ -38,6 +38,7 @@ import { checkThemeCompatibility, type ThemeCheckResult } from './theme-checker.
 import { checkCssSpecificity, type SpecificityCheckResult } from './specificity-checker.js';
 import { checkLayoutPatterns, type LayoutCheckResult } from './layout-checker.js';
 import { checkCssScope, type ScopeCheckResult } from './scope-checker.js';
+import { checkCssShorthand, type ShorthandCheckResult } from './shorthand-checker.js';
 import { parseCem } from './cem.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -68,6 +69,7 @@ export interface ValidateComponentCodeResult {
   specificity?: SpecificityCheckResult;
   layout?: LayoutCheckResult;
   scope?: ScopeCheckResult;
+  shorthand?: ShorthandCheckResult;
   imports?: ImportCheckResult;
 }
 
@@ -250,6 +252,17 @@ export function validateComponentCode(
       }
     } catch {
       // Skip if tag not found
+    }
+
+    // 8g. CSS Shorthand — risky shorthand + var() combinations
+    try {
+      const shorthandResult = checkCssShorthand(css);
+      if (shorthandResult.issues.length > 0) {
+        result.shorthand = shorthandResult;
+        totalIssues += shorthandResult.issues.length;
+      }
+    } catch {
+      // Skip on error
     }
   }
 

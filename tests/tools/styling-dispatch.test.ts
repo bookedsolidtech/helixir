@@ -156,6 +156,22 @@ describe('handleStylingCall — check_css_scope', () => {
   });
 });
 
+// ─── handleStylingCall — check_css_shorthand ────────────────────────────────
+
+describe('handleStylingCall — check_css_shorthand', () => {
+  it('dispatches shorthand check for risky var() patterns', () => {
+    const result = handleStylingCall(
+      'check_css_shorthand',
+      { cssText: '.card { border: 1px solid var(--color); }' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+    const parsed = JSON.parse((result.content as Array<{ text: string }>)[0].text);
+    expect(parsed.issues.length).toBeGreaterThan(0);
+    expect(parsed.issues[0].rule).toBe('shorthand-var-risk');
+  });
+});
+
 // ─── handleStylingCall — check_css_specificity ──────────────────────────────
 
 describe('handleStylingCall — check_css_specificity', () => {

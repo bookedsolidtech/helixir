@@ -1,6 +1,7 @@
 import { parseCem } from './cem.js';
 import type { ComponentMetadata, Cem } from './cem.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
+import { getShadowDomWarnings } from '../shared/mcp-helpers.js';
 
 /**
  * Synthesizes a human-readable narrative prose description from a CEM declaration.
@@ -90,9 +91,38 @@ export function buildNarrative(meta: ComponentMetadata): string {
       customizeLines.push(`\nExample:\n\`\`\`css\n${partExamples}\n\`\`\``);
     }
 
-    customizeLines.push(
-      `\n**Do NOT:** Use descendant selectors like \`${meta.tagName} .inner\` — Shadow DOM prevents these from reaching internal elements. Only CSS custom properties and \`::part()\` selectors work across the shadow boundary.`,
+    // Build component-tailored Shadow DOM constraints
+    const constraints: string[] = [];
+    const allWarnings = getShadowDomWarnings(meta.tagName);
+
+    // Always include core encapsulation warning (first 2 warnings)
+    constraints.push(...allWarnings.slice(0, 2));
+
+    // Include ::part() warnings only if the component has parts
+    if (meta.cssParts.length > 0) {
+      constraints.push(...allWarnings.filter((w) => w.includes('::part()')));
+    }
+
+    // Include ::slotted() warning only if the component has slots
+    if (meta.slots.length > 0) {
+      constraints.push(...allWarnings.filter((w) => w.includes('::slotted()')));
+    }
+
+    // Always include :host, display:contents, and var() fallback warnings
+    constraints.push(
+      ...allWarnings.filter(
+        (w) =>
+          w.includes(':host') || w.includes('display: contents') || w.includes('fallback values'),
+      ),
     );
+
+    // Deduplicate (some may overlap)
+    const uniqueConstraints = [...new Set(constraints)];
+
+    customizeLines.push(`\n**Shadow DOM constraints:**`);
+    for (const c of uniqueConstraints) {
+      customizeLines.push(`- ${c}`);
+    }
 
     sections.push(customizeLines.join('\n'));
   }

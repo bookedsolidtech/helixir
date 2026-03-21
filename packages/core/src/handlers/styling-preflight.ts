@@ -22,6 +22,7 @@ import { checkCssSpecificity } from './specificity-checker.js';
 import { buildCssSnippet } from './styling-diagnostics.js';
 import { checkTokenFallbacksFromMeta } from './token-fallback-checker.js';
 import { checkCssScopeFromMeta } from './scope-checker.js';
+import { suggestFix, type SuggestFixInput } from './suggest-fix.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -31,12 +32,18 @@ export interface PreflightInput {
   meta: ComponentMetadata;
 }
 
+export interface PreflightFix {
+  suggestion: string;
+  explanation: string;
+}
+
 export interface PreflightIssue {
   severity: 'error' | 'warning' | 'info';
   category: string;
   message: string;
   line?: number;
   suggestion?: string;
+  fix?: PreflightFix;
 }
 
 export interface PreflightComponentApi {
@@ -162,6 +169,22 @@ export function runStylingPreflight(input: PreflightInput): PreflightResult {
     });
   }
 
+  // 3. Generate inline fixes for actionable issues
+  for (const issue of issues) {
+    safeRun(() => {
+      const fixInput = mapIssueToFixInput(issue, css, meta);
+      if (fixInput) {
+        const fixResult = suggestFix(fixInput);
+        if (fixResult.suggestion !== fixResult.original) {
+          issue.fix = {
+            suggestion: fixResult.suggestion,
+            explanation: fixResult.explanation,
+          };
+        }
+      }
+    });
+  }
+
   // 4. Build the component API summary
   const componentApi: PreflightComponentApi = {
     tagName: meta.tagName,
@@ -195,6 +218,80 @@ function safeRun(fn: () => void): void {
   } catch {
     // Individual checker failed — skip and continue with other checks
   }
+}
+
+// ─── Issue → Fix Mapping ────────────────────────────────────────────────────
+
+/** Maps category to suggest_fix type and extracts the original CSS from the issue. */
+function mapIssueToFixInput(
+  issue: PreflightIssue,
+  css: string,
+  meta: ComponentMetadata,
+): SuggestFixInput | null {
+  const partNames = meta.cssParts.map((p) => p.name);
+  const tagName = meta.tagName;
+
+  // Extract the CSS rule at the issue's line (or use a heuristic from the message)
+  const original = issue.line ? extractLineContent(css, issue.line) : '';
+  if (!original && issue.category !== 'specificity') return null;
+
+  switch (issue.category) {
+    case 'shadowDom':
+      return {
+        type: 'shadow-dom',
+        issue: detectShadowDomIssueType(issue.message),
+        original,
+        tagName,
+        partNames,
+      };
+    case 'themeCompat':
+      return {
+        type: 'theme-compat',
+        issue: 'hardcoded-color',
+        original,
+        tagName,
+      };
+    case 'tokenFallbacks':
+      return {
+        type: 'token-fallback',
+        issue: issue.message.includes('fallback') ? 'missing-fallback' : 'hardcoded-color',
+        original,
+        tagName,
+      };
+    case 'specificity':
+      if (issue.message.includes('!important')) {
+        const importantOriginal = original || extractImportantRule(css);
+        if (!importantOriginal) return null;
+        return {
+          type: 'specificity',
+          issue: 'important',
+          original: importantOriginal,
+          tagName,
+        };
+      }
+      return null;
+    default:
+      return null;
+  }
+}
+
+function extractLineContent(css: string, lineNum: number): string {
+  const lines = css.split('\n');
+  if (lineNum < 1 || lineNum > lines.length) return '';
+  return (lines[lineNum - 1] ?? '').trim();
+}
+
+function extractImportantRule(css: string): string {
+  const match = css.match(/[^{}]*!important[^}]*/);
+  return match ? match[0].trim() : '';
+}
+
+function detectShadowDomIssueType(message: string): string {
+  if (message.includes('descendant') || message.includes('child')) return 'descendant-piercing';
+  if (message.includes('::part') && message.includes('class')) return 'part-structural';
+  if (message.includes('/deep/') || message.includes('>>>')) return 'deprecated-deep';
+  if (message.includes('::slotted')) return 'slotted-descendant';
+  return 'descendant-piercing';
 }
 
 // ─── Verdict Builder ────────────────────────────────────────────────────────

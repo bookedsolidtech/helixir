@@ -121,7 +121,8 @@ function checkSlottedMisuse(lines: string[]): ShadowDomIssue[] {
 function checkPartDescendants(lines: string[]): ShadowDomIssue[] {
   const issues: ShadowDomIssue[] = [];
   // ::part(name) followed by whitespace then a selector (not { or , or : or ;)
-  const pattern = /::part\([^)]+\)\s+[a-zA-Z.#[]/;
+  // Also catches child combinator: ::part(name) > selector
+  const pattern = /::part\([^)]+\)\s+(?:>?\s*)?[a-zA-Z.#[]/;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i] ?? '';
@@ -133,9 +134,116 @@ function checkPartDescendants(lines: string[]): ShadowDomIssue[] {
         severity: 'error',
         rule: 'no-part-descendant',
         message:
-          '::part() cannot be chained with descendant selectors. You can only style the part itself.',
-        suggestion: 'Remove the descendant selector and style the part directly.',
+          '::part() cannot be chained with descendant or child selectors. You can only style the part itself.',
+        suggestion: 'Remove the descendant/child selector and style the part directly.',
         code: line.trim(),
+      });
+    }
+  }
+
+  return issues;
+}
+
+function checkPartStructural(lines: string[]): ShadowDomIssue[] {
+  const issues: ShadowDomIssue[] = [];
+  // ::part(name) followed immediately by .class or [attr] (no whitespace)
+  // But NOT followed by : (pseudo-class like :hover) or :: (pseudo-element like ::before)
+  const pattern = /::part\([^)]+\)(?:\.[a-zA-Z]|\[[a-zA-Z])/;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] ?? '';
+    const match = pattern.exec(line);
+    if (match) {
+      issues.push({
+        line: i + 1,
+        column: match.index + 1,
+        severity: 'error',
+        rule: 'no-part-structural',
+        message:
+          '::part() cannot be combined with class or attribute selectors. Parts exist in a different DOM tree.',
+        suggestion:
+          'Remove the class/attribute selector. Use CSS custom properties or the part name to differentiate styles.',
+        code: line.trim(),
+      });
+    }
+  }
+
+  return issues;
+}
+
+function checkPartChaining(lines: string[]): ShadowDomIssue[] {
+  const issues: ShadowDomIssue[] = [];
+  // ::part(name)::part(name) — parts cannot be chained through nested shadow roots
+  const pattern = /::part\([^)]+\)::part\(/;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] ?? '';
+    const match = pattern.exec(line);
+    if (match) {
+      issues.push({
+        line: i + 1,
+        column: match.index + 1,
+        severity: 'error',
+        rule: 'no-part-chain',
+        message:
+          '::part() cannot be chained. Parts do not forward through nested shadow roots automatically.',
+        suggestion:
+          'The outer component must use the "exportparts" attribute to re-export inner parts. Then style the forwarded part name directly.',
+        code: line.trim(),
+      });
+    }
+  }
+
+  return issues;
+}
+
+function checkDeprecatedDeep(lines: string[]): ShadowDomIssue[] {
+  const issues: ShadowDomIssue[] = [];
+  // /deep/, >>>, ::deep — all deprecated shadow-piercing selectors
+  const pattern = /(?:\/deep\/|>>>|::deep)/;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] ?? '';
+    const match = pattern.exec(line);
+    if (match) {
+      issues.push({
+        line: i + 1,
+        column: match.index + 1,
+        severity: 'error',
+        rule: 'deprecated-deep',
+        message: `"${match[0]}" is a deprecated shadow-piercing combinator. It has been removed from all browsers.`,
+        suggestion:
+          'Use CSS custom properties to pass values through the shadow boundary, or use ::part() to style exposed parts.',
+        code: line.trim(),
+      });
+    }
+  }
+
+  return issues;
+}
+
+function checkDisplayContentsOnHost(lines: string[], tagName: string): ShadowDomIssue[] {
+  const issues: ShadowDomIssue[] = [];
+  // Detect tagname { ... display: contents ... }
+  // This is a simplified check — looks for the tag as a selector then display:contents in that block
+  const blockPattern = new RegExp(`(?:^|[},])\\s*${escapeRegex(tagName)}\\s*\\{([^}]*)\\}`, 'gi');
+  let blockMatch: RegExpExecArray | null;
+
+  while ((blockMatch = blockPattern.exec(lines.join('\n'))) !== null) {
+    const blockContent = blockMatch[1] ?? '';
+    if (/display\s*:\s*contents/i.test(blockContent)) {
+      const blockStart = blockMatch.index;
+      const preceding = lines.join('\n').slice(0, blockStart);
+      const line = (preceding.match(/\n/g) ?? []).length + 1;
+
+      issues.push({
+        line,
+        column: 1,
+        severity: 'error',
+        rule: 'no-display-contents-host',
+        message: `Setting "display: contents" on <${tagName}> removes the host element from the layout box tree, which can break Shadow DOM rendering and accessibility.`,
+        suggestion: `Use "display: block" or "display: inline-block" instead. If you need to remove the wrapper, consider CSS custom properties or ::part() styling.`,
+        code: `${tagName} { display: contents; }`,
       });
     }
   }
@@ -280,10 +388,14 @@ export function checkShadowDomUsage(
 
   issues.push(...checkSlottedMisuse(lines));
   issues.push(...checkPartDescendants(lines));
+  issues.push(...checkPartStructural(lines));
+  issues.push(...checkPartChaining(lines));
+  issues.push(...checkDeprecatedDeep(lines));
   issues.push(...checkImportantOnTokens(lines));
 
   if (tagName) {
     issues.push(...checkDescendantSelectors(lines, tagName));
+    issues.push(...checkDisplayContentsOnHost(lines, tagName));
   }
 
   if (meta) {

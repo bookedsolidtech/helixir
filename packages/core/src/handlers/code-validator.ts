@@ -27,6 +27,9 @@ import { checkA11yUsage, type A11yUsageResult } from './a11y-usage-checker.js';
 import { checkCssVars, type CssVarCheckResult } from './css-var-checker.js';
 import { checkComponentImports, type ImportCheckResult } from './import-checker.js';
 import { checkTokenFallbacks, type TokenFallbackResult } from './token-fallback-checker.js';
+import { checkComposition, type CompositionResult } from './composition-checker.js';
+import { checkMethodCalls, type MethodCheckResult } from './method-checker.js';
+import { checkThemeCompatibility, type ThemeCheckResult } from './theme-checker.js';
 import { parseCem } from './cem.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -51,6 +54,9 @@ export interface ValidateComponentCodeResult {
   a11yUsage?: A11yUsageResult;
   cssVars?: CssVarCheckResult;
   tokenFallbacks?: TokenFallbackResult;
+  composition?: CompositionResult;
+  methodCalls?: MethodCheckResult;
+  themeCompat?: ThemeCheckResult;
   imports?: ImportCheckResult;
 }
 
@@ -123,7 +129,18 @@ export function validateComponentCode(
     // Skip on error
   }
 
-  // 6. Shadow DOM Usage — CSS anti-patterns (only if CSS provided)
+  // 6. Composition — cross-component pattern validation
+  try {
+    const compResult = checkComposition(html, cem);
+    if (compResult.issues.length > 0) {
+      result.composition = compResult;
+      totalIssues += compResult.issues.length;
+    }
+  } catch {
+    // Skip on error
+  }
+
+  // 7. Shadow DOM Usage — CSS anti-patterns (only if CSS provided)
   if (css) {
     try {
       const meta = parseCem(tagName, cem);
@@ -162,6 +179,17 @@ export function validateComponentCode(
     } catch {
       // Skip if tag not found
     }
+
+    // 8c. Theme Compatibility — dark mode safety (only if CSS provided)
+    try {
+      const themeResult = checkThemeCompatibility(css);
+      if (themeResult.issues.length > 0) {
+        result.themeCompat = themeResult;
+        totalIssues += themeResult.issues.length;
+      }
+    } catch {
+      // Skip on error
+    }
   }
 
   // 8. Event Usage — framework event binding (only if code provided)
@@ -172,6 +200,17 @@ export function validateComponentCode(
       if (eventResult.issues.length > 0) {
         result.eventUsage = eventResult;
         totalIssues += eventResult.issues.length;
+      }
+    } catch {
+      // Skip if tag not found
+    }
+
+    // 9. Method Calls — API usage validation (only if code provided)
+    try {
+      const methodResult = checkMethodCalls(code, tagName, cem);
+      if (methodResult.issues.length > 0) {
+        result.methodCalls = methodResult;
+        totalIssues += methodResult.issues.length;
       }
     } catch {
       // Skip if tag not found

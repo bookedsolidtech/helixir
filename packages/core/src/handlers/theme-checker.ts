@@ -13,7 +13,12 @@
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface ThemeIssue {
-  rule: 'hardcoded-theme-color' | 'hardcoded-shadow' | 'potential-contrast-issue';
+  rule:
+    | 'hardcoded-theme-color'
+    | 'hardcoded-shadow'
+    | 'potential-contrast-issue'
+    | 'mixed-token-hardcoded'
+    | 'dark-mode-shadow-invisible';
   property: string;
   value: string;
   line: number;
@@ -64,6 +69,25 @@ function containsHardcodedColor(value: string): boolean {
     HSL_COLOR.test(value) ||
     NAMED_COLOR.test(value)
   );
+}
+
+function usesToken(value: string): boolean {
+  return /var\s*\(/.test(value);
+}
+
+/** Low-opacity shadow patterns: rgba(…, 0.0X) or hsla(…, 0.0X) with alpha ≤ 0.1 */
+const LOW_OPACITY_RGBA = /rgba?\s*\([^)]*,\s*(0\.0\d*)\s*\)/i;
+const LOW_OPACITY_HSLA = /hsla?\s*\([^)]*,\s*(0\.0\d*)\s*\)/i;
+
+function hasLowOpacityShadow(value: string): number | null {
+  for (const pattern of [LOW_OPACITY_RGBA, LOW_OPACITY_HSLA]) {
+    const match = pattern.exec(value);
+    if (match) {
+      const alpha = parseFloat(match[1] ?? '1');
+      if (alpha <= 0.1) return alpha;
+    }
+  }
+  return null;
 }
 
 // ─── Light/dark classification ──────────────────────────────────────────────
@@ -148,9 +172,15 @@ export function checkThemeCompatibility(css: string): ThemeCheckResult {
   const declarations = parseCssDeclarations(css);
   const issues: ThemeIssue[] = [];
 
-  // Track color and background per selector block for contrast checks
-  let blockTextColor: { value: string; line: number; lightness: Lightness } | null = null;
-  let blockBgColor: { value: string; line: number; lightness: Lightness } | null = null;
+  // Track color and background per selector block for contrast + mixed checks
+  let blockTextColor: {
+    value: string;
+    line: number;
+    lightness: Lightness;
+    isToken: boolean;
+  } | null = null;
+  let blockBgColor: { value: string; line: number; lightness: Lightness; isToken: boolean } | null =
+    null;
 
   for (const decl of declarations) {
     const propLower = decl.property.toLowerCase();
@@ -184,14 +214,29 @@ export function checkThemeCompatibility(css: string): ThemeCheckResult {
             `Use a design token: var(--shadow-token).`,
         });
       }
+
+      // Check for low-opacity shadows invisible on dark backgrounds
+      const alpha = hasLowOpacityShadow(decl.value);
+      if (alpha !== null) {
+        issues.push({
+          rule: 'dark-mode-shadow-invisible',
+          property: decl.property,
+          value: decl.value,
+          line: decl.line,
+          message:
+            `Shadow with alpha ${alpha} will be invisible on dark backgrounds. ` +
+            `Use a higher opacity or a design token that adapts to the theme.`,
+        });
+      }
     }
 
-    // Track text/background for contrast check
+    // Track text/background for contrast + mixed-source checks
     if (propLower === 'color') {
       blockTextColor = {
         value: decl.value,
         line: decl.line,
         lightness: classifyColor(decl.value),
+        isToken: usesToken(decl.value),
       };
     }
     if (propLower === 'background-color' || propLower === 'background') {
@@ -199,14 +244,16 @@ export function checkThemeCompatibility(css: string): ThemeCheckResult {
         value: decl.value,
         line: decl.line,
         lightness: classifyColor(decl.value),
+        isToken: usesToken(decl.value),
       };
     }
 
-    // Check for contrast issues when we have both color and background
+    // Check for issues when we have both color and background in the same block
     if (blockTextColor && blockBgColor) {
       const textLight = blockTextColor.lightness;
       const bgLight = blockBgColor.lightness;
 
+      // Contrast issue: both light or both dark
       if (
         (textLight === 'light' && bgLight === 'light') ||
         (textLight === 'dark' && bgLight === 'dark')
@@ -220,6 +267,23 @@ export function checkThemeCompatibility(css: string): ThemeCheckResult {
             `Both text (${blockTextColor.value}) and background (${blockBgColor.value}) ` +
             `appear to be ${textLight}. This may cause contrast issues. ` +
             `Use semantic tokens that pair correctly across themes.`,
+        });
+      }
+
+      // Mixed token/hardcoded: one uses var(), the other is hardcoded
+      if (blockTextColor.isToken !== blockBgColor.isToken) {
+        const hardcodedSide = blockTextColor.isToken ? 'background' : 'color';
+        const hardcodedValue = blockTextColor.isToken ? blockBgColor.value : blockTextColor.value;
+        const hardcodedLine = blockTextColor.isToken ? blockBgColor.line : blockTextColor.line;
+        issues.push({
+          rule: 'mixed-token-hardcoded',
+          property: hardcodedSide,
+          value: hardcodedValue,
+          line: hardcodedLine,
+          message:
+            `"${hardcodedSide}" uses a hardcoded value (${hardcodedValue}) while the paired property uses a design token. ` +
+            `When the theme switches, the token will adapt but the hardcoded value won't — breaking the color pairing. ` +
+            `Use tokens for both.`,
         });
       }
 

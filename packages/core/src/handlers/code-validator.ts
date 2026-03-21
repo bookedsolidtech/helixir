@@ -21,6 +21,7 @@
  * 16. check_css_shorthand — risky shorthand + var() combinations
  * 17. check_color_contrast — low contrast pairs, mixed token/hardcoded sources
  * 18. check_transition_animation — transitions/animations on component hosts
+ * 19. check_shadow_dom_js — JS-side shadow DOM encapsulation bypass detection
  */
 
 import type { Cem } from './cem.js';
@@ -45,6 +46,7 @@ import { checkCssScope, type ScopeCheckResult } from './scope-checker.js';
 import { checkCssShorthand, type ShorthandCheckResult } from './shorthand-checker.js';
 import { checkColorContrast, type ColorContrastResult } from './color-contrast-checker.js';
 import { checkTransitionAnimation, type TransitionCheckResult } from './transition-checker.js';
+import { checkShadowDomJs, type ShadowDomJsResult } from './shadow-dom-js-checker.js';
 import { parseCem } from './cem.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -78,6 +80,7 @@ export interface ValidateComponentCodeResult {
   shorthand?: ShorthandCheckResult;
   colorContrast?: ColorContrastResult;
   transitionAnimation?: TransitionCheckResult;
+  shadowDomJs?: ShadowDomJsResult;
   imports?: ImportCheckResult;
 }
 
@@ -318,6 +321,17 @@ export function validateComponentCode(
       }
     } catch {
       // Skip if tag not found
+    }
+
+    // 10. Shadow DOM JS — encapsulation bypass detection (only if code provided)
+    try {
+      const jsResult = checkShadowDomJs(code, tagName);
+      if (jsResult.issues.length > 0) {
+        result.shadowDomJs = jsResult;
+        totalIssues += jsResult.issues.length;
+      }
+    } catch {
+      // Skip on error
     }
   }
 

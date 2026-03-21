@@ -14,6 +14,7 @@ export * from './dimensions.js';
 export * from './framework.js';
 export * from './generate-types.js';
 export * from './health.js';
+export * from './html-usage-checker.js';
 export * from './migration.js';
 export * from './narrative.js';
 export * from './story.js';

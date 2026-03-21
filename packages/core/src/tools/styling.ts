@@ -4,6 +4,7 @@ import { parseCem } from '../handlers/cem.js';
 import type { Cem } from '../handlers/cem.js';
 import { diagnoseStyling } from '../handlers/styling-diagnostics.js';
 import { checkShadowDomUsage } from '../handlers/shadow-dom-checker.js';
+import { checkHtmlUsage } from '../handlers/html-usage-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -15,6 +16,11 @@ const DiagnoseStylingArgsSchema = z.object({
 const CheckShadowDomUsageArgsSchema = z.object({
   cssText: z.string(),
   tagName: z.string().optional(),
+});
+
+const CheckHtmlUsageArgsSchema = z.object({
+  htmlText: z.string(),
+  tagName: z.string(),
 });
 
 export const STYLING_TOOL_DEFINITIONS = [
@@ -65,6 +71,31 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'check_html_usage',
+    description:
+      'Validates consumer HTML against a component CEM — catches invalid slot names, wrong enum attribute values, boolean attribute misuse, and unknown attributes with typo suggestions. Run this on any HTML using web components to catch markup mistakes.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+        htmlText: {
+          type: 'string',
+          description: 'The HTML code to validate against the component CEM.',
+        },
+        tagName: {
+          type: 'string',
+          description: 'The custom element tag name to validate against (e.g. "sl-button").',
+        },
+      },
+      required: ['htmlText', 'tagName'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -94,6 +125,13 @@ export function handleStylingCall(
         }
       }
       const result = checkShadowDomUsage(cssText, tagName, meta);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_html_usage') {
+      const { htmlText, tagName } = CheckHtmlUsageArgsSchema.parse(args);
+      const meta = parseCem(tagName, cem);
+      const result = checkHtmlUsage(htmlText, meta);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

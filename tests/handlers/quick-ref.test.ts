@@ -149,10 +149,12 @@ describe('getComponentQuickRef — attribute details', () => {
 // ─── CSS Styling Details ─────────────────────────────────────────────────────
 
 describe('getComponentQuickRef — CSS details', () => {
-  it('CSS properties include example usage', () => {
+  it('CSS properties include example usage with meaningful value', () => {
     const ref = getComponentQuickRef(buttonMeta);
     const bg = ref.cssProperties.find((p) => p.name === '--my-button-bg');
     expect(bg?.example).toContain('--my-button-bg');
+    // Should NOT use 'initial' — it's misleading for custom properties
+    expect(bg?.example).not.toContain('initial');
   });
 
   it('CSS parts include ::part() selector example', () => {
@@ -166,6 +168,31 @@ describe('getComponentQuickRef — CSS details', () => {
     expect(ref.cssSnippet).toContain('my-button');
     expect(ref.cssSnippet).toContain('--my-button-bg');
     expect(ref.cssSnippet).toContain('::part(base)');
+  });
+
+  it('cssSnippet does NOT use "initial" for custom property values', () => {
+    const ref = getComponentQuickRef(buttonMeta);
+    expect(ref.cssSnippet).not.toContain(': initial;');
+  });
+
+  it('cssSnippet includes slot styling section when slots exist', () => {
+    const ref = getComponentQuickRef(buttonMeta);
+    expect(ref.cssSnippet).toContain('Slot styling');
+    expect(ref.cssSnippet).toContain('[slot="prefix"]');
+  });
+
+  it('cssSnippet omits slot styling for components without slots', () => {
+    const ref = getComponentQuickRef(bareComponent);
+    expect(ref.cssSnippet).not.toContain('Slot styling');
+  });
+
+  it('CSS property example uses CEM default when available', () => {
+    const metaWithDefault: ComponentMetadata = {
+      ...bareComponent,
+      cssProperties: [{ name: '--my-bg', description: 'Background', default: '#fff' }],
+    };
+    const ref = getComponentQuickRef(metaWithDefault);
+    expect(ref.cssProperties[0]?.example).toContain('#fff');
   });
 });
 

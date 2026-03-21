@@ -29,6 +29,56 @@ describe('suggestFix — Shadow DOM selectors', () => {
   });
 });
 
+// ─── Shadow DOM advanced fixes ──────────────────────────────────────────────
+
+describe('suggestFix — Shadow DOM advanced', () => {
+  it('suggests CSS custom properties for deprecated /deep/ combinator', () => {
+    const result = suggestFix({
+      type: 'shadow-dom',
+      issue: 'deprecated-deep',
+      original: 'my-button /deep/ .inner { color: red; }',
+      tagName: 'my-button',
+      partNames: ['base'],
+    });
+    expect(result.suggestion).toContain('::part(');
+    expect(result.explanation).toContain('deprecated');
+    expect(result.severity).toBe('error');
+  });
+
+  it('suggests removing class after ::part()', () => {
+    const result = suggestFix({
+      type: 'shadow-dom',
+      issue: 'part-structural',
+      original: 'my-button::part(base).active { color: red; }',
+      tagName: 'my-button',
+    });
+    expect(result.explanation).toContain('class');
+    expect(result.severity).toBe('error');
+  });
+
+  it('suggests exportparts for ::part() chaining', () => {
+    const result = suggestFix({
+      type: 'shadow-dom',
+      issue: 'part-chain',
+      original: 'my-card::part(body)::part(inner) { color: red; }',
+      tagName: 'my-card',
+    });
+    expect(result.explanation).toContain('exportparts');
+    expect(result.severity).toBe('error');
+  });
+
+  it('suggests alternative to display:contents on host', () => {
+    const result = suggestFix({
+      type: 'shadow-dom',
+      issue: 'display-contents-host',
+      original: 'my-button { display: contents; }',
+      tagName: 'my-button',
+    });
+    expect(result.explanation).toContain('display: contents');
+    expect(result.severity).toBe('error');
+  });
+});
+
 // ─── Token fallback fixes ───────────────────────────────────────────────────
 
 describe('suggestFix — token fallbacks', () => {

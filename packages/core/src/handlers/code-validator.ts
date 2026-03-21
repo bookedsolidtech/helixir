@@ -47,6 +47,7 @@ import { checkCssShorthand, type ShorthandCheckResult } from './shorthand-checke
 import { checkColorContrast, type ColorContrastResult } from './color-contrast-checker.js';
 import { checkTransitionAnimation, type TransitionCheckResult } from './transition-checker.js';
 import { checkShadowDomJs, type ShadowDomJsResult } from './shadow-dom-js-checker.js';
+import { checkDarkModePatterns, type DarkModeCheckResult } from './dark-mode-checker.js';
 import { parseCem } from './cem.js';
 import { summarizeValidation, type ValidationSummary } from './validation-summary.js';
 import { buildAntiPatternHints } from './quick-ref.js';
@@ -85,6 +86,7 @@ export interface ValidateComponentCodeResult {
   colorContrast?: ColorContrastResult;
   transitionAnimation?: TransitionCheckResult;
   shadowDomJs?: ShadowDomJsResult;
+  darkMode?: DarkModeCheckResult;
   imports?: ImportCheckResult;
 }
 
@@ -307,6 +309,17 @@ export function validateComponentCode(
       if (transitionResult.issues.length > 0) {
         result.transitionAnimation = transitionResult;
         totalIssues += transitionResult.issues.length;
+      }
+    } catch {
+      // Skip on error
+    }
+
+    // 8j. Dark Mode Patterns — theme-scoped standard properties + shadow DOM piercing
+    try {
+      const darkResult = checkDarkModePatterns(css);
+      if (darkResult.issues.length > 0) {
+        result.darkMode = darkResult;
+        totalIssues += darkResult.issues.length;
       }
     } catch {
       // Skip on error

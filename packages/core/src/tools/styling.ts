@@ -30,6 +30,7 @@ import { checkShadowDomJs } from '../handlers/shadow-dom-js-checker.js';
 import { resolveCssApi } from '../handlers/css-api-resolver.js';
 import { runStylingPreflight } from '../handlers/styling-preflight.js';
 import { validateCssFile } from '../handlers/css-file-validator.js';
+import { checkDarkModePatterns } from '../handlers/dark-mode-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -175,6 +176,10 @@ const StylingPreflightArgsSchema = z.object({
 });
 
 const ValidateCssFileArgsSchema = z.object({
+  cssText: z.string(),
+});
+
+const CheckDarkModePatternsArgsSchema = z.object({
   cssText: z.string(),
 });
 
@@ -849,6 +854,21 @@ export const STYLING_TOOL_DEFINITIONS = [
       required: ['cssText'],
     },
   },
+  {
+    name: 'check_dark_mode_patterns',
+    description:
+      "Detects dark mode styling anti-patterns specific to web components with Shadow DOM. Catches: (1) theme-scoped selectors (.dark, [data-theme], @media prefers-color-scheme) setting standard CSS properties on web component hosts — these won't reach shadow DOM internals, (2) descendant selectors inside theme scopes trying to pierce shadow boundaries. Suggests using CSS custom properties to communicate theme changes through shadow DOM. Run this on any CSS that implements dark mode or theming for web components.",
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        cssText: {
+          type: 'string',
+          description: 'The CSS code to check for dark mode anti-patterns.',
+        },
+      },
+      required: ['cssText'],
+    },
+  },
 ];
 
 /**
@@ -1045,6 +1065,12 @@ export function handleStylingCall(
     if (name === 'validate_css_file') {
       const { cssText } = ValidateCssFileArgsSchema.parse(args);
       const result = validateCssFile(cssText, cem);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_dark_mode_patterns') {
+      const { cssText } = CheckDarkModePatternsArgsSchema.parse(args);
+      const result = checkDarkModePatterns(cssText);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

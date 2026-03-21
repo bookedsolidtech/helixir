@@ -230,6 +230,7 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
         'resolve_css_api',
         'styling_preflight',
         'validate_css_file',
+        'check_dark_mode_patterns',
       ];
       const tokenTools = ['get_design_tokens', 'find_token'];
       const expectedTools = [...coreTools, ...tokenTools];

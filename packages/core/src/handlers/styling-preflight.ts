@@ -323,6 +323,7 @@ function extractPropertyFromMessage(message: string): string | undefined {
 }
 
 function detectShadowDomIssueType(message: string): string {
+  if (message.includes(':root')) return 'root-scope-token';
   if (message.includes('descendant') || message.includes('child')) return 'descendant-piercing';
   if (message.includes('::part') && message.includes('class')) return 'part-structural';
   if (message.includes('/deep/') || message.includes('>>>')) return 'deprecated-deep';

@@ -4166,6 +4166,36 @@
       "declarations": [
         {
           "kind": "function",
+          "name": "checkCssScopeFromMeta",
+          "return": {
+            "type": {
+              "text": "ScopeCheckResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "css",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "cssProperties",
+              "type": {
+                "text": "Array<{ name: string }>"
+              }
+            }
+          ],
+          "description": "Core implementation accepting a pre-built set of known tokens.\nUsed by both the CEM-based entry point and the preflight (which already has metadata)."
+        },
+        {
+          "kind": "function",
           "name": "checkCssScope",
           "return": {
             "type": {
@@ -4191,10 +4221,19 @@
                 "text": "Cem"
               }
             }
-          ]
+          ],
+          "description": "CEM-based entry point — parses the CEM to extract known tokens,\nthen delegates to the core implementation."
         }
       ],
       "exports": [
+        {
+          "kind": "js",
+          "name": "checkCssScopeFromMeta",
+          "declaration": {
+            "name": "checkCssScopeFromMeta",
+            "module": "packages/core/src/handlers/scope-checker.ts"
+          }
+        },
         {
           "kind": "js",
           "name": "checkCssScope",
@@ -4890,6 +4929,30 @@
       "declarations": [
         {
           "kind": "function",
+          "name": "checkTokenFallbacksFromMeta",
+          "return": {
+            "type": {
+              "text": "TokenFallbackResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cssText",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "knownTokens",
+              "type": {
+                "text": "Set<string>"
+              }
+            }
+          ],
+          "description": "Core implementation accepting a pre-built set of known tokens.\nUsed by both the CEM-based entry point and the preflight (which already has metadata)."
+        },
+        {
+          "kind": "function",
           "name": "checkTokenFallbacks",
           "return": {
             "type": {
@@ -4915,10 +4978,19 @@
                 "text": "Cem"
               }
             }
-          ]
+          ],
+          "description": "CEM-based entry point — parses the CEM to extract known tokens,\nthen delegates to the core implementation."
         }
       ],
       "exports": [
+        {
+          "kind": "js",
+          "name": "checkTokenFallbacksFromMeta",
+          "declaration": {
+            "name": "checkTokenFallbacksFromMeta",
+            "module": "packages/core/src/handlers/token-fallback-checker.ts"
+          }
+        },
         {
           "kind": "js",
           "name": "checkTokenFallbacks",

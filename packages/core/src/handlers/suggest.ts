@@ -7,6 +7,7 @@ import { SafeFileOperations } from '../shared/file-ops.js';
 import { parseCem, CemSchema } from './cem.js';
 import type { Cem } from './cem.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
+import { getShadowDomWarnings } from '../shared/mcp-helpers.js';
 
 export type FrontendFramework = 'react' | 'vue' | 'svelte' | 'angular' | 'html';
 
@@ -217,10 +218,7 @@ function buildStyling(
   }
   const cssSnippet = snippetParts.join('\n\n');
 
-  const warnings: string[] = [
-    `Do not use descendant selectors to reach internal elements (e.g. \`${tagName} .label\` will not work — Shadow DOM prevents this).`,
-    'CSS custom properties and `::part()` selectors are the only supported ways to style inside Shadow DOM.',
-  ];
+  const warnings = getShadowDomWarnings(tagName);
 
   return { cssProperties, cssParts, cssSnippet, warnings };
 }

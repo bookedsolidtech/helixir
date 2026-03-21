@@ -1,6 +1,7 @@
 import { parseCem } from './cem.js';
 import type { ComponentMetadata, Cem } from './cem.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
+import { getShadowDomWarnings } from '../shared/mcp-helpers.js';
 
 /**
  * Synthesizes a human-readable narrative prose description from a CEM declaration.
@@ -92,9 +93,8 @@ export function buildNarrative(meta: ComponentMetadata): string {
       customizeLines.push(`\nExample:\n\`\`\`css\n${partExamples}\n\`\`\``);
     }
 
-    customizeLines.push(
-      `\n**Do NOT:** Use descendant selectors like \`${meta.tagName} .inner\` — Shadow DOM prevents these from reaching internal elements. Only CSS custom properties and \`::part()\` selectors work across the shadow boundary.`,
-    );
+    const [w1, w2] = getShadowDomWarnings(meta.tagName);
+    customizeLines.push(`\n**Do NOT:** ${w1} ${w2}`);
 
     sections.push(customizeLines.join('\n'));
   }

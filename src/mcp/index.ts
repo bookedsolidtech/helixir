@@ -85,6 +85,7 @@ import {
 import {
   STYLING_TOOL_DEFINITIONS,
   handleStylingCall,
+  handleThemeDetection,
   isStylingTool,
 } from '../../packages/core/src/tools/styling.js';
 import { createErrorResponse } from '../../packages/core/src/shared/mcp-helpers.js';
@@ -269,6 +270,9 @@ export async function main(): Promise<void> {
             'CEM not yet loaded — server is still initializing. Please retry.',
           );
         return handleValidateCall(name, typedArgs, resolveCem(libraryId, cemCache));
+      }
+      if (name === 'detect_theme_support') {
+        return handleThemeDetection(config);
       }
       if (isStylingTool(name)) {
         if (cemCache === null || cemReloading)

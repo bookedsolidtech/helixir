@@ -360,14 +360,9 @@ describe('handleStylingCall — get_component_quick_ref', () => {
   });
 });
 
-// ─── handleStylingCall — detect_theme_support ───────────────────────────────
-
-describe('handleStylingCall — detect_theme_support', () => {
-  it('dispatches and returns theme support info', () => {
-    const result = handleStylingCall('detect_theme_support', {}, cem);
-    expect(result.isError).toBeFalsy();
-  });
-});
+// ─── detect_theme_support ────────────────────────────────────────────────────
+// detect_theme_support is now handled via handleThemeDetection (async, config-based)
+// and is tested in tests/handlers/theme-detection.test.ts
 
 // ─── handleStylingCall — check_component_imports ────────────────────────────
 

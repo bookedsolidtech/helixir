@@ -8,6 +8,7 @@ import { checkHtmlUsage } from '../handlers/html-usage-checker.js';
 import { checkEventUsage } from '../handlers/event-usage-checker.js';
 import { getComponentQuickRef } from '../handlers/quick-ref.js';
 import { detectThemeSupport } from '../handlers/theme-detection.js';
+import type { McpWcConfig } from '../config.js';
 import { checkComponentImports } from '../handlers/import-checker.js';
 import { checkSlotChildren } from '../handlers/slot-children-checker.js';
 import { checkAttributeConflicts } from '../handlers/attribute-conflict-checker.js';
@@ -311,16 +312,10 @@ export const STYLING_TOOL_DEFINITIONS = [
   {
     name: 'detect_theme_support',
     description:
-      'Analyzes a component library for theming capabilities — token categories (color, spacing, typography, etc.), semantic naming patterns, dark mode readiness, and coverage score. Library-wide analysis, not per-component.',
+      'Analyzes the component library for theming capabilities. Scans source files to detect CSS custom property usage, theme files, dark mode support, and color-scheme configuration. Returns the theming approach, detected token categories, and actionable recommendations.',
     inputSchema: {
       type: 'object' as const,
-      properties: {
-        libraryId: {
-          type: 'string',
-          description:
-            'Optional library ID to target a specific loaded library instead of the default.',
-        },
-      },
+      properties: {},
       additionalProperties: false,
     },
   },
@@ -922,10 +917,7 @@ export function handleStylingCall(
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 
-    if (name === 'detect_theme_support') {
-      const result = detectThemeSupport(cem);
-      return createSuccessResponse(JSON.stringify(result, null, 2));
-    }
+    // detect_theme_support is handled separately via handleThemeDetection (async, config-based)
 
     if (name === 'check_component_imports') {
       const codeText = z.string().parse(args.codeText);
@@ -1086,4 +1078,20 @@ export function handleStylingCall(
  */
 export function isStylingTool(name: string): boolean {
   return STYLING_TOOL_DEFINITIONS.some((t) => t.name === name);
+}
+
+/**
+ * Handles the detect_theme_support tool call.
+ * This tool uses filesystem scanning (config-based) rather than CEM analysis.
+ */
+export async function handleThemeDetection(
+  config: McpWcConfig,
+): Promise<MCPToolResult> {
+  try {
+    const result = await detectThemeSupport(config);
+    return createSuccessResponse(JSON.stringify(result, null, 2));
+  } catch (err) {
+    const mcpErr = handleToolError(err);
+    return createErrorResponse(`[${mcpErr.category}] ${mcpErr.message}`);
+  }
 }

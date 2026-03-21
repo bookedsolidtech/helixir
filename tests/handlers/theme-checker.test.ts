@@ -52,6 +52,13 @@ describe('checkThemeCompatibility — hardcoded colors', () => {
     expect(result.issues.some((i) => i.rule === 'hardcoded-theme-color')).toBe(true);
   });
 
+  it('catches hardcoded colors in single-line CSS', () => {
+    const css = '.card { background-color: #ffffff; color: #333; }';
+    const result = checkThemeCompatibility(css);
+    const hardcoded = result.issues.filter((i) => i.rule === 'hardcoded-theme-color');
+    expect(hardcoded.length).toBeGreaterThanOrEqual(2);
+  });
+
   it('does NOT flag inherit/currentColor/transparent', () => {
     const css = `.card {
   color: inherit;

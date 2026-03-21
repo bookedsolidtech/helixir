@@ -128,6 +128,13 @@ describe('checkTokenFallbacks — hardcoded colors', () => {
     expect(hardcoded).toHaveLength(1);
   });
 
+  it('catches hardcoded colors in single-line CSS', () => {
+    const css = 'my-button { --my-button-color: #ff0000; --my-button-bg: #ffffff; }';
+    const result = checkTokenFallbacks(css, 'my-button', fixture);
+    const hardcoded = result.issues.filter((i) => i.rule === 'hardcoded-color');
+    expect(hardcoded).toHaveLength(2);
+  });
+
   it('does NOT flag non-color properties for hardcoded colors', () => {
     const css = `my-button {
   --my-button-radius: 4px;

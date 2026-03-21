@@ -167,6 +167,94 @@ describe('checkShadowDomUsage', () => {
     });
   });
 
+  describe('deprecated shadow-piercing selectors', () => {
+    it('detects /deep/ combinator', () => {
+      const css = `my-button /deep/ .inner { color: red; }`;
+      const result = checkShadowDomUsage(css);
+      expect(result.issues.some((i) => i.rule === 'deprecated-deep')).toBe(true);
+    });
+
+    it('detects >>> combinator', () => {
+      const css = `my-button >>> .inner { color: red; }`;
+      const result = checkShadowDomUsage(css);
+      expect(result.issues.some((i) => i.rule === 'deprecated-deep')).toBe(true);
+    });
+
+    it('detects ::deep pseudo-element', () => {
+      const css = `my-button::deep .inner { color: red; }`;
+      const result = checkShadowDomUsage(css);
+      expect(result.issues.some((i) => i.rule === 'deprecated-deep')).toBe(true);
+    });
+  });
+
+  describe('::part() advanced anti-patterns', () => {
+    it('detects class selector directly after ::part()', () => {
+      const css = `my-button::part(base).active { color: red; }`;
+      const result = checkShadowDomUsage(css);
+      expect(result.issues.some((i) => i.rule === 'no-part-structural')).toBe(true);
+    });
+
+    it('detects attribute selector directly after ::part()', () => {
+      const css = `my-button::part(base)[data-active] { color: red; }`;
+      const result = checkShadowDomUsage(css);
+      expect(result.issues.some((i) => i.rule === 'no-part-structural')).toBe(true);
+    });
+
+    it('detects ::part()::part() chaining', () => {
+      const css = `my-card::part(body)::part(inner) { color: red; }`;
+      const result = checkShadowDomUsage(css);
+      expect(result.issues.some((i) => i.rule === 'no-part-chain')).toBe(true);
+    });
+
+    it('allows valid ::part() with :hover', () => {
+      const css = `my-button::part(base):hover { color: blue; }`;
+      const result = checkShadowDomUsage(css);
+      const partIssues = result.issues.filter(
+        (i) => i.rule === 'no-part-structural' || i.rule === 'no-part-chain',
+      );
+      expect(partIssues).toHaveLength(0);
+    });
+
+    it('allows valid ::part() with :focus', () => {
+      const css = `my-button::part(base):focus { outline: 2px solid blue; }`;
+      const result = checkShadowDomUsage(css);
+      const partIssues = result.issues.filter(
+        (i) => i.rule === 'no-part-structural' || i.rule === 'no-part-chain',
+      );
+      expect(partIssues).toHaveLength(0);
+    });
+
+    it('allows valid ::part() with ::before pseudo-element', () => {
+      const css = `my-button::part(base)::before { content: "→"; }`;
+      const result = checkShadowDomUsage(css);
+      const partIssues = result.issues.filter(
+        (i) => i.rule === 'no-part-structural' || i.rule === 'no-part-chain',
+      );
+      expect(partIssues).toHaveLength(0);
+    });
+
+    it('detects child combinator after ::part()', () => {
+      const css = `my-button::part(base) > span { color: red; }`;
+      const result = checkShadowDomUsage(css);
+      expect(result.issues.some((i) => i.rule === 'no-part-descendant')).toBe(true);
+    });
+  });
+
+  describe('display:contents on host', () => {
+    it('detects display:contents on component host', () => {
+      const css = `my-button { display: contents; }`;
+      const result = checkShadowDomUsage(css, 'my-button');
+      expect(result.issues.some((i) => i.rule === 'no-display-contents-host')).toBe(true);
+    });
+
+    it('does not flag display:contents on non-host elements', () => {
+      const css = `.wrapper { display: contents; }`;
+      const result = checkShadowDomUsage(css, 'my-button');
+      const contentIssues = result.issues.filter((i) => i.rule === 'no-display-contents-host');
+      expect(contentIssues).toHaveLength(0);
+    });
+  });
+
   describe('clean CSS', () => {
     it('reports clean for valid CSS', () => {
       const css = [

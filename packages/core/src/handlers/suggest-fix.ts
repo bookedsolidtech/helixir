@@ -90,6 +90,57 @@ function fixShadowDom(input: SuggestFixInput): FixSuggestion {
     };
   }
 
+  if (input.issue === 'deprecated-deep') {
+    const cssBody = original.match(/\{([^}]*)\}/)?.[1]?.trim() ?? '';
+    const bestPart = partNames[0] ?? 'base';
+    const suggestion = `${tagName ?? 'the-element'}::part(${bestPart}) { ${cssBody} }`;
+
+    return {
+      original,
+      suggestion,
+      explanation: `The /deep/, >>>, and ::deep combinators are deprecated and removed from all browsers. Use ::part() to style exposed parts, or CSS custom properties to pass values through the shadow boundary.`,
+      severity: 'error',
+    };
+  }
+
+  if (input.issue === 'part-structural') {
+    // Remove the class/attribute selector after ::part()
+    const suggestion = original.replace(
+      /(::part\([^)]+\))(?:\.[a-zA-Z][a-zA-Z0-9_-]*|\[[^\]]+\])/,
+      '$1',
+    );
+
+    return {
+      original,
+      suggestion,
+      explanation: `::part() cannot be combined with class or attribute selectors because parts exist in a different DOM tree. Style the part directly. If you need state-based styling, use :host([state])::part(name) or a CSS custom property to communicate state.`,
+      severity: 'error',
+    };
+  }
+
+  if (input.issue === 'part-chain') {
+    // Extract the outer part name
+    const partMatch = original.match(/::part\(([^)]+)\)/);
+    const partName = partMatch?.[1] ?? 'inner-part';
+
+    return {
+      original,
+      suggestion: `${tagName ?? 'the-element'}::part(${partName}) { /* style the forwarded part */ }`,
+      explanation: `::part() cannot be chained through nested shadow roots. The outer component must use exportparts="inner-part" on the inner component's host element to re-export the part. Then style the forwarded part name directly on the outer component.`,
+      severity: 'error',
+    };
+  }
+
+  if (input.issue === 'display-contents-host') {
+    const tag = tagName ?? 'the-element';
+    return {
+      original,
+      suggestion: `${tag} { display: block; /* or inline-block */ }`,
+      explanation: `display: contents removes the host element from the layout box tree, which destroys the Shadow DOM attachment point and breaks accessibility. Use display: block or display: inline-block instead.`,
+      severity: 'error',
+    };
+  }
+
   return {
     original,
     suggestion: original,

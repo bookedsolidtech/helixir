@@ -17,6 +17,7 @@ import { validateComponentCode } from '../handlers/code-validator.js';
 import { checkTokenFallbacks } from '../handlers/token-fallback-checker.js';
 import { checkComposition } from '../handlers/composition-checker.js';
 import { checkMethodCalls } from '../handlers/method-checker.js';
+import { checkThemeCompatibility } from '../handlers/theme-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -77,6 +78,10 @@ const CheckCompositionArgsSchema = z.object({
 const CheckMethodCallsArgsSchema = z.object({
   codeText: z.string(),
   tagName: z.string(),
+});
+
+const CheckThemeCompatibilityArgsSchema = z.object({
+  cssText: z.string(),
 });
 
 const ValidateComponentCodeArgsSchema = z.object({
@@ -460,6 +465,27 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'check_theme_compatibility',
+    description:
+      'Validates consumer CSS for dark mode and theme compatibility — catches hardcoded colors on background/color/border properties, hardcoded shadow colors, and potential contrast issues (light-on-light or dark-on-dark pairings). Does NOT require a CEM — works on any CSS. Run this on styling code to ensure it adapts to theme changes.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+        cssText: {
+          type: 'string',
+          description: 'The CSS code to check for theme compatibility issues.',
+        },
+      },
+      required: ['cssText'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -545,6 +571,12 @@ export function handleStylingCall(
     if (name === 'check_css_vars') {
       const { cssText, tagName } = CheckCssVarsArgsSchema.parse(args);
       const result = checkCssVars(cssText, tagName, cem);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_theme_compatibility') {
+      const { cssText } = CheckThemeCompatibilityArgsSchema.parse(args);
+      const result = checkThemeCompatibility(cssText);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

@@ -49,6 +49,7 @@ import { checkTransitionAnimation, type TransitionCheckResult } from './transiti
 import { checkShadowDomJs, type ShadowDomJsResult } from './shadow-dom-js-checker.js';
 import { parseCem } from './cem.js';
 import { summarizeValidation, type ValidationSummary } from './validation-summary.js';
+import { buildAntiPatternHints } from './quick-ref.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -64,6 +65,7 @@ export interface ValidateComponentCodeInput {
 export interface ValidateComponentCodeResult {
   clean: boolean;
   totalIssues: number;
+  antiPatterns: string[];
   summary?: ValidationSummary;
   htmlUsage?: HtmlUsageCheckResult;
   shadowDom?: ShadowDomCheckResult;
@@ -94,9 +96,19 @@ export function validateComponentCode(
   const { html, css, code, tagName, cem, framework } = input;
   let totalIssues = 0;
 
+  // Generate anti-pattern hints for the component
+  let antiPatterns: string[] = [];
+  try {
+    const meta = parseCem(tagName, cem);
+    antiPatterns = buildAntiPatternHints(meta);
+  } catch {
+    // Tag not in CEM — skip anti-patterns
+  }
+
   const result: ValidateComponentCodeResult = {
     clean: true,
     totalIssues: 0,
+    antiPatterns,
   };
 
   // 1. HTML Usage — attribute/slot/enum validation

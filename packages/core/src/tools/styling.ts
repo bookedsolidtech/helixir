@@ -445,7 +445,7 @@ export const STYLING_TOOL_DEFINITIONS = [
   {
     name: 'validate_component_code',
     description:
-      'ALL-IN-ONE validator — runs 14 anti-hallucination sub-validators on agent-generated code in a single call. Validates HTML attributes, slot children, attribute conflicts, a11y patterns, Shadow DOM CSS, custom properties, token fallbacks, theme compatibility, CSS specificity, layout patterns, inline styles, event bindings, method calls, composition patterns, and component imports. Use this as the FINAL check before submitting any code that uses web components.',
+      'ALL-IN-ONE validator — runs 19 anti-hallucination sub-validators on agent-generated code in a single call. Validates HTML attributes, slot children, attribute conflicts, a11y patterns, Shadow DOM CSS, custom properties, token fallbacks, theme compatibility, CSS specificity, layout patterns, inline styles, event bindings, method calls, composition patterns, component imports, color contrast, CSS scope, shorthand safety, and transition/animation patterns. Returns antiPatterns (component-specific negative examples) and auto-generated fix suggestions on issues. Use this as the FINAL check before submitting any code that uses web components.',
     inputSchema: {
       type: 'object' as const,
       properties: {

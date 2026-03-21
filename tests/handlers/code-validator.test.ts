@@ -81,7 +81,7 @@ describe('validateComponentCode — clean code', () => {
   it('returns clean for valid HTML + CSS', () => {
     const result = validateComponentCode({
       html: '<my-button variant="primary">Click</my-button>',
-      css: 'my-button { --my-button-color: red; }',
+      css: 'my-button { --my-button-color: var(--brand-color, red); }',
       tagName: 'my-button',
       cem: fixture,
     });

@@ -118,18 +118,25 @@ interface CssDecl {
 
 function parseCssDeclarations(css: string): CssDecl[] {
   const results: CssDecl[] = [];
-  const lines = css.split('\n');
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i] ?? '';
-    const match = /^\s*([a-z-]+)\s*:\s*(.+?)\s*;?\s*$/i.exec(line);
-    if (match) {
-      results.push({
-        property: match[1] ?? '',
-        value: (match[2] ?? '').trim(),
-        line: i + 1,
-      });
-    }
+  // Match property declarations anywhere in CSS, handling both multi-line and single-line
+  const declPattern = /(?:^|[{;])\s*([a-z-]+)\s*:\s*([^;{}]+)/gi;
+  let match: RegExpExecArray | null;
+
+  while ((match = declPattern.exec(css)) !== null) {
+    const prop = (match[1] ?? '').trim();
+    const val = (match[2] ?? '').trim();
+    if (!prop || !val) continue;
+
+    // Skip CSS custom properties (handled by token-fallback-checker)
+    if (prop.startsWith('--')) continue;
+
+    // Line number from position of the property name in source
+    const propStart = match.index + match[0].indexOf(prop);
+    const preceding = css.slice(0, propStart);
+    const line = (preceding.match(/\n/g) ?? []).length + 1;
+
+    results.push({ property: prop, value: val, line });
   }
 
   return results;

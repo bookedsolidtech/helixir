@@ -136,11 +136,14 @@ export function summarizeValidation(result: ValidateComponentCodeResult): Valida
 
   if (result.themeCompat) {
     for (const issue of result.themeCompat.issues) {
+      const original = `${issue.property}: ${issue.value};`;
+      const fix = tryAutoFix('theme-compat', issue.rule, original, issue.property);
       issues.push({
         severity: 'warning',
         category: 'themeCompat',
         message: issue.message,
         line: issue.line,
+        ...(fix ? { fix } : {}),
       });
     }
   }

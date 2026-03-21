@@ -308,6 +308,70 @@ describe('suggestFix — layout', () => {
   });
 });
 
+// ─── Library-agnostic token suggestions ─────────────────────────────────────
+
+describe('suggestFix — library-agnostic tokens', () => {
+  it('uses provided tokenPrefix instead of hardcoded --sl- tokens', () => {
+    const result = suggestFix({
+      type: 'token-fallback',
+      issue: 'hardcoded-color',
+      original: 'background-color: #3b82f6;',
+      property: 'background-color',
+      tokenPrefix: '--hx-',
+    });
+    expect(result.suggestion).toContain('--hx-');
+    expect(result.suggestion).not.toContain('--sl-');
+  });
+
+  it('uses generic placeholder when no tokenPrefix provided', () => {
+    const result = suggestFix({
+      type: 'token-fallback',
+      issue: 'hardcoded-color',
+      original: 'color: #333;',
+      property: 'color',
+    });
+    // Should NOT contain library-specific prefix
+    expect(result.suggestion).not.toContain('--sl-');
+    expect(result.suggestion).toContain('var(');
+  });
+
+  it('uses tokenPrefix in theme-compat hardcoded-color fix', () => {
+    const result = suggestFix({
+      type: 'theme-compat',
+      issue: 'hardcoded-color',
+      original: 'background: white;',
+      property: 'background',
+      tokenPrefix: '--fast-',
+    });
+    expect(result.suggestion).toContain('--fast-');
+    expect(result.suggestion).not.toContain('--sl-');
+  });
+
+  it('uses tokenPrefix in theme-compat contrast-pair fix', () => {
+    const result = suggestFix({
+      type: 'theme-compat',
+      issue: 'contrast-pair',
+      original: 'background: #f0f0f0; color: #e0e0e0;',
+      tokenPrefix: '--md-',
+    });
+    expect(result.suggestion).toContain('--md-');
+    expect(result.suggestion).not.toContain('--sl-');
+  });
+
+  it('generates property-appropriate token names from prefix', () => {
+    const result = suggestFix({
+      type: 'token-fallback',
+      issue: 'hardcoded-color',
+      original: 'border-radius: 8px;',
+      property: 'border-radius',
+      tokenPrefix: '--hx-',
+    });
+    expect(result.suggestion).toContain('--hx-');
+    // Should generate a radius-related token name
+    expect(result.suggestion).toMatch(/--hx-.*radius/i);
+  });
+});
+
 // ─── Result structure ───────────────────────────────────────────────────────
 
 describe('suggestFix — result structure', () => {

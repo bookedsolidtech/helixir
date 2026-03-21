@@ -29,6 +29,51 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/core/src/handlers/a11y-usage-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "checkA11yUsage",
+          "return": {
+            "type": {
+              "text": "A11yUsageResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "html",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "checkA11yUsage",
+          "declaration": {
+            "name": "checkA11yUsage",
+            "module": "packages/core/src/handlers/a11y-usage-checker.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/core/src/handlers/accessibility.ts",
       "declarations": [
         {
@@ -1259,6 +1304,83 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/core/src/handlers/attribute-conflict-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "parseAttributeConstraints",
+          "return": {
+            "type": {
+              "text": "AttributeConstraint[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            },
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Parse CEM member descriptions to extract attribute constraints."
+        },
+        {
+          "kind": "function",
+          "name": "checkAttributeConflicts",
+          "return": {
+            "type": {
+              "text": "AttributeConflictResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "html",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "parseAttributeConstraints",
+          "declaration": {
+            "name": "parseAttributeConstraints",
+            "module": "packages/core/src/handlers/attribute-conflict-checker.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "checkAttributeConflicts",
+          "declaration": {
+            "name": "checkAttributeConflicts",
+            "module": "packages/core/src/handlers/attribute-conflict-checker.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/core/src/handlers/audit-report.ts",
       "declarations": [
         {
@@ -2313,6 +2435,72 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/core/src/handlers/code-validator.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "validateComponentCode",
+          "return": {
+            "type": {
+              "text": "ValidateComponentCodeResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "input",
+              "type": {
+                "text": "ValidateComponentCodeInput"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "validateComponentCode",
+          "declaration": {
+            "name": "validateComponentCode",
+            "module": "packages/core/src/handlers/code-validator.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/color-contrast-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "checkColorContrast",
+          "return": {
+            "type": {
+              "text": "ColorContrastResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "css",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "checkColorContrast",
+          "declaration": {
+            "name": "checkColorContrast",
+            "module": "packages/core/src/handlers/color-contrast-checker.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/core/src/handlers/compare.ts",
       "declarations": [
         {
@@ -2405,6 +2593,45 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/core/src/handlers/composition-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "checkComposition",
+          "return": {
+            "type": {
+              "text": "CompositionResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "html",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "checkComposition",
+          "declaration": {
+            "name": "checkComposition",
+            "module": "packages/core/src/handlers/composition-checker.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/core/src/handlers/composition.ts",
       "declarations": [
         {
@@ -2439,6 +2666,97 @@
           "declaration": {
             "name": "getCompositionExample",
             "module": "packages/core/src/handlers/composition.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/css-api-resolver.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "resolveCssApi",
+          "return": {
+            "type": {
+              "text": "CssApiResolution"
+            }
+          },
+          "parameters": [
+            {
+              "name": "css",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "meta",
+              "type": {
+                "text": "ComponentMetadata"
+              }
+            },
+            {
+              "name": "html",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "resolveCssApi",
+          "declaration": {
+            "name": "resolveCssApi",
+            "module": "packages/core/src/handlers/css-api-resolver.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/css-var-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "checkCssVars",
+          "return": {
+            "type": {
+              "text": "CssVarCheckResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cssText",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "checkCssVars",
+          "declaration": {
+            "name": "checkCssVars",
+            "module": "packages/core/src/handlers/css-var-checker.ts"
           }
         }
       ]
@@ -2612,6 +2930,52 @@
           "declaration": {
             "name": "computeWeightedScore",
             "module": "packages/core/src/handlers/dimensions.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/event-usage-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "checkEventUsage",
+          "return": {
+            "type": {
+              "text": "EventUsageCheckResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "codeText",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "meta",
+              "type": {
+                "text": "ComponentMetadata"
+              }
+            },
+            {
+              "name": "framework",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "checkEventUsage",
+          "declaration": {
+            "name": "checkEventUsage",
+            "module": "packages/core/src/handlers/event-usage-checker.ts"
           }
         }
       ]
@@ -3060,9 +3424,95 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/core/src/handlers/html-usage-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "checkHtmlUsage",
+          "return": {
+            "type": {
+              "text": "HtmlUsageCheckResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "htmlText",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "meta",
+              "type": {
+                "text": "ComponentMetadata"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "checkHtmlUsage",
+          "declaration": {
+            "name": "checkHtmlUsage",
+            "module": "packages/core/src/handlers/html-usage-checker.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/import-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "checkComponentImports",
+          "return": {
+            "type": {
+              "text": "ImportCheckResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "codeText",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "checkComponentImports",
+          "declaration": {
+            "name": "checkComponentImports",
+            "module": "packages/core/src/handlers/import-checker.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/core/src/handlers/index.ts",
       "declarations": [],
       "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/a11y-usage-checker.js"
+          }
+        },
         {
           "kind": "js",
           "name": "*",
@@ -3124,7 +3574,39 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "packages/core/src/handlers/code-validator.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/color-contrast-checker.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "packages/core/src/handlers/compare.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/transition-checker.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/css-var-checker.js"
           }
         },
         {
@@ -3141,6 +3623,14 @@
           "declaration": {
             "name": "*",
             "module": "packages/core/src/handlers/composition.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/composition-checker.js"
           }
         },
         {
@@ -3180,7 +3670,55 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "packages/core/src/handlers/event-usage-checker.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "packages/core/src/handlers/health.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/html-usage-checker.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/import-checker.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/layout-checker.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/attribute-conflict-checker.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/method-checker.js"
           }
         },
         {
@@ -3204,7 +3742,87 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "packages/core/src/handlers/quick-ref.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/recommend-checks.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/scope-checker.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/shorthand-checker.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/specificity-checker.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/suggest-fix.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "packages/core/src/handlers/story.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/shadow-dom-checker.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/shadow-dom-js-checker.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/slot-children-checker.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/styling-diagnostics.js"
           }
         },
         {
@@ -3220,7 +3838,39 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "packages/core/src/handlers/theme-checker.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/theme-detection.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/token-fallback-checker.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "packages/core/src/handlers/tokens.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/validation-summary.js"
           }
         },
         {
@@ -3245,6 +3895,84 @@
           "declaration": {
             "name": "*",
             "module": "packages/core/src/handlers/validate.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/layout-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "checkLayoutPatterns",
+          "return": {
+            "type": {
+              "text": "LayoutCheckResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "css",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "checkLayoutPatterns",
+          "declaration": {
+            "name": "checkLayoutPatterns",
+            "module": "packages/core/src/handlers/layout-checker.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/method-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "checkMethodCalls",
+          "return": {
+            "type": {
+              "text": "MethodCheckResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "code",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "checkMethodCalls",
+          "declaration": {
+            "name": "checkMethodCalls",
+            "module": "packages/core/src/handlers/method-checker.ts"
           }
         }
       ]
@@ -3368,6 +4096,348 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/core/src/handlers/quick-ref.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "getComponentQuickRef",
+          "return": {
+            "type": {
+              "text": "ComponentQuickRef"
+            }
+          },
+          "parameters": [
+            {
+              "name": "meta",
+              "type": {
+                "text": "ComponentMetadata"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "getComponentQuickRef",
+          "declaration": {
+            "name": "getComponentQuickRef",
+            "module": "packages/core/src/handlers/quick-ref.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/recommend-checks.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "recommendChecks",
+          "return": {
+            "type": {
+              "text": "RecommendChecksResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "code",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "recommendChecks",
+          "declaration": {
+            "name": "recommendChecks",
+            "module": "packages/core/src/handlers/recommend-checks.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/scope-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "checkCssScope",
+          "return": {
+            "type": {
+              "text": "ScopeCheckResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "css",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "checkCssScope",
+          "declaration": {
+            "name": "checkCssScope",
+            "module": "packages/core/src/handlers/scope-checker.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/shadow-dom-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "checkShadowDomUsage",
+          "return": {
+            "type": {
+              "text": "ShadowDomCheckResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cssText",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "tagName",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "meta",
+              "optional": true,
+              "type": {
+                "text": "ComponentMetadata"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "checkShadowDomUsage",
+          "declaration": {
+            "name": "checkShadowDomUsage",
+            "module": "packages/core/src/handlers/shadow-dom-checker.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/shadow-dom-js-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "checkShadowDomJs",
+          "return": {
+            "type": {
+              "text": "ShadowDomJsResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "code",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "tagName",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "checkShadowDomJs",
+          "declaration": {
+            "name": "checkShadowDomJs",
+            "module": "packages/core/src/handlers/shadow-dom-js-checker.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/shorthand-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "checkCssShorthand",
+          "return": {
+            "type": {
+              "text": "ShorthandCheckResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "css",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "checkCssShorthand",
+          "declaration": {
+            "name": "checkCssShorthand",
+            "module": "packages/core/src/handlers/shorthand-checker.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/slot-children-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "parseSlotConstraints",
+          "return": {
+            "type": {
+              "text": "SlotConstraint[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "slots",
+              "type": {
+                "text": "CemSlot[]"
+              }
+            }
+          ],
+          "description": "Parses CEM slot definitions to extract slot child constraints."
+        },
+        {
+          "kind": "function",
+          "name": "checkSlotChildren",
+          "return": {
+            "type": {
+              "text": "SlotChildCheckResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "html",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "parseSlotConstraints",
+          "declaration": {
+            "name": "parseSlotConstraints",
+            "module": "packages/core/src/handlers/slot-children-checker.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "checkSlotChildren",
+          "declaration": {
+            "name": "checkSlotChildren",
+            "module": "packages/core/src/handlers/slot-children-checker.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/specificity-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "checkCssSpecificity",
+          "return": {
+            "type": {
+              "text": "SpecificityCheckResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "code",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "options",
+              "optional": true,
+              "type": {
+                "text": "SpecificityCheckOptions"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "checkCssSpecificity",
+          "declaration": {
+            "name": "checkCssSpecificity",
+            "module": "packages/core/src/handlers/specificity-checker.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/core/src/handlers/story.ts",
       "declarations": [
         {
@@ -3396,6 +4466,236 @@
           "declaration": {
             "name": "generateStory",
             "module": "packages/core/src/handlers/story.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/styling-diagnostics.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "detectTokenPrefix",
+          "return": {
+            "type": {
+              "text": "string | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cssProperties",
+              "type": {
+                "text": "Array<{ name: string; description: string }>"
+              }
+            }
+          ],
+          "description": "Detects a common prefix from CSS custom property names.\ne.g., `--sl-button-bg`, `--sl-button-color` → `--sl-`\n      `--my-card-bg`, `--my-card-border` → `--my-`"
+        },
+        {
+          "kind": "function",
+          "name": "detectThemingApproach",
+          "return": {
+            "type": {
+              "text": "ThemingApproach"
+            }
+          },
+          "parameters": [
+            {
+              "name": "meta",
+              "type": {
+                "text": "ComponentMetadata"
+              }
+            }
+          ],
+          "description": "Classifies the component's theming approach based on available CEM data."
+        },
+        {
+          "kind": "function",
+          "name": "detectDarkModeSupport",
+          "return": {
+            "type": {
+              "text": "DarkModeSupport"
+            }
+          },
+          "parameters": [
+            {
+              "name": "meta",
+              "type": {
+                "text": "ComponentMetadata"
+              }
+            }
+          ],
+          "description": "Heuristically detects dark mode support from CSS property names and descriptions."
+        },
+        {
+          "kind": "function",
+          "name": "buildAntiPatterns",
+          "return": {
+            "type": {
+              "text": "AntiPatternWarning[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "meta",
+              "type": {
+                "text": "ComponentMetadata"
+              }
+            }
+          ],
+          "description": "Builds Shadow DOM anti-pattern warnings tailored to this component."
+        },
+        {
+          "kind": "function",
+          "name": "buildCssSnippet",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "meta",
+              "type": {
+                "text": "ComponentMetadata"
+              }
+            }
+          ],
+          "description": "Generates a correct CSS usage snippet for the component."
+        },
+        {
+          "kind": "function",
+          "name": "diagnoseStyling",
+          "return": {
+            "type": {
+              "text": "StylingDiagnostics"
+            }
+          },
+          "parameters": [
+            {
+              "name": "meta",
+              "type": {
+                "text": "ComponentMetadata"
+              }
+            }
+          ],
+          "description": "Produces a full styling diagnostics report for a component."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "detectTokenPrefix",
+          "declaration": {
+            "name": "detectTokenPrefix",
+            "module": "packages/core/src/handlers/styling-diagnostics.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "detectThemingApproach",
+          "declaration": {
+            "name": "detectThemingApproach",
+            "module": "packages/core/src/handlers/styling-diagnostics.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "detectDarkModeSupport",
+          "declaration": {
+            "name": "detectDarkModeSupport",
+            "module": "packages/core/src/handlers/styling-diagnostics.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "buildAntiPatterns",
+          "declaration": {
+            "name": "buildAntiPatterns",
+            "module": "packages/core/src/handlers/styling-diagnostics.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "buildCssSnippet",
+          "declaration": {
+            "name": "buildCssSnippet",
+            "module": "packages/core/src/handlers/styling-diagnostics.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "diagnoseStyling",
+          "declaration": {
+            "name": "diagnoseStyling",
+            "module": "packages/core/src/handlers/styling-diagnostics.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/styling-preflight.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "runStylingPreflight",
+          "return": {
+            "type": {
+              "text": "PreflightResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "input",
+              "type": {
+                "text": "PreflightInput"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "runStylingPreflight",
+          "declaration": {
+            "name": "runStylingPreflight",
+            "module": "packages/core/src/handlers/styling-preflight.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/suggest-fix.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "suggestFix",
+          "return": {
+            "type": {
+              "text": "FixSuggestion"
+            }
+          },
+          "parameters": [
+            {
+              "name": "input",
+              "type": {
+                "text": "SuggestFixInput"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "suggestFix",
+          "declaration": {
+            "name": "suggestFix",
+            "module": "packages/core/src/handlers/suggest-fix.ts"
           }
         }
       ]
@@ -3489,6 +4789,142 @@
           "declaration": {
             "name": "generateImport",
             "module": "packages/core/src/handlers/suggest.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/theme-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "checkThemeCompatibility",
+          "return": {
+            "type": {
+              "text": "ThemeCheckResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "css",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "checkThemeCompatibility",
+          "declaration": {
+            "name": "checkThemeCompatibility",
+            "module": "packages/core/src/handlers/theme-checker.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/theme-detection.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "categorizeTokens",
+          "return": {
+            "type": {
+              "text": "TokenCategories"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "detectThemeSupport",
+          "return": {
+            "type": {
+              "text": "ThemeSupportResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "categorizeTokens",
+          "declaration": {
+            "name": "categorizeTokens",
+            "module": "packages/core/src/handlers/theme-detection.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "detectThemeSupport",
+          "declaration": {
+            "name": "detectThemeSupport",
+            "module": "packages/core/src/handlers/theme-detection.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/token-fallback-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "checkTokenFallbacks",
+          "return": {
+            "type": {
+              "text": "TokenFallbackResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cssText",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "checkTokenFallbacks",
+          "declaration": {
+            "name": "checkTokenFallbacks",
+            "module": "packages/core/src/handlers/token-fallback-checker.ts"
           }
         }
       ]
@@ -3633,6 +5069,45 @@
           "declaration": {
             "name": "findComponentsUsingToken",
             "module": "packages/core/src/handlers/tokens.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/transition-checker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "checkTransitionAnimation",
+          "return": {
+            "type": {
+              "text": "TransitionCheckResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "css",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "checkTransitionAnimation",
+          "declaration": {
+            "name": "checkTransitionAnimation",
+            "module": "packages/core/src/handlers/transition-checker.ts"
           }
         }
       ]
@@ -3806,6 +5281,39 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/core/src/handlers/validation-summary.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "summarizeValidation",
+          "return": {
+            "type": {
+              "text": "ValidationSummary"
+            }
+          },
+          "parameters": [
+            {
+              "name": "result",
+              "type": {
+                "text": "ValidateComponentCodeResult"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "summarizeValidation",
+          "declaration": {
+            "name": "summarizeValidation",
+            "module": "packages/core/src/handlers/validation-summary.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/core/src/index.ts",
       "declarations": [],
       "exports": [
@@ -3951,6 +5459,14 @@
           "declaration": {
             "name": "*",
             "module": "packages/core/src/tools/story.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/tools/styling.js"
           }
         },
         {
@@ -4361,6 +5877,24 @@
             }
           ],
           "description": "Creates an error MCP tool response with text content."
+        },
+        {
+          "kind": "function",
+          "name": "getShadowDomWarnings",
+          "return": {
+            "type": {
+              "text": "string[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns Shadow DOM styling constraint warnings, interpolated with the given tagName.\nUsed by suggest_usage, narrative, and quick-ref handlers to keep messaging consistent.\n\nThese warnings are the primary defense against AI hallucination of invalid\nShadow DOM styling patterns. Every warning maps to a real anti-pattern\nobserved in production agent output."
         }
       ],
       "exports": [
@@ -4377,6 +5911,14 @@
           "name": "createErrorResponse",
           "declaration": {
             "name": "createErrorResponse",
+            "module": "packages/core/src/shared/mcp-helpers.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getShadowDomWarnings",
+          "declaration": {
+            "name": "getShadowDomWarnings",
             "module": "packages/core/src/shared/mcp-helpers.ts"
           }
         }
@@ -5603,6 +7145,94 @@
           "declaration": {
             "name": "isStoryTool",
             "module": "packages/core/src/tools/story.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/tools/styling.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "STYLING_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'diagnose_styling', description: 'Generates a Shadow DOM styling guide for a web component — token prefix, theming approach, dark mode support, anti-pattern warnings, and correct CSS usage snippets. Use this before writing any component CSS to prevent Shadow DOM mistakes.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, tagName: { type: 'string', description: 'The custom element tag name to diagnose (e.g. \"sl-button\").', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'check_shadow_dom_usage', description: 'Scans consumer CSS code for Shadow DOM anti-patterns — descendant selectors piercing shadow boundaries, ::slotted() misuse, invalid ::part() chaining, !important on tokens, unknown part names, and typo detection. Run this on any CSS targeting web components to catch mistakes before they reach production.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The CSS code to scan for Shadow DOM anti-patterns.', }, tagName: { type: 'string', description: 'Optional tag name to scope checks. When provided, enables CEM-based validation (unknown parts, typo detection).', }, }, required: ['cssText'], additionalProperties: false, }, }, { name: 'check_html_usage', description: 'Validates consumer HTML against a component CEM — catches invalid slot names, wrong enum attribute values, boolean attribute misuse, and unknown attributes with typo suggestions. Run this on any HTML using web components to catch markup mistakes.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, htmlText: { type: 'string', description: 'The HTML code to validate against the component CEM.', }, tagName: { type: 'string', description: 'The custom element tag name to validate against (e.g. \"sl-button\").', }, }, required: ['htmlText', 'tagName'], additionalProperties: false, }, }, { name: 'check_event_usage', description: \"Validates event listener patterns against a component CEM — catches React onXxx props for custom events (won't work), unknown event names, misspelled events, and framework-specific binding mistakes. Supports React, Vue, and Angular patterns.\", inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, codeText: { type: 'string', description: 'The code (JSX, template, etc.) to validate event usage in.', }, tagName: { type: 'string', description: 'The custom element tag name to validate against (e.g. \"sl-button\").', }, framework: { type: 'string', enum: ['react', 'vue', 'angular', 'html'], description: 'Optional framework hint. Enables framework-specific checks (e.g. React onXxx prop detection).', }, }, required: ['codeText', 'tagName'], additionalProperties: false, }, }, { name: 'get_component_quick_ref', description: 'Returns a complete quick reference for a web component — all attributes with types and valid enum values, methods, events, slots, CSS custom properties with examples, CSS parts with ::part() selectors, a ready-to-use CSS snippet, and Shadow DOM warnings. Use this as the FIRST call when working with any web component to get the complete API surface.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, tagName: { type: 'string', description: 'The custom element tag name (e.g. \"sl-button\").', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'detect_theme_support', description: 'Analyzes a component library for theming capabilities — token categories (color, spacing, typography, etc.), semantic naming patterns, dark mode readiness, and coverage score. Library-wide analysis, not per-component.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, }, additionalProperties: false, }, }, { name: 'check_component_imports', description: 'Scans HTML/JSX/template code for all custom element tags and verifies they exist in the loaded CEM. Catches non-existent components and misspelled tag names with fuzzy suggestions. Use this to verify that generated code only references real components.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, codeText: { type: 'string', description: 'The HTML/JSX/template code to scan for custom element tags.', }, }, required: ['codeText'], additionalProperties: false, }, }, { name: 'check_slot_children', description: 'Validates that children placed inside a web component\\'s slots match the expected element types from the CEM — catches wrong child elements in constrained slots (e.g. putting a <div> inside <sl-select> which requires <sl-option>). Parses slot descriptions for \"Must be\", \"Works best with\", and \"Accepts\" patterns.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, htmlText: { type: 'string', description: 'The HTML code containing the component and its children to validate.', }, tagName: { type: 'string', description: 'The parent custom element tag name to check slot children for (e.g. \"sl-select\").', }, }, required: ['htmlText', 'tagName'], additionalProperties: false, }, }, { name: 'check_attribute_conflicts', description: 'Detects conditional attributes used without their guard conditions — catches \"target\" without \"href\", \"min\"/\"max\" on non-number inputs, \"checked\" without type=\"checkbox\", and other attribute interaction mistakes. Parses CEM member descriptions for \"Only used when\" and \"Only applies to\" patterns.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, htmlText: { type: 'string', description: 'The HTML code containing the component to check for attribute conflicts.', }, tagName: { type: 'string', description: 'The custom element tag name to validate against (e.g. \"sl-button\").', }, }, required: ['htmlText', 'tagName'], additionalProperties: false, }, }, { name: 'check_a11y_usage', description: 'Validates consumer HTML for accessibility mistakes when using web components — catches missing accessible labels on icon buttons/dialogs/selects, and manual role overrides on components that self-assign ARIA roles. Run this on any HTML using web components to catch a11y issues.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, htmlText: { type: 'string', description: 'The HTML code to validate for accessibility issues.', }, tagName: { type: 'string', description: 'The custom element tag name to check accessibility for (e.g. \"sl-icon-button\").', }, }, required: ['htmlText', 'tagName'], additionalProperties: false, }, }, { name: 'check_css_vars', description: 'Validates consumer CSS for custom property usage against a component CEM — catches unknown CSS custom properties with typo suggestions, and !important on design tokens (anti-pattern). Run this on any CSS that sets component-scoped custom properties.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The CSS code to validate for custom property usage.', }, tagName: { type: 'string', description: 'The custom element tag name to validate against (e.g. \"sl-button\").', }, }, required: ['cssText', 'tagName'], additionalProperties: false, }, }, { name: 'validate_component_code', description: 'ALL-IN-ONE validator — runs 14 anti-hallucination sub-validators on agent-generated code in a single call. Validates HTML attributes, slot children, attribute conflicts, a11y patterns, Shadow DOM CSS, custom properties, token fallbacks, theme compatibility, CSS specificity, layout patterns, inline styles, event bindings, method calls, composition patterns, and component imports. Use this as the FINAL check before submitting any code that uses web components.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, html: { type: 'string', description: 'The HTML markup to validate.', }, css: { type: 'string', description: 'Optional CSS code to validate for Shadow DOM and custom property issues.', }, code: { type: 'string', description: 'Optional JS/JSX/template code to validate event bindings.', }, tagName: { type: 'string', description: 'The primary custom element tag name to validate against.', }, framework: { type: 'string', enum: ['react', 'vue', 'angular', 'html'], description: 'Optional framework hint for event validation.', }, }, required: ['html', 'tagName'], additionalProperties: false, }, }, { name: 'check_token_fallbacks', description: 'Validates consumer CSS for proper var() fallback chains and detects hardcoded colors that break theme switching. Catches var() calls without fallback values (fragile if token undefined), hardcoded hex/rgb/hsl/named colors on color properties (breaks dark mode), and named CSS colors used directly instead of tokens. Run this on any CSS that references design tokens.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The CSS code to validate for token fallback usage.', }, tagName: { type: 'string', description: 'The custom element tag name to validate against (e.g. \"sl-button\").', }, }, required: ['cssText', 'tagName'], additionalProperties: false, }, }, { name: 'check_composition', description: 'Validates cross-component composition patterns — catches tab/panel count mismatches, unlinked cross-references (tab panel=\"x\" without matching panel name=\"x\"), and empty containers (select with no options). Detects component pairs automatically from CEM slot descriptions. Run this on any HTML using compound components like tab-groups, selects, accordions, etc.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, htmlText: { type: 'string', description: 'The HTML code containing compound component patterns to validate.', }, }, required: ['htmlText'], additionalProperties: false, }, }, { name: 'check_method_calls', description: 'Validates JavaScript/TypeScript code for correct method and property usage on web components — catches hallucinated API calls (methods that do not exist), properties called as methods (e.g. dialog.open() when open is a boolean), methods assigned as properties (e.g. dialog.show = true), and typos with suggestions. Run this on any JS code that interacts with web component APIs.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, codeText: { type: 'string', description: 'The JavaScript/TypeScript code to validate for method/property usage.', }, tagName: { type: 'string', description: 'The custom element tag name to validate against (e.g. \"sl-dialog\").', }, }, required: ['codeText', 'tagName'], additionalProperties: false, }, }, { name: 'check_theme_compatibility', description: 'Validates consumer CSS for dark mode and theme compatibility — catches hardcoded colors on background/color/border properties, hardcoded shadow colors, and potential contrast issues (light-on-light or dark-on-dark pairings). Does NOT require a CEM — works on any CSS. Run this on styling code to ensure it adapts to theme changes.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The CSS code to check for theme compatibility issues.', }, }, required: ['cssText'], additionalProperties: false, }, }, { name: 'recommend_checks', description: 'Analyzes code to determine which validation tools are most relevant — detects HTML, CSS, JavaScript, and JSX patterns, identifies custom element tags, and returns a prioritized list of tool names. Use this as a meta-tool to discover which validators to run on a given piece of code without running them all.', inputSchema: { type: 'object' as const, properties: { codeText: { type: 'string', description: 'The code to analyze for determining which validation tools are relevant.', }, }, required: ['codeText'], additionalProperties: false, }, }, { name: 'suggest_fix', description: 'Generates concrete, copy-pasteable code fixes for validation issues. Pass the issue type (shadow-dom, token-fallback, theme-compat, method-call, event-usage, specificity, layout), the specific issue kind, and the original code — returns a corrected code snippet with an explanation. Use this after any validator flags an issue to get the exact fix.', inputSchema: { type: 'object' as const, properties: { type: { type: 'string', enum: [ 'shadow-dom', 'token-fallback', 'theme-compat', 'method-call', 'event-usage', 'specificity', 'layout', ], description: 'The category of validation issue.', }, issue: { type: 'string', description: 'The specific issue kind (e.g. \"descendant-piercing\", \"missing-fallback\", \"hardcoded-color\", \"property-as-method\", \"react-custom-event\").', }, original: { type: 'string', description: 'The original problematic code.', }, tagName: { type: 'string', description: 'Optional tag name of the component.', }, partNames: { type: 'array', items: { type: 'string' }, description: 'Optional list of CSS part names exposed by the component.', }, property: { type: 'string', description: 'Optional CSS property name for token/theme fixes.', }, memberName: { type: 'string', description: 'Optional method/property name for method call fixes.', }, suggestedName: { type: 'string', description: 'Optional corrected name for typo fixes.', }, eventName: { type: 'string', description: 'Optional event name for event usage fixes.', }, tokenPrefix: { type: 'string', description: 'Optional token prefix from the component library (e.g. \"--hx-\", \"--fast-\", \"--md-\"). When provided, suggested replacement tokens use this prefix. Get this from diagnose_styling.', }, }, required: ['type', 'issue', 'original'], additionalProperties: false, }, }, { name: 'check_css_specificity', description: 'Detects CSS specificity anti-patterns that cause styling issues with web components — catches !important usage, ID selectors targeting components, deeply nested selectors (4+ levels), and inline style attributes. Supports both CSS and HTML mode. Run this on any CSS or HTML to prevent specificity wars.', inputSchema: { type: 'object' as const, properties: { code: { type: 'string', description: 'The CSS or HTML code to analyze for specificity issues.', }, mode: { type: 'string', enum: ['css', 'html'], description: 'Analysis mode — \"css\" checks stylesheets for !important/ID/nesting issues, \"html\" checks for inline style attributes on web components. Defaults to \"css\".', }, }, required: ['code'], additionalProperties: false, }, }, { name: 'check_layout_patterns', description: 'Detects layout anti-patterns when styling web component host elements — catches display overrides (components manage their own display), fixed pixel dimensions (breaks responsive), position absolute/fixed (conflicts with component positioning), and overflow: hidden (clips shadow DOM popups/tooltips). Run this on any CSS that sets layout properties on web components.', inputSchema: { type: 'object' as const, properties: { cssText: { type: 'string', description: 'The CSS code to check for layout anti-patterns on web component hosts.', }, }, required: ['cssText'], additionalProperties: false, }, }, { name: 'check_css_scope', description: 'Detects when component-scoped CSS custom properties are set at the wrong scope. Catches component tokens placed on :root, html, body, or * selectors instead of on the component host element. Component tokens only take effect when set on the host — setting them on :root has no effect through shadow DOM.', inputSchema: { type: 'object' as const, properties: { cssText: { type: 'string', description: 'The CSS code to check for scope mismatches.', }, tagName: { type: 'string', description: 'The web component tag name (e.g. \"sl-button\").', }, }, required: ['cssText', 'tagName'], additionalProperties: false, }, }, { name: 'check_css_shorthand', description: 'Detects risky CSS shorthand + var() combinations that can fail silently. When var() is mixed with literal values in shorthand properties (border, background, font, margin, etc.), if any var() is undefined the ENTIRE declaration fails — not just the dynamic part. Suggests decomposing into longhand properties.', inputSchema: { type: 'object' as const, properties: { cssText: { type: 'string', description: 'The CSS code to check for risky shorthand + var() patterns.', }, }, required: ['cssText'], additionalProperties: false, }, }, { name: 'check_color_contrast', description: 'Detects color contrast issues in CSS: low-contrast hardcoded color pairs (light-on-light, dark-on-dark), mixed color sources (one design token + one hardcoded), and low opacity on text. Catches patterns that break readability across theme changes.', inputSchema: { type: 'object' as const, properties: { cssText: { type: 'string', description: 'CSS code to analyze for color contrast issues' }, }, required: ['cssText'], }, }, { name: 'check_transition_animation', description: 'Detects CSS transitions and animations on web component hosts that target standard properties which cannot cross Shadow DOM boundaries. Transitions on standard properties (color, background, opacity) only affect the host element box, not the component internals. Use CSS custom properties for animations that the component consumes.', inputSchema: { type: 'object' as const, properties: { cssText: { type: 'string', description: 'CSS code to analyze' }, tagName: { type: 'string', description: 'Tag name of the web component (e.g., \"sl-button\")', }, }, required: ['cssText', 'tagName'], }, }, { name: 'check_shadow_dom_js', description: 'Detects JavaScript anti-patterns that violate Shadow DOM encapsulation from consumer code. Catches: accessing .shadowRoot.querySelector() to bypass encapsulation, calling attachShadow() on existing components, setting innerHTML on web components (overwriting slot content), and using style.cssText instead of CSS custom properties.', inputSchema: { type: 'object' as const, properties: { codeText: { type: 'string', description: 'JavaScript/TypeScript code to analyze' }, tagName: { type: 'string', description: 'Optional tag name of the web component for context-aware checks (e.g., \"sl-button\")', }, }, required: ['codeText'], }, }, { name: 'resolve_css_api', description: 'Resolves every ::part(), CSS custom property, and slot reference in agent-generated code against the actual component CEM data. Returns a structured report showing which references are valid, which are hallucinated, and suggests the closest valid alternatives. Call this BEFORE shipping any CSS to verify that every part name, token name, and slot name actually exists on the target component.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The CSS code to resolve against the component API.', }, tagName: { type: 'string', description: 'The custom element tag name (e.g. \"sl-dialog\").', }, htmlText: { type: 'string', description: 'Optional HTML code to validate slot attribute references against the component API.', }, }, required: ['cssText', 'tagName'], }, }, { name: 'styling_preflight', description: \"Single-call styling validation that combines component API discovery, CSS reference resolution, and anti-pattern detection. Returns: the component's full style API surface (parts, tokens, slots), valid/invalid status for every ::part() and token reference, Shadow DOM and theme validation issues, a correct CSS snippet, and a pass/fail verdict. Call this ONCE before finalizing any component CSS to prevent hallucinated part names, invalid tokens, and Shadow DOM mistakes.\", inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The CSS code to validate against the component API.', }, tagName: { type: 'string', description: 'The custom element tag name (e.g. \"hx-button\").', }, htmlText: { type: 'string', description: 'Optional HTML code to validate slot attribute references against the component API.', }, }, required: ['cssText', 'tagName'], }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleStylingCall",
+          "return": {
+            "type": {
+              "text": "MCPToolResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "Record<string, unknown>"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ],
+          "description": "Dispatches a styling tool call by name and returns an MCPToolResult."
+        },
+        {
+          "kind": "function",
+          "name": "isStylingTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the styling tool group."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "STYLING_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "STYLING_TOOL_DEFINITIONS",
+            "module": "packages/core/src/tools/styling.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleStylingCall",
+          "declaration": {
+            "name": "handleStylingCall",
+            "module": "packages/core/src/tools/styling.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isStylingTool",
+          "declaration": {
+            "name": "isStylingTool",
+            "module": "packages/core/src/tools/styling.ts"
           }
         }
       ]

@@ -188,6 +188,16 @@ export function buildAntiPatterns(meta: ComponentMetadata): AntiPatternWarning[]
     });
   }
 
+  // Warn about font vs layout inheritance through slots
+  if (meta.slots.length > 0) {
+    warnings.push({
+      pattern: `${tag}::slotted(div) { margin: 10px; } /* expecting layout to inherit */`,
+      explanation:
+        'Slotted content inherits font styles (color, font-size, line-height) from the shadow DOM, but layout properties (margin, padding, display, width) must be set in light DOM CSS — they do not inherit through the shadow boundary.',
+      correctApproach: `Style layout in light DOM CSS: ${tag} > div { margin: 10px; }. Font properties like color and font-size will inherit from the component's shadow DOM automatically.`,
+    });
+  }
+
   return warnings;
 }
 
@@ -200,13 +210,14 @@ export function buildCssSnippet(meta: ComponentMetadata): string {
   const lines: string[] = [];
   const tag = meta.tagName;
 
-  // Token customization section
+  // Token customization section — show how to OVERRIDE custom properties
   if (meta.cssProperties.length > 0) {
-    lines.push(`/* Token customization */`);
+    lines.push(`/* Token customization — override on the component host */`);
     lines.push(`${tag} {`);
     for (const prop of meta.cssProperties.slice(0, 5)) {
-      const defaultVal = prop.description ? `/* ${prop.description} */` : '';
-      lines.push(`  ${prop.name}: var(${prop.name}) ${defaultVal};`.trimEnd());
+      const value = prop.default ?? guessDefaultValue(prop.name);
+      const comment = prop.description ? ` /* ${prop.description} */` : '';
+      lines.push(`  ${prop.name}: ${value};${comment}`);
     }
     lines.push(`}`);
   }
@@ -223,12 +234,48 @@ export function buildCssSnippet(meta: ComponentMetadata): string {
     }
   }
 
+  // Slot styling section — show how to style slotted content in light DOM
+  if (meta.slots.length > 0) {
+    lines.push('');
+    lines.push(`/* Slot styling — target slotted elements in light DOM CSS */`);
+    const hasDefaultSlot = meta.slots.some((s) => s.name === '');
+    const namedSlots = meta.slots.filter((s) => s.name !== '');
+
+    if (hasDefaultSlot) {
+      lines.push(`${tag} > * { /* styles for default slot content */ }`);
+    }
+    for (const slot of namedSlots.slice(0, 3)) {
+      const desc = slot.description ? ` /* ${slot.description} */` : '';
+      lines.push(`${tag} [slot="${slot.name}"] { ${desc.trim()} }`);
+    }
+    lines.push(`/* Note: slotted content inherits font styles (color, font-size)`);
+    lines.push(`   from the shadow DOM, but layout (margin, padding, display)`);
+    lines.push(`   must be set here in light DOM CSS. */`);
+  }
+
   if (lines.length === 0) {
     lines.push(`/* ${tag} exposes no CSS customization points in its CEM. */`);
     lines.push(`/* Check the component documentation for styling options. */`);
   }
 
   return lines.join('\n');
+}
+
+/**
+ * Guesses a sensible placeholder value based on CSS property name patterns.
+ * Used when the CEM doesn't specify a default value.
+ */
+function guessDefaultValue(propName: string): string {
+  const lower = propName.toLowerCase();
+  if (/color|bg|background/.test(lower)) return '#value';
+  if (/size|font/.test(lower)) return '1rem';
+  if (/radius/.test(lower)) return '4px';
+  if (/spacing|padding|margin|gap/.test(lower)) return '1rem';
+  if (/shadow/.test(lower)) return '0 1px 2px rgba(0,0,0,.1)';
+  if (/weight/.test(lower)) return '400';
+  if (/width|height/.test(lower)) return 'auto';
+  if (/opacity/.test(lower)) return '1';
+  return '#value';
 }
 
 // ─── Main Entry Point ────────────────────────────────────────────────────────

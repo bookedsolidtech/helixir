@@ -646,6 +646,98 @@ describe('suggestUsage — component with no members', () => {
 });
 
 // ---------------------------------------------------------------------------
+// suggestUsage — styling section
+// ---------------------------------------------------------------------------
+
+describe('suggestUsage — styling section (my-button with CSS props and parts)', () => {
+  it('returns a styling object when the component has CSS properties', async () => {
+    const result = await suggestUsage('my-button', makeConfig());
+    expect(result.styling).toBeDefined();
+  });
+
+  it('styling.cssProperties lists the component CSS custom properties', async () => {
+    const result = await suggestUsage('my-button', makeConfig());
+    expect(result.styling!.cssProperties.length).toBeGreaterThan(0);
+    const names = result.styling!.cssProperties.map((p) => p.name);
+    expect(names).toContain('--my-button-bg');
+  });
+
+  it('styling.cssProperties entries include exampleValue and description', async () => {
+    const result = await suggestUsage('my-button', makeConfig());
+    const prop = result.styling!.cssProperties.find((p) => p.name === '--my-button-bg');
+    expect(prop).toBeDefined();
+    expect(typeof prop!.exampleValue).toBe('string');
+    expect(prop!.exampleValue.length).toBeGreaterThan(0);
+    expect(typeof prop!.description).toBe('string');
+  });
+
+  it('styling.cssParts lists the component CSS parts', async () => {
+    const result = await suggestUsage('my-button', makeConfig());
+    expect(result.styling!.cssParts.length).toBeGreaterThan(0);
+    const names = result.styling!.cssParts.map((p) => p.name);
+    expect(names).toContain('base');
+  });
+
+  it('styling.cssParts entries include exampleSelector using ::part()', async () => {
+    const result = await suggestUsage('my-button', makeConfig());
+    const part = result.styling!.cssParts.find((p) => p.name === 'base');
+    expect(part).toBeDefined();
+    expect(part!.exampleSelector).toBe('my-button::part(base)');
+  });
+
+  it('styling.cssSnippet contains the component tag name', async () => {
+    const result = await suggestUsage('my-button', makeConfig());
+    expect(result.styling!.cssSnippet).toContain('my-button');
+  });
+
+  it('styling.cssSnippet contains CSS custom property names', async () => {
+    const result = await suggestUsage('my-button', makeConfig());
+    expect(result.styling!.cssSnippet).toContain('--my-button-bg');
+  });
+
+  it('styling.cssSnippet contains ::part() selectors', async () => {
+    const result = await suggestUsage('my-button', makeConfig());
+    expect(result.styling!.cssSnippet).toContain('::part(');
+  });
+
+  it('styling.warnings is a non-empty array', async () => {
+    const result = await suggestUsage('my-button', makeConfig());
+    expect(Array.isArray(result.styling!.warnings)).toBe(true);
+    expect(result.styling!.warnings.length).toBeGreaterThan(0);
+  });
+
+  it('styling.warnings mention Shadow DOM', async () => {
+    const result = await suggestUsage('my-button', makeConfig());
+    const allWarnings = result.styling!.warnings.join(' ');
+    expect(allWarnings).toContain('Shadow DOM');
+  });
+
+  it('returns no styling when component has no CSS properties or parts', async () => {
+    const noStyleCem = {
+      schemaVersion: '1.0.0',
+      modules: [
+        {
+          kind: 'javascript-module' as const,
+          path: 'src/x-plain.js',
+          declarations: [
+            {
+              kind: 'class' as const,
+              name: 'XPlain',
+              tagName: 'x-plain',
+              members: [],
+              events: [],
+              slots: [],
+            },
+          ],
+        },
+      ],
+    };
+    const result = await suggestUsage('x-plain', makeConfig(), noStyleCem as never);
+    expect(result.styling).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // suggestUsage — component with no description (slots without descriptions)
 // ---------------------------------------------------------------------------
 

@@ -121,6 +121,7 @@ export function recommendChecks(code: string): RecommendChecksResult {
   // JavaScript-based checks
   if (codeType.includes('javascript')) {
     recommended.push('check_method_calls');
+    recommended.push('check_shadow_dom_js');
 
     if (/addEventListener|on[A-Z]/.test(code)) {
       recommended.push('check_event_usage');

@@ -124,6 +124,22 @@ describe('handleStylingCall — check_method_calls', () => {
   });
 });
 
+// ─── handleStylingCall — check_layout_patterns ──────────────────────────────
+
+describe('handleStylingCall — check_layout_patterns', () => {
+  it('dispatches layout pattern check', () => {
+    const result = handleStylingCall(
+      'check_layout_patterns',
+      { cssText: 'sl-card { display: flex; }' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+    const parsed = JSON.parse((result.content as Array<{ text: string }>)[0].text);
+    expect(parsed.issues.length).toBeGreaterThan(0);
+    expect(parsed.issues[0].type).toBe('host-display-override');
+  });
+});
+
 // ─── handleStylingCall — check_css_specificity ──────────────────────────────
 
 describe('handleStylingCall — check_css_specificity', () => {

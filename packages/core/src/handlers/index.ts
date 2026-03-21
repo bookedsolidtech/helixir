@@ -21,6 +21,7 @@ export * from './event-usage-checker.js';
 export * from './health.js';
 export * from './html-usage-checker.js';
 export * from './import-checker.js';
+export * from './layout-checker.js';
 export * from './attribute-conflict-checker.js';
 export * from './method-checker.js';
 export * from './migration.js';

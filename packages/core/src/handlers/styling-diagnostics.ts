@@ -234,6 +234,21 @@ export function buildCssSnippet(meta: ComponentMetadata): string {
     }
   }
 
+  // Dark mode section — show the correct pattern for theme-scoped styling
+  if (meta.cssProperties.length > 0) {
+    const firstToken = meta.cssProperties[0];
+    if (firstToken) {
+      lines.push('');
+      lines.push(`/* Dark mode — use custom properties, NOT standard properties */`);
+      lines.push(`.dark ${tag},`);
+      lines.push(`[data-theme="dark"] ${tag} {`);
+      lines.push(`  ${firstToken.name}: /* dark value */;`);
+      lines.push(`}`);
+      lines.push(`/* WRONG: .dark ${tag} { color: white; } — standard properties`);
+      lines.push(`   on the host won't reach shadow DOM internals. */`);
+    }
+  }
+
   // Slot styling section — show how to style slotted content in light DOM
   if (meta.slots.length > 0) {
     lines.push('');

@@ -20,7 +20,14 @@ export interface FixSuggestion {
 }
 
 export interface SuggestFixInput {
-  type: 'shadow-dom' | 'token-fallback' | 'theme-compat' | 'method-call' | 'event-usage';
+  type:
+    | 'shadow-dom'
+    | 'token-fallback'
+    | 'theme-compat'
+    | 'method-call'
+    | 'event-usage'
+    | 'specificity'
+    | 'layout';
   issue: string;
   original: string;
   tagName?: string;
@@ -270,6 +277,116 @@ useEffect(() => {
   };
 }
 
+// ─── Specificity fixes ──────────────────────────────────────────────────────
+
+function fixSpecificity(input: SuggestFixInput): FixSuggestion {
+  const { original, tagName } = input;
+
+  if (input.issue === 'important') {
+    const suggestion = original.replace(/\s*!important\s*/g, ' ');
+    return {
+      original,
+      suggestion,
+      explanation:
+        '!important prevents theme overrides and makes specificity impossible to manage. Remove it and use CSS custom properties to communicate with the component instead.',
+      severity: 'error',
+    };
+  }
+
+  if (input.issue === 'id-selector') {
+    // Replace #id with a class or tag selector
+    const suggestion = original.replace(/#([a-z][a-z0-9_-]*)/gi, '.$1');
+    return {
+      original,
+      suggestion,
+      explanation:
+        'ID selectors have extremely high specificity and make component styling brittle. Use class selectors or the tag name directly.',
+      severity: 'warning',
+    };
+  }
+
+  if (input.issue === 'deep-nesting') {
+    const tag = tagName ?? 'the-element';
+    return {
+      original,
+      suggestion: `${tag} { /* use CSS custom properties or ::part() instead of deep nesting */ }`,
+      explanation:
+        'Deeply nested selectors (4+ levels) are fragile and cannot pierce shadow DOM anyway. Use the component tag directly with CSS custom properties or ::part().',
+      severity: 'warning',
+    };
+  }
+
+  if (input.issue === 'inline-style') {
+    const tag = tagName ?? 'the-element';
+    return {
+      original,
+      suggestion: `/* Move inline styles to a stylesheet: */\n${tag} { /* your styles here */ }`,
+      explanation:
+        'Inline styles have the highest specificity and prevent theming. Move styles to a stylesheet using the tag name selector.',
+      severity: 'warning',
+    };
+  }
+
+  return {
+    original,
+    suggestion: original,
+    explanation: 'Reduce CSS specificity to make styling more maintainable and theme-friendly.',
+    severity: 'info',
+  };
+}
+
+// ─── Layout fixes ───────────────────────────────────────────────────────────
+
+function fixLayout(input: SuggestFixInput): FixSuggestion {
+  const { original, tagName, property } = input;
+  const tag = tagName ?? 'the-element';
+
+  if (input.issue === 'host-display') {
+    return {
+      original,
+      suggestion: `/* Web components manage their own display. Wrap instead: */\n.${tag}-wrapper { display: flex; }\n${tag} { /* no display override */ }`,
+      explanation: `Setting display on <${tag}> overrides the component's internal layout. Wrap the component in a container and set display there instead.`,
+      severity: 'warning',
+    };
+  }
+
+  if (input.issue === 'fixed-dimensions') {
+    const prop = property ?? 'width';
+    return {
+      original,
+      suggestion: `${tag} { ${prop}: auto; max-${prop}: 400px; }`,
+      explanation: `Fixed ${prop} on a web component host prevents responsive behavior. Use max-${prop} or let the component size itself. Use CSS custom properties if the component exposes sizing tokens.`,
+      severity: 'warning',
+    };
+  }
+
+  if (input.issue === 'position-override') {
+    return {
+      original,
+      suggestion: `/* Wrap the component instead: */\n.${tag}-container { position: relative; }\n${tag} { /* no position override */ }`,
+      explanation: `Setting position on <${tag}> can break the component's internal stacking context. Position a wrapper element instead.`,
+      severity: 'warning',
+    };
+  }
+
+  if (input.issue === 'overflow-hidden') {
+    return {
+      original,
+      suggestion: `/* If needed, wrap: */\n.${tag}-container { overflow: hidden; }\n${tag} { /* no overflow override */ }`,
+      explanation: `overflow: hidden on <${tag}> can clip the component's dropdown menus, tooltips, and other overlay content. Apply overflow to a wrapper instead.`,
+      severity: 'warning',
+    };
+  }
+
+  return {
+    original,
+    suggestion: original,
+    explanation:
+      'Avoid overriding layout properties on web component host elements. Use wrapper elements or CSS custom properties.',
+    severity: 'info',
+  };
+}
+
 // ─── Main Entry Point ───────────────────────────────────────────────────────
 
 export function suggestFix(input: SuggestFixInput): FixSuggestion {
@@ -284,6 +401,10 @@ export function suggestFix(input: SuggestFixInput): FixSuggestion {
       return fixMethodCall(input);
     case 'event-usage':
       return fixEventUsage(input);
+    case 'specificity':
+      return fixSpecificity(input);
+    case 'layout':
+      return fixLayout(input);
     default:
       return {
         original: input.original,

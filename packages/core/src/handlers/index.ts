@@ -30,6 +30,7 @@ export * from './slot-children-checker.js';
 export * from './styling-diagnostics.js';
 export * from './suggest.js';
 export * from './theme-detection.js';
+export * from './token-fallback-checker.js';
 export * from './tokens.js';
 export * from './typegenerate.js';
 export * from './typescript.js';

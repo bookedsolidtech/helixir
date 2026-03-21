@@ -1,0 +1,99 @@
+{
+  "category": "infrastructure",
+  "description": "Integrate the custom agent system into HELiXiR following the pattern established in HELiX. HELiXiR should focus on auditing and a special workflow/delegation matrix related to the health scanning dimensions and infrastructure.\n\n### Agent Task\nResearch the HELiX custom agent integration at `/Volumes/Development/booked/helix/.automaker/context/custom-agent-integration-guide.md` and replicate the pattern for HELiXiR, with a focus on health scanning infrastructure.\n\n### What to Build\n\n1. **Symlink agents** from `/Volumes/Development/booked/booked-solid-tech/.claude/agents/engineering/` into this project's `.claude/agents/` directory\n\n2. **Register customSubagents** in `.automaker/settings.json` with role-based tools and models\n\n3. **Create workflow context files** in `.automaker/context/`:\n   - `health-scanning-audit-workflow.md` — audit the health scoring dimensions (accessibility, CEM completeness, test coverage, Storybook coverage, TypeScript strictness, bundle size, documentation)\n   - `cem-validation-workflow.md` — Custom Elements Manifest accuracy audit\n   - `scoring-calibration-workflow.md` — verify scoring weights and thresholds are calibrated correctly\n   - `custom-agent-delegation.md` — routing table specific to HELiXiR's MCP server and scoring infrastructure\n\n4. **Design HELiXiR-specific audit workflows:**\n   - Health scanner accuracy audit: compare MCP tool outputs against manual verification\n   - CEM parsing correctness: validate that CEM analysis matches actual component APIs\n   - Scoring dimension coverage: ensure all 7 quality dimensions are properly measured\n   - Performance audit for MCP server response times and caching\n   - Integration testing: verify HELiXiR tools work correctly with Claude Code\n\n### Reference\n- HELiX integration guide: `/Volumes/Development/booked/helix/.automaker/context/custom-agent-integration-guide.md`\n- HELiX settings (21 agents): `/Volumes/Development/booked/helix/.automaker/settings.json`\n- Agent source: `/Volumes/Development/booked/booked-solid-tech/.claude/agents/engineering/`\n\n### Acceptance Criteria\n- All relevant agents symlinked and discoverable by protoMaker\n- customSubagents registered in settings.json\n- Health scanning audit workflow documented\n- CEM validation workflow documented\n- At least 4 workflow context files created",
+  "title": "integrate custom agent system — health scanning audit workflow and delegation matrix",
+  "status": "done",
+  "complexity": "architectural",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "60d86345-9ee9-4e5a-b246-da82f3ed2a92",
+  "id": "feature-1773899514816-1oluo0wc3",
+  "branchName": "feature/integrate-custom-agent-system-health",
+  "descriptionHistory": [
+    {
+      "description": "Integrate the custom agent system into HELiXiR following the pattern established in HELiX. HELiXiR should focus on auditing and a special workflow/delegation matrix related to the health scanning dimensions and infrastructure.\n\n### Agent Task\nResearch the HELiX custom agent integration at `/Volumes/Development/booked/helix/.automaker/context/custom-agent-integration-guide.md` and replicate the pattern for HELiXiR, with a focus on health scanning infrastructure.\n\n### What to Build\n\n1. **Symlink agents** from `/Volumes/Development/booked/booked-solid-tech/.claude/agents/engineering/` into this project's `.claude/agents/` directory\n\n2. **Register customSubagents** in `.automaker/settings.json` with role-based tools and models\n\n3. **Create workflow context files** in `.automaker/context/`:\n   - `health-scanning-audit-workflow.md` — audit the health scoring dimensions (accessibility, CEM completeness, test coverage, Storybook coverage, TypeScript strictness, bundle size, documentation)\n   - `cem-validation-workflow.md` — Custom Elements Manifest accuracy audit\n   - `scoring-calibration-workflow.md` — verify scoring weights and thresholds are calibrated correctly\n   - `custom-agent-delegation.md` — routing table specific to HELiXiR's MCP server and scoring infrastructure\n\n4. **Design HELiXiR-specific audit workflows:**\n   - Health scanner accuracy audit: compare MCP tool outputs against manual verification\n   - CEM parsing correctness: validate that CEM analysis matches actual component APIs\n   - Scoring dimension coverage: ensure all 7 quality dimensions are properly measured\n   - Performance audit for MCP server response times and caching\n   - Integration testing: verify HELiXiR tools work correctly with Claude Code\n\n### Reference\n- HELiX integration guide: `/Volumes/Development/booked/helix/.automaker/context/custom-agent-integration-guide.md`\n- HELiX settings (21 agents): `/Volumes/Development/booked/helix/.automaker/settings.json`\n- Agent source: `/Volumes/Development/booked/booked-solid-tech/.claude/agents/engineering/`\n\n### Acceptance Criteria\n- All relevant agents symlinked and discoverable by protoMaker\n- customSubagents registered in settings.json\n- Health scanning audit workflow documented\n- CEM validation workflow documented\n- At least 4 workflow context files created",
+      "timestamp": "2026-03-19T05:51:54.816Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-19T05:51:54.818Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-19T05:51:54.818Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-19T05:57:10.502Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-19T05:57:36.581Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-19T05:57:38.596Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-19T05:57:43.947Z",
+      "reason": "Max agent retries exceeded (3)"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-19T06:04:25.769Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-21T03:00:48.637Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-19T05:57:38.596Z",
+  "executionHistory": [
+    {
+      "id": "d91f0592-fb9f-408f-ac50-0a0a2f0611fb",
+      "startedAt": "2026-03-19T05:57:12.323Z",
+      "completedAt": "2026-03-19T05:57:36.903Z",
+      "durationMs": 24580,
+      "costUsd": 0,
+      "model": "claude-sonnet-4-6",
+      "success": false,
+      "error": "Operation was cancelled",
+      "trigger": "manual"
+    }
+  ],
+  "statusChangeReason": "Max agent retries exceeded (3)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max agent retries exceeded (3)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-19T05:57:43.946Z"
+  },
+  "costUsd": 1.4046822499999998,
+  "lastSessionId": "72aaa297-5ce4-4368-9dd2-7646ae9f8992",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/97",
+  "prNumber": 97,
+  "prCreatedAt": "2026-03-19T06:04:24.910Z",
+  "reviewStartedAt": "2026-03-19T06:04:25.769Z",
+  "prTrackedSince": "2026-03-19T06:04:25.780Z",
+  "prLastPolledAt": "2026-03-21T05:01:42.174Z",
+  "prMergedAt": "2026-03-19T06:05:34Z",
+  "completedAt": "2026-03-21T03:00:48.637Z"
+}

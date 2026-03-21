@@ -1,0 +1,64 @@
+{
+  "category": "infrastructure",
+  "description": "## Context\n\nWe have 11 real web component libraries at `/Volumes/Development/booked/wc-libraries/` plus the helix production library at `/Volumes/Development/booked/helix/packages/hx-library/`. After adding 3 new dimensions (14 total), we need to validate the full scorer at scale and generate actionable reports.\n\n## Implementation\n\n### Benchmark Test Suite\nCreate `tests/benchmark/cross-library-scorer.test.ts`:\n\n1. **Load all 11 libraries** from `/Volumes/Development/booked/wc-libraries/`:\n   - material, spectrum, vaadin, fluentui, carbon, ui5, calcite, porsche, ionic, wired, elix\n   - Each has `custom-elements.json` at root\n   \n2. **Load helix library** from `/Volumes/Development/booked/helix/packages/hx-library/custom-elements.json`\n\n3. **For each library, score ALL components** using `scoreComponentMultiDimensional()`\n\n4. **Generate per-library scorecard**:\n   - Average score, grade distribution, dimension averages\n   - Top 5 / Bottom 5 components\n   - Dimension-level insights (which dimensions drag scores down)\n   - Confidence breakdown (verified/heuristic/untested)\n\n5. **Cross-library comparison table**:\n   - Libraries ranked by average score\n   - Per-dimension rankings\n   - Identify which dimensions differentiate high vs low scoring libraries\n\n6. **Helix-specific report**:\n   - Full component-by-component breakdown\n   - Issues found per component (especially from CEM-Source Fidelity)\n   - Comparison against Material Web and Carbon (gold standards)\n   - Actionable list of issues for the helix team to fix\n\n### Test Assertions\n- All libraries parse without errors\n- All components score between 0-100\n- Grade distribution makes sense (no library is all F, no library is all A)\n- CEM-Source Fidelity catches at least 1 real discrepancy in helix (the carousel bug proves they exist)\n- Helix scores competitively with Material Web on CEM-native dimensions\n\n### Output\n- Test results to stdout (vitest)\n- Optional: Write scorecard JSON to `tests/__fixtures__/benchmark-results/` for comparison over time\n- Helix report as structured JSON for feeding back to helix team\n\n### Dependencies\n- Depends on all 3 new analyzers (F1, F2, F3) being merged\n\n### Key Files\n- New: `tests/benchmark/cross-library-scorer.test.ts`\n- New: `tests/benchmark/helix-report.test.ts` (helix-specific deep analysis)\n- Libraries: `/Volumes/Development/booked/wc-libraries/{name}/custom-elements.json`\n- Helix: `/Volumes/Development/booked/helix/packages/hx-library/custom-elements.json`\n\n### Acceptance Criteria\n- [ ] All 11 wc-libraries + helix scored successfully\n- [ ] Per-library scorecards generated\n- [ ] Cross-library comparison table correct\n- [ ] Helix report identifies real issues\n- [ ] CEM-Source Fidelity dimension finds real discrepancies\n- [ ] No test regressions\n- [ ] Benchmark completes in under 60 seconds (performance gate)",
+  "title": "feat: Cross-Library Benchmark Suite — validate scorer against 11 real libraries + generate Helix report",
+  "status": "done",
+  "branchName": "feature/cross-library-benchmark-suite",
+  "epicId": "feature-1773801140156-b3n5aqaz2",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "ca93b18c-03f1-46f5-882f-6989548f05c1",
+  "id": "feature-1773801257896-sczpc2dyd",
+  "descriptionHistory": [
+    {
+      "description": "## Context\n\nWe have 11 real web component libraries at `/Volumes/Development/booked/wc-libraries/` plus the helix production library at `/Volumes/Development/booked/helix/packages/hx-library/`. After adding 3 new dimensions (14 total), we need to validate the full scorer at scale and generate actionable reports.\n\n## Implementation\n\n### Benchmark Test Suite\nCreate `tests/benchmark/cross-library-scorer.test.ts`:\n\n1. **Load all 11 libraries** from `/Volumes/Development/booked/wc-libraries/`:\n   - material, spectrum, vaadin, fluentui, carbon, ui5, calcite, porsche, ionic, wired, elix\n   - Each has `custom-elements.json` at root\n   \n2. **Load helix library** from `/Volumes/Development/booked/helix/packages/hx-library/custom-elements.json`\n\n3. **For each library, score ALL components** using `scoreComponentMultiDimensional()`\n\n4. **Generate per-library scorecard**:\n   - Average score, grade distribution, dimension averages\n   - Top 5 / Bottom 5 components\n   - Dimension-level insights (which dimensions drag scores down)\n   - Confidence breakdown (verified/heuristic/untested)\n\n5. **Cross-library comparison table**:\n   - Libraries ranked by average score\n   - Per-dimension rankings\n   - Identify which dimensions differentiate high vs low scoring libraries\n\n6. **Helix-specific report**:\n   - Full component-by-component breakdown\n   - Issues found per component (especially from CEM-Source Fidelity)\n   - Comparison against Material Web and Carbon (gold standards)\n   - Actionable list of issues for the helix team to fix\n\n### Test Assertions\n- All libraries parse without errors\n- All components score between 0-100\n- Grade distribution makes sense (no library is all F, no library is all A)\n- CEM-Source Fidelity catches at least 1 real discrepancy in helix (the carousel bug proves they exist)\n- Helix scores competitively with Material Web on CEM-native dimensions\n\n### Output\n- Test results to stdout (vitest)\n- Optional: Write scorecard JSON to `tests/__fixtures__/benchmark-results/` for comparison over time\n- Helix report as structured JSON for feeding back to helix team\n\n### Dependencies\n- Depends on all 3 new analyzers (F1, F2, F3) being merged\n\n### Key Files\n- New: `tests/benchmark/cross-library-scorer.test.ts`\n- New: `tests/benchmark/helix-report.test.ts` (helix-specific deep analysis)\n- Libraries: `/Volumes/Development/booked/wc-libraries/{name}/custom-elements.json`\n- Helix: `/Volumes/Development/booked/helix/packages/hx-library/custom-elements.json`\n\n### Acceptance Criteria\n- [ ] All 11 wc-libraries + helix scored successfully\n- [ ] Per-library scorecards generated\n- [ ] Cross-library comparison table correct\n- [ ] Helix report identifies real issues\n- [ ] CEM-Source Fidelity dimension finds real discrepancies\n- [ ] No test regressions\n- [ ] Benchmark completes in under 60 seconds (performance gate)",
+      "timestamp": "2026-03-18T02:34:17.896Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-18T02:34:17.897Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-18T02:34:17.897Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-18T03:44:42.969Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-18T04:01:15.145Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-18T04:35:41.349Z"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [
+    "feature-1773801240034-o1w52j8t6",
+    "feature-1773801180845-zcxtn5lhu",
+    "feature-1773801193733-jc6x78jqf"
+  ],
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-18T03:53:23.652Z",
+  "costUsd": 2.2212742500000004,
+  "lastSessionId": "cf05d0a9-08c7-4f20-ace0-720c64609b72",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/88",
+  "prNumber": 88,
+  "prCreatedAt": "2026-03-18T04:01:14.211Z",
+  "reviewStartedAt": "2026-03-18T04:01:15.145Z",
+  "prTrackedSince": "2026-03-18T04:01:15.147Z",
+  "prLastPolledAt": "2026-03-18T06:35:56.381Z",
+  "prMergedAt": "2026-03-18T04:35:19Z",
+  "completedAt": "2026-03-18T04:35:41.349Z"
+}

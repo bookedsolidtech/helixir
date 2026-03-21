@@ -1,0 +1,76 @@
+{
+  "category": "Uncategorized",
+  "description": "In `packages/core/src/handlers/health.ts` at lines ~240 and ~249, `getHealthTrend` and `getHealthDiff` throw plain `Error` objects when component history is missing. These get wrapped as `[UNKNOWN]` by the error handler instead of the correct `[NOT_FOUND]` category.\n\n**Fix:** Replace bare `throw new Error(...)` with `throw new MCPError(ErrorCategory.NOT_FOUND, ...)` at both locations.\n\n**Acceptance criteria:**\n- `getHealthTrend` throws `MCPError(NOT_FOUND)` when no history file exists for a component\n- `getHealthDiff` throws `MCPError(NOT_FOUND)` when no history file exists for a component  \n- Tests verify the error category is `NOT_FOUND` not `UNKNOWN`\n- All existing tests continue to pass",
+  "title": "fix: use NOT_FOUND error category for missing component history",
+  "status": "done",
+  "complexity": "small",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "b9ec8060-814f-4ad0-a386-d397eac15b98",
+  "id": "feature-1772670336213-nx9kiz4f3",
+  "branchName": "feature/fix-use-notfound-error-category-for",
+  "descriptionHistory": [
+    {
+      "description": "In `packages/core/src/handlers/health.ts` at lines ~240 and ~249, `getHealthTrend` and `getHealthDiff` throw plain `Error` objects when component history is missing. These get wrapped as `[UNKNOWN]` by the error handler instead of the correct `[NOT_FOUND]` category.\n\n**Fix:** Replace bare `throw new Error(...)` with `throw new MCPError(ErrorCategory.NOT_FOUND, ...)` at both locations.\n\n**Acceptance criteria:**\n- `getHealthTrend` throws `MCPError(NOT_FOUND)` when no history file exists for a component\n- `getHealthDiff` throws `MCPError(NOT_FOUND)` when no history file exists for a component  \n- Tests verify the error category is `NOT_FOUND` not `UNKNOWN`\n- All existing tests continue to pass",
+      "timestamp": "2026-03-05T00:25:36.213Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-05T00:25:36.213Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-05T00:25:36.213Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T03:46:57.959Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T03:50:01.684Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-12T03:56:03.802Z",
+      "reason": "Merge failed: Command failed: gh pr merge 32 --squash\nGraphQL: Squash merges are not allowed on this repository. (mergePullRequest)\n"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-12T04:24:41.964Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-12T03:46:59.849Z",
+  "costUsd": 0.52190975,
+  "lastSessionId": "200cbc03-0d1d-434d-936a-52eec1e2049d",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/32",
+  "prNumber": 32,
+  "prCreatedAt": "2026-03-12T03:50:00.816Z",
+  "reviewStartedAt": "2026-03-12T03:50:01.684Z",
+  "prTrackedSince": "2026-03-12T03:50:01.687Z",
+  "prLastPolledAt": "2026-03-12T03:55:33.873Z",
+  "statusChangeReason": "Merge failed: Command failed: gh pr merge 32 --squash\nGraphQL: Squash merges are not allowed on this repository. (mergePullRequest)\n",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Merge failed: Command failed: gh pr merge 32 --squash\nGraphQL: Squash merges are not allowed on this repository. (mergePullRequest)\n"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-12T03:56:03.805Z"
+  },
+  "prMergedAt": "2026-03-12T04:24:40Z",
+  "completedAt": "2026-03-12T04:24:41.964Z"
+}

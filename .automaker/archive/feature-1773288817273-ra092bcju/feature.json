@@ -1,0 +1,58 @@
+{
+  "category": "Uncategorized",
+  "description": "The release workflow (`.github/workflows/release.yml`) does not set `NPM_CONFIG_PROVENANCE: 'true'`. This means published npm packages lack signed provenance attestation — a trust signal that npm now surfaces on the package page and that users can verify with `npm audit signatures`.\n\nThe helix repo (`../helix`) has this enabled. helixir should match.\n\n**Fix:** Add `NPM_CONFIG_PROVENANCE: 'true'` to the `env:` block of the release job in `.github/workflows/release.yml`.\n\n**Acceptance criteria:**\n- `NPM_CONFIG_PROVENANCE: 'true'` is present in the release job env block\n- Workflow YAML is valid (no syntax errors)\n- No other workflow steps are modified",
+  "title": "chore: add NPM provenance signing to release workflow",
+  "status": "done",
+  "complexity": "small",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "df2e0e8c-4122-48ec-9fd8-914efaf20fe4",
+  "id": "feature-1773288817273-ra092bcju",
+  "branchName": "feature/chore-add-npm-provenance-signing-to",
+  "descriptionHistory": [
+    {
+      "description": "The release workflow (`.github/workflows/release.yml`) does not set `NPM_CONFIG_PROVENANCE: 'true'`. This means published npm packages lack signed provenance attestation — a trust signal that npm now surfaces on the package page and that users can verify with `npm audit signatures`.\n\nThe helix repo (`../helix`) has this enabled. helixir should match.\n\n**Fix:** Add `NPM_CONFIG_PROVENANCE: 'true'` to the `env:` block of the release job in `.github/workflows/release.yml`.\n\n**Acceptance criteria:**\n- `NPM_CONFIG_PROVENANCE: 'true'` is present in the release job env block\n- Workflow YAML is valid (no syntax errors)\n- No other workflow steps are modified",
+      "timestamp": "2026-03-12T04:13:37.273Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-12T04:13:37.273Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-12T04:13:37.273Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T05:47:21.663Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T05:48:03.336Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-12T06:13:37.486Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-12T05:47:24.460Z",
+  "costUsd": 0.20054375000000002,
+  "lastSessionId": "25ec5545-ccf6-4de2-992d-245130548c26",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/34",
+  "prNumber": 34,
+  "prCreatedAt": "2026-03-12T05:48:02.700Z",
+  "reviewStartedAt": "2026-03-12T05:48:03.336Z",
+  "prTrackedSince": "2026-03-12T05:48:03.337Z",
+  "prLastPolledAt": "2026-03-12T08:14:19.299Z",
+  "prMergedAt": "2026-03-12T06:13:36Z",
+  "completedAt": "2026-03-12T06:13:37.486Z"
+}

@@ -1,0 +1,62 @@
+{
+  "category": "infrastructure",
+  "description": "Consumer report from trip-planner project.\n\nProblem: There is no automated way to detect when helix.d.ts type definitions drift from the actual CEM (Custom Elements Manifest). This has led to 3+ critical bugs found in the trip-planner integration where TypeScript types suggested wrong attribute names.\n\nProposed tool: validate_type_definitions\n- Reads the CEM JSON\n- Reads the helix.d.ts file\n- Compares every component's attributes, properties, events, and slots\n- Reports mismatches: missing, extra, wrong types\n- Returns structured diff that can be used by agents to auto-fix\n\nAdditionally: Add a CI gate that runs this validation on every PR to the helix library, preventing drift at the source.\n\nAcceptance criteria:\n- MCP tool exists and returns structured comparison\n- Catches all known drift issues (tabs, skeleton, spinner)\n- Can be run by Helixir CLI as well as MCP\n- CI integration guide documented",
+  "title": "feat: add validate_type_definitions MCP tool to catch CEM-to-types drift",
+  "status": "done",
+  "complexity": "medium",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "63be7b9a-0522-4e9d-b3ca-7c71c262984b",
+  "id": "feature-1773800476733-u113nxlw2",
+  "branchName": "feature/feat-add-validatetypedefinitions-mcp",
+  "descriptionHistory": [
+    {
+      "description": "Consumer report from trip-planner project.\n\nProblem: There is no automated way to detect when helix.d.ts type definitions drift from the actual CEM (Custom Elements Manifest). This has led to 3+ critical bugs found in the trip-planner integration where TypeScript types suggested wrong attribute names.\n\nProposed tool: validate_type_definitions\n- Reads the CEM JSON\n- Reads the helix.d.ts file\n- Compares every component's attributes, properties, events, and slots\n- Reports mismatches: missing, extra, wrong types\n- Returns structured diff that can be used by agents to auto-fix\n\nAdditionally: Add a CI gate that runs this validation on every PR to the helix library, preventing drift at the source.\n\nAcceptance criteria:\n- MCP tool exists and returns structured comparison\n- Catches all known drift issues (tabs, skeleton, spinner)\n- Can be run by Helixir CLI as well as MCP\n- CI integration guide documented",
+      "timestamp": "2026-03-18T02:21:16.733Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-18T02:21:16.734Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-18T02:21:16.734Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-18T02:31:06.841Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-18T02:33:36.962Z"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-18T02:42:24.864Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-18T03:44:30.277Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-18T02:31:10.712Z",
+  "costUsd": 3.2904907000000017,
+  "lastSessionId": "64eeab9a-50a9-4841-a323-f68e85159279",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/83",
+  "prNumber": 83,
+  "prCreatedAt": "2026-03-18T02:42:23.520Z",
+  "reviewStartedAt": "2026-03-18T02:42:24.864Z",
+  "prTrackedSince": "2026-03-18T02:42:24.866Z",
+  "prLastPolledAt": "2026-03-18T03:43:45.671Z",
+  "completedAt": "2026-03-18T03:44:30.277Z"
+}

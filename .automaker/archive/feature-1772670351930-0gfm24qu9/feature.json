@@ -1,0 +1,85 @@
+{
+  "category": "Uncategorized",
+  "description": "The README description of the `cdnBase` config key is unclear — users don't know what format to use or what it controls.\n\n**Fix:** Update README.md config reference table to add an example value and explain what `cdnBase` does (base URL for CDN bundle size estimation, e.g. `https://cdn.jsdelivr.net/npm`).\n\n**Acceptance criteria:**\n- `cdnBase` entry in the README config table has a clear description and example value\n- Example shows full URL format\n- No other README content changed",
+  "title": "fix: clarify cdnBase config description in README",
+  "status": "done",
+  "complexity": "small",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "2eff202a-0fe3-49b0-ae99-7bce5ae380f3",
+  "id": "feature-1772670351930-0gfm24qu9",
+  "branchName": "feature/fix-clarify-cdnbase-config-description",
+  "descriptionHistory": [
+    {
+      "description": "The README description of the `cdnBase` config key is unclear — users don't know what format to use or what it controls.\n\n**Fix:** Update README.md config reference table to add an example value and explain what `cdnBase` does (base URL for CDN bundle size estimation, e.g. `https://cdn.jsdelivr.net/npm`).\n\n**Acceptance criteria:**\n- `cdnBase` entry in the README config table has a clear description and example value\n- Example shows full URL format\n- No other README content changed",
+      "timestamp": "2026-03-05T00:25:51.930Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-05T00:25:51.930Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-05T00:25:51.930Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T05:48:27.361Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T05:49:37.542Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-12T06:16:43.310Z",
+      "reason": "Max remediation cycles exceeded (4)"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-12T06:58:21.704Z",
+      "reason": "CodeRabbit fix pushed — neutral cdnBase URL in example"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-12T17:54:08.354Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-12T05:48:31.105Z",
+  "costUsd": 0.32195524999999997,
+  "lastSessionId": "4b5c2bf6-79fc-4a97-a3a9-bc2ba1258517",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/36",
+  "prNumber": 36,
+  "prCreatedAt": "2026-03-12T05:49:36.847Z",
+  "reviewStartedAt": "2026-03-12T05:49:37.542Z",
+  "prTrackedSince": "2026-03-12T05:49:37.544Z",
+  "prLastPolledAt": "2026-03-12T21:34:21.892Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 1**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@README.md`:\n- Line 365: The README's example currently hard-codes a Shoelace CDN in the\n\"cdnBase\" field which makes the generic ds- example inconsistent; change the\nexample value for the \"cdnBase\" key to a neutral base (e.g.,\n\"https://cdn.jsdelivr.net/npm\") or make the entire example Shoelace-specific so\nit is consistent; update the \"cdnBase\" entry in the example block to the neutral\nURL (or rewrite surrounding example to explicitly reference Shoelace) and ensure\nany explanatory text reflects that choice.\n```\n\n</details>\n\n---\n\n<details>\n<summary>ℹ️ Review info</summary>\n\n<details>\n<summary>⚙️ Run configuration</summary>\n\n**Configuration used**: Path: .coderabbit.yaml\n\n**Review profile**: ASSERTIVE\n\n**Plan**: Pro\n\n**Run ID**: `77eafd45-8aa3-474f-9fff-4e50278c8087`\n\n</details>\n\n<details>\n<summary>📥 Commits</summary>\n\nReviewing files that changed from the base of the PR and between 20244ceaa24bee1d4c4313a02ea7f31c6dd91db6 and 3679809f638426327c561d9f32c8b11f29ada45d.\n\n</details>\n\n<details>\n<summary>📒 Files selected for processing (1)</summary>\n\n* `README.md`\n\n</details>\n\n</details>\n\n<!-- This is an auto-generated comment by CodeRabbit for review status -->\n---\n### CodeRabbit Review (1 items)\n- [WARNING] <!-- This is an auto-generated comment: summarize by coderabbit.ai -->\n<!-- configuration_strict_warnings_start -->",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1,
+  "statusChangeReason": "CodeRabbit fix pushed — neutral cdnBase URL in example",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max remediation cycles exceeded (4)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-12T06:16:43.311Z"
+  },
+  "prMergedAt": "2026-03-12T17:53:40Z",
+  "completedAt": "2026-03-12T17:54:08.354Z"
+}

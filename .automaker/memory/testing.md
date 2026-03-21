@@ -5,9 +5,9 @@ relevantTo: [testing]
 importance: 0.7
 relatedFiles: []
 usageStats:
-  loaded: 12
-  referenced: 8
-  successfulFeatures: 8
+  loaded: 21
+  referenced: 9
+  successfulFeatures: 9
 ---
 # testing
 
@@ -198,3 +198,27 @@ usageStats:
 - **Situation:** Core handlers and tools were updated with libraryId parameter threading, but tests were not updated until the full test suite was run.
 - **Root cause:** TypeScript build passes because the implementation is sound; tests fail only when actually executed against the updated handlers. There's a gap between code changes and test verification.
 - **How to avoid:** Faster implementation velocity when not test-driven, but delays discovery of test staleness until explicit test runs. Implementation-first approach works when test coverage is comprehensive enough to catch drift.
+
+#### [Gotcha] Migrating CI from direct scripts to Turbo entrypoints silently drops coverage reporting: `test:all` runs `turbo run test` which calls the `test` script (vitest run), not `test:coverage` (2026-03-21)
+- **Situation:** PR #98 added Turbo orchestration scripts and CI was updated to use `test:all` for consistency, but `test:all` was defined as `turbo run test`, not `turbo run test:coverage`
+- **Root cause:** The PR's own `test:all` definition used the bare `test` script — matching that definition maintained internal consistency but dropped coverage
+- **How to avoid:** CI is now consistent with local Turbo usage, but coverage enforcement in CI is silently lost with no warning or failure — a regression that is easy to miss
+
+### Replace toBeLessThan(N) assertions with toBe(exact_value) in metric scoring tests when the implementation produces a deterministic output (2026-03-21)
+- **Context:** A test for mixed-namespace CSS token scoring used toBeLessThan(15) to assert 'bad score', but after adding a 50% dominance threshold the correct output became exactly 0.
+- **Why:** Loose inequality assertions (toBeLessThan) allow score regressions to go undetected as long as they stay below the threshold. An exact assertion is a hard regression guard that forces any scoring logic change to explicitly update the test expectation.
+- **Rejected:** Keeping toBeLessThan(15) was tempting since it still passes — rejected because it permits a future regression where score returns to e.g. 5 (which is < 15) without failing the test, hiding the behavioral change.
+- **Trade-offs:** Exact assertions are more brittle to intentional scoring algorithm changes (require explicit test updates), but that friction is the point — it surfaces the change as a deliberate decision rather than a silent drift.
+- **Breaking if changed:** If the 50% threshold is removed or the scoring formula changes, toBe(0) will fail immediately, which is the desired behavior — it forces the developer to consciously update the expectation rather than silently accept a different score.
+
+#### [Gotcha] Migrating CI from direct script invocations to Turbo :all entrypoints silently drops coverage reporting — test:all runs vitest run without --coverage, while the old test:coverage script included it (2026-03-21)
+- **Situation:** PR #98 standardizing package manager and CI scripts to use Turbo orchestration across all 4 workflow files
+- **Root cause:** Turbo's test:all target was designed for speed and caching across packages, not for coverage artifact generation; coverage requires a separate explicit invocation
+- **How to avoid:** CI becomes faster and consistent with local Turbo runs, but coverage is no longer automatically collected on every PR — it must be explicitly triggered via test:coverage
+
+### test:all uses `turbo run test` without coverage flag — coverage enforcement is intentionally absent from CI (2026-03-21)
+- **Context:** CodeRabbit flagged inconsistency between workflow scripts and turbo.json; investigation revealed test:all runs vitest without --coverage
+- **Why:** Coverage enforcement in CI adds noise and can block PRs on legitimate feature work; test:coverage exists for local developer use only, keeping CI fast and non-blocking
+- **Rejected:** Adding --coverage to CI turbo pipeline — rejected because it would enforce coverage thresholds as a merge gate, which the team explicitly did not want
+- **Trade-offs:** CI stays fast and green without coverage regression risk; trade-off is no automated coverage regression detection in the pipeline
+- **Breaking if changed:** If test:all is changed to include coverage flags, it could introduce CI failures on PRs that reduce coverage, blocking merges unintentionally

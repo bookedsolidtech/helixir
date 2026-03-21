@@ -5,9 +5,9 @@ relevantTo: [architecture]
 importance: 0.7
 relatedFiles: []
 usageStats:
-  loaded: 19
-  referenced: 15
-  successfulFeatures: 15
+  loaded: 30
+  referenced: 18
+  successfulFeatures: 18
 ---
 # architecture
 
@@ -494,3 +494,71 @@ usageStats:
 - **Rejected:** A single ci.yml that runs all steps sequentially — rejected likely because it creates a single point of failure, slower feedback loops, and makes it harder to selectively re-run specific checks
 - **Trade-offs:** Easier to maintain and scale individual concerns; harder to discover what 'CI' means as a whole since there is no single entry point — feature tickets may incorrectly reference ci.yml
 - **Breaking if changed:** If someone creates a ci.yml expecting it to be the canonical pipeline, it would create confusion and potential duplicate runs or conflicts with existing granular workflows
+
+### CI workflows use direct commands (tsc, vitest --coverage) instead of turbo :all convenience scripts (2026-03-19)
+- **Context:** Monorepo has turbo-orchestrated :all scripts (build:all, test:all) for local dev, but CI workflows call root-level commands directly
+- **Why:** CI environments are always clean — turbo's caching provides zero benefit and adds daemon startup overhead. Direct commands also allow precise control: test:coverage needs coverage flags that turbo's test:all doesn't pass, and publish.yml must build only the root package to avoid unnecessarily building github-action package during changesets publish
+- **Rejected:** Using turbo :all scripts in CI for consistency with local dev workflow
+- **Trade-offs:** CI and local dev use visually inconsistent commands, which invites future reviewers/bots to flag it as an error. Benefit is simpler CI with no turbo overhead and precise behavioral control
+- **Breaking if changed:** Switching CI to test:all loses coverage reporting. Switching publish.yml to build:all adds unnecessary build steps and turbo overhead to the release pipeline
+
+#### [Gotcha] Root package being a workspace member causes infinite recursion if turbo wraps root-level scripts (2026-03-19)
+- **Situation:** In a pnpm monorepo using turbo, the root package.json is also a workspace member (required for changesets to track root package versions)
+- **Root cause:** Turbo task orchestration walks the workspace graph. If root scripts are included in turbo's task graph, turbo attempts to run root scripts as part of running root scripts — infinite recursion
+- **How to avoid:** Root scripts must remain outside turbo's graph, requiring the additive :all pattern (separate scripts that invoke turbo for sub-packages only)
+
+#### [Pattern] Turbo :all scripts are additive developer convenience wrappers, not replacements for direct commands (2026-03-19)
+- **Problem solved:** Monorepo needs both turbo-orchestrated parallel execution for local dev and direct targeted commands for CI
+- **Why this works:** Solves the root-recursion problem: :all scripts invoke turbo only for sub-packages, while the root command runs directly. Gives developers turbo caching and parallelism locally without forcing CI into the same path
+- **Trade-offs:** Two mental models for the same operations. Requires explicit documentation that :all scripts are not CI-equivalent replacements or reviewers will consistently flag the 'inconsistency'
+
+### Removed the explicit Build step from `test.yml` when migrating to Turbo, relying on `turbo.json` task graph where `test` declares `dependsOn: [build]` (2026-03-21)
+- **Context:** Before Turbo, CI workflows had to manually sequence build-then-test steps; after Turbo adoption the dependency is encoded in `turbo.json`
+- **Why:** Turbo's task graph makes explicit sequencing in CI redundant and fragile — if the dependency is only in the workflow YAML and not in turbo.json, local `turbo run test` would not enforce the order
+- **Rejected:** Keeping explicit Build step in `test.yml` alongside `test:all` would cause double-building (Turbo builds again internally) and creates two sources of truth for the dependency
+- **Trade-offs:** CI is simpler and can't drift from local behavior, but the dependency is now invisible in the workflow file — engineers must know to check turbo.json to understand sequencing
+- **Breaking if changed:** If `test`'s `dependsOn` is removed from `turbo.json`, tests will run without a fresh build in CI and locally, causing silent stale-artifact test failures
+
+#### [Pattern] Batch all CI workflow file changes into a single commit via `mcp__github__push_files` rather than sequential individual file pushes (2026-03-21)
+- **Problem solved:** Four workflow files needed updating on a remote PR branch without a local worktree checkout
+- **Why this works:** A single atomic commit keeps CI history clean, avoids triggering multiple redundant CI runs mid-fix, and ensures all workflows are consistent at every commit SHA
+- **Trade-offs:** Simpler history and no partial-state CI runs, but if the push fails partway there is no partial recovery — all files must be resent
+
+### Shadow DOM warning strings in narrative.ts (prose) and suggest.ts (structured data fields) are intentionally kept separate despite identical or near-identical content (2026-03-21)
+- **Context:** PR review suggested centralizing a repeated Shadow DOM warning into a shared constant used by both narrative.ts and suggest.ts
+- **Why:** The two callsites serve fundamentally different output contexts: narrative.ts produces user-facing markdown prose while suggest.ts produces structured data fields. Their phrasing diverges by design and will likely continue to diverge as each evolves independently. A shared constant would couple two unrelated output layers.
+- **Rejected:** Extracting a shared constant — rejected because it adds an indirection layer for only two callsites with no real string-drift risk, and it obscures the intentional contextual difference between prose and structured-data phrasing
+- **Trade-offs:** Easier: each callsite can evolve its wording independently without side effects. Harder: if the warning truly needs to stay in sync, there is no compile-time enforcement — divergence would be silent
+- **Breaking if changed:** If a shared constant were introduced and one context later needed different phrasing, the refactor would be non-trivial and could introduce accidental regressions in the other output layer
+
+### Shadow DOM warnings centralized into a shared `getShadowDomWarnings(tagName)` helper in `mcp-helpers.ts` rather than inlined in each handler (2026-03-21)
+- **Context:** Both `suggest.ts` and `narrative.ts` independently constructed identical Shadow DOM warning strings, creating silent drift risk — one could be updated while the other lagged
+- **Why:** A single source of truth guarantees warning text stays consistent across all MCP tool responses; consumers just call the helper and destructure the result
+- **Rejected:** Keeping inline strings per handler — rejected because it had already caused a real divergence caught in PR review, and would require auditing every handler on future copy changes
+- **Trade-offs:** Easier: updating warning copy in one place propagates everywhere. Harder: helper must be stable/backward-compatible since multiple handlers depend on its return shape
+- **Breaking if changed:** Removing or changing the return type of `getShadowDomWarnings` would break both `suggest.ts` and `narrative.ts` at compile time; changing the warning text itself changes all MCP tool output simultaneously
+
+#### [Gotcha] Regex pattern /size/ in CSS token category matchers causes false-positive cross-category token classification, matching 'font-size' as a spacing token (2026-03-21)
+- **Situation:** Shadow DOM theming completeness scoring categorized CSS custom properties into semantic buckets (color, typography, spacing, etc.) using regex patterns. The spacing category included /size/ to catch tokens like --*-size.
+- **Root cause:** Token category patterns must be semantically unambiguous. /size/ is a substring that appears in multiple semantic domains (font-size, border-radius-size, icon-size) and cannot safely belong to only one category without anchor constraints.
+- **How to avoid:** Removing /size/ slightly reduces spacing category coverage (standalone '--*-size' tokens no longer count as spacing), but eliminates double-counting that inflates theming completeness scores for components with typography tokens.
+
+#### [Pattern] Minimum dominance threshold (≥50%) required before awarding metric points prevents misleading partial credit in consistency scoring (2026-03-21)
+- **Problem solved:** CSS token namespace consistency scored how uniformly components used a single vendor prefix (e.g., --sdr-, --helix-). Without a threshold, 3 properties each with a different prefix scored 1/3 * 15 ≈ 5 points despite having zero actual consistency.
+- **Why this works:** A ratio-only score conflates 'partial consistency' with 'total fragmentation'. The metric's intent is to reward namespace discipline — if no prefix dominates, the component has no namespace strategy and should score 0, not receive proportional credit for the largest minority.
+- **Trade-offs:** The 50% cliff creates a binary discontinuity: 49% dominant prefix scores 0, 50% scores 7. This could penalize legitimate dual-namespace components (e.g., during migration). Alternative would be a softer curve, but 50% was chosen as the minimum meaningful majority threshold.
+
+#### [Pattern] Shared shadow DOM warning helpers (getShadowDomWarnings) are centralized in mcp-helpers.ts rather than inlined per-tool, ensuring consistent warning messaging across suggest.ts, narrative.ts, and future tools. (2026-03-21)
+- **Problem solved:** CodeRabbit flagged duplicate/inconsistent shadow DOM warning logic spread across multiple MCP tool files as a nitpick in PR #101.
+- **Why this works:** Centralizing the helper ensures any future change to shadow DOM warning copy or logic only needs to happen in one place, reducing drift between tools that surface the same architectural constraint to users.
+- **Trade-offs:** Centralization makes the helper a shared dependency — a breaking change to getShadowDomWarnings signature affects all callers simultaneously, requiring coordinated updates.
+
+#### [Pattern] All CI workflows use Turbo :all scripts (build:all, test:all, lint:all, type-check:all) rather than per-package direct commands (2026-03-21)
+- **Problem solved:** CodeRabbit warning identified inconsistency where some workflows called package-level scripts directly instead of turbo orchestration scripts
+- **Why this works:** Turbo :all scripts enable caching, parallelism, and dependency-order execution across the monorepo — direct package commands bypass all of this
+- **Trade-offs:** Turbo orchestration adds complexity in turbo.json maintenance but yields significant CI speed improvements and cache hit rates
+
+#### [Pattern] Shared warning/constraint text that must appear consistently across multiple MCP tool handlers should be extracted into a helper in mcp-helpers.ts rather than inlined per-handler, even when the text is short. (2026-03-21)
+- **Problem solved:** getShadowDomWarnings(tagName) needed in suggest.ts, narrative.ts, and quick-ref handlers — three separate files each previously maintaining their own copy
+- **Why this works:** MCP tool response text is user-facing documentation; inconsistent phrasing across tools for the same constraint erodes trust and creates support confusion. Single source also makes future constraint updates atomic.
+- **Trade-offs:** Helper indirection adds one import per handler file; gain is guaranteed consistency and single-edit updates. The tradeoff strongly favors the helper for any text used in 3+ places.

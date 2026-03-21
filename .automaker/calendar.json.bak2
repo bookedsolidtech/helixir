@@ -1,0 +1,312 @@
+[
+  {
+    "title": "Auto-mode started",
+    "date": "2026-03-16",
+    "type": "ops",
+    "description": "Autonomous feature processing started",
+    "id": "event-1773696733273-lug76e2n7",
+    "sourceId": "ops:auto-mode:started:2026-03-16",
+    "createdAt": "2026-03-16T21:32:13.272Z",
+    "updatedAt": "2026-03-16T21:32:13.272Z"
+  },
+  {
+    "title": "Started: Deep antagonistic audit: full-system bug fix and architectural hardening sweep",
+    "date": "2026-03-16",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773696764094-5pjkpkrir",
+    "sourceId": "ops:feature:started:feature-1773696714010-ssi3tefig",
+    "createdAt": "2026-03-16T21:32:44.090Z",
+    "updatedAt": "2026-03-16T21:32:44.090Z"
+  },
+  {
+    "title": "Merged: feature-1773696714010-ssi3tefig",
+    "date": "2026-03-16",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773698938183-3v208hu09",
+    "sourceId": "ops:feature:pr-merged:feature-1773696714010-ssi3tefig",
+    "createdAt": "2026-03-16T22:08:58.174Z",
+    "updatedAt": "2026-03-16T22:08:58.174Z"
+  },
+  {
+    "title": "Auto-mode started",
+    "date": "2026-03-17",
+    "type": "ops",
+    "description": "Autonomous feature processing started",
+    "id": "event-1773708526308-9uio7g9jv",
+    "sourceId": "ops:auto-mode:started:2026-03-17",
+    "createdAt": "2026-03-17T00:48:46.306Z",
+    "updatedAt": "2026-03-17T00:48:46.306Z"
+  },
+  {
+    "title": "Started: fix: mark internal packages as private to fix publish pipeline",
+    "date": "2026-03-17",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773709415666-tb17osz7y",
+    "sourceId": "ops:feature:started:feature-1773709384268-hajnzugkz",
+    "createdAt": "2026-03-17T01:03:35.662Z",
+    "updatedAt": "2026-03-17T01:21:07.014Z"
+  },
+  {
+    "title": "Completed: fix: mark internal packages as private to fix publish pipeline",
+    "date": "2026-03-17",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773710498615-slj2r151o",
+    "sourceId": "ops:feature:completed:feature-1773709384268-hajnzugkz",
+    "createdAt": "2026-03-17T01:21:38.610Z",
+    "updatedAt": "2026-03-17T01:21:38.610Z"
+  },
+  {
+    "title": "Merged: feature-1773709384268-hajnzugkz",
+    "date": "2026-03-17",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773712017617-ypzndr2y0",
+    "sourceId": "ops:feature:pr-merged:feature-1773709384268-hajnzugkz",
+    "createdAt": "2026-03-17T01:46:57.612Z",
+    "updatedAt": "2026-03-17T01:46:57.612Z"
+  },
+  {
+    "title": "Auto-mode started",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Autonomous feature processing started",
+    "id": "event-1773799257452-cmy9pnm5a",
+    "sourceId": "ops:auto-mode:started:2026-03-18",
+    "createdAt": "2026-03-18T02:00:57.451Z",
+    "updatedAt": "2026-03-18T02:00:57.451Z"
+  },
+  {
+    "title": "Started: bug: CEM reports hx-carousel event as `hx-slide-change` but actual component fires `hx-slide`",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773799288314-gfcuyrb1a",
+    "sourceId": "ops:feature:started:feature-1773794206852-6w7fsgtfc",
+    "createdAt": "2026-03-18T02:01:28.312Z",
+    "updatedAt": "2026-03-18T02:01:28.312Z"
+  },
+  {
+    "title": "Completed: bug: CEM reports hx-carousel event as `hx-slide-change` but actual component fires `hx-slide`",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773799521219-dpac1i0vb",
+    "sourceId": "ops:feature:completed:feature-1773794206852-6w7fsgtfc",
+    "createdAt": "2026-03-18T02:05:21.206Z",
+    "updatedAt": "2026-03-18T02:05:21.206Z"
+  },
+  {
+    "title": "Started: fix: helix.d.ts HxTabsAttributes properties drift from CEM",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773800535823-uuq0by623",
+    "sourceId": "ops:feature:started:feature-1773800462021-pezxbfca9",
+    "createdAt": "2026-03-18T02:22:15.820Z",
+    "updatedAt": "2026-03-18T02:22:15.820Z"
+  },
+  {
+    "title": "Started: fix: helix.d.ts HxSkeletonAttributes and HxSpinnerAttributes property drift",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773800538764-p7igg9fjr",
+    "sourceId": "ops:feature:started:feature-1773800469009-8fv2tksuq",
+    "createdAt": "2026-03-18T02:22:18.763Z",
+    "updatedAt": "2026-03-18T02:22:18.763Z"
+  },
+  {
+    "title": "Completed: fix: helix.d.ts HxSkeletonAttributes and HxSpinnerAttributes property drift",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773801061979-ou4ash72t",
+    "sourceId": "ops:feature:completed:feature-1773800469009-8fv2tksuq",
+    "createdAt": "2026-03-18T02:31:01.978Z",
+    "updatedAt": "2026-03-18T02:31:01.978Z"
+  },
+  {
+    "title": "Started: feat: add validate_type_definitions MCP tool to catch CEM-to-types drift",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773801066844-bud3x84yv",
+    "sourceId": "ops:feature:started:feature-1773800476733-u113nxlw2",
+    "createdAt": "2026-03-18T02:31:06.842Z",
+    "updatedAt": "2026-03-18T02:31:06.842Z"
+  },
+  {
+    "title": "Completed: fix: helix.d.ts HxTabsAttributes properties drift from CEM",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773801131214-iabcuvu2d",
+    "sourceId": "ops:feature:completed:feature-1773800462021-pezxbfca9",
+    "createdAt": "2026-03-18T02:32:11.213Z",
+    "updatedAt": "2026-03-18T02:32:11.213Z"
+  },
+  {
+    "title": "Started: feat: automated CEM sync CI gate to prevent stale published manifests",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773801134759-eop7mjvsv",
+    "sourceId": "ops:feature:started:feature-1773800482350-362rmu94f",
+    "createdAt": "2026-03-18T02:32:14.757Z",
+    "updatedAt": "2026-03-18T02:32:14.757Z"
+  },
+  {
+    "title": "Completed: feat: automated CEM sync CI gate to prevent stale published manifests",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773801590467-qdtoszi9i",
+    "sourceId": "ops:feature:completed:feature-1773800482350-362rmu94f",
+    "createdAt": "2026-03-18T02:39:50.466Z",
+    "updatedAt": "2026-03-18T02:39:50.466Z"
+  },
+  {
+    "title": "Completed: feat: add validate_type_definitions MCP tool to catch CEM-to-types drift",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773801744868-rsjjp2jai",
+    "sourceId": "ops:feature:completed:feature-1773800476733-u113nxlw2",
+    "createdAt": "2026-03-18T02:42:24.867Z",
+    "updatedAt": "2026-03-18T02:42:24.867Z"
+  },
+  {
+    "title": "Started: feat: CEM-Source Fidelity analyzer — cross-reference CEM declarations against actual source code",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773801748215-ca7g3prv3",
+    "sourceId": "ops:feature:started:feature-1773801240034-o1w52j8t6",
+    "createdAt": "2026-03-18T02:42:28.211Z",
+    "updatedAt": "2026-03-18T02:42:28.211Z"
+  },
+  {
+    "title": "Completed: feat: CEM-Source Fidelity analyzer — cross-reference CEM declarations against actual source code",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773802456585-mknts4pxd",
+    "sourceId": "ops:feature:completed:feature-1773801240034-o1w52j8t6",
+    "createdAt": "2026-03-18T02:54:16.585Z",
+    "updatedAt": "2026-03-18T03:34:47.772Z"
+  },
+  {
+    "title": "Merged: feature-1773801240034-o1w52j8t6",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773804816957-js2fi04it",
+    "sourceId": "ops:feature:pr-merged:feature-1773801240034-o1w52j8t6",
+    "createdAt": "2026-03-18T03:33:36.954Z",
+    "updatedAt": "2026-03-18T03:33:36.954Z"
+  },
+  {
+    "title": "Started: feat: Slot Architecture analyzer — score slot documentation, default slot, and slot-property coherence",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773804828141-e4oxcr4qg",
+    "sourceId": "ops:feature:started:feature-1773801180845-zcxtn5lhu",
+    "createdAt": "2026-03-18T03:33:48.136Z",
+    "updatedAt": "2026-03-18T03:33:48.136Z"
+  },
+  {
+    "title": "Started: feat: Naming Convention Consistency analyzer — library-wide naming pattern scoring",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773804831191-0xc4c7yzt",
+    "sourceId": "ops:feature:started:feature-1773801193733-jc6x78jqf",
+    "createdAt": "2026-03-18T03:33:51.187Z",
+    "updatedAt": "2026-03-18T03:33:51.187Z"
+  },
+  {
+    "title": "Completed: feat: Slot Architecture analyzer — score slot documentation, default slot, and slot-property coherence",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773805363281-bu3nfb5jp",
+    "sourceId": "ops:feature:completed:feature-1773801180845-zcxtn5lhu",
+    "createdAt": "2026-03-18T03:42:43.280Z",
+    "updatedAt": "2026-03-18T03:42:43.280Z"
+  },
+  {
+    "title": "Completed: feat: Naming Convention Consistency analyzer — library-wide naming pattern scoring",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773805478297-ztx5zjcna",
+    "sourceId": "ops:feature:completed:feature-1773801193733-jc6x78jqf",
+    "createdAt": "2026-03-18T03:44:38.296Z",
+    "updatedAt": "2026-03-18T03:44:38.296Z"
+  },
+  {
+    "title": "Started: feat: Cross-Library Benchmark Suite — validate scorer against 11 real libraries + generate Helix report",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773805482977-w7kcx3w9s",
+    "sourceId": "ops:feature:started:feature-1773801257896-sczpc2dyd",
+    "createdAt": "2026-03-18T03:44:42.971Z",
+    "updatedAt": "2026-03-18T03:44:42.971Z"
+  },
+  {
+    "title": "Completed: feat: Cross-Library Benchmark Suite — validate scorer against 11 real libraries + generate Helix report",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773806475149-vy7j3mh9r",
+    "sourceId": "ops:feature:completed:feature-1773801257896-sczpc2dyd",
+    "createdAt": "2026-03-18T04:01:15.147Z",
+    "updatedAt": "2026-03-18T04:01:15.147Z"
+  },
+  {
+    "title": "Started: fix: exempt promotion PRs from \"Changeset Required\" CI check",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773831317277-p2nyc92w0",
+    "sourceId": "ops:feature:started:feature-1773831284719-fn9ektkpw",
+    "createdAt": "2026-03-18T10:55:17.273Z",
+    "updatedAt": "2026-03-18T10:55:17.273Z"
+  },
+  {
+    "title": "Completed: fix: exempt promotion PRs from \"Changeset Required\" CI check",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773831382970-6clvr9dc8",
+    "sourceId": "ops:feature:completed:feature-1773831284719-fn9ektkpw",
+    "createdAt": "2026-03-18T10:56:22.969Z",
+    "updatedAt": "2026-03-18T10:56:22.969Z"
+  },
+  {
+    "title": "Started: Fix CI checks never running on changeset release PRs",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773891211807-7mhorplcf",
+    "sourceId": "ops:feature:started:feature-1773891063027-5mc2nvzhi",
+    "createdAt": "2026-03-19T03:33:31.802Z",
+    "updatedAt": "2026-03-19T03:33:31.802Z"
+  },
+  {
+    "title": "Completed: Fix CI checks never running on changeset release PRs",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773891241556-dazktxoza",
+    "sourceId": "ops:feature:completed:feature-1773891063027-5mc2nvzhi",
+    "createdAt": "2026-03-19T03:34:01.552Z",
+    "updatedAt": "2026-03-19T03:34:01.552Z"
+  }
+]

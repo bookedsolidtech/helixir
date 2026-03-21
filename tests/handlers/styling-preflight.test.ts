@@ -283,3 +283,86 @@ describe('runStylingPreflight — verdict', () => {
     expect(result.verdict.toLowerCase()).toMatch(/fail|issue|error/);
   });
 });
+
+// ─── Anti-Patterns in Preflight ─────────────────────────────────────────────
+
+describe('runStylingPreflight — antiPatterns', () => {
+  it('includes antiPatterns array in result', () => {
+    const result = runStylingPreflight({
+      css: '',
+      meta: buttonMeta,
+    });
+    expect(Array.isArray(result.antiPatterns)).toBe(true);
+    expect(result.antiPatterns.length).toBeGreaterThan(0);
+  });
+
+  it('includes shadow DOM warning with component tag name', () => {
+    const result = runStylingPreflight({
+      css: '',
+      meta: buttonMeta,
+    });
+    expect(result.antiPatterns.some((p) => p.includes('hx-button'))).toBe(true);
+    expect(result.antiPatterns.some((p) => p.includes('shadow') || p.includes('Shadow'))).toBe(
+      true,
+    );
+  });
+
+  it('includes :root scope warning for components with tokens', () => {
+    const result = runStylingPreflight({
+      css: '',
+      meta: buttonMeta,
+    });
+    expect(result.antiPatterns.some((p) => p.includes(':root'))).toBe(true);
+  });
+
+  it('includes no-style-api warning for bare components', () => {
+    const result = runStylingPreflight({
+      css: '',
+      meta: bareMeta,
+    });
+    expect(result.antiPatterns.some((p) => p.includes('no CSS') || p.includes('no style'))).toBe(
+      true,
+    );
+  });
+});
+
+// ─── Inline Fix Suggestions ─────────────────────────────────────────────────
+
+describe('runStylingPreflight — inline fixes', () => {
+  it('shadow DOM issue has fix with ::part() suggestion', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button .inner { color: red; }',
+      meta: buttonMeta,
+    });
+    const shadowIssue = result.issues.find((i) => i.category === 'shadowDom');
+    expect(shadowIssue?.fix).toBeDefined();
+    expect(shadowIssue?.fix?.suggestion).toContain('::part(');
+  });
+
+  it('!important issue has fix removing !important', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button { color: red !important; }',
+      meta: buttonMeta,
+    });
+    const specIssue = result.issues.find((i) => i.category === 'specificity');
+    expect(specIssue?.fix).toBeDefined();
+    expect(specIssue?.fix?.suggestion).not.toContain('!important');
+  });
+
+  it('clean CSS has no issues and no fixes', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button::part(base) { --hx-button-bg: var(--theme, blue); }',
+      meta: buttonMeta,
+    });
+    expect(result.issues).toHaveLength(0);
+  });
+
+  it('fix includes explanation', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button .inner { color: red; }',
+      meta: buttonMeta,
+    });
+    const shadowIssue = result.issues.find((i) => i.category === 'shadowDom');
+    expect(shadowIssue?.fix?.explanation).toBeTruthy();
+  });
+});

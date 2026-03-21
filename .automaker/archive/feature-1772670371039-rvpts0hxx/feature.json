@@ -1,0 +1,65 @@
+{
+  "category": "Uncategorized",
+  "description": "The CI workflow (`.github/workflows/ci.yml`) does not run a dependency audit. Add `pnpm audit --audit-level=high` after the `pnpm install` step.\n\n**Fix:** Add an audit step to `ci.yml`. Use `--audit-level=high` to fail only on high/critical vulnerabilities (not informational or low).\n\n**Acceptance criteria:**\n- `ci.yml` includes a `pnpm audit --audit-level=high` step\n- Step runs after `pnpm install`\n- CI passes with the new step (current deps have no high/critical vulnerabilities)",
+  "title": "chore: add pnpm audit step to CI pipeline",
+  "status": "done",
+  "complexity": "small",
+  "priority": 4,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "2cf71c1c-0aa9-460a-b73f-4e7e52c8b511",
+  "id": "feature-1772670371039-rvpts0hxx",
+  "branchName": "feature/chore-add-pnpm-audit-step-to-ci-pipeline",
+  "descriptionHistory": [
+    {
+      "description": "The CI workflow (`.github/workflows/ci.yml`) does not run a dependency audit. Add `pnpm audit --audit-level=high` after the `pnpm install` step.\n\n**Fix:** Add an audit step to `ci.yml`. Use `--audit-level=high` to fail only on high/critical vulnerabilities (not informational or low).\n\n**Acceptance criteria:**\n- `ci.yml` includes a `pnpm audit --audit-level=high` step\n- Step runs after `pnpm install`\n- CI passes with the new step (current deps have no high/critical vulnerabilities)",
+      "timestamp": "2026-03-05T00:26:11.039Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-05T00:26:11.039Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-05T00:26:11.039Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T06:13:46.090Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T06:14:58.021Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-12T16:53:22.556Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-12T06:14:58.021Z",
+  "costUsd": 0.21761224999999995,
+  "lastSessionId": "823b8d8c-2f19-4209-9b9e-93b8591ae3e1",
+  "executionHistory": [
+    {
+      "id": "a161953e-4975-4fcc-95ff-4c7344cf39ca",
+      "startedAt": "2026-03-12T06:13:50.489Z",
+      "completedAt": "2026-03-12T06:14:29.692Z",
+      "durationMs": 39204,
+      "costUsd": 0.21761224999999995,
+      "model": "claude-opus-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Add pnpm audit step to CI pipeline\n\n### Changes Implemented\n- None required. The feature is already implemented.\n\n### Files Modified\n- None\n\n### Risks/Blockers Encountered\n- The feature description references `ci.yml`, but the project uses separate workflow files (`build.yml`, `test.yml`, `lint.yml`, `format.yml`, `security.yml`, `release.yml`).\n- `.github/workflows/security.yml` already contains exactly the requested step: `pnpm audit --audit-level=high` running after `pnpm install --frozen-lockfile`.\n- All three acceptance criteria are already satisfied:\n  1. The audit step exists in the CI workflow (`security.yml` line 29-30)\n  2. It runs after `pnpm install` (line 27)\n  3. Current deps have no high/critical vulnerabilities (only 1 moderate, which passes with `--audit-level=high`)\n\n### Verification Status\n- Ran `pnpm audit --audit-level=high` locally — exits successfully (1 moderate vulnerability, no high/critical)\n- Confirmed `security.yml` workflow structure matches requirements\n- Playwright verification not applicable — this is a CI configuration feature, not a UI feature\n\n### Learnings\n- The project splits CI into granular workflow files rather than a single `ci.yml`\n- The security audit workflow was already in place\n\n### Notes for Developer\n- This feature appears to already be implemented. If the intent was to consolidate into a single `ci.yml`, that would be a different scope. The existing `security.yml` satisfies all acceptance criteria as written.",
+  "reviewStartedAt": "2026-03-12T06:14:58.021Z",
+  "completedAt": "2026-03-12T16:53:22.556Z"
+}

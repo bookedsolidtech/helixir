@@ -1,0 +1,70 @@
+{
+  "category": "Uncategorized",
+  "description": "In `packages/core/src/handlers/tokens.ts` around line 52, `parseTokens` uses synchronous `readFileSync`/`existsSync` which blocks the Node.js event loop. This is inconsistent with the async contract of all other handlers.\n\n**Fix:** Convert `parseTokens` (and any callers) to `async`/`await` using `readFile` from `fs/promises`.\n\n**Acceptance criteria:**\n- `parseTokens` is `async` and uses `readFile` instead of `readFileSync`\n- `existsSync` replaced with async `stat` or similar\n- All callers updated to `await parseTokens(...)`\n- All existing tests pass\n- No synchronous file I/O remains in tokens.ts",
+  "title": "fix: convert parseTokens to async in tokens.ts",
+  "status": "done",
+  "complexity": "small",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "8385066e-6f02-4975-98cd-b6840b7d99e5",
+  "id": "feature-1772670339649-4zudcnl72",
+  "branchName": "feature/fix-convert-parsetokens-to-async-in",
+  "descriptionHistory": [
+    {
+      "description": "In `packages/core/src/handlers/tokens.ts` around line 52, `parseTokens` uses synchronous `readFileSync`/`existsSync` which blocks the Node.js event loop. This is inconsistent with the async contract of all other handlers.\n\n**Fix:** Convert `parseTokens` (and any callers) to `async`/`await` using `readFile` from `fs/promises`.\n\n**Acceptance criteria:**\n- `parseTokens` is `async` and uses `readFile` instead of `readFileSync`\n- `existsSync` replaced with async `stat` or similar\n- All callers updated to `await parseTokens(...)`\n- All existing tests pass\n- No synchronous file I/O remains in tokens.ts",
+      "timestamp": "2026-03-05T00:25:39.650Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-05T00:25:39.650Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-05T00:25:39.650Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T03:47:30.744Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T03:48:33.654Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-12T05:21:21.355Z"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-12T05:21:39.175Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-12T03:48:33.654Z",
+  "costUsd": 0.225796,
+  "lastSessionId": "26cd0cc9-277d-41ac-9e11-a0806ae6eff7",
+  "executionHistory": [
+    {
+      "id": "347bc3c2-a15d-4327-9259-52deea1d6126",
+      "startedAt": "2026-03-12T03:47:32.396Z",
+      "completedAt": "2026-03-12T03:48:20.798Z",
+      "durationMs": 48402,
+      "costUsd": 0.225796,
+      "model": "claude-opus-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Convert parseTokens to async\n\n### Changes Implemented\n- None required — the conversion was already completed in the current codebase.\n\n### Current State (all acceptance criteria already met)\n- `parseTokens` is `async` and uses `readFile` from `fs/promises` (line 66)\n- `existsSync` already replaced with async `access` from `fs/promises` (line 61)\n- All callers (`getDesignTokens`, `findToken`) already `await parseTokens(...)` (lines 112, 133)\n- No synchronous file I/O remains in `tokens.ts`\n- Build passes (exit code 0)\n- All 1317 tests pass across 53 test files\n\n### Files Modified\n- None — no changes needed\n\n### Verification Status\n- Build: `npm run build` — success\n- Tests: `npx vitest run` — 53 files, 1317 tests passed\n- `git diff --stat` — clean, no modifications\n- Playwright verification not applicable (no runtime changes to verify)\n\n### Risks/Blockers Encountered\n- None. The feature was already implemented prior to this task.\n\n### Notes for Developer\n- This feature appears to have been completed in a prior commit. The branch can be closed or merged as-is.",
+  "reviewStartedAt": "2026-03-12T03:48:33.654Z",
+  "completedAt": "2026-03-12T05:21:39.175Z"
+}

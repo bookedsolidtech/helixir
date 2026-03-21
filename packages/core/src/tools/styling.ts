@@ -9,6 +9,8 @@ import { checkEventUsage } from '../handlers/event-usage-checker.js';
 import { getComponentQuickRef } from '../handlers/quick-ref.js';
 import { detectThemeSupport } from '../handlers/theme-detection.js';
 import { checkComponentImports } from '../handlers/import-checker.js';
+import { checkSlotChildren } from '../handlers/slot-children-checker.js';
+import { checkAttributeConflicts } from '../handlers/attribute-conflict-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -35,6 +37,16 @@ const CheckEventUsageArgsSchema = z.object({
   codeText: z.string(),
   tagName: z.string(),
   framework: z.enum(['react', 'vue', 'angular', 'html']).optional(),
+});
+
+const CheckSlotChildrenArgsSchema = z.object({
+  htmlText: z.string(),
+  tagName: z.string(),
+});
+
+const CheckAttributeConflictsArgsSchema = z.object({
+  htmlText: z.string(),
+  tagName: z.string(),
 });
 
 export const STYLING_TOOL_DEFINITIONS = [
@@ -199,6 +211,57 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'check_slot_children',
+    description:
+      'Validates that children placed inside a web component\'s slots match the expected element types from the CEM — catches wrong child elements in constrained slots (e.g. putting a <div> inside <sl-select> which requires <sl-option>). Parses slot descriptions for "Must be", "Works best with", and "Accepts" patterns.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+        htmlText: {
+          type: 'string',
+          description: 'The HTML code containing the component and its children to validate.',
+        },
+        tagName: {
+          type: 'string',
+          description:
+            'The parent custom element tag name to check slot children for (e.g. "sl-select").',
+        },
+      },
+      required: ['htmlText', 'tagName'],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'check_attribute_conflicts',
+    description:
+      'Detects conditional attributes used without their guard conditions — catches "target" without "href", "min"/"max" on non-number inputs, "checked" without type="checkbox", and other attribute interaction mistakes. Parses CEM member descriptions for "Only used when" and "Only applies to" patterns.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+        htmlText: {
+          type: 'string',
+          description: 'The HTML code containing the component to check for attribute conflicts.',
+        },
+        tagName: {
+          type: 'string',
+          description: 'The custom element tag name to validate against (e.g. "sl-button").',
+        },
+      },
+      required: ['htmlText', 'tagName'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -260,6 +323,18 @@ export function handleStylingCall(
     if (name === 'check_component_imports') {
       const codeText = z.string().parse(args.codeText);
       const result = checkComponentImports(codeText, cem);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_slot_children') {
+      const { htmlText, tagName } = CheckSlotChildrenArgsSchema.parse(args);
+      const result = checkSlotChildren(htmlText, tagName, cem);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_attribute_conflicts') {
+      const { htmlText, tagName } = CheckAttributeConflictsArgsSchema.parse(args);
+      const result = checkAttributeConflicts(htmlText, tagName, cem);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

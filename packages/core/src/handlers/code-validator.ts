@@ -17,6 +17,9 @@
  * 12. check_theme_compatibility — dark mode/theme safety
  * 13. check_css_specificity — !important/ID/nesting anti-patterns
  * 14. check_layout_patterns — host display/dimension overrides
+ * 15. check_css_scope — component tokens on wrong scope
+ * 16. check_css_shorthand — risky shorthand + var() combinations
+ * 17. check_color_contrast — low contrast pairs, mixed token/hardcoded sources
  */
 
 import type { Cem } from './cem.js';
@@ -39,6 +42,7 @@ import { checkCssSpecificity, type SpecificityCheckResult } from './specificity-
 import { checkLayoutPatterns, type LayoutCheckResult } from './layout-checker.js';
 import { checkCssScope, type ScopeCheckResult } from './scope-checker.js';
 import { checkCssShorthand, type ShorthandCheckResult } from './shorthand-checker.js';
+import { checkColorContrast, type ColorContrastResult } from './color-contrast-checker.js';
 import { parseCem } from './cem.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -70,6 +74,7 @@ export interface ValidateComponentCodeResult {
   layout?: LayoutCheckResult;
   scope?: ScopeCheckResult;
   shorthand?: ShorthandCheckResult;
+  colorContrast?: ColorContrastResult;
   imports?: ImportCheckResult;
 }
 
@@ -260,6 +265,17 @@ export function validateComponentCode(
       if (shorthandResult.issues.length > 0) {
         result.shorthand = shorthandResult;
         totalIssues += shorthandResult.issues.length;
+      }
+    } catch {
+      // Skip on error
+    }
+
+    // 8h. Color Contrast — low contrast pairs, mixed token/hardcoded sources
+    try {
+      const contrastResult = checkColorContrast(css);
+      if (contrastResult.issues.length > 0) {
+        result.colorContrast = contrastResult;
+        totalIssues += contrastResult.issues.length;
       }
     } catch {
       // Skip on error

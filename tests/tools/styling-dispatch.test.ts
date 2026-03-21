@@ -172,6 +172,22 @@ describe('handleStylingCall — check_css_shorthand', () => {
   });
 });
 
+// ─── handleStylingCall — check_color_contrast ───────────────────────────────
+
+describe('handleStylingCall — check_color_contrast', () => {
+  it('dispatches color contrast check for low-contrast pairs', () => {
+    const result = handleStylingCall(
+      'check_color_contrast',
+      { cssText: '.card { background: white; color: #f0f0f0; }' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+    const parsed = JSON.parse((result.content as Array<{ text: string }>)[0].text);
+    expect(parsed.issues.length).toBeGreaterThan(0);
+    expect(parsed.issues[0].rule).toBe('low-contrast-pair');
+  });
+});
+
 // ─── handleStylingCall — check_css_specificity ──────────────────────────────
 
 describe('handleStylingCall — check_css_specificity', () => {

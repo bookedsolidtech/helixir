@@ -24,6 +24,7 @@ import { checkCssSpecificity } from '../handlers/specificity-checker.js';
 import { checkLayoutPatterns } from '../handlers/layout-checker.js';
 import { checkCssScope } from '../handlers/scope-checker.js';
 import { checkCssShorthand } from '../handlers/shorthand-checker.js';
+import { checkColorContrast } from '../handlers/color-contrast-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -105,6 +106,10 @@ const CheckCssScopeArgsSchema = z.object({
 });
 
 const CheckCssShorthandArgsSchema = z.object({
+  cssText: z.string(),
+});
+
+const CheckColorContrastArgsSchema = z.object({
   cssText: z.string(),
 });
 
@@ -684,6 +689,18 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'check_color_contrast',
+    description:
+      'Detects color contrast issues in CSS: low-contrast hardcoded color pairs (light-on-light, dark-on-dark), mixed color sources (one design token + one hardcoded), and low opacity on text. Catches patterns that break readability across theme changes.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        cssText: { type: 'string', description: 'CSS code to analyze for color contrast issues' },
+      },
+      required: ['cssText'],
+    },
+  },
 ];
 
 /**
@@ -823,6 +840,12 @@ export function handleStylingCall(
     if (name === 'check_css_shorthand') {
       const { cssText } = CheckCssShorthandArgsSchema.parse(args);
       const result = checkCssShorthand(cssText);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_color_contrast') {
+      const { cssText } = CheckColorContrastArgsSchema.parse(args);
+      const result = checkColorContrast(cssText);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

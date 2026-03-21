@@ -138,6 +138,23 @@ export function validateComponentCode(
     // Skip on error
   }
 
+  // 6a. Inline Style Detection — check HTML for inline style= attributes
+  try {
+    const inlineResult = checkCssSpecificity(html, { mode: 'html' });
+    if (inlineResult.issues.length > 0) {
+      // Merge into existing specificity result or create new one
+      if (result.specificity) {
+        result.specificity.issues.push(...inlineResult.issues);
+        result.specificity.summary += '; ' + inlineResult.summary;
+      } else {
+        result.specificity = inlineResult;
+      }
+      totalIssues += inlineResult.issues.length;
+    }
+  } catch {
+    // Skip on error
+  }
+
   // 6. Composition — cross-component pattern validation
   try {
     const compResult = checkComposition(html, cem);

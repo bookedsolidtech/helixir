@@ -141,6 +141,46 @@ function fixShadowDom(input: SuggestFixInput): FixSuggestion {
     };
   }
 
+  if (input.issue === 'external-host') {
+    const tag = tagName ?? 'the-element';
+    return {
+      original,
+      suggestion: `${tag} { /* your styles here */ }`,
+      explanation: `:host and :host-context() only work inside a shadow root stylesheet (the component's own CSS). In consumer CSS, target the component by its tag name directly.`,
+      severity: 'error',
+    };
+  }
+
+  if (input.issue === 'slotted-descendant') {
+    // Extract the ::slotted() part and the body
+    const slottedMatch = original.match(/::slotted\(([^)]+)\)/);
+    const selector = slottedMatch?.[1] ?? '*';
+    const cssBody = original.match(/\{([^}]*)\}/)?.[1]?.trim() ?? '';
+
+    return {
+      original,
+      suggestion: `::slotted(${selector}) { ${cssBody} }`,
+      explanation: `::slotted() can only style the direct slotted element — not its children or descendants. Remove the descendant/child selector. To style children of slotted content, use light DOM CSS in your page stylesheet.`,
+      severity: 'error',
+    };
+  }
+
+  if (input.issue === 'slotted-compound') {
+    // Extract just the tag name from the compound selector
+    const slottedMatch = original.match(/::slotted\(([^)]+)\)/);
+    const compound = slottedMatch?.[1]?.trim() ?? '';
+    // Extract just the first simple selector
+    const simple = compound.match(/^([a-zA-Z*][a-zA-Z0-9-]*)/)?.[1] ?? '*';
+    const cssBody = original.match(/\{([^}]*)\}/)?.[1]?.trim() ?? '';
+
+    return {
+      original,
+      suggestion: `::slotted(${simple}) { ${cssBody} }`,
+      explanation: `::slotted() only accepts a single simple selector — not compound selectors like "${compound}". Use just "::slotted(${simple})" or add a class to the slotted element and use "::slotted(.my-class)".`,
+      severity: 'error',
+    };
+  }
+
   return {
     original,
     suggestion: original,

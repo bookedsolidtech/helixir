@@ -23,6 +23,7 @@ import { suggestFix } from '../handlers/suggest-fix.js';
 import { checkCssSpecificity } from '../handlers/specificity-checker.js';
 import { checkLayoutPatterns } from '../handlers/layout-checker.js';
 import { checkCssScope } from '../handlers/scope-checker.js';
+import { checkCssShorthand } from '../handlers/shorthand-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -101,6 +102,10 @@ const CheckCssScopeArgsSchema = z.object({
   cssText: z.string(),
   tagName: z.string(),
   cem: z.any(),
+});
+
+const CheckCssShorthandArgsSchema = z.object({
+  cssText: z.string(),
 });
 
 const CheckCssSpecificityArgsSchema = z.object({
@@ -663,6 +668,22 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'check_css_shorthand',
+    description:
+      'Detects risky CSS shorthand + var() combinations that can fail silently. When var() is mixed with literal values in shorthand properties (border, background, font, margin, etc.), if any var() is undefined the ENTIRE declaration fails — not just the dynamic part. Suggests decomposing into longhand properties.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        cssText: {
+          type: 'string',
+          description: 'The CSS code to check for risky shorthand + var() patterns.',
+        },
+      },
+      required: ['cssText'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -796,6 +817,12 @@ export function handleStylingCall(
     if (name === 'check_css_scope') {
       const { cssText, tagName } = CheckCssScopeArgsSchema.parse(args);
       const result = checkCssScope(cssText, tagName, cem);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_css_shorthand') {
+      const { cssText } = CheckCssShorthandArgsSchema.parse(args);
+      const result = checkCssShorthand(cssText);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

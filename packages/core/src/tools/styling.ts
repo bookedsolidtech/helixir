@@ -13,6 +13,7 @@ import { checkSlotChildren } from '../handlers/slot-children-checker.js';
 import { checkAttributeConflicts } from '../handlers/attribute-conflict-checker.js';
 import { checkA11yUsage } from '../handlers/a11y-usage-checker.js';
 import { checkCssVars } from '../handlers/css-var-checker.js';
+import { validateComponentCode } from '../handlers/code-validator.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -59,6 +60,14 @@ const CheckA11yUsageArgsSchema = z.object({
 const CheckCssVarsArgsSchema = z.object({
   cssText: z.string(),
   tagName: z.string(),
+});
+
+const ValidateComponentCodeArgsSchema = z.object({
+  html: z.string(),
+  css: z.string().optional(),
+  code: z.string().optional(),
+  tagName: z.string(),
+  framework: z.enum(['react', 'vue', 'angular', 'html']).optional(),
 });
 
 export const STYLING_TOOL_DEFINITIONS = [
@@ -325,6 +334,44 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'validate_component_code',
+    description:
+      'ALL-IN-ONE validator — runs every anti-hallucination check on agent-generated code in a single call. Validates HTML attributes, slot children, attribute conflicts, a11y patterns, Shadow DOM CSS, custom properties, event bindings, and component imports. Use this as the FINAL check before submitting any code that uses web components.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+        html: {
+          type: 'string',
+          description: 'The HTML markup to validate.',
+        },
+        css: {
+          type: 'string',
+          description: 'Optional CSS code to validate for Shadow DOM and custom property issues.',
+        },
+        code: {
+          type: 'string',
+          description: 'Optional JS/JSX/template code to validate event bindings.',
+        },
+        tagName: {
+          type: 'string',
+          description: 'The primary custom element tag name to validate against.',
+        },
+        framework: {
+          type: 'string',
+          enum: ['react', 'vue', 'angular', 'html'],
+          description: 'Optional framework hint for event validation.',
+        },
+      },
+      required: ['html', 'tagName'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -410,6 +457,19 @@ export function handleStylingCall(
     if (name === 'check_css_vars') {
       const { cssText, tagName } = CheckCssVarsArgsSchema.parse(args);
       const result = checkCssVars(cssText, tagName, cem);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'validate_component_code') {
+      const { html, css, code, tagName, framework } = ValidateComponentCodeArgsSchema.parse(args);
+      const result = validateComponentCode({
+        html,
+        css,
+        code,
+        tagName,
+        cem,
+        framework,
+      });
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

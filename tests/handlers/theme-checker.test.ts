@@ -115,6 +115,77 @@ describe('checkThemeCompatibility — contrast pairing', () => {
   });
 });
 
+// ─── Mixed token/hardcoded pairs ────────────────────────────────────────────
+
+describe('checkThemeCompatibility — mixed token and hardcoded', () => {
+  it('detects hardcoded color with token background in same block', () => {
+    const css = `.card {
+  background: var(--surface-color);
+  color: #333333;
+}`;
+    const result = checkThemeCompatibility(css);
+    expect(result.issues.some((i) => i.rule === 'mixed-token-hardcoded')).toBe(true);
+  });
+
+  it('detects hardcoded background with token color in same block', () => {
+    const css = `.card {
+  color: var(--text-color);
+  background-color: #ffffff;
+}`;
+    const result = checkThemeCompatibility(css);
+    expect(result.issues.some((i) => i.rule === 'mixed-token-hardcoded')).toBe(true);
+  });
+
+  it('does NOT flag when both use tokens', () => {
+    const css = `.card {
+  color: var(--text-color);
+  background: var(--surface-color);
+}`;
+    const result = checkThemeCompatibility(css);
+    const mixed = result.issues.filter((i) => i.rule === 'mixed-token-hardcoded');
+    expect(mixed).toHaveLength(0);
+  });
+
+  it('does NOT flag when both are hardcoded (caught by hardcoded-theme-color)', () => {
+    const css = `.card {
+  color: #333;
+  background: #fff;
+}`;
+    const result = checkThemeCompatibility(css);
+    const mixed = result.issues.filter((i) => i.rule === 'mixed-token-hardcoded');
+    expect(mixed).toHaveLength(0);
+  });
+});
+
+// ─── Low-opacity shadows (invisible in dark mode) ──────────────────────────
+
+describe('checkThemeCompatibility — dark mode shadow visibility', () => {
+  it('warns about very low opacity black shadows', () => {
+    const css = `.card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}`;
+    const result = checkThemeCompatibility(css);
+    expect(result.issues.some((i) => i.rule === 'dark-mode-shadow-invisible')).toBe(true);
+  });
+
+  it('does NOT flag shadows with reasonable opacity', () => {
+    const css = `.card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}`;
+    const result = checkThemeCompatibility(css);
+    const invisible = result.issues.filter((i) => i.rule === 'dark-mode-shadow-invisible');
+    expect(invisible).toHaveLength(0);
+  });
+
+  it('warns about low opacity hsla shadows', () => {
+    const css = `.card {
+  box-shadow: 0 1px 3px hsla(0, 0%, 0%, 0.06);
+}`;
+    const result = checkThemeCompatibility(css);
+    expect(result.issues.some((i) => i.rule === 'dark-mode-shadow-invisible')).toBe(true);
+  });
+});
+
 // ─── Result structure ───────────────────────────────────────────────────────
 
 describe('checkThemeCompatibility — result structure', () => {

@@ -22,6 +22,7 @@ import { checkCssSpecificity } from './specificity-checker.js';
 import { buildCssSnippet } from './styling-diagnostics.js';
 import { checkTokenFallbacksFromMeta } from './token-fallback-checker.js';
 import { checkCssScopeFromMeta } from './scope-checker.js';
+import { buildAntiPatterns } from './quick-ref.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -52,6 +53,7 @@ export interface PreflightResult {
   componentApi: PreflightComponentApi;
   resolution: CssApiResolution;
   issues: PreflightIssue[];
+  antiPatterns: string[];
   correctSnippet: string;
   verdict: string;
 }
@@ -172,16 +174,20 @@ export function runStylingPreflight(input: PreflightInput): PreflightResult {
     hasStyleApi: meta.cssParts.length > 0 || meta.cssProperties.length > 0 || meta.slots.length > 0,
   };
 
-  // 5. Generate correct CSS snippet
+  // 5. Generate anti-patterns (component-specific "don't do this" examples)
+  const antiPatterns = buildAntiPatterns(meta);
+
+  // 6. Generate correct CSS snippet
   const correctSnippet = buildCssSnippet(meta);
 
-  // 6. Build verdict
+  // 7. Build verdict
   const verdict = buildVerdict(resolution, issues);
 
   return {
     componentApi,
     resolution,
     issues,
+    antiPatterns,
     correctSnippet,
     verdict,
   };

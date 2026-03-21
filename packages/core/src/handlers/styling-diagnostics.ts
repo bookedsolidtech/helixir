@@ -161,7 +161,22 @@ export function buildAntiPatterns(meta: ComponentMetadata): AntiPatternWarning[]
       correctApproach:
         'Style slotted content directly in your page CSS by targeting the elements themselves before they are slotted in.',
     });
+    warnings.push({
+      pattern: `::slotted(div.foo) { ... } or ::slotted(div) span { ... }`,
+      explanation:
+        '::slotted() only accepts simple selectors (one element, class, or attribute). Compound selectors and descendant selectors after ::slotted() are invalid.',
+      correctApproach:
+        'Use ::slotted(div) or ::slotted(.my-class) — one simple selector only. To style children of slotted content, use light DOM CSS.',
+    });
   }
+
+  // Warn about :host misuse in consumer CSS
+  warnings.push({
+    pattern: `:host { ... } or :host-context(.theme) { ... } /* in consumer CSS */`,
+    explanation:
+      ':host and :host-context() only work inside a shadow root stylesheet. They have no effect in consumer CSS.',
+    correctApproach: `Target the component by tag name instead: ${tag} { display: block; }`,
+  });
 
   // Warn about ::part() descendant selectors
   if (meta.cssParts.length > 0) {

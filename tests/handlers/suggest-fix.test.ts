@@ -77,6 +77,40 @@ describe('suggestFix — Shadow DOM advanced', () => {
     expect(result.explanation).toContain('display: contents');
     expect(result.severity).toBe('error');
   });
+
+  it('suggests tag name instead of :host in consumer CSS', () => {
+    const result = suggestFix({
+      type: 'shadow-dom',
+      issue: 'external-host',
+      original: ':host { display: block; }',
+      tagName: 'my-button',
+    });
+    expect(result.suggestion).toContain('my-button');
+    expect(result.explanation).toContain(':host');
+    expect(result.severity).toBe('error');
+  });
+
+  it('suggests removing descendant selector after ::slotted()', () => {
+    const result = suggestFix({
+      type: 'shadow-dom',
+      issue: 'slotted-descendant',
+      original: '::slotted(div) span { color: red; }',
+    });
+    expect(result.suggestion).toContain('::slotted(div)');
+    expect(result.suggestion).not.toContain('span');
+    expect(result.severity).toBe('error');
+  });
+
+  it('suggests simple selector for compound ::slotted()', () => {
+    const result = suggestFix({
+      type: 'shadow-dom',
+      issue: 'slotted-compound',
+      original: '::slotted(div.foo) { color: red; }',
+    });
+    expect(result.suggestion).toContain('::slotted(div)');
+    expect(result.explanation).toContain('simple selector');
+    expect(result.severity).toBe('error');
+  });
 });
 
 // ─── Token fallback fixes ───────────────────────────────────────────────────

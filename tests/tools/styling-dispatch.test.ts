@@ -140,6 +140,22 @@ describe('handleStylingCall — check_layout_patterns', () => {
   });
 });
 
+// ─── handleStylingCall — check_css_scope ─────────────────────────────────────
+
+describe('handleStylingCall — check_css_scope', () => {
+  it('dispatches scope check for component tokens on :root', () => {
+    const result = handleStylingCall(
+      'check_css_scope',
+      { cssText: ':root { --my-button-color: red; }', tagName: 'my-button' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+    const parsed = JSON.parse((result.content as Array<{ text: string }>)[0].text);
+    expect(parsed.issues.length).toBeGreaterThan(0);
+    expect(parsed.issues[0].rule).toBe('scope-mismatch');
+  });
+});
+
 // ─── handleStylingCall — check_css_specificity ──────────────────────────────
 
 describe('handleStylingCall — check_css_specificity', () => {

@@ -131,6 +131,99 @@ describe('suggestFix — event usage', () => {
   });
 });
 
+// ─── Specificity fixes ─────────────────────────────────────────────────────
+
+describe('suggestFix — specificity', () => {
+  it('removes !important from CSS', () => {
+    const result = suggestFix({
+      type: 'specificity',
+      issue: 'important',
+      original: 'my-button { color: red !important; }',
+      tagName: 'my-button',
+    });
+    expect(result.suggestion).not.toContain('!important');
+    expect(result.severity).toBe('error');
+  });
+
+  it('suggests class selector instead of ID selector', () => {
+    const result = suggestFix({
+      type: 'specificity',
+      issue: 'id-selector',
+      original: '#app my-button { color: red; }',
+    });
+    expect(result.suggestion).toContain('.app');
+    expect(result.suggestion).not.toContain('#app');
+  });
+
+  it('suggests flattened selector for deep nesting', () => {
+    const result = suggestFix({
+      type: 'specificity',
+      issue: 'deep-nesting',
+      original: '.page .section .card .header my-button { color: red; }',
+      tagName: 'my-button',
+    });
+    expect(result.suggestion).toContain('my-button');
+    expect(result.explanation).toContain('nested');
+  });
+
+  it('suggests stylesheet for inline styles', () => {
+    const result = suggestFix({
+      type: 'specificity',
+      issue: 'inline-style',
+      original: '<my-button style="color: red;">Click</my-button>',
+      tagName: 'my-button',
+    });
+    expect(result.suggestion).toContain('stylesheet');
+    expect(result.severity).toBe('warning');
+  });
+});
+
+// ─── Layout fixes ──────────────────────────────────────────────────────────
+
+describe('suggestFix — layout', () => {
+  it('suggests wrapper for display override', () => {
+    const result = suggestFix({
+      type: 'layout',
+      issue: 'host-display',
+      original: 'my-card { display: flex; }',
+      tagName: 'my-card',
+    });
+    expect(result.suggestion).toContain('wrapper');
+    expect(result.severity).toBe('warning');
+  });
+
+  it('suggests max-width for fixed dimensions', () => {
+    const result = suggestFix({
+      type: 'layout',
+      issue: 'fixed-dimensions',
+      original: 'my-card { width: 400px; }',
+      tagName: 'my-card',
+      property: 'width',
+    });
+    expect(result.suggestion).toContain('max-width');
+  });
+
+  it('suggests wrapper for position override', () => {
+    const result = suggestFix({
+      type: 'layout',
+      issue: 'position-override',
+      original: 'my-card { position: absolute; }',
+      tagName: 'my-card',
+    });
+    expect(result.suggestion).toContain('container');
+  });
+
+  it('suggests wrapper for overflow hidden', () => {
+    const result = suggestFix({
+      type: 'layout',
+      issue: 'overflow-hidden',
+      original: 'my-card { overflow: hidden; }',
+      tagName: 'my-card',
+    });
+    expect(result.explanation).toContain('dropdown');
+  });
+});
+
 // ─── Result structure ───────────────────────────────────────────────────────
 
 describe('suggestFix — result structure', () => {

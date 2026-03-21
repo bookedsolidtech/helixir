@@ -140,7 +140,7 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
       });
     });
 
-    it('returns all expected tool names (38 core + 2 token when configured)', async () => {
+    it('returns all expected tool names (65 core + 2 token when configured)', async () => {
       sendRequest('tools/list', {});
       const response = await recv();
 
@@ -201,6 +201,31 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
         'get_project_diagnostics',
         // type generation
         'generate_types',
+        // styling
+        'diagnose_styling',
+        'check_shadow_dom_usage',
+        'check_html_usage',
+        'check_event_usage',
+        'get_component_quick_ref',
+        'detect_theme_support',
+        'check_component_imports',
+        'check_slot_children',
+        'check_attribute_conflicts',
+        'check_a11y_usage',
+        'check_css_vars',
+        'validate_component_code',
+        'check_token_fallbacks',
+        'check_composition',
+        'check_method_calls',
+        'check_theme_compatibility',
+        'recommend_checks',
+        'suggest_fix',
+        'check_css_specificity',
+        'check_layout_patterns',
+        'check_css_scope',
+        'check_css_shorthand',
+        'check_color_contrast',
+        'check_transition_animation',
       ];
       const tokenTools = ['get_design_tokens', 'find_token'];
       const expectedTools = [...coreTools, ...tokenTools];

@@ -117,10 +117,16 @@ export interface ComponentMetadata {
   tagName: string;
   name: string;
   description: string;
-  members: Array<{ name: string; kind: string; type: string; description: string }>;
+  members: Array<{
+    name: string;
+    kind: string;
+    type: string;
+    description: string;
+    attribute?: string;
+  }>;
   events: Array<{ name: string; type: string; description: string }>;
   slots: Array<{ name: string; description: string }>;
-  cssProperties: Array<{ name: string; description: string }>;
+  cssProperties: Array<{ name: string; description: string; default?: string }>;
   cssParts: Array<{ name: string; description: string }>;
 }
 
@@ -223,6 +229,7 @@ function mapDeclaration(decl: CemDeclaration): ComponentMetadata {
       kind: m.kind,
       type: m.type?.text ?? '',
       description: m.description ?? '',
+      attribute: m.attribute,
     })),
     events: (decl.events ?? []).map((e) => ({
       name: e.name,
@@ -236,6 +243,7 @@ function mapDeclaration(decl: CemDeclaration): ComponentMetadata {
     cssProperties: (decl.cssProperties ?? []).map((p) => ({
       name: p.name,
       description: p.description ?? '',
+      ...(p.default !== undefined ? { default: p.default } : {}),
     })),
     cssParts: (decl.cssParts ?? []).map((p) => ({
       name: p.name,

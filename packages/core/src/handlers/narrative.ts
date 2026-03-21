@@ -63,22 +63,36 @@ export function buildNarrative(meta: ComponentMetadata): string {
 
     if (meta.cssProperties.length > 0) {
       customizeLines.push(`\`${meta.tagName}\` exposes CSS custom properties for theming:`);
-      meta.cssProperties.slice(0, 5).forEach((p) => {
+      const topProps = meta.cssProperties.slice(0, 5);
+      topProps.forEach((p) => {
         const desc = p.description ? ` — ${p.description}` : '';
-        customizeLines.push(`- \`${p.name}\`${desc}`);
+        const exampleVal = p.default ?? 'initial';
+        customizeLines.push(`- \`${p.name}\`: \`var(${p.name}, ${exampleVal})\`${desc}`);
       });
       if (meta.cssProperties.length > 5) {
         customizeLines.push(`- *(and ${meta.cssProperties.length - 5} more)*`);
       }
+      const propLines = topProps.map((p) => `  ${p.name}: ${p.default ?? 'initial'};`).join('\n');
+      customizeLines.push(`\nExample:\n\`\`\`css\n${meta.tagName} {\n${propLines}\n}\n\`\`\``);
     }
 
     if (meta.cssParts.length > 0) {
       customizeLines.push(`\nCSS parts for structural styling:`);
-      meta.cssParts.slice(0, 4).forEach((p) => {
+      const topParts = meta.cssParts.slice(0, 4);
+      topParts.forEach((p) => {
         const desc = p.description ? ` — ${p.description}` : '';
-        customizeLines.push(`- \`::part(${p.name})\`${desc}`);
+        customizeLines.push(`- \`${meta.tagName}::part(${p.name})\`${desc}`);
       });
+      const partExamples = topParts
+        .slice(0, 2)
+        .map((p) => `${meta.tagName}::part(${p.name}) {\n  /* custom styles */\n}`)
+        .join('\n\n');
+      customizeLines.push(`\nExample:\n\`\`\`css\n${partExamples}\n\`\`\``);
     }
+
+    customizeLines.push(
+      `\n**Do NOT:** Use descendant selectors like \`${meta.tagName} .inner\` — Shadow DOM prevents these from reaching internal elements. Only CSS custom properties and \`::part()\` selectors work across the shadow boundary.`,
+    );
 
     sections.push(customizeLines.join('\n'));
   }

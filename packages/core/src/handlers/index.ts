@@ -8,6 +8,7 @@ export * from './bundle.js';
 export * from './cdn.js';
 export * from './cem.js';
 export * from './compare.js';
+export * from './css-var-checker.js';
 export * from './component.js';
 export * from './composition.js';
 export * from './dependencies.js';

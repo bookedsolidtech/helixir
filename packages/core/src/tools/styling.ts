@@ -12,6 +12,7 @@ import { checkComponentImports } from '../handlers/import-checker.js';
 import { checkSlotChildren } from '../handlers/slot-children-checker.js';
 import { checkAttributeConflicts } from '../handlers/attribute-conflict-checker.js';
 import { checkA11yUsage } from '../handlers/a11y-usage-checker.js';
+import { checkCssVars } from '../handlers/css-var-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -52,6 +53,11 @@ const CheckAttributeConflictsArgsSchema = z.object({
 
 const CheckA11yUsageArgsSchema = z.object({
   htmlText: z.string(),
+  tagName: z.string(),
+});
+
+const CheckCssVarsArgsSchema = z.object({
+  cssText: z.string(),
   tagName: z.string(),
 });
 
@@ -294,6 +300,31 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'check_css_vars',
+    description:
+      'Validates consumer CSS for custom property usage against a component CEM — catches unknown CSS custom properties with typo suggestions, and !important on design tokens (anti-pattern). Run this on any CSS that sets component-scoped custom properties.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+        cssText: {
+          type: 'string',
+          description: 'The CSS code to validate for custom property usage.',
+        },
+        tagName: {
+          type: 'string',
+          description: 'The custom element tag name to validate against (e.g. "sl-button").',
+        },
+      },
+      required: ['cssText', 'tagName'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -373,6 +404,12 @@ export function handleStylingCall(
     if (name === 'check_a11y_usage') {
       const { htmlText, tagName } = CheckA11yUsageArgsSchema.parse(args);
       const result = checkA11yUsage(htmlText, tagName, cem);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_css_vars') {
+      const { cssText, tagName } = CheckCssVarsArgsSchema.parse(args);
+      const result = checkCssVars(cssText, tagName, cem);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

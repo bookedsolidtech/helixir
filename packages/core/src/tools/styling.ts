@@ -14,6 +14,8 @@ import { checkAttributeConflicts } from '../handlers/attribute-conflict-checker.
 import { checkA11yUsage } from '../handlers/a11y-usage-checker.js';
 import { checkCssVars } from '../handlers/css-var-checker.js';
 import { validateComponentCode } from '../handlers/code-validator.js';
+import { checkTokenFallbacks } from '../handlers/token-fallback-checker.js';
+import { checkComposition } from '../handlers/composition-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -60,6 +62,15 @@ const CheckA11yUsageArgsSchema = z.object({
 const CheckCssVarsArgsSchema = z.object({
   cssText: z.string(),
   tagName: z.string(),
+});
+
+const CheckTokenFallbacksArgsSchema = z.object({
+  cssText: z.string(),
+  tagName: z.string(),
+});
+
+const CheckCompositionArgsSchema = z.object({
+  htmlText: z.string(),
 });
 
 const ValidateComponentCodeArgsSchema = z.object({
@@ -372,6 +383,52 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'check_token_fallbacks',
+    description:
+      'Validates consumer CSS for proper var() fallback chains and detects hardcoded colors that break theme switching. Catches var() calls without fallback values (fragile if token undefined), hardcoded hex/rgb/hsl/named colors on color properties (breaks dark mode), and named CSS colors used directly instead of tokens. Run this on any CSS that references design tokens.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+        cssText: {
+          type: 'string',
+          description: 'The CSS code to validate for token fallback usage.',
+        },
+        tagName: {
+          type: 'string',
+          description: 'The custom element tag name to validate against (e.g. "sl-button").',
+        },
+      },
+      required: ['cssText', 'tagName'],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'check_composition',
+    description:
+      'Validates cross-component composition patterns — catches tab/panel count mismatches, unlinked cross-references (tab panel="x" without matching panel name="x"), and empty containers (select with no options). Detects component pairs automatically from CEM slot descriptions. Run this on any HTML using compound components like tab-groups, selects, accordions, etc.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+        htmlText: {
+          type: 'string',
+          description: 'The HTML code containing compound component patterns to validate.',
+        },
+      },
+      required: ['htmlText'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -457,6 +514,18 @@ export function handleStylingCall(
     if (name === 'check_css_vars') {
       const { cssText, tagName } = CheckCssVarsArgsSchema.parse(args);
       const result = checkCssVars(cssText, tagName, cem);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_composition') {
+      const { htmlText } = CheckCompositionArgsSchema.parse(args);
+      const result = checkComposition(htmlText, cem);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_token_fallbacks') {
+      const { cssText, tagName } = CheckTokenFallbacksArgsSchema.parse(args);
+      const result = checkTokenFallbacks(cssText, tagName, cem);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

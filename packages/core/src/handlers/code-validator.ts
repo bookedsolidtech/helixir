@@ -11,6 +11,7 @@
  * 6. check_a11y_usage — accessibility pattern validation
  * 7. check_css_vars — custom property usage validation
  * 8. check_component_imports — unknown tag detection
+ * 9. check_token_fallbacks — var() fallback chain validation
  */
 
 import type { Cem } from './cem.js';
@@ -25,6 +26,7 @@ import {
 import { checkA11yUsage, type A11yUsageResult } from './a11y-usage-checker.js';
 import { checkCssVars, type CssVarCheckResult } from './css-var-checker.js';
 import { checkComponentImports, type ImportCheckResult } from './import-checker.js';
+import { checkTokenFallbacks, type TokenFallbackResult } from './token-fallback-checker.js';
 import { parseCem } from './cem.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -48,6 +50,7 @@ export interface ValidateComponentCodeResult {
   attributeConflicts?: AttributeConflictResult;
   a11yUsage?: A11yUsageResult;
   cssVars?: CssVarCheckResult;
+  tokenFallbacks?: TokenFallbackResult;
   imports?: ImportCheckResult;
 }
 
@@ -144,6 +147,17 @@ export function validateComponentCode(
       if (cssResult.issues.length > 0) {
         result.cssVars = cssResult;
         totalIssues += cssResult.issues.length;
+      }
+    } catch {
+      // Skip if tag not found
+    }
+
+    // 8b. Token Fallbacks — var() chain validation (only if CSS provided)
+    try {
+      const fallbackResult = checkTokenFallbacks(css, tagName, cem);
+      if (fallbackResult.issues.length > 0) {
+        result.tokenFallbacks = fallbackResult;
+        totalIssues += fallbackResult.issues.length;
       }
     } catch {
       // Skip if tag not found

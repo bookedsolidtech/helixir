@@ -157,6 +157,22 @@ function fixShadowDom(input: SuggestFixInput): FixSuggestion {
     };
   }
 
+  if (input.issue === 'root-scope-token') {
+    const tag = tagName ?? 'the-element';
+    // Extract token name from the original CSS
+    const tokenMatch = original.match(/(--[\w-]+)\s*:/);
+    const token = tokenMatch?.[1] ?? '--component-token';
+    const valueMatch = original.match(/:\s*([^;]+)/);
+    const value = valueMatch?.[1]?.trim() ?? 'value';
+
+    return {
+      original,
+      suggestion: `${tag} { ${token}: ${value}; }`,
+      explanation: `Component tokens set on :root have no effect through Shadow DOM boundaries. The token "${token}" must be set on the component's host element (<${tag}>) for the shadow root to inherit it.`,
+      severity: 'error',
+    };
+  }
+
   if (input.issue === 'external-host') {
     const tag = tagName ?? 'the-element';
     return {

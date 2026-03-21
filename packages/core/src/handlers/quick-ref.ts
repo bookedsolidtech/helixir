@@ -76,9 +76,12 @@ function buildCssSnippet(tagName: string, meta: ComponentMetadata): string {
   if (meta.cssProperties.length > 0) {
     const propLines = meta.cssProperties
       .slice(0, 5)
-      .map((p) => `  ${p.name}: initial;`)
+      .map((p) => {
+        const value = p.default ?? guessDefaultValue(p.name);
+        return `  ${p.name}: ${value};`;
+      })
       .join('\n');
-    parts.push(`${tagName} {\n${propLines}\n}`);
+    parts.push(`/* Token customization */\n${tagName} {\n${propLines}\n}`);
   }
 
   if (meta.cssParts.length > 0) {
@@ -86,10 +89,35 @@ function buildCssSnippet(tagName: string, meta: ComponentMetadata): string {
       .slice(0, 3)
       .map((p) => `${tagName}::part(${p.name}) {\n  /* ${p.description || p.name} */\n}`)
       .join('\n\n');
-    parts.push(partBlocks);
+    parts.push(`/* Part-based customization */\n${partBlocks}`);
+  }
+
+  if (meta.slots.length > 0) {
+    const slotLines: string[] = [];
+    const hasDefaultSlot = meta.slots.some((s) => s.name === '');
+    const namedSlots = meta.slots.filter((s) => s.name !== '');
+
+    if (hasDefaultSlot) {
+      slotLines.push(`${tagName} > * { /* default slot content */ }`);
+    }
+    for (const slot of namedSlots.slice(0, 3)) {
+      slotLines.push(`${tagName} [slot="${slot.name}"] { /* ${slot.description || slot.name} */ }`);
+    }
+
+    parts.push(`/* Slot styling — target in light DOM CSS */\n${slotLines.join('\n')}`);
   }
 
   return parts.join('\n\n');
+}
+
+function guessDefaultValue(propName: string): string {
+  const lower = propName.toLowerCase();
+  if (/color|bg|background/.test(lower)) return '#value';
+  if (/size|font/.test(lower)) return '1rem';
+  if (/radius/.test(lower)) return '4px';
+  if (/spacing|padding|margin|gap/.test(lower)) return '1rem';
+  if (/shadow/.test(lower)) return '0 1px 2px rgba(0,0,0,.1)';
+  return '#value';
 }
 
 // ─── Main Entry Point ───────────────────────────────────────────────────────
@@ -131,7 +159,7 @@ export function getComponentQuickRef(meta: ComponentMetadata): ComponentQuickRef
   const cssProperties: QuickRefCssProperty[] = meta.cssProperties.map((p) => ({
     name: p.name,
     description: p.description,
-    example: `${p.name}: initial;`,
+    example: `${p.name}: ${p.default ?? guessDefaultValue(p.name)};`,
   }));
 
   const cssParts: QuickRefCssPart[] = meta.cssParts.map((p) => ({

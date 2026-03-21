@@ -9,6 +9,7 @@
  */
 
 import type { ValidateComponentCodeResult } from './code-validator.js';
+import { suggestFix } from './suggest-fix.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -20,6 +21,8 @@ export interface PrioritizedIssue {
   message: string;
   line?: number;
   suggestion?: string;
+  /** Auto-generated corrected code when the issue has enough data for a fix. */
+  fix?: string;
 }
 
 export interface ValidationSummary {
@@ -48,12 +51,14 @@ export function summarizeValidation(result: ValidateComponentCodeResult): Valida
   // ERROR-level: will break at runtime
   if (result.shadowDom) {
     for (const issue of result.shadowDom.issues) {
+      const fix = tryAutoFix('shadow-dom', mapRuleToIssue(issue.rule), issue.code);
       issues.push({
         severity: 'error',
         category: 'shadowDom',
         message: issue.message,
         line: issue.line,
         suggestion: issue.suggestion,
+        ...(fix ? { fix } : {}),
       });
     }
   }
@@ -117,11 +122,14 @@ export function summarizeValidation(result: ValidateComponentCodeResult): Valida
 
   if (result.tokenFallbacks) {
     for (const issue of result.tokenFallbacks.issues) {
+      const original = `${issue.property}: ${issue.value};`;
+      const fix = tryAutoFix('token-fallback', issue.rule, original, issue.property);
       issues.push({
         severity: 'warning',
         category: 'tokenFallbacks',
         message: issue.message,
         line: issue.line,
+        ...(fix ? { fix } : {}),
       });
     }
   }
@@ -279,6 +287,54 @@ export function summarizeValidation(result: ValidateComponentCodeResult): Valida
     topIssues,
     verdict,
   };
+}
+
+// ─── Auto-Fix Helpers ───────────────────────────────────────────────────────
+
+/**
+ * Maps shadow-dom-checker rule names to suggest_fix issue types.
+ */
+function mapRuleToIssue(rule: string): string {
+  const ruleMap: Record<string, string> = {
+    'no-descendant-piercing': 'descendant-piercing',
+    'no-direct-element-styling': 'direct-element-styling',
+    'no-deprecated-deep': 'deprecated-deep',
+    'no-part-structural': 'part-structural',
+    'no-part-chain': 'part-chain',
+    'no-display-contents-host': 'display-contents-host',
+    'no-external-host': 'external-host',
+    'no-slotted-descendant': 'slotted-descendant',
+    'no-slotted-compound': 'slotted-compound',
+  };
+  return ruleMap[rule] ?? rule;
+}
+
+/**
+ * Attempts to generate an auto-fix for a validation issue.
+ * Returns the corrected code string, or undefined if no fix is possible.
+ */
+function tryAutoFix(
+  type: string,
+  issue: string,
+  original?: string,
+  property?: string,
+): string | undefined {
+  if (!original) return undefined;
+  try {
+    const result = suggestFix({
+      type: type as 'shadow-dom' | 'token-fallback' | 'theme-compat' | 'specificity' | 'layout',
+      issue,
+      original,
+      ...(property ? { property } : {}),
+    });
+    // Only return fix if it's actually different from the original
+    if (result.suggestion !== original) {
+      return result.suggestion;
+    }
+  } catch {
+    // suggestFix failed — no auto-fix available
+  }
+  return undefined;
 }
 
 // ─── Verdict Builder ────────────────────────────────────────────────────────

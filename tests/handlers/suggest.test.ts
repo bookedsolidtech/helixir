@@ -236,9 +236,10 @@ describe('suggestUsage — Shoelace sl-button', () => {
     expect(slotNames).toContain('suffix');
   });
 
-  it('does not include notes for sl-button', async () => {
+  it('includes validation nudge in notes for sl-button', async () => {
     const result = await suggestUsage('sl-button', makeShoelaceConfig());
-    expect(result.notes).toBeUndefined();
+    expect(result.notes).toBeDefined();
+    expect(result.notes!.some((n) => n.includes('validate_component_code'))).toBe(true);
   });
 });
 

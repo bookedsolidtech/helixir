@@ -176,7 +176,13 @@ function extractUnionOptions(typeText: string): string[] | null {
   return null;
 }
 
-function buildStyling(tagName: string, meta: { cssProperties: Array<{ name: string; description: string; default?: string }>; cssParts: Array<{ name: string; description: string }> }): SuggestUsageStyling | undefined {
+function buildStyling(
+  tagName: string,
+  meta: {
+    cssProperties: Array<{ name: string; description: string; default?: string }>;
+    cssParts: Array<{ name: string; description: string }>;
+  },
+): SuggestUsageStyling | undefined {
   if (meta.cssProperties.length === 0 && meta.cssParts.length === 0) return undefined;
 
   const topProps = meta.cssProperties.slice(0, 5);

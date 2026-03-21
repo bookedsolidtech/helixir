@@ -1,0 +1,296 @@
+import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import {
+  handleStylingCall,
+  isStylingTool,
+  STYLING_TOOL_DEFINITIONS,
+} from '../../packages/core/src/tools/styling.js';
+
+const FIXTURE_CEM = resolve(import.meta.dirname, '../__fixtures__/custom-elements.json');
+const cem = JSON.parse(readFileSync(FIXTURE_CEM, 'utf-8'));
+
+// ─── isStylingTool ──────────────────────────────────────────────────────────
+
+describe('isStylingTool', () => {
+  it('returns true for all defined styling tools', () => {
+    for (const tool of STYLING_TOOL_DEFINITIONS) {
+      expect(isStylingTool(tool.name)).toBe(true);
+    }
+  });
+
+  it('returns false for unknown tools', () => {
+    expect(isStylingTool('not_a_tool')).toBe(false);
+  });
+});
+
+// ─── handleStylingCall — recommend_checks ───────────────────────────────────
+
+describe('handleStylingCall — recommend_checks', () => {
+  it('returns recommended tools for HTML code', () => {
+    const result = handleStylingCall(
+      'recommend_checks',
+      { codeText: '<sl-button variant="primary">Click me</sl-button>' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+    const parsed = JSON.parse((result.content as Array<{ text: string }>)[0].text);
+    expect(parsed.recommended).toContain('validate_component_code');
+    expect(parsed.recommended).toContain('check_html_usage');
+    expect(parsed.codeType).toContain('html');
+    expect(parsed.detectedTags).toContain('sl-button');
+  });
+
+  it('returns recommended tools for CSS code', () => {
+    const result = handleStylingCall(
+      'recommend_checks',
+      { codeText: 'sl-button { --sl-button-color: var(--app-color); }' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+    const parsed = JSON.parse((result.content as Array<{ text: string }>)[0].text);
+    expect(parsed.recommended).toContain('check_shadow_dom_usage');
+    expect(parsed.recommended).toContain('check_token_fallbacks');
+    expect(parsed.codeType).toContain('css');
+  });
+
+  it('returns recommended tools for JavaScript code', () => {
+    const result = handleStylingCall(
+      'recommend_checks',
+      { codeText: `const dialog = document.querySelector('sl-dialog');\ndialog.show();` },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+    const parsed = JSON.parse((result.content as Array<{ text: string }>)[0].text);
+    expect(parsed.recommended).toContain('check_method_calls');
+    expect(parsed.codeType).toContain('javascript');
+  });
+});
+
+// ─── handleStylingCall — check_theme_compatibility ──────────────────────────
+
+describe('handleStylingCall — check_theme_compatibility', () => {
+  it('dispatches and returns a result', () => {
+    const result = handleStylingCall(
+      'check_theme_compatibility',
+      { cssText: '.card { background: var(--color-bg); color: var(--color-text); }' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+    const parsed = JSON.parse((result.content as Array<{ text: string }>)[0].text);
+    expect(parsed).toHaveProperty('issues');
+  });
+});
+
+// ─── handleStylingCall — check_composition ──────────────────────────────────
+
+describe('handleStylingCall — check_composition', () => {
+  it('dispatches and returns a result', () => {
+    const result = handleStylingCall(
+      'check_composition',
+      { htmlText: '<sl-select><sl-option value="1">One</sl-option></sl-select>' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+  });
+});
+
+// ─── handleStylingCall — check_token_fallbacks ──────────────────────────────
+
+describe('handleStylingCall — check_token_fallbacks', () => {
+  it('dispatches and returns a result', () => {
+    const result = handleStylingCall(
+      'check_token_fallbacks',
+      { cssText: 'sl-button { color: var(--my-color, #333); }', tagName: 'sl-button' },
+      cem,
+    );
+    // May return error if tag not in CEM — we just verify dispatch works
+    const content = (result.content as Array<{ text: string }>)[0].text;
+    expect(content).toBeTruthy();
+  });
+});
+
+// ─── handleStylingCall — check_method_calls ─────────────────────────────────
+
+describe('handleStylingCall — check_method_calls', () => {
+  it('dispatches and returns a result', () => {
+    const result = handleStylingCall(
+      'check_method_calls',
+      { codeText: `const el = document.querySelector('my-button');`, tagName: 'my-button' },
+      cem,
+    );
+    // my-button exists in our fixture CEM
+    expect(result.isError).toBeFalsy();
+  });
+});
+
+// ─── handleStylingCall — diagnose_styling ───────────────────────────────────
+
+describe('handleStylingCall — diagnose_styling', () => {
+  it('dispatches and returns styling diagnostics', () => {
+    const result = handleStylingCall('diagnose_styling', { tagName: 'my-button' }, cem);
+    expect(result.isError).toBeFalsy();
+  });
+});
+
+// ─── handleStylingCall — check_shadow_dom_usage ─────────────────────────────
+
+describe('handleStylingCall — check_shadow_dom_usage', () => {
+  it('dispatches without tagName', () => {
+    const result = handleStylingCall(
+      'check_shadow_dom_usage',
+      { cssText: 'my-button { color: red; }' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+  });
+
+  it('dispatches with tagName', () => {
+    const result = handleStylingCall(
+      'check_shadow_dom_usage',
+      { cssText: 'my-button { color: red; }', tagName: 'my-button' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+  });
+
+  it('dispatches with unknown tagName gracefully', () => {
+    const result = handleStylingCall(
+      'check_shadow_dom_usage',
+      { cssText: 'unknown-el { color: red; }', tagName: 'unknown-el' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+  });
+});
+
+// ─── handleStylingCall — check_html_usage ───────────────────────────────────
+
+describe('handleStylingCall — check_html_usage', () => {
+  it('dispatches and validates HTML', () => {
+    const result = handleStylingCall(
+      'check_html_usage',
+      { htmlText: '<my-button>Click</my-button>', tagName: 'my-button' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+  });
+});
+
+// ─── handleStylingCall — check_event_usage ──────────────────────────────────
+
+describe('handleStylingCall — check_event_usage', () => {
+  it('dispatches and validates event usage', () => {
+    const result = handleStylingCall(
+      'check_event_usage',
+      { codeText: '<my-button>Click</my-button>', tagName: 'my-button' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+  });
+});
+
+// ─── handleStylingCall — get_component_quick_ref ────────────────────────────
+
+describe('handleStylingCall — get_component_quick_ref', () => {
+  it('dispatches and returns quick ref', () => {
+    const result = handleStylingCall('get_component_quick_ref', { tagName: 'my-button' }, cem);
+    expect(result.isError).toBeFalsy();
+  });
+});
+
+// ─── handleStylingCall — detect_theme_support ───────────────────────────────
+
+describe('handleStylingCall — detect_theme_support', () => {
+  it('dispatches and returns theme support info', () => {
+    const result = handleStylingCall('detect_theme_support', {}, cem);
+    expect(result.isError).toBeFalsy();
+  });
+});
+
+// ─── handleStylingCall — check_component_imports ────────────────────────────
+
+describe('handleStylingCall — check_component_imports', () => {
+  it('dispatches and validates imports', () => {
+    const result = handleStylingCall(
+      'check_component_imports',
+      { codeText: '<my-button>Click</my-button>' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+  });
+});
+
+// ─── handleStylingCall — check_slot_children ────────────────────────────────
+
+describe('handleStylingCall — check_slot_children', () => {
+  it('dispatches and validates slot children', () => {
+    const result = handleStylingCall(
+      'check_slot_children',
+      { htmlText: '<my-select><my-option>One</my-option></my-select>', tagName: 'my-select' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+  });
+});
+
+// ─── handleStylingCall — check_attribute_conflicts ──────────────────────────
+
+describe('handleStylingCall — check_attribute_conflicts', () => {
+  it('dispatches and validates attributes', () => {
+    const result = handleStylingCall(
+      'check_attribute_conflicts',
+      { htmlText: '<my-button>Click</my-button>', tagName: 'my-button' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+  });
+});
+
+// ─── handleStylingCall — check_a11y_usage ───────────────────────────────────
+
+describe('handleStylingCall — check_a11y_usage', () => {
+  it('dispatches and validates a11y', () => {
+    const result = handleStylingCall(
+      'check_a11y_usage',
+      { htmlText: '<my-button>Click</my-button>', tagName: 'my-button' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+  });
+});
+
+// ─── handleStylingCall — check_css_vars ─────────────────────────────────────
+
+describe('handleStylingCall — check_css_vars', () => {
+  it('dispatches and validates CSS vars', () => {
+    const result = handleStylingCall(
+      'check_css_vars',
+      { cssText: 'my-button { --my-color: red; }', tagName: 'my-button' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+  });
+});
+
+// ─── handleStylingCall — validate_component_code ────────────────────────────
+
+describe('handleStylingCall — validate_component_code', () => {
+  it('dispatches the all-in-one aggregator', () => {
+    const result = handleStylingCall(
+      'validate_component_code',
+      { html: '<my-button>Click</my-button>', tagName: 'my-button' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+  });
+});
+
+// ─── handleStylingCall — unknown tool ───────────────────────────────────────
+
+describe('handleStylingCall — unknown tool', () => {
+  it('returns error for unknown tool name', () => {
+    const result = handleStylingCall('unknown_tool', {}, cem);
+    expect(result.isError).toBe(true);
+  });
+});

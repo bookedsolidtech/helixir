@@ -26,6 +26,7 @@ export * from './method-checker.js';
 export * from './migration.js';
 export * from './narrative.js';
 export * from './quick-ref.js';
+export * from './recommend-checks.js';
 export * from './story.js';
 export * from './shadow-dom-checker.js';
 export * from './slot-children-checker.js';

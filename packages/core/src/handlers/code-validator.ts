@@ -48,6 +48,7 @@ import { checkColorContrast, type ColorContrastResult } from './color-contrast-c
 import { checkTransitionAnimation, type TransitionCheckResult } from './transition-checker.js';
 import { checkShadowDomJs, type ShadowDomJsResult } from './shadow-dom-js-checker.js';
 import { parseCem } from './cem.js';
+import { summarizeValidation, type ValidationSummary } from './validation-summary.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -63,6 +64,7 @@ export interface ValidateComponentCodeInput {
 export interface ValidateComponentCodeResult {
   clean: boolean;
   totalIssues: number;
+  summary?: ValidationSummary;
   htmlUsage?: HtmlUsageCheckResult;
   shadowDom?: ShadowDomCheckResult;
   eventUsage?: EventUsageCheckResult;
@@ -337,6 +339,9 @@ export function validateComponentCode(
 
   result.totalIssues = totalIssues;
   result.clean = totalIssues === 0;
+
+  // Generate prioritized summary with severity scoring
+  result.summary = summarizeValidation(result);
 
   return result;
 }

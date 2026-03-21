@@ -22,7 +22,7 @@ import { checkCssSpecificity } from './specificity-checker.js';
 import { buildCssSnippet } from './styling-diagnostics.js';
 import { checkTokenFallbacksFromMeta } from './token-fallback-checker.js';
 import { checkCssScopeFromMeta } from './scope-checker.js';
-import { buildAntiPatterns } from './quick-ref.js';
+import { buildAntiPatternHints } from './quick-ref.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -175,7 +175,7 @@ export function runStylingPreflight(input: PreflightInput): PreflightResult {
   };
 
   // 5. Generate anti-patterns (component-specific "don't do this" examples)
-  const antiPatterns = buildAntiPatterns(meta);
+  const antiPatterns = buildAntiPatternHints(meta);
 
   // 6. Generate correct CSS snippet
   const correctSnippet = buildCssSnippet(meta);

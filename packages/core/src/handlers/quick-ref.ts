@@ -123,7 +123,7 @@ function guessDefaultValue(propName: string): string {
 
 // ─── Anti-Pattern Builder ──────────────────────────────────────────────────
 
-export function buildAntiPatterns(meta: ComponentMetadata): string[] {
+export function buildAntiPatternHints(meta: ComponentMetadata): string[] {
   const tag = meta.tagName;
   const patterns: string[] = [];
 
@@ -236,7 +236,7 @@ export function getComponentQuickRef(meta: ComponentMetadata): ComponentQuickRef
     );
   }
 
-  const antiPatterns = buildAntiPatterns(meta);
+  const antiPatterns = buildAntiPatternHints(meta);
 
   return {
     tagName: meta.tagName,

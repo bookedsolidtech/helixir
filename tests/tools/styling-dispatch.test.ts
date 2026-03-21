@@ -188,6 +188,22 @@ describe('handleStylingCall — check_color_contrast', () => {
   });
 });
 
+// ─── handleStylingCall — check_transition_animation ─────────────────────
+
+describe('handleStylingCall — check_transition_animation', () => {
+  it('dispatches transition animation check for host transitions', () => {
+    const result = handleStylingCall(
+      'check_transition_animation',
+      { cssText: 'sl-button { transition: background-color 0.3s ease; }', tagName: 'sl-button' },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+    const parsed = JSON.parse((result.content as Array<{ text: string }>)[0].text);
+    expect(parsed.issues.length).toBeGreaterThan(0);
+    expect(parsed.issues[0].rule).toBe('transition-no-effect');
+  });
+});
+
 // ─── handleStylingCall — check_css_specificity ──────────────────────────────
 
 describe('handleStylingCall — check_css_specificity', () => {

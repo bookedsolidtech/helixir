@@ -25,6 +25,7 @@ import { checkLayoutPatterns } from '../handlers/layout-checker.js';
 import { checkCssScope } from '../handlers/scope-checker.js';
 import { checkCssShorthand } from '../handlers/shorthand-checker.js';
 import { checkColorContrast } from '../handlers/color-contrast-checker.js';
+import { checkTransitionAnimation } from '../handlers/transition-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -111,6 +112,11 @@ const CheckCssShorthandArgsSchema = z.object({
 
 const CheckColorContrastArgsSchema = z.object({
   cssText: z.string(),
+});
+
+const CheckTransitionAnimationArgsSchema = z.object({
+  cssText: z.string(),
+  tagName: z.string(),
 });
 
 const CheckCssSpecificityArgsSchema = z.object({
@@ -701,6 +707,22 @@ export const STYLING_TOOL_DEFINITIONS = [
       required: ['cssText'],
     },
   },
+  {
+    name: 'check_transition_animation',
+    description:
+      'Detects CSS transitions and animations on web component hosts that target standard properties which cannot cross Shadow DOM boundaries. Transitions on standard properties (color, background, opacity) only affect the host element box, not the component internals. Use CSS custom properties for animations that the component consumes.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        cssText: { type: 'string', description: 'CSS code to analyze' },
+        tagName: {
+          type: 'string',
+          description: 'Tag name of the web component (e.g., "sl-button")',
+        },
+      },
+      required: ['cssText', 'tagName'],
+    },
+  },
 ];
 
 /**
@@ -846,6 +868,12 @@ export function handleStylingCall(
     if (name === 'check_color_contrast') {
       const { cssText } = CheckColorContrastArgsSchema.parse(args);
       const result = checkColorContrast(cssText);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_transition_animation') {
+      const { cssText, tagName } = CheckTransitionAnimationArgsSchema.parse(args);
+      const result = checkTransitionAnimation(cssText, tagName);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

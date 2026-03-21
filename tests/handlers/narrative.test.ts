@@ -46,3 +46,36 @@ describe('getComponentNarrative', () => {
     expect((err as MCPError).category).toBe(ErrorCategory.NOT_FOUND);
   });
 });
+
+// ---------------------------------------------------------------------------
+// getComponentNarrative — enhanced CSS customization section
+// ---------------------------------------------------------------------------
+
+describe('getComponentNarrative — CSS customization section (my-button)', () => {
+  it('includes var() usage examples for CSS custom properties', () => {
+    const result = getComponentNarrative('my-button', FIXTURE_CEM);
+    expect(result).toContain('var(--my-button-bg');
+  });
+
+  it('includes a CSS code block example for custom properties', () => {
+    const result = getComponentNarrative('my-button', FIXTURE_CEM);
+    expect(result).toContain('```css');
+    expect(result).toContain('--my-button-bg');
+  });
+
+  it('includes ::part() selector examples', () => {
+    const result = getComponentNarrative('my-button', FIXTURE_CEM);
+    expect(result).toContain('my-button::part(base)');
+  });
+
+  it('includes a Do NOT section warning about descendant selectors', () => {
+    const result = getComponentNarrative('my-button', FIXTURE_CEM);
+    expect(result).toContain('Do NOT');
+    expect(result).toContain('Shadow DOM');
+  });
+
+  it('includes part code block example', () => {
+    const result = getComponentNarrative('my-button', FIXTURE_CEM);
+    expect(result).toContain('::part(base) {');
+  });
+});

@@ -15,7 +15,7 @@ export interface CssArchitectureResult {
 /** Theming categories expected in a well-rounded component */
 const THEMING_CATEGORIES: Array<{ name: string; patterns: RegExp[] }> = [
   { name: 'color', patterns: [/color/, /background/, /fill/, /stroke/] },
-  { name: 'spacing', patterns: [/spacing/, /padding/, /margin/, /gap/, /size/] },
+  { name: 'spacing', patterns: [/spacing/, /padding/, /margin/, /gap/] },
   { name: 'typography', patterns: [/font/, /text/, /line-height/, /letter-spacing/] },
   { name: 'border', patterns: [/border/, /radius/, /outline/] },
 ];
@@ -115,7 +115,9 @@ export function analyzeCssArchitecture(decl: CemDeclaration): CssArchitectureRes
       }
       const maxCount = Math.max(...prefixCounts.values());
       const consistencyRatio = maxCount / cssProperties.length;
-      namespaceScore = Math.round(consistencyRatio * 15);
+      if (consistencyRatio >= 0.5) {
+        namespaceScore = Math.round(consistencyRatio * 15);
+      }
     }
   }
   const detectedPrefixes = detectNamespacePrefixes(cssProperties);
@@ -132,18 +134,17 @@ export function analyzeCssArchitecture(decl: CemDeclaration): CssArchitectureRes
   // 6. Theming completeness (15 points, new)
   // Components with CSS properties should cover common theming categories
   let themingScore = 0;
+  const propertyNames = cssProperties.map((p) => p.name.toLowerCase());
   if (cssProperties.length > 0) {
-    const propertyNames = cssProperties.map((p) => p.name.toLowerCase());
     const coveredCategories = THEMING_CATEGORIES.filter(({ patterns }) =>
       patterns.some((pattern) => propertyNames.some((name) => pattern.test(name))),
     );
     const coverageRatio = coveredCategories.length / THEMING_CATEGORIES.length;
     themingScore = Math.round(coverageRatio * 15);
   }
-  const coveredCategoryNames = THEMING_CATEGORIES.filter(({ patterns }) => {
-    const propertyNames = cssProperties.map((p) => p.name.toLowerCase());
-    return patterns.some((pattern) => propertyNames.some((name) => pattern.test(name)));
-  }).map(({ name }) => name);
+  const coveredCategoryNames = THEMING_CATEGORIES.filter(({ patterns }) =>
+    patterns.some((pattern) => propertyNames.some((name) => pattern.test(name))),
+  ).map(({ name }) => name);
   subMetrics.push({
     name: 'Theming completeness',
     score: themingScore,

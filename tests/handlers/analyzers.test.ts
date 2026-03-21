@@ -307,8 +307,8 @@ describe('analyzeCssArchitecture', () => {
     const result = analyzeCssArchitecture(SHADOW_DOM_POOR_DECL);
     const metric = result.subMetrics.find((m) => m.name === 'Token namespace consistency');
     expect(metric).toBeDefined();
-    // --a-, --b-, --c- are all different prefixes → low score
-    expect(metric!.score).toBeLessThan(15);
+    // --a-, --b-, --c- are all different prefixes → no dominant prefix → 0
+    expect(metric!.score).toBe(0);
   });
 
   it('includes theming completeness sub-metric', () => {

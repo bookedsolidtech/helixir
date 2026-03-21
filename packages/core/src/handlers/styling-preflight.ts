@@ -279,6 +279,16 @@ function mapIssueToFixInput(
         original,
         tagName,
       };
+    case 'darkMode':
+      return {
+        type: 'dark-mode',
+        issue: issue.message.includes('descendant')
+          ? 'theme-scope-shadow-piercing'
+          : 'theme-scope-standard-property',
+        original,
+        tagName,
+        property: extractPropertyFromMessage(issue.message),
+      };
     case 'specificity':
       if (issue.message.includes('!important')) {
         const importantOriginal = original || extractImportantRule(css);
@@ -305,6 +315,11 @@ function extractLineContent(css: string, lineNum: number): string {
 function extractImportantRule(css: string): string {
   const match = css.match(/[^{}]*!important[^}]*/);
   return match ? match[0].trim() : '';
+}
+
+function extractPropertyFromMessage(message: string): string | undefined {
+  const match = message.match(/"([a-z-]+)" on/);
+  return match?.[1];
 }
 
 function detectShadowDomIssueType(message: string): string {

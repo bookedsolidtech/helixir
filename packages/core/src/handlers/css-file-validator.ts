@@ -319,6 +319,18 @@ function mapIssueToFixInput(
         original,
         tagName,
       };
+    case 'darkMode': {
+      const propMatch = issue.message.match(/"([a-z-]+)" on/);
+      return {
+        type: 'dark-mode',
+        issue: issue.message.includes('descendant')
+          ? 'theme-scope-shadow-piercing'
+          : 'theme-scope-standard-property',
+        original,
+        tagName,
+        property: propMatch?.[1],
+      };
+    }
     case 'specificity':
       if (issue.message.includes('!important')) {
         const importantOriginal = original || extractImportantRule(css);

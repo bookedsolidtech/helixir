@@ -308,6 +308,59 @@ describe('suggestFix — layout', () => {
   });
 });
 
+// ─── Dark mode fixes ────────────────────────────────────────────────────────
+
+describe('suggestFix — dark mode', () => {
+  it('suggests custom property for theme-scoped standard property', () => {
+    const result = suggestFix({
+      type: 'dark-mode',
+      issue: 'theme-scope-standard-property',
+      original: '.dark sl-button { color: white; }',
+      tagName: 'sl-button',
+      property: 'color',
+    });
+    expect(result.suggestion).toContain('--sl-button-color');
+    expect(result.explanation).toContain('shadow DOM internals');
+    expect(result.severity).toBe('error');
+  });
+
+  it('uses tokenPrefix when provided for standard property fix', () => {
+    const result = suggestFix({
+      type: 'dark-mode',
+      issue: 'theme-scope-standard-property',
+      original: '.dark hx-button { background-color: #1a1a1a; }',
+      tagName: 'hx-button',
+      property: 'background-color',
+      tokenPrefix: '--hx-',
+    });
+    expect(result.suggestion).toContain('--hx-bg');
+    expect(result.suggestion).not.toContain('--hx-button-');
+  });
+
+  it('suggests ::part() or custom property for shadow piercing', () => {
+    const result = suggestFix({
+      type: 'dark-mode',
+      issue: 'theme-scope-shadow-piercing',
+      original: '.dark sl-button .inner { color: white; }',
+      tagName: 'sl-button',
+    });
+    expect(result.suggestion).toContain('::part(');
+    expect(result.suggestion).toContain('custom properties');
+    expect(result.severity).toBe('error');
+  });
+
+  it('returns generic guidance for unknown dark-mode issues', () => {
+    const result = suggestFix({
+      type: 'dark-mode',
+      issue: 'unknown-issue',
+      original: '.dark my-el { opacity: 0.5; }',
+      tagName: 'my-el',
+    });
+    expect(result.explanation).toContain('CSS custom properties');
+    expect(result.severity).toBe('info');
+  });
+});
+
 // ─── Library-agnostic token suggestions ─────────────────────────────────────
 
 describe('suggestFix — library-agnostic tokens', () => {

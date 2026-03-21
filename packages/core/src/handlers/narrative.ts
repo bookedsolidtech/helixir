@@ -167,6 +167,51 @@ export function buildNarrative(meta: ComponentMetadata): string {
     sections.push(eventLines.join('\n'));
   }
 
+  // --- Common mistakes (component-specific) ---
+  const mistakes: string[] = [];
+
+  if (meta.cssParts.length > 0) {
+    const partNames = meta.cssParts.map((p) => `\`${p.name}\``).join(', ');
+    mistakes.push(
+      `Only these CSS parts exist: ${partNames}. ` +
+        `Any other part name in \`::part()\` will silently fail.`,
+    );
+  }
+
+  if (meta.cssProperties.length > 0 && meta.cssParts.length === 0) {
+    mistakes.push(
+      `This component has NO CSS parts — use CSS custom properties only. ` +
+        `\`::part()\` selectors will not match anything.`,
+    );
+  }
+
+  if (meta.cssProperties.length === 0 && meta.cssParts.length === 0) {
+    mistakes.push(
+      `This component exposes NO CSS API (no parts, no custom properties). ` +
+        `You cannot style its internals. Only the host element box can be styled.`,
+    );
+  }
+
+  if (meta.events.some((e) => e.name.includes('-'))) {
+    mistakes.push(
+      `Custom events (with hyphens) cannot use React \`onXxx\` props. ` +
+        `Use \`ref.current.addEventListener()\` instead.`,
+    );
+  }
+
+  if (meta.slots.length > 0 && meta.cssParts.length > 0) {
+    mistakes.push(
+      `Style slotted content in light DOM CSS (before it enters the slot), ` +
+        `not with \`::slotted()\` in your consumer stylesheet.`,
+    );
+  }
+
+  if (mistakes.length > 0) {
+    const mistakeLines = ['**Common mistakes:**', ...mistakes.map((m) => `- ${m}`)];
+    mistakeLines.push('', `*Run \`styling_preflight\` with your CSS to validate all references.*`);
+    sections.push(mistakeLines.join('\n'));
+  }
+
   return sections.join('\n\n');
 }
 

@@ -20,6 +20,7 @@
  * 15. check_css_scope — component tokens on wrong scope
  * 16. check_css_shorthand — risky shorthand + var() combinations
  * 17. check_color_contrast — low contrast pairs, mixed token/hardcoded sources
+ * 18. check_transition_animation — transitions/animations on component hosts
  */
 
 import type { Cem } from './cem.js';
@@ -43,6 +44,7 @@ import { checkLayoutPatterns, type LayoutCheckResult } from './layout-checker.js
 import { checkCssScope, type ScopeCheckResult } from './scope-checker.js';
 import { checkCssShorthand, type ShorthandCheckResult } from './shorthand-checker.js';
 import { checkColorContrast, type ColorContrastResult } from './color-contrast-checker.js';
+import { checkTransitionAnimation, type TransitionCheckResult } from './transition-checker.js';
 import { parseCem } from './cem.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -75,6 +77,7 @@ export interface ValidateComponentCodeResult {
   scope?: ScopeCheckResult;
   shorthand?: ShorthandCheckResult;
   colorContrast?: ColorContrastResult;
+  transitionAnimation?: TransitionCheckResult;
   imports?: ImportCheckResult;
 }
 
@@ -276,6 +279,17 @@ export function validateComponentCode(
       if (contrastResult.issues.length > 0) {
         result.colorContrast = contrastResult;
         totalIssues += contrastResult.issues.length;
+      }
+    } catch {
+      // Skip on error
+    }
+
+    // 8i. Transition Animation — transitions/animations on component hosts
+    try {
+      const transitionResult = checkTransitionAnimation(css, tagName);
+      if (transitionResult.issues.length > 0) {
+        result.transitionAnimation = transitionResult;
+        totalIssues += transitionResult.issues.length;
       }
     } catch {
       // Skip on error

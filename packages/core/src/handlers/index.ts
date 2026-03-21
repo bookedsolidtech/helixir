@@ -10,6 +10,7 @@ export * from './cem.js';
 export * from './code-validator.js';
 export * from './color-contrast-checker.js';
 export * from './compare.js';
+export * from './transition-checker.js';
 export * from './css-var-checker.js';
 export * from './component.js';
 export * from './composition.js';

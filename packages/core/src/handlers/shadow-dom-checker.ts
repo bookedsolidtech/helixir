@@ -451,6 +451,49 @@ function checkMisspelledTokens(lines: string[], meta: ComponentMetadata): Shadow
   return issues;
 }
 
+function checkRootScopeTokens(lines: string[], meta: ComponentMetadata): ShadowDomIssue[] {
+  const issues: ShadowDomIssue[] = [];
+  const validTokens = new Set(meta.cssProperties.map((p) => p.name));
+  if (validTokens.size === 0) return issues;
+
+  // Find :root blocks and check for component tokens inside them
+  const text = lines.join('\n');
+  const rootBlockPattern = /:root\s*\{([^}]*)}/g;
+  let blockMatch: RegExpExecArray | null;
+
+  while ((blockMatch = rootBlockPattern.exec(text)) !== null) {
+    const blockContent = blockMatch[1] ?? '';
+    const blockStartOffset = blockMatch.index;
+    const linesBeforeBlock = text.slice(0, blockStartOffset).split('\n').length;
+
+    // Find each token declaration inside this :root block
+    const tokenPattern = /(--[\w-]+)\s*:/g;
+    let tokenMatch: RegExpExecArray | null;
+
+    while ((tokenMatch = tokenPattern.exec(blockContent)) !== null) {
+      const tokenName = tokenMatch[1] ?? '';
+      if (validTokens.has(tokenName)) {
+        // Calculate line number: lines before block + lines within block content before this token
+        const contentBefore = blockContent.slice(0, tokenMatch.index);
+        const extraLines = (contentBefore.match(/\n/g) ?? []).length;
+        const line = linesBeforeBlock + extraLines;
+
+        issues.push({
+          line,
+          column: 1,
+          severity: 'error',
+          rule: 'no-root-scope-token',
+          message: `Component token "${tokenName}" set on :root has no effect through Shadow DOM.`,
+          suggestion: `Set it on the host element instead: ${meta.tagName} { ${tokenName}: value; }`,
+          code: `:root { ${tokenName}: ...; }`,
+        });
+      }
+    }
+  }
+
+  return issues;
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function escapeRegex(str: string): string {
@@ -502,6 +545,7 @@ export function checkShadowDomUsage(
   if (meta) {
     issues.push(...checkUnknownParts(lines, meta));
     issues.push(...checkMisspelledTokens(lines, meta));
+    issues.push(...checkRootScopeTokens(lines, meta));
   }
 
   issues.sort((a, b) => a.line - b.line || a.column - b.column);

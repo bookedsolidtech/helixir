@@ -346,6 +346,51 @@ describe('checkShadowDomUsage', () => {
     });
   });
 
+  describe(':root scope token detection', () => {
+    it('detects component tokens set on :root', () => {
+      const css = `:root { --my-button-bg: blue; }`;
+      const result = checkShadowDomUsage(css, 'my-button', buttonMeta);
+      expect(result.clean).toBe(false);
+      expect(result.issues).toHaveLength(1);
+      expect(result.issues[0]!.rule).toBe('no-root-scope-token');
+      expect(result.issues[0]!.severity).toBe('error');
+      expect(result.issues[0]!.message).toContain(':root');
+      expect(result.issues[0]!.suggestion).toContain('my-button');
+    });
+
+    it('detects multiple component tokens on :root', () => {
+      const css = `:root {\n  --my-button-bg: blue;\n  --my-button-color: white;\n}`;
+      const result = checkShadowDomUsage(css, 'my-button', buttonMeta);
+      expect(result.issues.filter((i) => i.rule === 'no-root-scope-token')).toHaveLength(2);
+    });
+
+    it('ignores non-component tokens on :root', () => {
+      const css = `:root { --global-font-size: 16px; }`;
+      const result = checkShadowDomUsage(css, 'my-button', buttonMeta);
+      const rootIssues = result.issues.filter((i) => i.rule === 'no-root-scope-token');
+      expect(rootIssues).toHaveLength(0);
+    });
+
+    it('detects tokens in :root with var() usage', () => {
+      const css = `:root { --my-button-bg: var(--theme-primary); }`;
+      const result = checkShadowDomUsage(css, 'my-button', buttonMeta);
+      expect(result.issues.some((i) => i.rule === 'no-root-scope-token')).toBe(true);
+    });
+
+    it('skips :root check when no metadata provided', () => {
+      const css = `:root { --my-button-bg: blue; }`;
+      const result = checkShadowDomUsage(css, 'my-button');
+      const rootIssues = result.issues.filter((i) => i.rule === 'no-root-scope-token');
+      expect(rootIssues).toHaveLength(0);
+    });
+
+    it('detects :root tokens in multi-block CSS', () => {
+      const css = `my-button { color: red; }\n:root { --my-button-bg: blue; }\n.container { display: flex; }`;
+      const result = checkShadowDomUsage(css, 'my-button', buttonMeta);
+      expect(result.issues.some((i) => i.rule === 'no-root-scope-token')).toBe(true);
+    });
+  });
+
   describe('result structure', () => {
     it('includes tagName when provided', () => {
       const result = checkShadowDomUsage('', 'my-button');

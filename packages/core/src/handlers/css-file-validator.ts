@@ -307,7 +307,7 @@ function mapIssueToFixInput(
     case 'shadowDom':
       return {
         type: 'shadow-dom',
-        issue: 'descendant-piercing',
+        issue: issue.message.includes(':root') ? 'root-scope-token' : 'descendant-piercing',
         original,
         tagName,
         partNames,

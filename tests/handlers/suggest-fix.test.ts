@@ -457,6 +457,46 @@ describe('suggestFix — library-agnostic tokens', () => {
   });
 });
 
+// ─── :root scope token fixes ────────────────────────────────────────────────
+
+describe('suggestFix — :root scope token', () => {
+  it('suggests moving token from :root to host element', () => {
+    const result = suggestFix({
+      type: 'shadow-dom',
+      issue: 'root-scope-token',
+      original: ':root { --my-button-bg: blue; }',
+      tagName: 'my-button',
+    });
+    expect(result.suggestion).toContain('my-button');
+    expect(result.suggestion).toContain('--my-button-bg');
+    expect(result.suggestion).toContain('blue');
+    expect(result.suggestion).not.toContain(':root');
+    expect(result.severity).toBe('error');
+  });
+
+  it('preserves var() values in the fix', () => {
+    const result = suggestFix({
+      type: 'shadow-dom',
+      issue: 'root-scope-token',
+      original: ':root { --sl-button-color: var(--theme-text); }',
+      tagName: 'sl-button',
+    });
+    expect(result.suggestion).toContain('var(--theme-text)');
+    expect(result.suggestion).toContain('sl-button');
+  });
+
+  it('explains why :root tokens fail through Shadow DOM', () => {
+    const result = suggestFix({
+      type: 'shadow-dom',
+      issue: 'root-scope-token',
+      original: ':root { --my-card-bg: #fff; }',
+      tagName: 'my-card',
+    });
+    expect(result.explanation).toContain(':root');
+    expect(result.explanation).toContain('Shadow DOM');
+  });
+});
+
 // ─── Result structure ───────────────────────────────────────────────────────
 
 describe('suggestFix — result structure', () => {

@@ -7,6 +7,7 @@ import { checkShadowDomUsage } from '../handlers/shadow-dom-checker.js';
 import { checkHtmlUsage } from '../handlers/html-usage-checker.js';
 import { checkEventUsage } from '../handlers/event-usage-checker.js';
 import { getComponentQuickRef } from '../handlers/quick-ref.js';
+import { detectThemeSupport } from '../handlers/theme-detection.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -160,6 +161,22 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'detect_theme_support',
+    description:
+      'Analyzes a component library for theming capabilities — token categories (color, spacing, typography, etc.), semantic naming patterns, dark mode readiness, and coverage score. Library-wide analysis, not per-component.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+      },
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -210,6 +227,11 @@ export function handleStylingCall(
       const { tagName } = GetComponentQuickRefArgsSchema.parse(args);
       const meta = parseCem(tagName, cem);
       const result = getComponentQuickRef(meta);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'detect_theme_support') {
+      const result = detectThemeSupport(cem);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

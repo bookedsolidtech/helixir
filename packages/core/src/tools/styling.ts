@@ -26,6 +26,7 @@ import { checkCssScope } from '../handlers/scope-checker.js';
 import { checkCssShorthand } from '../handlers/shorthand-checker.js';
 import { checkColorContrast } from '../handlers/color-contrast-checker.js';
 import { checkTransitionAnimation } from '../handlers/transition-checker.js';
+import { checkShadowDomJs } from '../handlers/shadow-dom-js-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -117,6 +118,11 @@ const CheckColorContrastArgsSchema = z.object({
 const CheckTransitionAnimationArgsSchema = z.object({
   cssText: z.string(),
   tagName: z.string(),
+});
+
+const CheckShadowDomJsArgsSchema = z.object({
+  codeText: z.string(),
+  tagName: z.string().optional(),
 });
 
 const CheckCssSpecificityArgsSchema = z.object({
@@ -723,6 +729,23 @@ export const STYLING_TOOL_DEFINITIONS = [
       required: ['cssText', 'tagName'],
     },
   },
+  {
+    name: 'check_shadow_dom_js',
+    description:
+      'Detects JavaScript anti-patterns that violate Shadow DOM encapsulation from consumer code. Catches: accessing .shadowRoot.querySelector() to bypass encapsulation, calling attachShadow() on existing components, setting innerHTML on web components (overwriting slot content), and using style.cssText instead of CSS custom properties.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        codeText: { type: 'string', description: 'JavaScript/TypeScript code to analyze' },
+        tagName: {
+          type: 'string',
+          description:
+            'Optional tag name of the web component for context-aware checks (e.g., "sl-button")',
+        },
+      },
+      required: ['codeText'],
+    },
+  },
 ];
 
 /**
@@ -874,6 +897,12 @@ export function handleStylingCall(
     if (name === 'check_transition_animation') {
       const { cssText, tagName } = CheckTransitionAnimationArgsSchema.parse(args);
       const result = checkTransitionAnimation(cssText, tagName);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_shadow_dom_js') {
+      const { codeText, tagName } = CheckShadowDomJsArgsSchema.parse(args);
+      const result = checkShadowDomJs(codeText, tagName);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

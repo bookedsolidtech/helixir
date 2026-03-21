@@ -204,6 +204,22 @@ describe('handleStylingCall — check_transition_animation', () => {
   });
 });
 
+// ─── handleStylingCall — check_shadow_dom_js ────────────────────────────
+
+describe('handleStylingCall — check_shadow_dom_js', () => {
+  it('dispatches shadow DOM JS check for shadowRoot access', () => {
+    const result = handleStylingCall(
+      'check_shadow_dom_js',
+      { codeText: `element.shadowRoot.querySelector('.inner');` },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+    const parsed = JSON.parse((result.content as Array<{ text: string }>)[0].text);
+    expect(parsed.issues.length).toBeGreaterThan(0);
+    expect(parsed.issues[0].rule).toBe('no-shadow-root-access');
+  });
+});
+
 // ─── handleStylingCall — check_css_specificity ──────────────────────────────
 
 describe('handleStylingCall — check_css_specificity', () => {

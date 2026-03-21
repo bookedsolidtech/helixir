@@ -29,15 +29,34 @@ The Lead Engineer handles standard implementation but delegates to specialists f
 
 ### Health Dimension Work
 
+#### Critical Tier
+
 | Task | Delegate To |
 |------|------------|
-| Accessibility scanner implementation or bug | `accessibility-engineer` |
-| CEM completeness scanner implementation or bug | `technical-writer` |
-| Test coverage scanner implementation or bug | `test-architect` |
-| Storybook coverage scanner implementation or bug | `storybook-specialist` |
-| TypeScript strictness scanner implementation or bug | `typescript-specialist` |
-| Bundle size scanner implementation or bug | `performance-engineer` |
-| Documentation scanner implementation or bug | `technical-writer` |
+| CEM completeness (`cem_completeness`) scanner implementation or bug | `technical-writer` |
+| Accessibility Compliance (`accessibility`) scanner implementation or bug | `accessibility-engineer` |
+| Type Coverage (`type_coverage`) scanner implementation or bug | `typescript-specialist` |
+| Test coverage (`test_coverage`) scanner implementation or bug | `test-architect` |
+| CEM-Source Fidelity (`cem_source_fidelity`) scanner implementation or bug | `technical-writer` |
+
+#### Important Tier
+
+| Task | Delegate To |
+|------|------------|
+| API Surface Quality (`api_surface_quality`) scanner implementation or bug | `solutions-architect` |
+| CSS Architecture (`css_architecture`) scanner implementation or bug | `performance-engineer` |
+| Event Architecture (`event_architecture`) scanner implementation or bug | `solutions-architect` |
+| Slot Architecture (`slot_architecture`) scanner implementation or bug | `component-architect` |
+| Bundle Size (`bundle_size`) scanner implementation or bug | `performance-engineer` |
+| Story Coverage (`story_coverage`) scanner implementation or bug | `storybook-specialist` |
+| Naming Consistency (`naming_consistency`) scanner implementation or bug | `technical-writer` |
+
+#### Advanced Tier
+
+| Task | Delegate To |
+|------|------------|
+| Performance (`performance`) scanner implementation or bug | `performance-engineer` |
+| Drupal Readiness (`drupal_readiness`) scanner implementation or bug | `cto` |
 
 ### Auditing and Validation
 
@@ -73,15 +92,29 @@ The Lead Engineer handles standard implementation but delegates to specialists f
 
 HELiXiR exposes these MCP tools to consumers (Claude Code, CI pipelines). Each tool has a designated reviewer:
 
+### Dimension Scan Tools
+
+| MCP Tool | Dimension | Tier | Reviewer |
+|----------|-----------|------|---------|
+| `scan_cem_completeness` | CEM Completeness (`cem_completeness`) | Critical | `technical-writer` |
+| `scan_accessibility` | Accessibility Compliance (`accessibility`) | Critical | `accessibility-engineer` |
+| `scan_type_coverage` | Type Coverage (`type_coverage`) | Critical | `typescript-specialist` |
+| `scan_test_coverage` | Test Coverage (`test_coverage`) | Critical | `test-architect` |
+| `scan_cem_source_fidelity` | CEM-Source Fidelity (`cem_source_fidelity`) | Critical | `technical-writer` |
+| `scan_api_surface` | API Surface Quality (`api_surface_quality`) | Important | `solutions-architect` |
+| `scan_css_architecture` | CSS Architecture (`css_architecture`) | Important | `performance-engineer` |
+| `scan_event_architecture` | Event Architecture (`event_architecture`) | Important | `solutions-architect` |
+| `scan_slot_architecture` | Slot Architecture (`slot_architecture`) | Important | `component-architect` |
+| `scan_bundle_size` | Bundle Size (`bundle_size`) | Important | `performance-engineer` |
+| `scan_story_coverage` | Story Coverage (`story_coverage`) | Important | `storybook-specialist` |
+| `scan_naming_consistency` | Naming Consistency (`naming_consistency`) | Important | `technical-writer` |
+| `scan_performance` | Performance (`performance`) | Advanced | `performance-engineer` |
+| `scan_drupal_readiness` | Drupal Readiness (`drupal_readiness`) | Advanced | `cto` |
+
+### Aggregate and Server Tools
+
 | MCP Tool | Reviewer |
 |----------|---------|
-| `scan_accessibility` | `accessibility-engineer` |
-| `scan_cem_completeness` | `technical-writer` |
-| `scan_test_coverage` | `test-architect` |
-| `scan_storybook_coverage` | `storybook-specialist` |
-| `scan_typescript_strictness` | `typescript-specialist` |
-| `scan_bundle_size` | `performance-engineer` |
-| `scan_documentation` | `technical-writer` |
 | `scan_health_score` (aggregate) | `principal-engineer` |
 | Server configuration tools | `devops-engineer` |
 | Cache management tools | `infrastructure-engineer` |
@@ -118,9 +151,15 @@ These tasks should NOT be delegated — the Lead Engineer handles them directly:
 Lead Engineer
   → Tier 1: code-reviewer (all PRs)
   → Tier 2: senior-code-reviewer (scoring, MCP contracts)
+       Critical dimension bugs → always Tier 2
   → Tier 3: chief-code-reviewer (architecture, security)
-  → CTO (release sign-off, major technical decisions)
-  → VP Engineering (threshold changes, dimension changes)
+  → CTO (release sign-off, major technical decisions; Drupal Readiness dimension owner)
+  → VP Engineering (threshold changes, dimension weight changes)
 ```
+
+**Tier-based escalation by dimension:**
+- **Critical dimension** bugs or regressions → Tier 2 (`senior-code-reviewer`) minimum
+- **Important dimension** changes → Tier 1 (`code-reviewer`); escalate to Tier 2 if scoring logic is touched
+- **Advanced dimension** changes → follow up within 2 weeks if no Tier 1 review occurs
 
 When in doubt: delegate earlier rather than later. A specialist takes 10 minutes to verify; a production bug in scoring logic takes days to remediate.

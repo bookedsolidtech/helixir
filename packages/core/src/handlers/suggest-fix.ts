@@ -36,26 +36,41 @@ export interface SuggestFixInput {
   memberName?: string;
   suggestedName?: string;
   eventName?: string;
+  /** Optional token prefix from the component's library (e.g. '--hx-', '--fast-'). When provided, suggested tokens use this prefix instead of generic placeholders. */
+  tokenPrefix?: string;
 }
 
 // ─── Token heuristics ────────────────────────────────────────────────────────
 
-const TOKEN_SUGGESTIONS: Record<string, string> = {
-  'background-color': '--sl-color-neutral-0',
-  background: '--sl-color-neutral-0',
-  color: '--sl-color-neutral-900',
-  'border-color': '--sl-color-neutral-300',
-  'box-shadow': '--sl-shadow-medium',
-  'font-family': '--sl-font-sans',
-  'font-size': '--sl-font-size-medium',
-  'border-radius': '--sl-border-radius-medium',
-  padding: '--sl-spacing-medium',
-  margin: '--sl-spacing-medium',
-  gap: '--sl-spacing-small',
+/** Maps CSS properties to semantic token suffixes (library-agnostic). */
+const TOKEN_SUFFIXES: Record<string, string> = {
+  'background-color': 'color-neutral-0',
+  background: 'color-neutral-0',
+  color: 'color-neutral-900',
+  'border-color': 'color-neutral-300',
+  'box-shadow': 'shadow-medium',
+  'font-family': 'font-sans',
+  'font-size': 'font-size-medium',
+  'border-radius': 'border-radius-medium',
+  padding: 'spacing-medium',
+  margin: 'spacing-medium',
+  gap: 'spacing-small',
 };
 
-function suggestTokenForProperty(property: string): string {
-  return TOKEN_SUGGESTIONS[property] ?? '--your-design-token';
+/**
+ * Suggests a token name for a CSS property. When a tokenPrefix is provided,
+ * generates a library-specific token (e.g. `--hx-color-neutral-0`).
+ * Without a prefix, returns a generic placeholder.
+ */
+function suggestTokenForProperty(property: string, tokenPrefix?: string): string {
+  const suffix = TOKEN_SUFFIXES[property];
+  if (!suffix) {
+    return tokenPrefix ? `${tokenPrefix}design-token` : '--your-design-token';
+  }
+  if (tokenPrefix) {
+    return `${tokenPrefix}${suffix}`;
+  }
+  return `--your-${suffix}`;
 }
 
 // ─── Shadow DOM fixes ────────────────────────────────────────────────────────
@@ -193,7 +208,7 @@ function fixShadowDom(input: SuggestFixInput): FixSuggestion {
 // ─── Token fallback fixes ────────────────────────────────────────────────────
 
 function fixTokenFallback(input: SuggestFixInput): FixSuggestion {
-  const { original, property } = input;
+  const { original, property, tokenPrefix } = input;
 
   if (input.issue === 'missing-fallback') {
     // Extract the var() call and add a sensible fallback
@@ -223,7 +238,7 @@ function fixTokenFallback(input: SuggestFixInput): FixSuggestion {
   }
 
   if (input.issue === 'hardcoded-color') {
-    const token = suggestTokenForProperty(property ?? 'color');
+    const token = suggestTokenForProperty(property ?? 'color', tokenPrefix);
     // Extract the property and value
     const propMatch = original.match(/([a-z-]+)\s*:\s*([^;]+)/i);
     if (propMatch) {
@@ -250,10 +265,10 @@ function fixTokenFallback(input: SuggestFixInput): FixSuggestion {
 // ─── Theme compatibility fixes ───────────────────────────────────────────────
 
 function fixThemeCompat(input: SuggestFixInput): FixSuggestion {
-  const { original, property } = input;
+  const { original, property, tokenPrefix } = input;
 
   if (input.issue === 'hardcoded-color') {
-    const token = suggestTokenForProperty(property ?? 'background');
+    const token = suggestTokenForProperty(property ?? 'background', tokenPrefix);
     const propMatch = original.match(/([a-z-]+)\s*:\s*([^;]+)/i);
     if (propMatch) {
       const [, prop, value] = propMatch;
@@ -269,9 +284,11 @@ function fixThemeCompat(input: SuggestFixInput): FixSuggestion {
   }
 
   if (input.issue === 'contrast-pair') {
+    const bgToken = suggestTokenForProperty('background-color', tokenPrefix);
+    const fgToken = suggestTokenForProperty('color', tokenPrefix);
     return {
       original,
-      suggestion: `background: var(--sl-color-neutral-0); color: var(--sl-color-neutral-900);`,
+      suggestion: `background: var(${bgToken}); color: var(${fgToken});`,
       explanation: `Light-on-light or dark-on-dark color pairs create contrast issues. Use semantic token pairs (surface + on-surface) that maintain readable contrast across themes.`,
       severity: 'warning',
     };

@@ -215,6 +215,19 @@ describe('buildAntiPatterns', () => {
     );
     expect(partWarning).toBeUndefined();
   });
+
+  it('includes font inheritance warning when slots exist', () => {
+    const warnings = buildAntiPatterns(buttonMeta);
+    const inheritWarning = warnings.find((w) => w.explanation.includes('inherit'));
+    expect(inheritWarning).toBeDefined();
+    expect(inheritWarning!.explanation).toContain('font');
+  });
+
+  it('skips font inheritance warning when no slots', () => {
+    const warnings = buildAntiPatterns(bareComponent);
+    const inheritWarning = warnings.find((w) => w.explanation.includes('inherit'));
+    expect(inheritWarning).toBeUndefined();
+  });
 });
 
 describe('buildCssSnippet', () => {
@@ -224,10 +237,53 @@ describe('buildCssSnippet', () => {
     expect(snippet).toContain('--my-button-bg');
   });
 
+  it('does NOT generate self-referential var() in token customization', () => {
+    const snippet = buildCssSnippet(buttonMeta);
+    // Should NOT contain --my-button-bg: var(--my-button-bg) — that's circular
+    expect(snippet).not.toMatch(/--my-button-bg:\s*var\(--my-button-bg\)/);
+    // Should contain a direct value assignment
+    expect(snippet).toMatch(/--my-button-bg:\s*[^v]/);
+  });
+
+  it('uses CEM default value when available', () => {
+    const metaWithDefaults: ComponentMetadata = {
+      ...bareComponent,
+      cssProperties: [
+        { name: '--my-card-bg', description: 'Background', default: '#ffffff' },
+        { name: '--my-card-radius', description: 'Radius', default: '4px' },
+      ],
+    };
+    const snippet = buildCssSnippet(metaWithDefaults);
+    expect(snippet).toContain('#ffffff');
+    expect(snippet).toContain('4px');
+  });
+
   it('includes part customization for components with CSS parts', () => {
     const snippet = buildCssSnippet(buttonMeta);
     expect(snippet).toContain('Part-based customization');
     expect(snippet).toContain('::part(base)');
+  });
+
+  it('includes slot styling section when component has slots', () => {
+    const snippet = buildCssSnippet(buttonMeta);
+    expect(snippet).toContain('Slot styling');
+    expect(snippet).toContain('light DOM');
+  });
+
+  it('includes named slot selector example', () => {
+    const snippet = buildCssSnippet(buttonMeta);
+    expect(snippet).toContain('[slot="prefix"]');
+  });
+
+  it('includes default slot child selector example', () => {
+    const snippet = buildCssSnippet(buttonMeta);
+    // Default slot: style children of the host
+    expect(snippet).toContain('my-button >');
+  });
+
+  it('skips slot section for components without slots', () => {
+    const snippet = buildCssSnippet(bareComponent);
+    expect(snippet).not.toContain('Slot styling');
   });
 
   it('generates fallback message for bare components', () => {
@@ -248,9 +304,6 @@ describe('buildCssSnippet', () => {
       })),
     };
     const snippet = buildCssSnippet(manyProps);
-    // Should have at most 5 properties listed (each appears twice: decl + var)
-    const propMatches = snippet.match(/--prop-/g);
-    expect(propMatches!.length).toBeLessThanOrEqual(10);
     // Should not contain --prop-5 through --prop-9
     expect(snippet).not.toContain('--prop-5');
     // Should have at most 3 parts listed

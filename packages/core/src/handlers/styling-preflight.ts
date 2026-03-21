@@ -23,6 +23,7 @@ import { buildCssSnippet } from './styling-diagnostics.js';
 import { checkTokenFallbacksFromMeta } from './token-fallback-checker.js';
 import { checkCssScopeFromMeta } from './scope-checker.js';
 import { suggestFix, type SuggestFixInput } from './suggest-fix.js';
+import { checkDarkModePatterns } from './dark-mode-checker.js';
 import { buildAntiPatternHints } from './quick-ref.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -166,6 +167,20 @@ export function runStylingPreflight(input: PreflightInput): PreflightResult {
           category: 'specificity',
           message: issue.message,
           line: issue.line,
+        });
+      }
+    });
+
+    // Dark mode patterns (theme-scoped standard properties, shadow piercing)
+    safeRun(() => {
+      const darkResult = checkDarkModePatterns(css);
+      for (const issue of darkResult.issues) {
+        issues.push({
+          severity: 'warning',
+          category: 'darkMode',
+          message: issue.message,
+          line: issue.line,
+          suggestion: issue.suggestion,
         });
       }
     });

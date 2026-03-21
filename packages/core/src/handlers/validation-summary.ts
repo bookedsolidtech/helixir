@@ -170,6 +170,18 @@ export function summarizeValidation(result: ValidateComponentCodeResult): Valida
     }
   }
 
+  if (result.darkMode) {
+    for (const issue of result.darkMode.issues) {
+      issues.push({
+        severity: 'warning',
+        category: 'darkMode',
+        message: issue.message,
+        line: issue.line,
+        suggestion: issue.suggestion,
+      });
+    }
+  }
+
   if (result.shorthand) {
     for (const issue of result.shorthand.issues) {
       issues.push({

@@ -47,8 +47,10 @@ import { checkCssShorthand, type ShorthandCheckResult } from './shorthand-checke
 import { checkColorContrast, type ColorContrastResult } from './color-contrast-checker.js';
 import { checkTransitionAnimation, type TransitionCheckResult } from './transition-checker.js';
 import { checkShadowDomJs, type ShadowDomJsResult } from './shadow-dom-js-checker.js';
+import { checkDarkModePatterns, type DarkModeCheckResult } from './dark-mode-checker.js';
 import { parseCem } from './cem.js';
 import { summarizeValidation, type ValidationSummary } from './validation-summary.js';
+import { buildAntiPatternHints } from './quick-ref.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -64,6 +66,7 @@ export interface ValidateComponentCodeInput {
 export interface ValidateComponentCodeResult {
   clean: boolean;
   totalIssues: number;
+  antiPatterns: string[];
   summary?: ValidationSummary;
   htmlUsage?: HtmlUsageCheckResult;
   shadowDom?: ShadowDomCheckResult;
@@ -83,6 +86,7 @@ export interface ValidateComponentCodeResult {
   colorContrast?: ColorContrastResult;
   transitionAnimation?: TransitionCheckResult;
   shadowDomJs?: ShadowDomJsResult;
+  darkMode?: DarkModeCheckResult;
   imports?: ImportCheckResult;
 }
 
@@ -94,9 +98,19 @@ export function validateComponentCode(
   const { html, css, code, tagName, cem, framework } = input;
   let totalIssues = 0;
 
+  // Generate anti-pattern hints for the component
+  let antiPatterns: string[] = [];
+  try {
+    const meta = parseCem(tagName, cem);
+    antiPatterns = buildAntiPatternHints(meta);
+  } catch {
+    // Tag not in CEM — skip anti-patterns
+  }
+
   const result: ValidateComponentCodeResult = {
     clean: true,
     totalIssues: 0,
+    antiPatterns,
   };
 
   // 1. HTML Usage — attribute/slot/enum validation
@@ -295,6 +309,17 @@ export function validateComponentCode(
       if (transitionResult.issues.length > 0) {
         result.transitionAnimation = transitionResult;
         totalIssues += transitionResult.issues.length;
+      }
+    } catch {
+      // Skip on error
+    }
+
+    // 8j. Dark Mode Patterns — theme-scoped standard properties + shadow DOM piercing
+    try {
+      const darkResult = checkDarkModePatterns(css);
+      if (darkResult.issues.length > 0) {
+        result.darkMode = darkResult;
+        totalIssues += darkResult.issues.length;
       }
     } catch {
       // Skip on error

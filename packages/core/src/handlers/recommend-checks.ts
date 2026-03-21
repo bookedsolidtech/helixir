@@ -102,6 +102,8 @@ export function recommendChecks(code: string): RecommendChecksResult {
 
   // CSS-based checks
   if (codeType.includes('css')) {
+    // Recommend the one-call CSS aggregator first
+    recommended.push('styling_preflight');
     recommended.push('check_shadow_dom_usage');
     recommended.push('check_css_vars');
     recommended.push('check_theme_compatibility');
@@ -110,6 +112,11 @@ export function recommendChecks(code: string): RecommendChecksResult {
     recommended.push('check_css_scope');
     recommended.push('check_color_contrast');
     recommended.push('check_transition_animation');
+
+    // Dark mode detection when theme/dark patterns are present
+    if (/\.dark|\.light|\[data-theme|\[data-mode|prefers-color-scheme/i.test(code)) {
+      recommended.push('check_dark_mode_patterns');
+    }
 
     // Token fallback and shorthand checks when var() is used
     if (/var\s*\(/.test(code)) {

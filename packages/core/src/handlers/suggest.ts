@@ -355,9 +355,15 @@ export async function suggestUsage(
     notes.push(
       `After writing CSS for ${tagName}, call \`styling_preflight\` to validate ` +
         `your ::part() and custom property names against the actual component API. ` +
-        `This catches hallucinated names before they ship.`,
+        `This catches hallucinated names before they ship. For dark mode, ` +
+        `use CSS custom properties (not standard properties) on the host.`,
     );
   }
+  notes.push(
+    `Before shipping, run \`validate_component_code\` with your HTML, CSS, and JS ` +
+      `to catch all issues in one call — it runs 20 validators including Shadow DOM, ` +
+      `dark mode, a11y, and API verification.`,
+  );
 
   // Detect events for framework snippets
   const eventNamesArr = meta.events.map((e) => e.name);

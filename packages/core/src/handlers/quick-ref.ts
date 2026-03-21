@@ -153,6 +153,12 @@ export function buildAntiPatternHints(meta: ComponentMetadata): string[] {
       `Hardcoded colors: \`${tag} { ${firstToken}: #hex; }\` — use \`var()\` with a theme ` +
         `token and fallback: \`${tag} { ${firstToken}: var(--theme-primary, blue); }\``,
     );
+    // Dark mode: standard properties in theme scopes
+    patterns.push(
+      `Dark mode: \`.dark ${tag} { color: white; }\` — standard properties on the host ` +
+        `won't reach shadow DOM internals. Use custom properties: ` +
+        `\`.dark ${tag} { ${firstToken}: value; }\``,
+    );
   }
 
   // Components with named slots

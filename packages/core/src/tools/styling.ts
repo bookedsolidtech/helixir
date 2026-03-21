@@ -19,6 +19,7 @@ import { checkComposition } from '../handlers/composition-checker.js';
 import { checkMethodCalls } from '../handlers/method-checker.js';
 import { checkThemeCompatibility } from '../handlers/theme-checker.js';
 import { recommendChecks } from '../handlers/recommend-checks.js';
+import { suggestFix } from '../handlers/suggest-fix.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -87,6 +88,18 @@ const CheckThemeCompatibilityArgsSchema = z.object({
 
 const RecommendChecksArgsSchema = z.object({
   codeText: z.string(),
+});
+
+const SuggestFixArgsSchema = z.object({
+  type: z.enum(['shadow-dom', 'token-fallback', 'theme-compat', 'method-call', 'event-usage']),
+  issue: z.string(),
+  original: z.string(),
+  tagName: z.string().optional(),
+  partNames: z.array(z.string()).optional(),
+  property: z.string().optional(),
+  memberName: z.string().optional(),
+  suggestedName: z.string().optional(),
+  eventName: z.string().optional(),
 });
 
 const ValidateComponentCodeArgsSchema = z.object({
@@ -507,6 +520,57 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'suggest_fix',
+    description:
+      'Generates concrete, copy-pasteable code fixes for validation issues. Pass the issue type (shadow-dom, token-fallback, theme-compat, method-call, event-usage), the specific issue kind, and the original code — returns a corrected code snippet with an explanation. Use this after any validator flags an issue to get the exact fix.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        type: {
+          type: 'string',
+          enum: ['shadow-dom', 'token-fallback', 'theme-compat', 'method-call', 'event-usage'],
+          description: 'The category of validation issue.',
+        },
+        issue: {
+          type: 'string',
+          description:
+            'The specific issue kind (e.g. "descendant-piercing", "missing-fallback", "hardcoded-color", "property-as-method", "react-custom-event").',
+        },
+        original: {
+          type: 'string',
+          description: 'The original problematic code.',
+        },
+        tagName: {
+          type: 'string',
+          description: 'Optional tag name of the component.',
+        },
+        partNames: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Optional list of CSS part names exposed by the component.',
+        },
+        property: {
+          type: 'string',
+          description: 'Optional CSS property name for token/theme fixes.',
+        },
+        memberName: {
+          type: 'string',
+          description: 'Optional method/property name for method call fixes.',
+        },
+        suggestedName: {
+          type: 'string',
+          description: 'Optional corrected name for typo fixes.',
+        },
+        eventName: {
+          type: 'string',
+          description: 'Optional event name for event usage fixes.',
+        },
+      },
+      required: ['type', 'issue', 'original'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -616,6 +680,12 @@ export function handleStylingCall(
     if (name === 'recommend_checks') {
       const { codeText } = RecommendChecksArgsSchema.parse(args);
       const result = recommendChecks(codeText);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'suggest_fix') {
+      const input = SuggestFixArgsSchema.parse(args);
+      const result = suggestFix(input);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

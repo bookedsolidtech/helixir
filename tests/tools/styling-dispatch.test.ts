@@ -124,6 +124,44 @@ describe('handleStylingCall — check_method_calls', () => {
   });
 });
 
+// ─── handleStylingCall — suggest_fix ────────────────────────────────────────
+
+describe('handleStylingCall — suggest_fix', () => {
+  it('dispatches shadow-dom fix suggestions', () => {
+    const result = handleStylingCall(
+      'suggest_fix',
+      {
+        type: 'shadow-dom',
+        issue: 'descendant-piercing',
+        original: 'my-button .inner { color: red; }',
+        tagName: 'my-button',
+        partNames: ['base'],
+      },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+    const parsed = JSON.parse((result.content as Array<{ text: string }>)[0].text);
+    expect(parsed.suggestion).toContain('::part(');
+  });
+
+  it('dispatches method-call fix suggestions', () => {
+    const result = handleStylingCall(
+      'suggest_fix',
+      {
+        type: 'method-call',
+        issue: 'property-as-method',
+        original: 'dialog.open();',
+        memberName: 'open',
+        tagName: 'sl-dialog',
+      },
+      cem,
+    );
+    expect(result.isError).toBeFalsy();
+    const parsed = JSON.parse((result.content as Array<{ text: string }>)[0].text);
+    expect(parsed.suggestion).toContain('open = true');
+  });
+});
+
 // ─── handleStylingCall — diagnose_styling ───────────────────────────────────
 
 describe('handleStylingCall — diagnose_styling', () => {

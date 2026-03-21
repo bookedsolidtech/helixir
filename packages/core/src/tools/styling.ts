@@ -1084,9 +1084,7 @@ export function isStylingTool(name: string): boolean {
  * Handles the detect_theme_support tool call.
  * This tool uses filesystem scanning (config-based) rather than CEM analysis.
  */
-export async function handleThemeDetection(
-  config: McpWcConfig,
-): Promise<MCPToolResult> {
+export async function handleThemeDetection(config: McpWcConfig): Promise<MCPToolResult> {
   try {
     const result = await detectThemeSupport(config);
     return createSuccessResponse(JSON.stringify(result, null, 2));

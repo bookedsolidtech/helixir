@@ -182,6 +182,7 @@ function buildStyling(
   meta: {
     cssProperties: Array<{ name: string; description: string; default?: string }>;
     cssParts: Array<{ name: string; description: string }>;
+    slots: Array<{ name: string; description: string }>;
   },
 ): SuggestUsageStyling | undefined {
   if (meta.cssProperties.length === 0 && meta.cssParts.length === 0) return undefined;
@@ -217,6 +218,35 @@ function buildStyling(
   const cssSnippet = snippetParts.join('\n\n');
 
   const warnings: string[] = getShadowDomWarnings(tagName);
+
+  // Add slot-specific styling guidance when the component has slots
+  if (meta.slots.length > 0) {
+    const namedSlots = meta.slots.filter((s) => s.name !== '');
+    const hasDefaultSlot = meta.slots.some((s) => s.name === '');
+
+    warnings.push(
+      `To style slotted content, use light DOM CSS targeting the elements BEFORE they are slotted in. Do not use \`::slotted()\` in consumer CSS — it only works inside the shadow root stylesheet.`,
+    );
+
+    if (hasDefaultSlot) {
+      warnings.push(
+        `Default slot: style children of \`${tagName}\` in your page CSS (e.g. \`${tagName} > p { ... }\`). These selectors work because slotted elements remain in the light DOM.`,
+      );
+    }
+
+    if (namedSlots.length > 0) {
+      const slotExample = namedSlots[0];
+      if (slotExample) {
+        warnings.push(
+          `Named slots: style elements with \`[slot="${slotExample.name}"]\` attribute selector in your page CSS (e.g. \`${tagName} [slot="${slotExample.name}"] { ... }\`).`,
+        );
+      }
+    }
+
+    warnings.push(
+      `Slotted content inherits font styles (color, font-size, line-height) from the component's shadow DOM, but layout properties (margin, padding, display) must be set in light DOM CSS.`,
+    );
+  }
 
   return { cssProperties, cssParts, cssSnippet, warnings };
 }

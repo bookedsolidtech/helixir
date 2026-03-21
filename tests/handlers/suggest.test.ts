@@ -712,6 +712,21 @@ describe('suggestUsage — styling section (my-button with CSS props and parts)'
     expect(allWarnings).toContain('Shadow DOM');
   });
 
+  it('styling.warnings include slot styling guidance for components with slots', async () => {
+    const result = await suggestUsage('my-button', makeConfig());
+    const allWarnings = result.styling!.warnings.join(' ');
+    // my-button has slots, so slot styling guidance should be present
+    expect(allWarnings).toContain('slotted content');
+    expect(allWarnings).toContain('light DOM CSS');
+  });
+
+  it('styling.warnings include named slot selectors when component has named slots', async () => {
+    const result = await suggestUsage('my-button', makeConfig());
+    const allWarnings = result.styling!.warnings.join(' ');
+    // my-button has named slots (prefix, suffix)
+    expect(allWarnings).toContain('[slot=');
+  });
+
   it('returns no styling when component has no CSS properties or parts', async () => {
     const noStyleCem = {
       schemaVersion: '1.0.0',

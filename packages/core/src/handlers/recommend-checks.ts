@@ -105,6 +105,8 @@ export function recommendChecks(code: string): RecommendChecksResult {
     recommended.push('check_shadow_dom_usage');
     recommended.push('check_css_vars');
     recommended.push('check_theme_compatibility');
+    recommended.push('check_css_specificity');
+    recommended.push('check_layout_patterns');
 
     // Token fallback check when var() is used
     if (/var\s*\(/.test(code)) {

@@ -18,6 +18,7 @@ export * from './migration.js';
 export * from './narrative.js';
 export * from './story.js';
 export * from './suggest.js';
+export * from './theme-detection.js';
 export * from './tokens.js';
 export * from './typegenerate.js';
 export * from './typescript.js';

@@ -201,6 +201,8 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
         'get_project_diagnostics',
         // type generation
         'generate_types',
+        // styling
+        'detect_theme_support',
       ];
       const tokenTools = ['get_design_tokens', 'find_token'];
       const expectedTools = [...coreTools, ...tokenTools];

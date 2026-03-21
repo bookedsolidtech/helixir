@@ -93,6 +93,34 @@ suggest_fix({
 | `specificity` | `important`, `id-selector`, `deep-nesting`, `inline-style` |
 | `layout` | `host-display`, `fixed-dimensions`, `position-override`, `overflow-hidden` |
 
+## Reading Validation Results
+
+`validate_component_code` returns a `summary` object with severity-scored, prioritized results:
+
+```
+{
+  summary: {
+    clean: false,
+    totalIssues: 5,
+    errors: 2,      // Will break at runtime — fix before shipping
+    warnings: 2,    // May break in dark mode, a11y, or theme changes
+    info: 1,        // Best practice suggestions
+    verdict: "2 errors (will break at runtime — fix before shipping), 2 warnings...",
+    topIssues: [    // Top 10, sorted by severity (errors first)
+      { severity: "error", category: "shadowDom", message: "...", line: 5 },
+      ...
+    ]
+  }
+}
+```
+
+**Severity classification:**
+| Severity | Categories | When it matters |
+|---|---|---|
+| error | shadowDom, imports, shadowDomJs, eventUsage, methodCalls | Always — code is broken |
+| warning | a11y, tokenFallbacks, themeCompat, colorContrast, scope, shorthand, slotChildren, attributeConflicts | Dark mode, accessibility, theme switching |
+| info | specificity, layout, transitionAnimation, htmlUsage, cssVars, composition | Code quality, maintainability |
+
 ## Don't Know Which Validators to Run?
 
 Call `recommend_checks` with your code — it analyzes the content type and returns a prioritized list.
@@ -117,3 +145,5 @@ Call `recommend_checks` with your code — it analyzes the content type and retu
 16. **Don't set `innerHTML` on web components** — use slot content or the component's properties/methods
 17. **Don't transition standard CSS properties on component hosts** — transitions on `color`, `background`, etc. only affect the host box, not shadow internals. Transition CSS custom properties instead.
 18. **Don't hardcode colors alongside design tokens** — if background uses a token but text color is hardcoded, theme changes will break contrast
+19. **Style slotted content in light DOM CSS, not `::slotted()`** — `::slotted()` only works inside shadow root stylesheets. Target slotted elements directly in your page CSS before they're slotted in.
+20. **Slotted content inherits font styles but not layout** — `color`, `font-size`, `line-height` inherit from the shadow DOM, but `margin`, `padding`, `display` must be set in light DOM CSS

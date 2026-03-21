@@ -350,6 +350,15 @@ export async function suggestUsage(
   // Build styling section
   const styling = buildStyling(tagName, meta);
 
+  // Validation nudge — remind agents to validate CSS against the CEM
+  if (meta.cssParts.length > 0 || meta.cssProperties.length > 0) {
+    notes.push(
+      `After writing CSS for ${tagName}, call \`styling_preflight\` to validate ` +
+        `your ::part() and custom property names against the actual component API. ` +
+        `This catches hallucinated names before they ship.`,
+    );
+  }
+
   // Detect events for framework snippets
   const eventNamesArr = meta.events.map((e) => e.name);
 

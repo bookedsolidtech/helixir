@@ -16,7 +16,12 @@ import type { ComponentMetadata } from './cem.js';
 import { resolveCssApi, type CssApiResolution } from './css-api-resolver.js';
 import { checkShadowDomUsage } from './shadow-dom-checker.js';
 import { checkThemeCompatibility } from './theme-checker.js';
+import { checkCssShorthand } from './shorthand-checker.js';
+import { checkColorContrast } from './color-contrast-checker.js';
+import { checkCssSpecificity } from './specificity-checker.js';
 import { buildCssSnippet } from './styling-diagnostics.js';
+import { checkTokenFallbacksFromMeta } from './token-fallback-checker.js';
+import { checkCssScopeFromMeta } from './scope-checker.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -60,9 +65,10 @@ export function runStylingPreflight(input: PreflightInput): PreflightResult {
   // 1. Resolve CSS references against CEM
   const resolution = resolveCssApi(css, meta, html);
 
-  // 2. Run shadow DOM validation (if CSS is non-empty)
+  // 2. Run all CSS validators (if CSS is non-empty)
   if (css.trim()) {
-    try {
+    // Shadow DOM anti-patterns
+    safeRun(() => {
       const shadowResult = checkShadowDomUsage(css, meta.tagName, meta);
       for (const issue of shadowResult.issues) {
         issues.push({
@@ -73,12 +79,10 @@ export function runStylingPreflight(input: PreflightInput): PreflightResult {
           suggestion: issue.suggestion,
         });
       }
-    } catch {
-      // Shadow DOM check failed — skip
-    }
+    });
 
-    // 3. Run theme compatibility check
-    try {
+    // Theme compatibility (hardcoded colors, mixed token sources, dark mode shadows)
+    safeRun(() => {
       const themeResult = checkThemeCompatibility(css);
       for (const issue of themeResult.issues) {
         issues.push({
@@ -88,9 +92,74 @@ export function runStylingPreflight(input: PreflightInput): PreflightResult {
           line: issue.line,
         });
       }
-    } catch {
-      // Theme check failed — skip
-    }
+    });
+
+    // Token fallbacks (var() without fallbacks, hardcoded colors on theme properties)
+    safeRun(() => {
+      const knownTokens = new Set(meta.cssProperties.map((p) => p.name));
+      const fallbackResult = checkTokenFallbacksFromMeta(css, knownTokens);
+      for (const issue of fallbackResult.issues) {
+        issues.push({
+          severity: 'warning',
+          category: 'tokenFallbacks',
+          message: issue.message,
+          line: issue.line,
+        });
+      }
+    });
+
+    // Scope validation (component tokens on :root instead of host)
+    safeRun(() => {
+      const scopeResult = checkCssScopeFromMeta(css, meta.tagName, meta.cssProperties);
+      for (const issue of scopeResult.issues) {
+        issues.push({
+          severity: 'warning',
+          category: 'scope',
+          message: issue.message,
+          line: issue.line,
+        });
+      }
+    });
+
+    // Shorthand + var() risky combinations
+    safeRun(() => {
+      const shorthandResult = checkCssShorthand(css);
+      for (const issue of shorthandResult.issues) {
+        issues.push({
+          severity: 'warning',
+          category: 'shorthand',
+          message: issue.message,
+          line: issue.line,
+          suggestion: issue.suggestion,
+        });
+      }
+    });
+
+    // Color contrast issues (low-contrast pairs, mixed sources)
+    safeRun(() => {
+      const contrastResult = checkColorContrast(css);
+      for (const issue of contrastResult.issues) {
+        issues.push({
+          severity: 'warning',
+          category: 'colorContrast',
+          message: issue.message,
+          line: issue.line,
+        });
+      }
+    });
+
+    // CSS specificity anti-patterns (!important, ID selectors, deep nesting)
+    safeRun(() => {
+      const specResult = checkCssSpecificity(css);
+      for (const issue of specResult.issues) {
+        issues.push({
+          severity: 'info',
+          category: 'specificity',
+          message: issue.message,
+          line: issue.line,
+        });
+      }
+    });
   }
 
   // 4. Build the component API summary
@@ -116,6 +185,16 @@ export function runStylingPreflight(input: PreflightInput): PreflightResult {
     correctSnippet,
     verdict,
   };
+}
+
+// ─── Safe Runner ─────────────────────────────────────────────────────────────
+
+function safeRun(fn: () => void): void {
+  try {
+    fn();
+  } catch {
+    // Individual checker failed — skip and continue with other checks
+  }
 }
 
 // ─── Verdict Builder ────────────────────────────────────────────────────────

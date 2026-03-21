@@ -187,6 +187,74 @@ describe('runStylingPreflight — bare component', () => {
   });
 });
 
+// ─── Token Fallback Validation ───────────────────────────────────────────────
+
+describe('runStylingPreflight — token fallback validation', () => {
+  it('catches var() without fallback on custom property declarations', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button { --hx-button-bg: var(--undefined-token); }',
+      meta: buttonMeta,
+    });
+    expect(result.issues.some((i) => i.category === 'tokenFallbacks')).toBe(true);
+  });
+
+  it('allows known component tokens without fallback', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button { color: var(--hx-button-color); }',
+      meta: buttonMeta,
+    });
+    expect(result.issues.filter((i) => i.category === 'tokenFallbacks')).toHaveLength(0);
+  });
+});
+
+// ─── Scope Validation ────────────────────────────────────────────────────────
+
+describe('runStylingPreflight — scope validation', () => {
+  it('catches component tokens on :root', () => {
+    const result = runStylingPreflight({
+      css: ':root { --hx-button-bg: blue; }',
+      meta: buttonMeta,
+    });
+    expect(result.issues.some((i) => i.category === 'scope')).toBe(true);
+  });
+});
+
+// ─── Shorthand Validation ────────────────────────────────────────────────────
+
+describe('runStylingPreflight — shorthand validation', () => {
+  it('catches risky shorthand + var() combinations', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button { border: 1px solid var(--hx-button-color); }',
+      meta: buttonMeta,
+    });
+    expect(result.issues.some((i) => i.category === 'shorthand')).toBe(true);
+  });
+});
+
+// ─── Color Contrast Validation ───────────────────────────────────────────────
+
+describe('runStylingPreflight — color contrast validation', () => {
+  it('catches low-contrast color pairs', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button { color: #eeeeee; background: #ffffff; }',
+      meta: buttonMeta,
+    });
+    expect(result.issues.some((i) => i.category === 'colorContrast')).toBe(true);
+  });
+});
+
+// ─── Specificity Validation ──────────────────────────────────────────────────
+
+describe('runStylingPreflight — specificity validation', () => {
+  it('catches !important usage', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button { color: red !important; }',
+      meta: buttonMeta,
+    });
+    expect(result.issues.some((i) => i.category === 'specificity')).toBe(true);
+  });
+});
+
 // ─── Overall Verdict ─────────────────────────────────────────────────────────
 
 describe('runStylingPreflight — verdict', () => {
@@ -201,7 +269,7 @@ describe('runStylingPreflight — verdict', () => {
 
   it('reports pass verdict for clean CSS', () => {
     const result = runStylingPreflight({
-      css: 'hx-button { --hx-button-bg: blue; }',
+      css: 'hx-button { --hx-button-bg: var(--theme-primary, blue); }',
       meta: buttonMeta,
     });
     expect(result.verdict).toContain('pass');

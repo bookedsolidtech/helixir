@@ -11,6 +11,7 @@ import { detectThemeSupport } from '../handlers/theme-detection.js';
 import { checkComponentImports } from '../handlers/import-checker.js';
 import { checkSlotChildren } from '../handlers/slot-children-checker.js';
 import { checkAttributeConflicts } from '../handlers/attribute-conflict-checker.js';
+import { checkA11yUsage } from '../handlers/a11y-usage-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -45,6 +46,11 @@ const CheckSlotChildrenArgsSchema = z.object({
 });
 
 const CheckAttributeConflictsArgsSchema = z.object({
+  htmlText: z.string(),
+  tagName: z.string(),
+});
+
+const CheckA11yUsageArgsSchema = z.object({
   htmlText: z.string(),
   tagName: z.string(),
 });
@@ -262,6 +268,32 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'check_a11y_usage',
+    description:
+      'Validates consumer HTML for accessibility mistakes when using web components — catches missing accessible labels on icon buttons/dialogs/selects, and manual role overrides on components that self-assign ARIA roles. Run this on any HTML using web components to catch a11y issues.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+        htmlText: {
+          type: 'string',
+          description: 'The HTML code to validate for accessibility issues.',
+        },
+        tagName: {
+          type: 'string',
+          description:
+            'The custom element tag name to check accessibility for (e.g. "sl-icon-button").',
+        },
+      },
+      required: ['htmlText', 'tagName'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -335,6 +367,12 @@ export function handleStylingCall(
     if (name === 'check_attribute_conflicts') {
       const { htmlText, tagName } = CheckAttributeConflictsArgsSchema.parse(args);
       const result = checkAttributeConflicts(htmlText, tagName, cem);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_a11y_usage') {
+      const { htmlText, tagName } = CheckA11yUsageArgsSchema.parse(args);
+      const result = checkA11yUsage(htmlText, tagName, cem);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

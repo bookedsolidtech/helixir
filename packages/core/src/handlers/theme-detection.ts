@@ -4,7 +4,12 @@ import { join, extname, basename } from 'node:path';
 import type { McpWcConfig } from '../config.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
 
-export type ThemingApproach = 'token-based' | 'class-based' | 'data-attribute' | 'media-query' | 'none';
+export type ThemingApproach =
+  | 'token-based'
+  | 'class-based'
+  | 'data-attribute'
+  | 'media-query'
+  | 'none';
 
 export interface ThemeDetectionResult {
   themingApproach: ThemingApproach;
@@ -45,7 +50,7 @@ const TOKEN_CATEGORY_PATTERNS: ReadonlyArray<{ category: string; pattern: RegExp
 async function collectFiles(root: string): Promise<string[]> {
   let entries: string[];
   try {
-    entries = await readdir(root, { recursive: true }) as string[];
+    entries = (await readdir(root, { recursive: true })) as string[];
   } catch (err) {
     const code = (err as NodeJS.ErrnoException).code;
     if (code === 'ENOENT' || code === 'ENOTDIR') {
@@ -138,16 +143,22 @@ function describeSwitchingMechanism(acc: ScanAccumulator, approach: ThemingAppro
 
   if (acc.hasDataTheme) parts.push('Set `data-theme` attribute on a container element.');
   if (acc.hasThemeClass || acc.hasThemeFile) {
-    parts.push('Toggle a theme class (e.g. `.theme-dark`, `.sl-theme-dark`) on `<html>` or a container element.');
+    parts.push(
+      'Toggle a theme class (e.g. `.theme-dark`, `.sl-theme-dark`) on `<html>` or a container element.',
+    );
   }
   if (acc.hasPrefersDark) {
-    parts.push('Respects `prefers-color-scheme` OS setting automatically via `@media (prefers-color-scheme: dark)`.');
+    parts.push(
+      'Respects `prefers-color-scheme` OS setting automatically via `@media (prefers-color-scheme: dark)`.',
+    );
   }
   if (acc.hasColorScheme) {
     parts.push('Sets `color-scheme` CSS property to coordinate native browser UI.');
   }
   if (approach === 'token-based' && parts.length === 0) {
-    parts.push('Override CSS custom properties on a container element or `:root` to switch themes.');
+    parts.push(
+      'Override CSS custom properties on a container element or `:root` to switch themes.',
+    );
   }
 
   return parts.join(' ');
@@ -157,25 +168,42 @@ function buildRecommendations(acc: ScanAccumulator, approach: ThemingApproach): 
   const recs: string[] = [];
 
   if (approach === 'none') {
-    recs.push('Introduce CSS custom properties for colors, spacing, and typography to enable theming.');
+    recs.push(
+      'Introduce CSS custom properties for colors, spacing, and typography to enable theming.',
+    );
     recs.push('Add a `prefers-color-scheme` media query or theme class to support dark mode.');
     return recs;
   }
 
   if (!acc.hasPrefersDark) {
-    recs.push('Add `@media (prefers-color-scheme: dark)` to respect system dark mode preference automatically.');
+    recs.push(
+      'Add `@media (prefers-color-scheme: dark)` to respect system dark mode preference automatically.',
+    );
   }
   if (!acc.hasColorScheme) {
-    recs.push('Set `color-scheme: light dark` (or `light` / `dark`) on `:root` or `:host` to align native browser controls.');
+    recs.push(
+      'Set `color-scheme: light dark` (or `light` / `dark`) on `:root` or `:host` to align native browser controls.',
+    );
   }
   if (acc.hasAbsoluteUnits && !acc.hasRelativeUnits) {
-    recs.push('Replace `px` token values with `rem`/`em` to support user font-size preferences and better scaling.');
+    recs.push(
+      'Replace `px` token values with `rem`/`em` to support user font-size preferences and better scaling.',
+    );
   }
   if (approach === 'class-based' && acc.tokenPropNames.length === 0) {
-    recs.push('Migrate from class-based theming to CSS custom property tokens for finer-grained consumer customization.');
+    recs.push(
+      'Migrate from class-based theming to CSS custom property tokens for finer-grained consumer customization.',
+    );
   }
-  if (approach === 'token-based' && !acc.hasThemeClass && !acc.hasDataTheme && !acc.hasPrefersDark) {
-    recs.push('Define a theme-switching mechanism (class, data-attribute, or media query) in addition to your token system.');
+  if (
+    approach === 'token-based' &&
+    !acc.hasThemeClass &&
+    !acc.hasDataTheme &&
+    !acc.hasPrefersDark
+  ) {
+    recs.push(
+      'Define a theme-switching mechanism (class, data-attribute, or media query) in addition to your token system.',
+    );
   }
 
   return recs;
@@ -209,7 +237,8 @@ export async function detectThemeSupport(config: McpWcConfig): Promise<ThemeDete
   }
 
   const themingApproach = determineApproach(acc);
-  const darkModeReady = acc.hasPrefersDark || acc.hasThemeClass || acc.hasDataTheme || acc.hasThemeFile;
+  const darkModeReady =
+    acc.hasPrefersDark || acc.hasThemeClass || acc.hasDataTheme || acc.hasThemeFile;
   const tokenCategories = detectCategories(acc.tokenPropNames);
   const themeSwitchingMechanism = describeSwitchingMechanism(acc, themingApproach);
   const recommendations = buildRecommendations(acc, themingApproach);

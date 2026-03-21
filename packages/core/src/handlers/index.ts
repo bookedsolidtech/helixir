@@ -18,6 +18,7 @@ export * from './health.js';
 export * from './html-usage-checker.js';
 export * from './migration.js';
 export * from './narrative.js';
+export * from './quick-ref.js';
 export * from './story.js';
 export * from './shadow-dom-checker.js';
 export * from './styling-diagnostics.js';

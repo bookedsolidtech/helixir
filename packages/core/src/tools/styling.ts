@@ -6,6 +6,7 @@ import { diagnoseStyling } from '../handlers/styling-diagnostics.js';
 import { checkShadowDomUsage } from '../handlers/shadow-dom-checker.js';
 import { checkHtmlUsage } from '../handlers/html-usage-checker.js';
 import { checkEventUsage } from '../handlers/event-usage-checker.js';
+import { getComponentQuickRef } from '../handlers/quick-ref.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -21,6 +22,10 @@ const CheckShadowDomUsageArgsSchema = z.object({
 
 const CheckHtmlUsageArgsSchema = z.object({
   htmlText: z.string(),
+  tagName: z.string(),
+});
+
+const GetComponentQuickRefArgsSchema = z.object({
   tagName: z.string(),
 });
 
@@ -134,6 +139,27 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'get_component_quick_ref',
+    description:
+      'Returns a complete quick reference for a web component — all attributes with types and valid enum values, methods, events, slots, CSS custom properties with examples, CSS parts with ::part() selectors, a ready-to-use CSS snippet, and Shadow DOM warnings. Use this as the FIRST call when working with any web component to get the complete API surface.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+        tagName: {
+          type: 'string',
+          description: 'The custom element tag name (e.g. "sl-button").',
+        },
+      },
+      required: ['tagName'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -177,6 +203,13 @@ export function handleStylingCall(
       const { codeText, tagName, framework } = CheckEventUsageArgsSchema.parse(args);
       const meta = parseCem(tagName, cem);
       const result = checkEventUsage(codeText, meta, framework);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'get_component_quick_ref') {
+      const { tagName } = GetComponentQuickRefArgsSchema.parse(args);
+      const meta = parseCem(tagName, cem);
+      const result = getComponentQuickRef(meta);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

@@ -285,7 +285,7 @@ export const STYLING_TOOL_DEFINITIONS = [
   {
     name: 'get_component_quick_ref',
     description:
-      'Returns a complete quick reference for a web component — all attributes with types and valid enum values, methods, events, slots, CSS custom properties with examples, CSS parts with ::part() selectors, a ready-to-use CSS snippet, and Shadow DOM warnings. Use this as the FIRST call when working with any web component to get the complete API surface.',
+      'Returns a complete quick reference for a web component — all attributes with types and valid enum values, methods, events, slots, CSS custom properties with examples, CSS parts with ::part() selectors, a ready-to-use CSS snippet, Shadow DOM warnings, and antiPatterns (component-specific "don\'t do this" negative examples using real tag/part/token names). Use this as the FIRST call when working with any web component to get the complete API surface and avoid common mistakes.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -591,7 +591,7 @@ export const STYLING_TOOL_DEFINITIONS = [
   {
     name: 'suggest_fix',
     description:
-      'Generates concrete, copy-pasteable code fixes for validation issues. Pass the issue type (shadow-dom, token-fallback, theme-compat, method-call, event-usage, specificity, layout), the specific issue kind, and the original code — returns a corrected code snippet with an explanation. Use this after any validator flags an issue to get the exact fix.',
+      'Generates concrete, copy-pasteable code fixes for validation issues. Pass the issue type (shadow-dom, token-fallback, theme-compat, method-call, event-usage, specificity, layout), the specific issue kind, and the original code — returns a corrected code snippet with an explanation. NOTE: styling_preflight and validate_css_file now embed fixes inline in each issue — only call suggest_fix directly for issues from other validators or when you need a fix for code not already validated.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -803,7 +803,7 @@ export const STYLING_TOOL_DEFINITIONS = [
   {
     name: 'styling_preflight',
     description:
-      "Single-call styling validation that combines component API discovery, CSS reference resolution, and anti-pattern detection. Returns: the component's full style API surface (parts, tokens, slots), valid/invalid status for every ::part() and token reference, Shadow DOM and theme validation issues, a correct CSS snippet, and a pass/fail verdict. Call this ONCE before finalizing any component CSS to prevent hallucinated part names, invalid tokens, and Shadow DOM mistakes.",
+      "Single-call styling validation that combines component API discovery, CSS reference resolution, and anti-pattern detection. Returns: the component's full style API surface (parts, tokens, slots), valid/invalid status for every ::part() and token reference, Shadow DOM and theme validation issues with inline fix suggestions (each issue includes a `fix` object with corrected code + explanation), antiPatterns (component-specific negative examples), a correct CSS snippet, and a pass/fail verdict. Call this ONCE before finalizing any component CSS — fixes are embedded in each issue so you don't need a separate suggest_fix call.",
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -832,7 +832,7 @@ export const STYLING_TOOL_DEFINITIONS = [
   {
     name: 'validate_css_file',
     description:
-      'Validates an entire CSS file targeting multiple web components in one call. Auto-detects all web component tag names in selectors, runs per-component validation (Shadow DOM, ::part() resolution, token validation, scope checks), and global validation (theme compatibility, color contrast, specificity, shorthand). Returns issues grouped by component plus global issues. Use this when reviewing a CSS file that styles multiple components — no need to know which components are used.',
+      'Validates an entire CSS file targeting multiple web components in one call. Auto-detects all web component tag names in selectors, runs per-component validation (Shadow DOM, ::part() resolution, token validation, scope checks) and global validation (theme compatibility, color contrast, specificity, shorthand). Each component result includes antiPatterns (negative examples) and each issue includes an inline `fix` object with corrected code + explanation. Returns issues grouped by component plus global issues. Use this when reviewing a CSS file that styles multiple components — no need to know which components are used.',
     inputSchema: {
       type: 'object' as const,
       properties: {

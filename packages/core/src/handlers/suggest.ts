@@ -104,6 +104,25 @@ async function loadCemFromConfig(config: McpWcConfig): Promise<Cem> {
 
 // ─── Return types ─────────────────────────────────────────────────────────────
 
+export interface SuggestUsageStylingProperty {
+  name: string;
+  exampleValue: string;
+  description: string;
+}
+
+export interface SuggestUsageStylingPart {
+  name: string;
+  description: string;
+  exampleSelector: string;
+}
+
+export interface SuggestUsageStyling {
+  cssProperties: SuggestUsageStylingProperty[];
+  cssParts: SuggestUsageStylingPart[];
+  cssSnippet: string;
+  warnings: string[];
+}
+
 export interface SuggestUsageResult {
   tagName: string;
   htmlSnippet: string;
@@ -114,6 +133,7 @@ export interface SuggestUsageResult {
   notes?: string[];
   framework?: FrontendFramework;
   frameworkSnippet?: string;
+  styling?: SuggestUsageStyling;
 }
 
 export interface GenerateImportResult {
@@ -154,6 +174,49 @@ function extractUnionOptions(typeText: string): string[] | null {
     return stringLiterals.map((p) => p.slice(1, -1));
   }
   return null;
+}
+
+function buildStyling(tagName: string, meta: { cssProperties: Array<{ name: string; description: string; default?: string }>; cssParts: Array<{ name: string; description: string }> }): SuggestUsageStyling | undefined {
+  if (meta.cssProperties.length === 0 && meta.cssParts.length === 0) return undefined;
+
+  const topProps = meta.cssProperties.slice(0, 5);
+  const topParts = meta.cssParts.slice(0, 4);
+
+  const cssProperties: SuggestUsageStylingProperty[] = topProps.map((p) => ({
+    name: p.name,
+    exampleValue: p.default ?? 'initial',
+    description: p.description,
+  }));
+
+  const cssParts: SuggestUsageStylingPart[] = topParts.map((p) => ({
+    name: p.name,
+    description: p.description,
+    exampleSelector: `${tagName}::part(${p.name})`,
+  }));
+
+  const propLines = topProps
+    .map((p) => `  ${p.name}: ${p.default ?? 'initial'};`)
+    .join('\n');
+
+  const partLines = topParts
+    .map((p) => `${tagName}::part(${p.name}) {\n  /* ${p.description || p.name} */\n}`)
+    .join('\n\n');
+
+  const snippetParts: string[] = [];
+  if (topProps.length > 0) {
+    snippetParts.push(`${tagName} {\n${propLines}\n}`);
+  }
+  if (topParts.length > 0) {
+    snippetParts.push(partLines);
+  }
+  const cssSnippet = snippetParts.join('\n\n');
+
+  const warnings: string[] = [
+    `Do not use descendant selectors to reach internal elements (e.g. \`${tagName} .label\` will not work — Shadow DOM prevents this).`,
+    'CSS custom properties and `::part()` selectors are the only supported ways to style inside Shadow DOM.',
+  ];
+
+  return { cssProperties, cssParts, cssSnippet, warnings };
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────────
@@ -252,6 +315,9 @@ export async function suggestUsage(
     );
   }
 
+  // Build styling section
+  const styling = buildStyling(tagName, meta);
+
   // Detect events for framework snippets
   const eventNamesArr = meta.events.map((e) => e.name);
 
@@ -281,6 +347,7 @@ export async function suggestUsage(
     ...(notes.length > 0 ? { notes } : {}),
     ...(detectedFramework ? { framework: detectedFramework } : {}),
     ...(frameworkSnippet ? { frameworkSnippet } : {}),
+    ...(styling ? { styling } : {}),
   };
 }
 

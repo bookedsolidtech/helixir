@@ -15,6 +15,7 @@ import { checkA11yUsage } from '../handlers/a11y-usage-checker.js';
 import { checkCssVars } from '../handlers/css-var-checker.js';
 import { validateComponentCode } from '../handlers/code-validator.js';
 import { checkTokenFallbacks } from '../handlers/token-fallback-checker.js';
+import { checkComposition } from '../handlers/composition-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -66,6 +67,10 @@ const CheckCssVarsArgsSchema = z.object({
 const CheckTokenFallbacksArgsSchema = z.object({
   cssText: z.string(),
   tagName: z.string(),
+});
+
+const CheckCompositionArgsSchema = z.object({
+  htmlText: z.string(),
 });
 
 const ValidateComponentCodeArgsSchema = z.object({
@@ -403,6 +408,27 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'check_composition',
+    description:
+      'Validates cross-component composition patterns — catches tab/panel count mismatches, unlinked cross-references (tab panel="x" without matching panel name="x"), and empty containers (select with no options). Detects component pairs automatically from CEM slot descriptions. Run this on any HTML using compound components like tab-groups, selects, accordions, etc.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+        htmlText: {
+          type: 'string',
+          description: 'The HTML code containing compound component patterns to validate.',
+        },
+      },
+      required: ['htmlText'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -488,6 +514,12 @@ export function handleStylingCall(
     if (name === 'check_css_vars') {
       const { cssText, tagName } = CheckCssVarsArgsSchema.parse(args);
       const result = checkCssVars(cssText, tagName, cem);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_composition') {
+      const { htmlText } = CheckCompositionArgsSchema.parse(args);
+      const result = checkComposition(htmlText, cem);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

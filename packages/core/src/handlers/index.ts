@@ -12,6 +12,7 @@ export * from './compare.js';
 export * from './css-var-checker.js';
 export * from './component.js';
 export * from './composition.js';
+export * from './composition-checker.js';
 export * from './dependencies.js';
 export * from './dimensions.js';
 export * from './framework.js';

@@ -12,26 +12,27 @@
 
 HELiXiR currently scores 14 health dimensions across 9 CEM-native and 5 external analyzers. None are Lit-specific. Here is what each analyzer measures and what Lit patterns it misses:
 
-| Analyzer | What It Measures | Lit-Specific Gaps |
-|----------|-----------------|-------------------|
-| **CEM Completeness** | Description, property docs, event types/docs, CSS parts, slots | Does not distinguish `@property()` vs `@state()` — treats all fields equally |
-| **Accessibility** | ARIA bindings, role assignments, keyboard handling, focus management | Framework-agnostic regex patterns; misses Lit-specific `@query` focus patterns |
-| **Type Coverage** | Property types, event payloads, method return types | Does not check Lit property option `type` declarations (String/Number/Boolean) |
-| **API Surface Quality** | Method docs, attribute reflection, defaults, property descriptions | Does not validate `reflect: true` appropriateness or `attribute: false` usage |
-| **CSS Architecture** | Custom property descriptions, design token naming, CSS parts docs | Does not check for `static styles` usage vs inline styles, `adoptedStyleSheets` |
-| **Event Architecture** | Kebab-case naming, typed payloads, event descriptions | Does not check `bubbles`/`composed` configuration, event cleanup in `disconnectedCallback` |
-| **CEM-Source Fidelity** | Event/property/attribute alignment between CEM and source | Already extracts `@property()` decorators but ignores `@state()`, `@query`, lifecycle patterns |
-| **Slot Architecture** | Default slot, named slots, type constraints, slot-property coherence | Does not analyze Lit template `<slot>` usage patterns |
-| **Naming Consistency** | Event prefixes, property naming, CSS prefixes, attribute-property mapping | Does not validate Lit-specific conventions (e.g., `_` prefix for `@state()`) |
-| **Test Coverage** | External — line coverage percentages | No Lit-specific test patterns |
-| **Bundle Size** | External — gzip sizes | No detection of tree-shaking-friendly Lit patterns |
-| **Story Coverage** | External — Storybook stories present | No Lit-specific story patterns |
-| **Performance** | External — runtime metrics | No Lit render performance patterns |
-| **Drupal Readiness** | External — CMS integration readiness | No Lit-specific SSR/hydration patterns |
+| Analyzer                | What It Measures                                                          | Lit-Specific Gaps                                                                              |
+| ----------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **CEM Completeness**    | Description, property docs, event types/docs, CSS parts, slots            | Does not distinguish `@property()` vs `@state()` — treats all fields equally                   |
+| **Accessibility**       | ARIA bindings, role assignments, keyboard handling, focus management      | Framework-agnostic regex patterns; misses Lit-specific `@query` focus patterns                 |
+| **Type Coverage**       | Property types, event payloads, method return types                       | Does not check Lit property option `type` declarations (String/Number/Boolean)                 |
+| **API Surface Quality** | Method docs, attribute reflection, defaults, property descriptions        | Does not validate `reflect: true` appropriateness or `attribute: false` usage                  |
+| **CSS Architecture**    | Custom property descriptions, design token naming, CSS parts docs         | Does not check for `static styles` usage vs inline styles, `adoptedStyleSheets`                |
+| **Event Architecture**  | Kebab-case naming, typed payloads, event descriptions                     | Does not check `bubbles`/`composed` configuration, event cleanup in `disconnectedCallback`     |
+| **CEM-Source Fidelity** | Event/property/attribute alignment between CEM and source                 | Already extracts `@property()` decorators but ignores `@state()`, `@query`, lifecycle patterns |
+| **Slot Architecture**   | Default slot, named slots, type constraints, slot-property coherence      | Does not analyze Lit template `<slot>` usage patterns                                          |
+| **Naming Consistency**  | Event prefixes, property naming, CSS prefixes, attribute-property mapping | Does not validate Lit-specific conventions (e.g., `_` prefix for `@state()`)                   |
+| **Test Coverage**       | External — line coverage percentages                                      | No Lit-specific test patterns                                                                  |
+| **Bundle Size**         | External — gzip sizes                                                     | No detection of tree-shaking-friendly Lit patterns                                             |
+| **Story Coverage**      | External — Storybook stories present                                      | No Lit-specific story patterns                                                                 |
+| **Performance**         | External — runtime metrics                                                | No Lit render performance patterns                                                             |
+| **Drupal Readiness**    | External — CMS integration readiness                                      | No Lit-specific SSR/hydration patterns                                                         |
 
 ### 1.2 Key Finding
 
 The CEM-Source Fidelity analyzer (`cem-source-fidelity.ts`) already performs source code analysis with regex-based extraction. It:
+
 - Reads component source files via `readComponentSource()`
 - Follows inheritance chains via `resolveInheritanceChain()` from `mixin-resolver.ts`
 - Extracts `@property()` decorators, `dispatchEvent()` calls, `observedAttributes`
@@ -48,6 +49,7 @@ The CEM-Source Fidelity analyzer (`cem-source-fidelity.ts`) already performs sou
 The fundamental Lit reactivity pattern: `@property()` declares public API (reflected to attributes, part of the component contract), while `@state()` declares internal reactive state (never exposed as attributes).
 
 **What to detect:**
+
 ```typescript
 // GOOD: Clear public/private distinction
 @property({ type: String }) label = '';           // Public API
@@ -59,6 +61,7 @@ The fundamental Lit reactivity pattern: `@property()` declares public API (refle
 ```
 
 **Detection signals (source regex):**
+
 - `@property()` count vs `@state()` count — a component with many `@property()` and zero `@state()` may be leaking internal state
 - `@property()` on private/underscore-prefixed fields — definite anti-pattern
 - `@state()` without `private` modifier — weak signal (should be private)
@@ -70,6 +73,7 @@ The fundamental Lit reactivity pattern: `@property()` declares public API (refle
 Lit's `@property({ type: X })` tells the framework how to serialize/deserialize attribute values. Missing `type` means Lit defaults to `String`, which may cause bugs for Boolean/Number properties.
 
 **What to detect:**
+
 ```typescript
 // GOOD: Explicit type declaration
 @property({ type: Boolean }) disabled = false;
@@ -82,6 +86,7 @@ Lit's `@property({ type: X })` tells the framework how to serialize/deserialize 
 ```
 
 **Detection signals (source regex):**
+
 - `@property()` with empty options or no `type:` key
 - Cross-reference with TypeScript type annotation — if type is `number` or `boolean` but no `type:` in decorator options
 
@@ -104,6 +109,7 @@ Lit's `@property({ type: X })` tells the framework how to serialize/deserialize 
 ```
 
 **Detection signals:**
+
 - Properties with complex types (`Map`, `Set`, `Array`, `Object`) without `attribute: false` — potential serialization bugs
 - `reflect: true` on object/array types — performance concern (serializing on every change)
 
@@ -116,6 +122,7 @@ Lit's `@property({ type: X })` tells the framework how to serialize/deserialize 
 Components that register global event listeners, observers, or subscriptions in `connectedCallback` must clean them up in `disconnectedCallback` to prevent memory leaks.
 
 **What to detect:**
+
 ```typescript
 // GOOD: Cleanup pattern
 connectedCallback() {
@@ -136,6 +143,7 @@ connectedCallback() {
 ```
 
 **Detection signals:**
+
 - `connectedCallback` with `addEventListener` but no `disconnectedCallback` or no `removeEventListener` — memory leak
 - `connectedCallback` without `super.connectedCallback()` — Lit lifecycle break
 - `disconnectedCallback` without `super.disconnectedCallback()` — Lit lifecycle break
@@ -146,11 +154,13 @@ connectedCallback() {
 - `updated(changedProperties)`: Runs after render. Best for DOM interaction, side effects.
 
 **Anti-patterns:**
+
 - Modifying reactive properties in `updated()` — causes extra render cycles
 - DOM queries in `willUpdate()` — DOM not yet updated
 - `requestUpdate()` calls in `updated()` — infinite render loop risk
 
 **Detection signals:**
+
 - `this.requestUpdate()` usage count — should be rare (>2 occurrences is a warning)
 - Property assignments (e.g., `this.x = ...`) inside `updated()` — triggers re-render
 - DOM access (e.g., `this.shadowRoot`, `this.querySelector`) inside `willUpdate()` — premature
@@ -184,6 +194,7 @@ render() {
 ```
 
 **Detection signals:**
+
 - `static styles` or `static get styles()` — present = good
 - `style=` inside `html\`` templates — inline style usage (warning, not error)
 
@@ -199,6 +210,7 @@ this.renderRoot.querySelector('#input');
 ```
 
 **Detection signals:**
+
 - `@query` / `@queryAll` decorator usage — positive signal
 - `this.shadowRoot?.querySelector` or `this.renderRoot.querySelector` count — negative signal if excessive
 - Presence of both is acceptable; exclusive use of manual queries when `@query` would work is suboptimal
@@ -206,6 +218,7 @@ this.renderRoot.querySelector('#input');
 ### 4.3 Template Directives
 
 Lit provides directives for render optimization:
+
 - `repeat()` — keyed list rendering (avoids full re-render)
 - `cache()` — caches template instances for conditional rendering
 - `guard()` — prevents re-evaluation of expensive computations
@@ -213,6 +226,7 @@ Lit provides directives for render optimization:
 - `classMap()`, `styleMap()` — efficient class/style binding
 
 **Detection signals:**
+
 - Import statements for `lit/directives/repeat.js`, etc. — positive signal
 - Usage of `Array.map()` in templates without `repeat()` — weak warning for large lists
 
@@ -258,6 +272,7 @@ render() {
 ### 5.3 adoptedStyleSheets
 
 Modern Lit components can use `adoptedStyleSheets` for shared styles:
+
 ```typescript
 static styles = [sharedStyles, css`/* component-specific */`];
 ```
@@ -278,11 +293,13 @@ declare global {
   }
 }
 
-this.dispatchEvent(new CustomEvent('my-change', {
-  detail: { value: this.value },
-  bubbles: true,
-  composed: true,
-}));
+this.dispatchEvent(
+  new CustomEvent('my-change', {
+    detail: { value: this.value },
+    bubbles: true,
+    composed: true,
+  }),
+);
 
 // BAD: Untyped events
 this.dispatchEvent(new CustomEvent('change'));
@@ -296,6 +313,7 @@ this.dispatchEvent(new CustomEvent('change'));
 For events to cross Shadow DOM boundaries, they need `composed: true`. For events to bubble through the DOM tree, they need `bubbles: true`.
 
 **Detection signals (source):**
+
 - `new CustomEvent(` with `composed: true` — correctly configured for Shadow DOM
 - `new CustomEvent(` without `composed` — event trapped inside shadow root
 - `new Event(` — lacks `detail` payload (should usually be `CustomEvent`)
@@ -320,29 +338,29 @@ disconnectedCallback() {
 
 Summary of the 5 highest-value Lit patterns not currently scored:
 
-| # | Pattern | Category | Detection Feasibility |
-|---|---------|----------|-----------------------|
-| 1 | `@property()` vs `@state()` usage | Reactive Properties | **High** — regex on source |
-| 2 | Property `type` declarations | Reactive Properties | **High** — regex on source |
-| 3 | Lifecycle cleanup (connect/disconnect symmetry) | Lifecycle | **High** — regex on source |
-| 4 | `static styles` usage | Render Efficiency | **High** — regex on source |
-| 5 | Event `composed`/`bubbles` configuration | Events | **Medium** — regex on source, may need context |
-| 6 | `super.connectedCallback()` compliance | Lifecycle | **High** — regex on source |
-| 7 | `@query` vs manual DOM lookup | Render Efficiency | **Medium** — regex count comparison |
-| 8 | `requestUpdate()` overuse | Lifecycle | **High** — regex count |
-| 9 | Complex type without `attribute: false` | Reactive Properties | **Low** — needs type inference |
-| 10 | Template directive usage | Render Efficiency | **Medium** — import statement scan |
+| #   | Pattern                                         | Category            | Detection Feasibility                          |
+| --- | ----------------------------------------------- | ------------------- | ---------------------------------------------- |
+| 1   | `@property()` vs `@state()` usage               | Reactive Properties | **High** — regex on source                     |
+| 2   | Property `type` declarations                    | Reactive Properties | **High** — regex on source                     |
+| 3   | Lifecycle cleanup (connect/disconnect symmetry) | Lifecycle           | **High** — regex on source                     |
+| 4   | `static styles` usage                           | Render Efficiency   | **High** — regex on source                     |
+| 5   | Event `composed`/`bubbles` configuration        | Events              | **Medium** — regex on source, may need context |
+| 6   | `super.connectedCallback()` compliance          | Lifecycle           | **High** — regex on source                     |
+| 7   | `@query` vs manual DOM lookup                   | Render Efficiency   | **Medium** — regex count comparison            |
+| 8   | `requestUpdate()` overuse                       | Lifecycle           | **High** — regex count                         |
+| 9   | Complex type without `attribute: false`         | Reactive Properties | **Low** — needs type inference                 |
+| 10  | Template directive usage                        | Render Efficiency   | **Medium** — import statement scan             |
 
 ---
 
 ## 8. Detection Method Comparison
 
-| Method | Pros | Cons | HELiXiR Precedent |
-|--------|------|------|--------------------|
-| CEM metadata | Fast, no source needed | Cannot detect Lit-specific patterns | All CEM-native analyzers |
-| Source regex | Framework-specific, proven pattern | False positives possible, fragile | CEM-Source Fidelity, Source Accessibility |
-| AST analysis | Precise, context-aware | New dependency, slower | None (not currently used) |
-| Hybrid (CEM + source) | Best coverage | More complex implementation | Accessibility (30% CEM + 70% source) |
+| Method                | Pros                               | Cons                                | HELiXiR Precedent                         |
+| --------------------- | ---------------------------------- | ----------------------------------- | ----------------------------------------- |
+| CEM metadata          | Fast, no source needed             | Cannot detect Lit-specific patterns | All CEM-native analyzers                  |
+| Source regex          | Framework-specific, proven pattern | False positives possible, fragile   | CEM-Source Fidelity, Source Accessibility |
+| AST analysis          | Precise, context-aware             | New dependency, slower              | None (not currently used)                 |
+| Hybrid (CEM + source) | Best coverage                      | More complex implementation         | Accessibility (30% CEM + 70% source)      |
 
 **Recommendation:** Follow the CEM-Source Fidelity analyzer pattern — source regex analysis with inheritance chain resolution. This is proven, requires no new dependencies, and aligns with HELiXiR's zero-dependency philosophy.
 

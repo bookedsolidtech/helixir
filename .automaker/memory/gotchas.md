@@ -5,9 +5,9 @@ relevantTo: [gotchas]
 importance: 0.7
 relatedFiles: []
 usageStats:
-  loaded: 68
-  referenced: 43
-  successfulFeatures: 43
+  loaded: 91
+  referenced: 53
+  successfulFeatures: 53
 ---
 # gotchas
 
@@ -150,3 +150,43 @@ usageStats:
 - **Situation:** Chore ticket explicitly requested adding a pnpm audit step to ci.yml, but no ci.yml exists and the step was already present in security.yml
 - **Root cause:** Ticket authors likely assumed a standard single-file CI convention without auditing the actual workflow structure first
 - **How to avoid:** Granular workflows improve CI clarity but increase the chance of misalignment between ticket descriptions and actual file structure
+
+#### [Gotcha] A single long function signature on one line can silently break CI format checks (Prettier line-length enforcement) even when the logic is correct (2026-03-21)
+- **Situation:** The buildStyling function in suggest.ts had its full signature — including a complex inline object type — written on a single line, causing a Prettier line-length violation that failed CI
+- **Root cause:** Prettier's line-length rule is enforced as a CI gate, so a violation blocks merging regardless of functional correctness. The fix is mechanical: break the signature across multiple lines per Prettier conventions for complex parameter types
+- **How to avoid:** Multi-line signatures are more verbose but are significantly more readable for complex inline types and avoid CI failures. Single-line is compact but brittle against line-length thresholds
+
+#### [Gotcha] Escalation branch was based off `main`, not the open PR branch — fixes intended for an open PR must be pushed directly to the PR's feature branch, not to any escalation branch (2026-03-21)
+- **Situation:** An autonomous escalation agent checked out or created a branch from `main` to address PR review warnings, but that branch did not contain the PR's in-flight changes, making the fix invisible to the PR
+- **Root cause:** GitHub MCP `push_files` was used to target the PR branch directly (`feature/enhance-suggestusage-to-include-styling`) once the branch mismatch was identified
+- **How to avoid:** Direct push to PR branch is clean but bypasses any local validation; the trade-off is accepted because CI runs on the PR branch post-push
+
+#### [Pattern] Multi-agent escalation chains can result in split work: one agent applies code fixes and pushes, but fails to close the feedback loop (PR comment/thread reply), requiring a verify-and-respond retry rather than a full re-implementation (2026-03-21)
+- **Problem solved:** CodeRabbit warning on PR #98 was escalated; prior agent had already pushed all 4 workflow file changes but left the CodeRabbit review thread unacknowledged
+- **Why this works:** Agent handoffs lack shared state about what communication actions (vs code actions) were completed — code changes are verifiable via GitHub API but comment actions are not surfaced in PR state the same way
+- **Trade-offs:** Retry agents must always independently verify prior work before acting, which adds latency but prevents double-application of changes
+
+#### [Gotcha] When an escalation signal references a closed PR, the work may already be resolved by a prior escalation attempt. Always verify PR state via GitHub before implementing any changes. (2026-03-21)
+- **Situation:** Retry #1 of an escalation for PR #101 was triggered, but the PR was already closed and all CodeRabbit warnings had been addressed in the prior attempt (retry #0).
+- **Root cause:** Escalation retry systems do not always have visibility into whether a prior attempt succeeded — they may re-trigger based on stale signal state. Checking PR state first prevents redundant or conflicting work.
+- **How to avoid:** Adding a PR state check step adds latency to escalation resolution but prevents wasted effort and potential regressions from double-applying changes.
+
+#### [Gotcha] Escalation/retry agents should first verify prior agent work before applying changes — duplicate work risk is real when multiple agents handle the same PR (2026-03-21)
+- **Situation:** This was a retry escalation of a prior agent task on PR #98; the prior agent had already applied all fixes and posted a PR comment
+- **Root cause:** Agent retry pipelines can re-execute work already completed if they don't check current state first via API reads
+- **How to avoid:** Adding a verification step at the start of each agent run adds latency but prevents duplicate/conflicting mutations
+
+#### [Gotcha] CodeRabbit review threads remain unresolved on the PR UI even after a direct reply comment is posted via GitHub API — manual resolution or a CodeRabbit re-review is required (2026-03-21)
+- **Situation:** Agent posted PR comment #4102117661 addressing the CodeRabbit thread at package.json line 45, but the thread status in the PR UI does not auto-resolve
+- **Root cause:** CodeRabbit tracks its own review thread state independently of GitHub comment replies — a reply does not signal resolution to CodeRabbit's system
+- **How to avoid:** Developers must manually resolve CodeRabbit threads or wait for CodeRabbit to re-review; automated agents cannot fully close these threads
+
+#### [Gotcha] Prior agent summaries claimed suggest.ts was updated to use getShadowDomWarnings() helper, but the actual file still contained the inline warnings array. The helper was added to mcp-helpers.ts in commit 7523ab6 but the consumer (suggest.ts) was never wired up. (2026-03-21)
+- **Situation:** PR #101 CodeRabbit flagged duplicated Shadow DOM warning text across handlers. Two prior agent attempts both reported the fix as complete without verifying the actual file contents.
+- **Root cause:** Agents summarized intent rather than verified outcome — the mcp-helpers.ts change was real but the suggest.ts import/usage change was never committed.
+- **How to avoid:** Verification via direct file reads adds time but is the only reliable signal; summary narratives are lossy and can overstate completion
+
+#### [Gotcha] The inline warning text in suggest.ts used '.label' as the descendant selector example while the getShadowDomWarnings() helper used '.inner' — confirming the two code paths were never synchronized despite claiming to express the same constraint. (2026-03-21)
+- **Situation:** Shadow DOM styling constraint warnings needed to be consistent across suggest_usage, narrative, and quick-ref MCP tool handlers
+- **Root cause:** The inline array predated the shared helper and was written independently; small textual drift is a reliable indicator that centralization was never completed
+- **How to avoid:** Centralized helper enforces single source of truth for warning text; any future wording change propagates automatically to all handlers

@@ -1,0 +1,55 @@
+{
+  "category": "Uncategorized",
+  "description": "Semantic-release automated publishing pipeline. PR #22 merged to dev, PR #23 merged to staging, PR #24 open for staging→main. Discord v0.1.0 backpost sent. Includes: .releaserc.json, release.yml (replaces publish.yml), workflow_dispatch for re-trigger, Discord webhook, CONTRIBUTING.md docs. All three changelog surfaces: CHANGELOG.md, GitHub Releases, Discord.",
+  "title": "Setup semantic-release for automated npm publishing",
+  "status": "done",
+  "branchName": "feature/semantic-release-automated-publish",
+  "complexity": "large",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "c2832e30-f9d9-4bb7-9371-c5d3c27bd420",
+  "id": "feature-1773167937630-flrn1beq1",
+  "descriptionHistory": [
+    {
+      "description": "## Summary\nConfigure semantic-release to automatically publish to npm when staging is merged into main. This is the foundation for the automated release pipeline.\n\n## Requirements\n\n### Install dependencies\n```bash\npnpm add -D semantic-release @semantic-release/changelog @semantic-release/git @semantic-release/github\n```\n\n### Create `.releaserc.json`\n```json\n{\n  \"branches\": [\"main\"],\n  \"plugins\": [\n    \"@semantic-release/commit-analyzer\",\n    \"@semantic-release/release-notes-generator\",\n    [\"@semantic-release/changelog\", { \"changelogFile\": \"CHANGELOG.md\" }],\n    \"@semantic-release/npm\",\n    \"@semantic-release/github\",\n    [\"@semantic-release/git\", {\n      \"assets\": [\"package.json\", \"CHANGELOG.md\"],\n      \"message\": \"chore(release): ${nextRelease.version}\"\n    }]\n  ]\n}\n```\n\n### Create `.github/workflows/release.yml`\nWorkflow that:\n- Triggers on push to `main`\n- Runs full quality gate (build, test, lint, format)\n- Runs `npx semantic-release`\n- Uses `NPM_TOKEN` and `GITHUB_TOKEN` secrets\n- Posts to Discord via webhook after successful publish\n\n### Safety rails\n- `npm publish --dry-run` before real publish\n- Version existence check against registry\n- Idempotent — second run on same commit is a no-op\n- `chore(release):` commits from semantic-release must bypass commitlint CI check\n\n### Discord notification step\nAfter successful publish, POST to Discord webhook with release version, changelog summary, and link to GitHub release. Use `DISCORD_RELEASE_WEBHOOK` repo secret.\n\n## Acceptance Criteria\n- [ ] `semantic-release --dry-run` works locally\n- [ ] `.releaserc.json` committed\n- [ ] `.github/workflows/release.yml` committed  \n- [ ] CHANGELOG.md auto-generated from conventional commits\n- [ ] GitHub Release auto-created with notes\n- [ ] Discord notification fires on publish\n- [ ] Version bump committed back to repo automatically\n- [ ] Existing `prepublishOnly` script doesn't conflict\n\n## References\n- GitHub issue: #21\n- NPM_TOKEN: granular token with 2FA bypass (already exists, needs to be added as repo secret)\n- Conventional commits already enforced via commitlint",
+      "timestamp": "2026-03-10T18:38:57.630Z",
+      "source": "initial"
+    },
+    {
+      "description": "Semantic-release automated publishing pipeline. PR #22 open against dev. Includes: .releaserc.json config, release.yml workflow (replaces publish.yml), Discord webhook notification, CONTRIBUTING.md docs. All three changelog surfaces covered: CHANGELOG.md, GitHub Releases, Discord.",
+      "timestamp": "2026-03-10T18:49:53.794Z",
+      "source": "edit"
+    },
+    {
+      "description": "Semantic-release automated publishing pipeline. PR #22 merged to dev, PR #23 merged to staging, PR #24 open for staging→main. Discord v0.1.0 backpost sent. Includes: .releaserc.json, release.yml (replaces publish.yml), workflow_dispatch for re-trigger, Discord webhook, CONTRIBUTING.md docs. All three changelog surfaces: CHANGELOG.md, GitHub Releases, Discord.",
+      "timestamp": "2026-03-10T19:17:17.869Z",
+      "source": "edit"
+    }
+  ],
+  "createdAt": "2026-03-10T18:38:57.630Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-10T18:38:57.630Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-10T18:49:53.794Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-12T03:46:22.280Z"
+    }
+  ],
+  "featureType": "code",
+  "reviewStartedAt": "2026-03-10T18:49:53.794Z",
+  "prNumber": 22,
+  "prMergedAt": "2026-03-10T19:06:06Z",
+  "completedAt": "2026-03-12T03:46:22.280Z"
+}

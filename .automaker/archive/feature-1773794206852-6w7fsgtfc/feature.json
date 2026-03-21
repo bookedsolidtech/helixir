@@ -1,0 +1,58 @@
+{
+  "category": "bug-fix",
+  "description": "## Problem\nThe Custom Elements Manifest (CEM) for hx-carousel documents the slide change event as `hx-slide-change` with detail type `CustomEvent<{index: number, slide: HelixCarouselItem}>`.\n\nHowever, when consumed in trip-planner, we need to use `onhx-slide` (suggesting the actual event name is `hx-slide`). This discrepancy between the CEM and the actual runtime behavior causes confusion for consumers.\n\n## Expected\nThe CEM event name should match the actual event dispatched by the component.\n\n## Steps to Reproduce\n1. Load `@helixui/library` CEM via Helixir\n2. Check hx-carousel events — CEM says `hx-slide-change`\n3. Listen for `hx-slide-change` in consumer code — may not fire\n4. Listen for `hx-slide` instead — fires correctly\n\n## Request\nVerify which event name the component actually dispatches and update either the CEM or the component to be consistent.",
+  "title": "bug: CEM reports hx-carousel event as `hx-slide-change` but actual component fires `hx-slide`",
+  "status": "done",
+  "complexity": "small",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "0f40dbe4-c66e-4405-8258-2723a87b1a8e",
+  "id": "feature-1773794206852-6w7fsgtfc",
+  "branchName": "feature/bug-cem-reports-hx-carousel-event-as-hx",
+  "descriptionHistory": [
+    {
+      "description": "## Problem\nThe Custom Elements Manifest (CEM) for hx-carousel documents the slide change event as `hx-slide-change` with detail type `CustomEvent<{index: number, slide: HelixCarouselItem}>`.\n\nHowever, when consumed in trip-planner, we need to use `onhx-slide` (suggesting the actual event name is `hx-slide`). This discrepancy between the CEM and the actual runtime behavior causes confusion for consumers.\n\n## Expected\nThe CEM event name should match the actual event dispatched by the component.\n\n## Steps to Reproduce\n1. Load `@helixui/library` CEM via Helixir\n2. Check hx-carousel events — CEM says `hx-slide-change`\n3. Listen for `hx-slide-change` in consumer code — may not fire\n4. Listen for `hx-slide` instead — fires correctly\n\n## Request\nVerify which event name the component actually dispatches and update either the CEM or the component to be consistent.",
+      "timestamp": "2026-03-18T00:36:46.852Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-18T00:36:46.853Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-18T00:36:46.853Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-18T02:01:28.311Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-18T02:05:21.189Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-18T02:42:28.200Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-18T02:01:30.443Z",
+  "costUsd": 1.4032982500000002,
+  "lastSessionId": "49c3f86b-e06f-4ff8-9c86-4eba42c96d34",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/79",
+  "prNumber": 79,
+  "prCreatedAt": "2026-03-18T02:05:19.777Z",
+  "reviewStartedAt": "2026-03-18T02:05:21.189Z",
+  "prTrackedSince": "2026-03-18T02:05:21.201Z",
+  "prLastPolledAt": "2026-03-18T02:08:31.098Z",
+  "prMergedAt": "2026-03-18T02:40:41Z",
+  "completedAt": "2026-03-18T02:42:28.200Z"
+}

@@ -1,0 +1,76 @@
+{
+  "category": "Uncategorized",
+  "description": "The `estimate_bundle_size` tool's package-name derivation heuristic is undocumented — users don't know what value to pass for `packageName` or how the tool determines the npm package name when it's not provided.\n\n**Fix:** Add a note in the README tools reference (and/or JSDoc on the tool handler) explaining the derivation logic (e.g., reads `name` field from `package.json`, falls back to CEM package name).\n\n**Acceptance criteria:**\n- README tools reference explains what `packageName` accepts and how it's derived\n- Users can understand what to pass without reading source code",
+  "title": "fix: document estimate_bundle_size package derivation logic",
+  "status": "done",
+  "complexity": "small",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "ed17ffaf-c8da-4b63-80a3-47bf39999a50",
+  "id": "feature-1772670355365-htxzmgmqe",
+  "branchName": "feature/fix-document-estimatebundlesize-package",
+  "descriptionHistory": [
+    {
+      "description": "The `estimate_bundle_size` tool's package-name derivation heuristic is undocumented — users don't know what value to pass for `packageName` or how the tool determines the npm package name when it's not provided.\n\n**Fix:** Add a note in the README tools reference (and/or JSDoc on the tool handler) explaining the derivation logic (e.g., reads `name` field from `package.json`, falls back to CEM package name).\n\n**Acceptance criteria:**\n- README tools reference explains what `packageName` accepts and how it's derived\n- Users can understand what to pass without reading source code",
+      "timestamp": "2026-03-05T00:25:55.365Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-05T00:25:55.365Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-05T00:25:55.365Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T05:49:00.264Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T05:50:31.540Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-12T06:40:36.543Z",
+      "reason": "Max same-state transitions exceeded in REVIEW (100 loops)"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-12T06:54:24.644Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-12T05:49:05.259Z",
+  "costUsd": 0.39743375000000003,
+  "lastSessionId": "a282efe3-d54f-4658-8127-b3cf1e608b78",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/37",
+  "prNumber": 37,
+  "prCreatedAt": "2026-03-12T05:50:30.884Z",
+  "reviewStartedAt": "2026-03-12T05:50:31.540Z",
+  "prTrackedSince": "2026-03-12T05:50:31.541Z",
+  "prLastPolledAt": "2026-03-12T08:54:20.893Z",
+  "statusChangeReason": "Max same-state transitions exceeded in REVIEW (100 loops)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max same-state transitions exceeded in REVIEW (100 loops)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-12T06:40:36.547Z"
+  },
+  "prMergedAt": "2026-03-12T06:54:05Z",
+  "completedAt": "2026-03-12T06:54:24.644Z"
+}

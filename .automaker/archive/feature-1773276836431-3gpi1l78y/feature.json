@@ -1,0 +1,59 @@
+{
+  "category": "Uncategorized",
+  "description": "**Source:** CLO report P0-005 (P0 — BLOCKING)\n**Assigned to Jake for review before agent pickup.**\n\n**Problem:** No NOTICE file identifying the project owner. Required for clear IP chain of title, especially before accepting any external contributions.\n\n**Action:** Create a `NOTICE` file in the repo root with this exact content:\n```\nHELiXiR\nCopyright 2025-2026 Clarity House LLC d/b/a Booked Solid Technology\nAll rights reserved.\n\nThis product is licensed under the MIT License.\nSee the LICENSE file for details.\n```\n\n**Acceptance Criteria:**\n- [ ] NOTICE file exists at repo root\n- [ ] Entity name matches LICENSE file exactly\n- [ ] Year range matches LICENSE file",
+  "title": "P0-005: Add NOTICE file to HELiXiR repo",
+  "status": "done",
+  "complexity": "small",
+  "assignee": null,
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "9b8a495a-85d4-41a6-b4ee-9d413632b4e3",
+  "id": "feature-1773276836431-3gpi1l78y",
+  "branchName": "feature/p0-005-add-notice-file-to-helixir-repo",
+  "descriptionHistory": [
+    {
+      "description": "**Source:** CLO report P0-005 (P0 — BLOCKING)\n**Assigned to Jake for review before agent pickup.**\n\n**Problem:** No NOTICE file identifying the project owner. Required for clear IP chain of title, especially before accepting any external contributions.\n\n**Action:** Create a `NOTICE` file in the repo root with this exact content:\n```\nHELiXiR\nCopyright 2025-2026 Clarity House LLC d/b/a Booked Solid Technology\nAll rights reserved.\n\nThis product is licensed under the MIT License.\nSee the LICENSE file for details.\n```\n\n**Acceptance Criteria:**\n- [ ] NOTICE file exists at repo root\n- [ ] Entity name matches LICENSE file exactly\n- [ ] Year range matches LICENSE file",
+      "timestamp": "2026-03-12T00:53:56.431Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-12T00:53:56.431Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-12T00:53:56.431Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T23:51:28.893Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T23:52:11.367Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-13T00:27:08.482Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-12T23:51:30.738Z",
+  "costUsd": 0.24247600000000002,
+  "lastSessionId": "a8e61413-66ce-41d8-af43-8eba44b25d79",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/54",
+  "prNumber": 54,
+  "prCreatedAt": "2026-03-12T23:52:10.663Z",
+  "reviewStartedAt": "2026-03-12T23:52:11.367Z",
+  "prTrackedSince": "2026-03-12T23:52:11.368Z",
+  "prLastPolledAt": "2026-03-13T00:29:45.312Z",
+  "prMergedAt": "2026-03-13T00:26:51Z",
+  "completedAt": "2026-03-13T00:27:08.482Z"
+}

@@ -1,0 +1,75 @@
+{
+  "category": "bug-fix",
+  "description": "## Bug\n\nAuto-mode agents call `gh pr merge --squash` when attempting to merge PRs, ignoring the `prMergeStrategy: \"merge\"` setting in `.automaker/settings.json`. This causes merges to fail with:\n\n```\nGraphQL: Squash merges are not allowed on this repository. (mergePullRequest)\n```\n\nThe feature then lands in `blocked` state and requires manual intervention.\n\n## Evidence\n\n- helixir PR #53 (P0-001: Fix LICENSE copyright holder) was blocked by this exact failure\n- Feature status history shows: `\"Merge failed: Command failed: gh pr merge 53 --squash\\nGraphQL: Squash merges are not allowed on this repository.\"`\n- `.automaker/settings.json` has `\"prMergeStrategy\": \"merge\"` set correctly\n\n## Fix Required\n\nThe PR merge step in the agent workflow must read `prMergeStrategy` from settings and pass the correct flag:\n- `\"merge\"` → `gh pr merge --merge`\n- `\"squash\"` → `gh pr merge --squash`\n- `\"rebase\"` → `gh pr merge --rebase`\n\n## Acceptance Criteria\n\n- [ ] Agent reads `prMergeStrategy` from `.automaker/settings.json` before calling `gh pr merge`\n- [ ] Correct merge flag is passed based on the setting\n- [ ] No more features blocked due to wrong merge strategy",
+  "title": "bug: auto-mode uses --squash merge despite prMergeStrategy: merge setting",
+  "status": "done",
+  "complexity": "small",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "238b66b3-814d-49c4-9305-43ced16e242e",
+  "id": "feature-1773359961211-u1fc5jwo9",
+  "branchName": "feature/bug-auto-mode-uses-squash-merge-despite",
+  "descriptionHistory": [
+    {
+      "description": "## Bug\n\nAuto-mode agents call `gh pr merge --squash` when attempting to merge PRs, ignoring the `prMergeStrategy: \"merge\"` setting in `.automaker/settings.json`. This causes merges to fail with:\n\n```\nGraphQL: Squash merges are not allowed on this repository. (mergePullRequest)\n```\n\nThe feature then lands in `blocked` state and requires manual intervention.\n\n## Evidence\n\n- helixir PR #53 (P0-001: Fix LICENSE copyright holder) was blocked by this exact failure\n- Feature status history shows: `\"Merge failed: Command failed: gh pr merge 53 --squash\\nGraphQL: Squash merges are not allowed on this repository.\"`\n- `.automaker/settings.json` has `\"prMergeStrategy\": \"merge\"` set correctly\n\n## Fix Required\n\nThe PR merge step in the agent workflow must read `prMergeStrategy` from settings and pass the correct flag:\n- `\"merge\"` → `gh pr merge --merge`\n- `\"squash\"` → `gh pr merge --squash`\n- `\"rebase\"` → `gh pr merge --rebase`\n\n## Acceptance Criteria\n\n- [ ] Agent reads `prMergeStrategy` from `.automaker/settings.json` before calling `gh pr merge`\n- [ ] Correct merge flag is passed based on the setting\n- [ ] No more features blocked due to wrong merge strategy",
+      "timestamp": "2026-03-12T23:59:21.211Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-12T23:59:21.211Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-12T23:59:21.211Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-13T00:00:13.176Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-13T00:07:34.793Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-13T00:10:06.522Z",
+      "reason": "Merge failed: Command failed: gh pr merge 57 --squash\nGraphQL: Squash merges are not allowed on this repository. (mergePullRequest)\n"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-13T00:33:36.523Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-13T00:00:18.404Z",
+  "costUsd": 1.5580850000000002,
+  "lastSessionId": "64307507-3914-46d2-bdb7-2a78784e3754",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/57",
+  "prNumber": 57,
+  "prCreatedAt": "2026-03-13T00:07:33.971Z",
+  "reviewStartedAt": "2026-03-13T00:07:34.793Z",
+  "prTrackedSince": "2026-03-13T00:07:34.794Z",
+  "prLastPolledAt": "2026-03-13T00:09:45.193Z",
+  "statusChangeReason": "Merge failed: Command failed: gh pr merge 57 --squash\nGraphQL: Squash merges are not allowed on this repository. (mergePullRequest)\n",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Merge failed: Command failed: gh pr merge 57 --squash\nGraphQL: Squash merges are not allowed on this repository. (mergePullRequest)\n"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-13T00:10:06.524Z"
+  },
+  "completedAt": "2026-03-13T00:33:36.523Z"
+}

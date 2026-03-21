@@ -4147,6 +4147,23 @@
       "declarations": [
         {
           "kind": "function",
+          "name": "buildAntiPatternHints",
+          "return": {
+            "type": {
+              "text": "string[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "meta",
+              "type": {
+                "text": "ComponentMetadata"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
           "name": "getComponentQuickRef",
           "return": {
             "type": {
@@ -4164,6 +4181,14 @@
         }
       ],
       "exports": [
+        {
+          "kind": "js",
+          "name": "buildAntiPatternHints",
+          "declaration": {
+            "name": "buildAntiPatternHints",
+            "module": "packages/core/src/handlers/quick-ref.ts"
+          }
+        },
         {
           "kind": "js",
           "name": "getComponentQuickRef",

@@ -1,0 +1,58 @@
+{
+  "category": "infrastructure",
+  "description": "## Problem\n\nThe \"Changeset Required\" GitHub Actions check runs on ALL PRs, including promotion PRs (dev→staging, staging→main). Promotion PRs don't need changesets — the individual feature PRs already contain them. This caused a ghost pending check that blocked auto-merge on PR #89 and PR #90 for 4+ hours overnight.\n\n## Fix\n\nUpdate the changeset CI workflow (likely `.github/workflows/changeset-check.yml` or similar) to skip when:\n- The PR base branch is `staging` (dev→staging promotion)\n- The PR base branch is `main` (staging→main promotion)\n- Or the PR head branch is `dev` or `staging`\n\n## Acceptance Criteria\n- Promotion PRs (dev→staging, staging→main) should NOT trigger the \"Changeset Required\" check\n- Feature PRs targeting `dev` should still require changesets as before\n- Auto-merge should not be blocked by stale changeset checks on promotion PRs",
+  "title": "fix: exempt promotion PRs from \"Changeset Required\" CI check",
+  "status": "done",
+  "complexity": "small",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "9da6cadc-c9e7-458b-801f-b31c3e7e09aa",
+  "id": "feature-1773831284719-fn9ektkpw",
+  "branchName": "feature/fix-exempt-promotion-prs-from-changeset",
+  "descriptionHistory": [
+    {
+      "description": "## Problem\n\nThe \"Changeset Required\" GitHub Actions check runs on ALL PRs, including promotion PRs (dev→staging, staging→main). Promotion PRs don't need changesets — the individual feature PRs already contain them. This caused a ghost pending check that blocked auto-merge on PR #89 and PR #90 for 4+ hours overnight.\n\n## Fix\n\nUpdate the changeset CI workflow (likely `.github/workflows/changeset-check.yml` or similar) to skip when:\n- The PR base branch is `staging` (dev→staging promotion)\n- The PR base branch is `main` (staging→main promotion)\n- Or the PR head branch is `dev` or `staging`\n\n## Acceptance Criteria\n- Promotion PRs (dev→staging, staging→main) should NOT trigger the \"Changeset Required\" check\n- Feature PRs targeting `dev` should still require changesets as before\n- Auto-merge should not be blocked by stale changeset checks on promotion PRs",
+      "timestamp": "2026-03-18T10:54:44.724Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-18T10:54:44.726Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-18T10:54:44.726Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-18T10:55:17.272Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-18T10:56:22.966Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-18T11:10:52.487Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-18T10:55:19.717Z",
+  "costUsd": 0.29051175000000007,
+  "lastSessionId": "f0526709-a134-4aa0-ab97-f43aa86d4fec",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/92",
+  "prNumber": 92,
+  "prCreatedAt": "2026-03-18T10:56:21.937Z",
+  "reviewStartedAt": "2026-03-18T10:56:22.966Z",
+  "prTrackedSince": "2026-03-18T10:56:22.968Z",
+  "prLastPolledAt": "2026-03-18T11:00:08.888Z",
+  "prMergedAt": "2026-03-18T11:10:35Z",
+  "completedAt": "2026-03-18T11:10:52.487Z"
+}

@@ -1,0 +1,58 @@
+{
+  "category": "Uncategorized",
+  "description": "The release workflow (`.github/workflows/release.yml`) currently re-runs the full test suite (build, type-check, lint, format, audit) before calling semantic-release. This is redundant — CI already gates every merge to main with these same checks. Re-running adds ~5-10 minutes of unnecessary overhead to every release and wastes CI minutes.\n\nThe helix repo's publish workflow skips re-testing entirely and trusts CI.\n\n**Fix:** Remove the build/test/lint/format/audit steps from the release job in `.github/workflows/release.yml`. Keep only: checkout, Node setup, pnpm install, and the semantic-release step.\n\n**Acceptance criteria:**\n- Release job no longer runs build, type-check, lint, format check, or audit steps\n- Release job still runs: checkout → setup Node → pnpm install → semantic-release\n- Workflow YAML is valid\n- No changes to `ci.yml`",
+  "title": "chore: remove redundant test re-run from release workflow",
+  "status": "done",
+  "complexity": "small",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "2cdc4d3e-52d1-4811-870d-bc9c56de5b5b",
+  "id": "feature-1773288822948-u4yrx5hoe",
+  "branchName": "feature/chore-remove-redundant-test-re-run-from",
+  "descriptionHistory": [
+    {
+      "description": "The release workflow (`.github/workflows/release.yml`) currently re-runs the full test suite (build, type-check, lint, format, audit) before calling semantic-release. This is redundant — CI already gates every merge to main with these same checks. Re-running adds ~5-10 minutes of unnecessary overhead to every release and wastes CI minutes.\n\nThe helix repo's publish workflow skips re-testing entirely and trusts CI.\n\n**Fix:** Remove the build/test/lint/format/audit steps from the release job in `.github/workflows/release.yml`. Keep only: checkout, Node setup, pnpm install, and the semantic-release step.\n\n**Acceptance criteria:**\n- Release job no longer runs build, type-check, lint, format check, or audit steps\n- Release job still runs: checkout → setup Node → pnpm install → semantic-release\n- Workflow YAML is valid\n- No changes to `ci.yml`",
+      "timestamp": "2026-03-12T04:13:42.948Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-12T04:13:42.948Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-12T04:13:42.948Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T05:47:54.533Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T05:48:58.721Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-12T06:13:43.238Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-12T05:47:57.548Z",
+  "costUsd": 0.28430225000000003,
+  "lastSessionId": "d052ebd5-2426-4916-a78d-5ee1e2566c2f",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/35",
+  "prNumber": 35,
+  "prCreatedAt": "2026-03-12T05:48:58.001Z",
+  "reviewStartedAt": "2026-03-12T05:48:58.721Z",
+  "prTrackedSince": "2026-03-12T05:48:58.722Z",
+  "prLastPolledAt": "2026-03-12T08:14:19.756Z",
+  "prMergedAt": "2026-03-12T06:13:41Z",
+  "completedAt": "2026-03-12T06:13:43.238Z"
+}

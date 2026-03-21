@@ -1,0 +1,99 @@
+{
+  "category": "tooling",
+  "description": "The `suggest_usage` tool currently generates HTML snippets but provides ZERO styling information. This is a primary source of agent hallucinations — agents see component usage but don't know how to style it, so they guess (incorrectly).\n\n**Changes to suggest.ts:**\nAdd a `styling` section to `SuggestUsageResult` that includes:\n1. Top 3-5 CSS custom properties with example values\n2. Available CSS parts with example `::part()` selectors\n3. A `cssSnippet` showing basic theming for this component\n4. A `warnings` array with Shadow DOM constraints (\"Do not use descendant selectors to reach internal elements\")\n\n**Changes to narrative.ts:**\nEnhance the \"How to customize it\" section to include:\n1. Actual `::part()` selector examples (not just part names)\n2. `var()` usage examples with the component's real property names\n3. A \"Do NOT\" section listing common mistakes\n\n**Acceptance criteria:**\n- `suggest_usage` returns a new `styling` object in the response\n- `get_component_narrative` \"How to customize\" section now includes concrete CSS examples\n- Tests updated with new fixture data covering CSS props and parts\n- No breaking changes to existing response shape (additive only)\n- Must pass lint, format, type-check",
+  "title": "Enhance suggest_usage to include styling guidance section",
+  "status": "done",
+  "complexity": "medium",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "00cfbe10-bb21-4b8e-a57a-cd21375bc751",
+  "id": "feature-1774061879988-x3cs4jzhp",
+  "branchName": "feature/enhance-suggestusage-to-include-styling",
+  "descriptionHistory": [
+    {
+      "description": "The `suggest_usage` tool currently generates HTML snippets but provides ZERO styling information. This is a primary source of agent hallucinations — agents see component usage but don't know how to style it, so they guess (incorrectly).\n\n**Changes to suggest.ts:**\nAdd a `styling` section to `SuggestUsageResult` that includes:\n1. Top 3-5 CSS custom properties with example values\n2. Available CSS parts with example `::part()` selectors\n3. A `cssSnippet` showing basic theming for this component\n4. A `warnings` array with Shadow DOM constraints (\"Do not use descendant selectors to reach internal elements\")\n\n**Changes to narrative.ts:**\nEnhance the \"How to customize it\" section to include:\n1. Actual `::part()` selector examples (not just part names)\n2. `var()` usage examples with the component's real property names\n3. A \"Do NOT\" section listing common mistakes\n\n**Acceptance criteria:**\n- `suggest_usage` returns a new `styling` object in the response\n- `get_component_narrative` \"How to customize\" section now includes concrete CSS examples\n- Tests updated with new fixture data covering CSS props and parts\n- No breaking changes to existing response shape (additive only)\n- Must pass lint, format, type-check",
+      "timestamp": "2026-03-21T02:57:59.988Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-21T02:57:59.989Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-21T02:57:59.989Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-21T03:05:11.860Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-21T03:08:42.424Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-21T03:13:43.578Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-21T03:13:44.329Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "verified",
+      "timestamp": "2026-03-21T03:15:06.442Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-21T03:15:06.442Z",
+  "costUsd": 2.3462444999999996,
+  "lastSessionId": "d14a0886-93fc-46ea-8bad-6b5de6cb6519",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/101",
+  "prNumber": 101,
+  "prCreatedAt": "2026-03-21T03:08:41.623Z",
+  "reviewStartedAt": "2026-03-21T03:08:42.424Z",
+  "prTrackedSince": "2026-03-21T03:15:06.390Z",
+  "prLastPolledAt": "2026-03-21T05:21:45.504Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 2**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@packages/core/src/handlers/narrative.ts`:\n- Around line 95-97: The Shadow DOM warning string in narrative.ts (pushed into\ncustomizeLines using meta.tagName) is duplicated in buildStyling() in\nsuggest.ts; extract that message into a single exported constant or helper\n(e.g., SHADOW_DOM_WARNING or getShadowDomWarning(tagName: string)) in a shared\nmodule and update both narrative.ts (where customizeLines is populated) and\nsuggest.ts (where buildStyling() constructs warnings) to import and use it so\nthe text is centralized and interpolation of meta.tagName is preserved.\n\nIn `@packages/core/src/handlers/suggest.ts`:\n- Around line 179-180: The line in function buildStyling is not\nPrettier-formatted; run Prettier (or your project's formatter) on the file and\nreformat the function signature and the early-return conditional in buildStyling\nso it matches project style (proper spacing, semicolons, and line breaks) —\ne.g., ensure the function declaration and the `if (meta.cssProperties.length ===\n0 && meta.cssParts.length === 0) return undefined;` statement are split/indented\nper Prettier rules and the file compiles with SuggestUsageStyling referenced\ncorrectly.\n```\n\n</details>\n\n---\n\n<details>\n<summary>ℹ️ Review info</summary>\n\n<details>\n<summary>⚙️ Run configuration</summary>\n\n**Configuration used**: Path: .coderabbit.yaml\n\n**Review profile**: ASSERTIVE\n\n**Plan**: Pro\n\n**Run ID**: `c464fd48-86c9-4a8a-b704-c4e745ec1434`\n\n</details>\n\n<details>\n<summary>📥 Commits</summary>\n\nReviewing files that changed from the base of the PR and between 553aefe9677554d966c7845c6fdbb8311179e5be and 33607df4de8b1f33b1f0e5838ced575dbb01a8a4.\n\n</details>\n\n<details>\n<summary>📒 Files selected for processing (5)</summary>\n\n* `packages/core/src/handlers/cem.ts`\n* `packages/core/s",
+  "prIterationCount": 1,
+  "reviewRemediationCount": 1,
+  "remediationCycleCount": 1,
+  "workItemState": "in_progress",
+  "executionHistory": [
+    {
+      "id": "a0b5483f-5063-48d9-90e6-1956e12e1edf",
+      "startedAt": "2026-03-21T03:13:43.606Z",
+      "completedAt": "2026-03-21T03:14:45.915Z",
+      "durationMs": 62314,
+      "costUsd": 0.3889235,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "retry"
+    }
+  ],
+  "completedAt": "2026-03-21T03:15:06.442Z",
+  "threadFeedback": [
+    {
+      "threadId": "PRRT_kwDORa2Z08512gWv",
+      "status": "denied",
+      "agentReasoning": "Trivial nitpick. The two warnings serve different contexts — narrative.ts is user-facing markdown prose, suggest.ts warnings are structured data fields. They have different phrasing by design. Extracting a shared constant adds indirection for two callsites with no real drift risk. The effort is disproportionate to the benefit.",
+      "resolvedAt": "2026-03-21T03:15:06.523Z"
+    },
+    {
+      "threadId": "PRRT_kwDORa2Z08512gWx",
+      "status": "accepted",
+      "agentReasoning": "The long function signature on a single line violates Prettier's line-length rules and is reportedly causing a CI format-check failure. The fix is low-risk and correct — break the signature across multiple lines per Prettier conventions.",
+      "resolvedAt": "2026-03-21T03:15:06.523Z"
+    }
+  ],
+  "remediationHistory": []
+}

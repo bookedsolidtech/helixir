@@ -1,0 +1,70 @@
+{
+  "category": "Uncategorized",
+  "description": "`README.md` lines 11-13 contain a `HUMAN TASK` placeholder comment left over from generation. This must not be in the published npm package.\n\n**Fix:** Remove the HUMAN TASK comment block from README.md.\n\n**Acceptance criteria:**\n- No `HUMAN TASK` text in README.md\n- README.md renders cleanly on npm and GitHub",
+  "title": "fix: remove HUMAN TASK comment from README before npm publish",
+  "status": "done",
+  "complexity": "small",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "3114a826-c157-4f20-8133-0d5f5370b6a2",
+  "id": "feature-1772670357646-sr63h3rkr",
+  "branchName": "feature/fix-remove-human-task-comment-from",
+  "descriptionHistory": [
+    {
+      "description": "`README.md` lines 11-13 contain a `HUMAN TASK` placeholder comment left over from generation. This must not be in the published npm package.\n\n**Fix:** Remove the HUMAN TASK comment block from README.md.\n\n**Acceptance criteria:**\n- No `HUMAN TASK` text in README.md\n- README.md renders cleanly on npm and GitHub",
+      "timestamp": "2026-03-05T00:25:57.646Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-05T00:25:57.646Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-05T00:25:57.646Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T03:46:22.293Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T03:47:25.073Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-12T05:21:25.363Z"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-12T05:21:42.340Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-12T03:47:25.072Z",
+  "costUsd": 0.29328425,
+  "lastSessionId": "85258b97-878e-4e39-bb2c-289d3445fc72",
+  "executionHistory": [
+    {
+      "id": "8e6bc3de-efb9-4dc6-bf70-68c856780164",
+      "startedAt": "2026-03-12T03:46:23.535Z",
+      "completedAt": "2026-03-12T03:47:11.269Z",
+      "durationMs": 47734,
+      "costUsd": 0.29328425,
+      "model": "claude-opus-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Remove HUMAN TASK comment from README.md\n\n### Changes Implemented\n- None required — the `HUMAN TASK` comment has already been removed from README.md in a prior commit.\n\n### Files Modified\n- None\n\n### Verification Status\n- Confirmed no `HUMAN TASK` text exists in README.md via grep search\n- README.md contains 595 lines of clean, well-structured markdown\n- Type-check (`tsc --noEmit`) passes with exit code 0\n- Working tree is clean (`git diff --stat` shows no changes)\n- Remaining `HUMAN TASK` references in `docs/DX_REVIEW.md` and `docs/AUDIT_SUMMARY.md` are audit documentation tracking the original issue, not the issue itself — out of scope for this feature\n- Playwright verification not applicable (static markdown file, no runtime behavior)\n\n### Risks/Blockers Encountered\n- The fix was already applied before this feature was picked up. No action needed.\n\n### Learnings\n- Always verify the current state before making changes — the issue may already be resolved.\n\n### Notes for Developer\n- This feature can be closed as already complete.",
+  "reviewStartedAt": "2026-03-12T03:47:25.073Z",
+  "completedAt": "2026-03-12T05:21:42.340Z"
+}

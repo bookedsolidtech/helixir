@@ -1,0 +1,62 @@
+{
+  "category": "infrastructure",
+  "description": "## Context\n\nSlots are the composition API of web components. Currently only measured as part of CEM Completeness (10 points for slot documentation). This deserves its own dimension — a component with undocumented or missing slots is fundamentally harder to use.\n\n## Implementation\n\nCreate `packages/core/src/handlers/analyzers/slot-architecture.ts`:\n\n### Scoring Model (100 points, weight: 5, tier: important)\n\n1. **Default slot documentation** (25 points):\n   - Has default slot declared: +15\n   - Default slot has description: +10\n   - Return null for components with no slots (presentational/leaf components — honest scoring)\n\n2. **Named slot documentation** (30 points):\n   - Proportional: slots with descriptions / total named slots\n   - Full points if all named slots documented\n\n3. **Slot type constraints** (20 points):\n   - Slots that specify expected content types or element types\n   - Check for `@slot` JSDoc annotations or description mentioning element types\n\n4. **Slot-property coherence** (25 points):\n   - When a component has both `slot=\"label\"` and a `label` property, are both documented?\n   - When a slot mirrors a property, is the relationship explained?\n   - Common patterns: label/icon/header/footer/prefix/suffix slots that often have matching properties\n   - Score proportional to coherent pairs / total pairs\n\n### Integration\n- Register as dimension 13 in `dimensions.ts`\n- Wire into `scoreComponentMultiDimensional()` in `health.ts`\n- Confidence: verified (pure CEM analysis)\n\n### Testing\n- Test with helix components (rich slot usage: hx-card, hx-dialog, hx-drawer)\n- Test with Spectrum components (extensive slot architecture)\n- Test null return for slot-less components\n- Test slot-property coherence detection\n- File: `tests/handlers/slot-architecture.test.ts`\n\n### Key Files\n- New: `packages/core/src/handlers/analyzers/slot-architecture.ts`\n- Modify: `packages/core/src/handlers/dimensions.ts`\n- Modify: `packages/core/src/handlers/health.ts`\n- New: `tests/handlers/slot-architecture.test.ts`\n\n### Acceptance Criteria\n- [ ] Default slot presence and documentation scored\n- [ ] Named slot descriptions scored proportionally\n- [ ] Slot type constraints detected and scored\n- [ ] Slot-property coherence pairs identified and scored\n- [ ] Returns null for components with no slots\n- [ ] Registered as dimension 13\n- [ ] Tests use real CEM fixtures (helix, spectrum, material)\n- [ ] All existing tests pass",
+  "title": "feat: Slot Architecture analyzer — score slot documentation, default slot, and slot-property coherence",
+  "status": "done",
+  "branchName": "feature/analyzer-slot-architecture",
+  "epicId": "feature-1773801140156-b3n5aqaz2",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "7d046ac2-0029-4ec7-9f43-ec8add253126",
+  "id": "feature-1773801180845-zcxtn5lhu",
+  "descriptionHistory": [
+    {
+      "description": "## Context\n\nSlots are the composition API of web components. Currently only measured as part of CEM Completeness (10 points for slot documentation). This deserves its own dimension — a component with undocumented or missing slots is fundamentally harder to use.\n\n## Implementation\n\nCreate `packages/core/src/handlers/analyzers/slot-architecture.ts`:\n\n### Scoring Model (100 points, weight: 5, tier: important)\n\n1. **Default slot documentation** (25 points):\n   - Has default slot declared: +15\n   - Default slot has description: +10\n   - Return null for components with no slots (presentational/leaf components — honest scoring)\n\n2. **Named slot documentation** (30 points):\n   - Proportional: slots with descriptions / total named slots\n   - Full points if all named slots documented\n\n3. **Slot type constraints** (20 points):\n   - Slots that specify expected content types or element types\n   - Check for `@slot` JSDoc annotations or description mentioning element types\n\n4. **Slot-property coherence** (25 points):\n   - When a component has both `slot=\"label\"` and a `label` property, are both documented?\n   - When a slot mirrors a property, is the relationship explained?\n   - Common patterns: label/icon/header/footer/prefix/suffix slots that often have matching properties\n   - Score proportional to coherent pairs / total pairs\n\n### Integration\n- Register as dimension 13 in `dimensions.ts`\n- Wire into `scoreComponentMultiDimensional()` in `health.ts`\n- Confidence: verified (pure CEM analysis)\n\n### Testing\n- Test with helix components (rich slot usage: hx-card, hx-dialog, hx-drawer)\n- Test with Spectrum components (extensive slot architecture)\n- Test null return for slot-less components\n- Test slot-property coherence detection\n- File: `tests/handlers/slot-architecture.test.ts`\n\n### Key Files\n- New: `packages/core/src/handlers/analyzers/slot-architecture.ts`\n- Modify: `packages/core/src/handlers/dimensions.ts`\n- Modify: `packages/core/src/handlers/health.ts`\n- New: `tests/handlers/slot-architecture.test.ts`\n\n### Acceptance Criteria\n- [ ] Default slot presence and documentation scored\n- [ ] Named slot descriptions scored proportionally\n- [ ] Slot type constraints detected and scored\n- [ ] Slot-property coherence pairs identified and scored\n- [ ] Returns null for components with no slots\n- [ ] Registered as dimension 13\n- [ ] Tests use real CEM fixtures (helix, spectrum, material)\n- [ ] All existing tests pass",
+      "timestamp": "2026-03-18T02:33:00.845Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-18T02:33:00.846Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-18T02:33:00.846Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-18T03:33:48.135Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-18T03:42:43.278Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-18T04:33:37.791Z"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [
+    "feature-1773801240034-o1w52j8t6"
+  ],
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-18T03:36:13.811Z",
+  "costUsd": 2.6341034999999993,
+  "lastSessionId": "a82bf055-0162-479b-b524-062c6bdbdb3c",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/86",
+  "prNumber": 86,
+  "prCreatedAt": "2026-03-18T03:42:42.486Z",
+  "reviewStartedAt": "2026-03-18T03:42:43.278Z",
+  "prTrackedSince": "2026-03-18T03:42:43.279Z",
+  "prLastPolledAt": "2026-03-18T06:35:55.401Z",
+  "prMergedAt": "2026-03-18T04:33:12Z",
+  "completedAt": "2026-03-18T04:33:37.791Z"
+}

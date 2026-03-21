@@ -284,6 +284,48 @@ describe('runStylingPreflight — verdict', () => {
   });
 });
 
+// ─── Anti-Patterns in Preflight ─────────────────────────────────────────────
+
+describe('runStylingPreflight — antiPatterns', () => {
+  it('includes antiPatterns array in result', () => {
+    const result = runStylingPreflight({
+      css: '',
+      meta: buttonMeta,
+    });
+    expect(Array.isArray(result.antiPatterns)).toBe(true);
+    expect(result.antiPatterns.length).toBeGreaterThan(0);
+  });
+
+  it('includes shadow DOM warning with component tag name', () => {
+    const result = runStylingPreflight({
+      css: '',
+      meta: buttonMeta,
+    });
+    expect(result.antiPatterns.some((p) => p.includes('hx-button'))).toBe(true);
+    expect(result.antiPatterns.some((p) => p.includes('shadow') || p.includes('Shadow'))).toBe(
+      true,
+    );
+  });
+
+  it('includes :root scope warning for components with tokens', () => {
+    const result = runStylingPreflight({
+      css: '',
+      meta: buttonMeta,
+    });
+    expect(result.antiPatterns.some((p) => p.includes(':root'))).toBe(true);
+  });
+
+  it('includes no-style-api warning for bare components', () => {
+    const result = runStylingPreflight({
+      css: '',
+      meta: bareMeta,
+    });
+    expect(result.antiPatterns.some((p) => p.includes('no CSS') || p.includes('no style'))).toBe(
+      true,
+    );
+  });
+});
+
 // ─── Inline Fix Suggestions ─────────────────────────────────────────────────
 
 describe('runStylingPreflight — inline fixes', () => {

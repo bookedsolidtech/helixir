@@ -1,0 +1,104 @@
+{
+  "category": "Uncategorized",
+  "description": "`packages/core/src/tools/component.ts` is at ~78.54% statement coverage (below the 80% threshold). Uncovered branches are at lines ~346-349 and ~352-355, which correspond to `get_prop_constraints` and `find_components_by_token` tool dispatch paths.\n\n**Fix:** Add tests in `tests/tools/component.test.ts` (or a new file) covering:\n- `get_prop_constraints` — property with no constraints defined\n- `get_prop_constraints` — component not found\n- `find_components_by_token` — token that matches no components\n- `find_components_by_token` — token that matches multiple components\n\n**Acceptance criteria:**\n- `component.ts` statement coverage ≥ 80%\n- All new tests pass\n- `pnpm test:coverage` shows green thresholds\n\n**PR #33 open — 2 CodeRabbit fixes required before merge:**\n1. Run Prettier on `tests/tools/component.test.ts` (CI format check failing)\n2. In the \"component not found\" test, change `throw new Error(...)` to `throw new MCPError(..., ErrorCategory.NOT_FOUND)` to match the actual error shape from `packages/core/src/handlers/cem.ts`",
+  "title": "fix: add edge case tests for get_prop_constraints and find_components_by_token",
+  "status": "done",
+  "complexity": "small",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "463f2a41-d1a1-4428-a6d7-9b6ebb36c856",
+  "id": "feature-1772670348463-41osl67ov",
+  "branchName": "feature/fix-add-edge-case-tests-for",
+  "descriptionHistory": [
+    {
+      "description": "`packages/core/src/tools/component.ts` is at ~78.54% statement coverage (below the 80% threshold). Uncovered branches are at lines ~346-349 and ~352-355, which correspond to `get_prop_constraints` and `find_components_by_token` tool dispatch paths.\n\n**Fix:** Add tests in `tests/tools/component.test.ts` (or a new file) covering:\n- `get_prop_constraints` — property with no constraints defined\n- `get_prop_constraints` — component not found\n- `find_components_by_token` — token that matches no components\n- `find_components_by_token` — token that matches multiple components\n\n**Acceptance criteria:**\n- `component.ts` statement coverage ≥ 80%\n- All new tests pass\n- `pnpm test:coverage` shows green thresholds",
+      "timestamp": "2026-03-05T00:25:48.463Z",
+      "source": "initial"
+    },
+    {
+      "description": "`packages/core/src/tools/component.ts` is at ~78.54% statement coverage (below the 80% threshold). Uncovered branches are at lines ~346-349 and ~352-355, which correspond to `get_prop_constraints` and `find_components_by_token` tool dispatch paths.\n\n**Fix:** Add tests in `tests/tools/component.test.ts` (or a new file) covering:\n- `get_prop_constraints` — property with no constraints defined\n- `get_prop_constraints` — component not found\n- `find_components_by_token` — token that matches no components\n- `find_components_by_token` — token that matches multiple components\n\n**Acceptance criteria:**\n- `component.ts` statement coverage ≥ 80%\n- All new tests pass\n- `pnpm test:coverage` shows green thresholds\n\n**PR #33 open — 2 CodeRabbit fixes required before merge:**\n1. Run Prettier on `tests/tools/component.test.ts` (CI format check failing)\n2. In the \"component not found\" test, change `throw new Error(...)` to `throw new MCPError(..., ErrorCategory.NOT_FOUND)` to match the actual error shape from `packages/core/src/handlers/cem.ts`",
+      "timestamp": "2026-03-12T04:25:28.230Z",
+      "source": "edit"
+    }
+  ],
+  "createdAt": "2026-03-05T00:25:48.463Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-05T00:25:48.463Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T03:49:09.411Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T03:50:14.150Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-12T03:54:47.715Z",
+      "reason": "Max remediation cycles exceeded (4)"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-12T04:24:57.714Z"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-12T04:24:59.647Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-12T05:27:46.135Z"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-12T05:28:01.879Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-12T16:40:33.017Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-12T03:49:12.706Z",
+  "costUsd": 0.36173500000000003,
+  "lastSessionId": "d3e9415c-6c21-4237-9dbb-1e452e5c9947",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/33",
+  "prNumber": 33,
+  "prCreatedAt": "2026-03-12T03:50:13.236Z",
+  "reviewStartedAt": "2026-03-12T03:50:14.150Z",
+  "prTrackedSince": "2026-03-12T03:50:14.152Z",
+  "prLastPolledAt": "2026-03-12T04:59:34.574Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 3**\n\n> [!CAUTION]\n> Some comments are outside the diff and can’t be posted inline due to platform limitations.\n> \n> \n> \n> <details>\n> <summary>⚠️ Outside diff range comments (1)</summary><blockquote>\n> \n> <details>\n> <summary>tests/tools/component.test.ts (1)</summary><blockquote>\n> \n> `583-695`: _⚠️ Potential issue_ | _🟡 Minor_\n> \n> **Run Prettier on this file before merging.**\n> \n> CI is already failing the format check for `tests/tools/component.test.ts`, so this change set will not merge cleanly until the file is reformatted.\n> \n> <details>\n> <summary>🤖 Prompt for AI Agents</summary>\n> \n> ```\n> Verify each finding against the current code and only fix it if needed.\n> \n> In `@tests/tools/component.test.ts` around lines 583 - 695, The file fails CI\n> formatting; run Prettier on the test file (or the repo formatter) to fix\n> whitespace/format issues in the describe block for \"handleComponentCall —\n> find_components_by_token\" and related tests (e.g., the it blocks referencing\n> handleComponentCall, get_prop_constraints, and findComponentsByToken), then\n> commit the reformatted file; you can run the project's formatter script (e.g.,\n> npm/yarn run format) or prettier --write on the file to resolve the CI format\n> check.\n> ```\n> \n> </details>\n> \n> </blockquote></details>\n> \n> </blockquote></details>\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@tests/tools/component.test.ts`:\n- Around line 609-622: The test currently mocks parseCem to throw a generic\nError; change it to throw the same MCPError used in\npackages/core/src/handlers/cem.ts with ErrorCategory.NOT_FOUND so the test\nexercises the not-found path: replace the vi.mocked(parseCem).mockImplementation\nto throw new MCPError(..., ErrorCategory.NOT_FOUND) and update assertions on\nhandleComponentCall to expect the error shape (e.g., content[0]",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1,
+  "statusChangeReason": "Max remediation cycles exceeded (4)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max remediation cycles exceeded (4)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-12T03:54:47.717Z"
+  },
+  "prMergedAt": "2026-03-12T16:40:20Z",
+  "completedAt": "2026-03-12T16:40:33.017Z"
+}

@@ -1,0 +1,57 @@
+{
+  "category": "core",
+  "description": "## Problem\n\nThe accessibility dimension in multi-dimensional health scoring penalizes ALL web component libraries because 4 of 8 checks measure data the CEM standard doesn't capture. Cross-library validation against 9 major libraries shows:\n\n- hasAriaRole (20pts): 0/36 pass — CEM never carries role info\n- hasAriaAttributes (15pts): 0/36 pass — CEM never carries aria-* template bindings\n- hasFormAssociation (10pts): 0/36 pass — Only helix uses formAssociated/internals naming\n- hasKeyboardEvents (10pts): 0/36 pass — CEM never carries keyboard handlers\n\nThat's 55/100 points allocated to checks with 0% pass rate. Every library scores F.\n\nMeanwhile, checks that DO work:\n- hasDisabled (15pts): 63.9% pass — reliable CEM signal\n- hasLabelSupport (10pts): 36.1% pass — reliable CEM signal\n- hasFocusMethod (15pts): 2.8% pass — too narrow (only matches exact `focus()`, misses `setFocus()`)\n- accessibilityDescription (5pts): 11.1% pass — moderate signal\n\n## Solution\n\n### 1. Reweight dimensions (total still 100):\n\n**Primary signals** (CEM reliably captures these):\n- hasDisabled: 20pts → 25pts (most reliable a11y signal in CEM)\n- hasLabelSupport: 10pts → 20pts (second most reliable)\n- hasFocusMethod: 15pts → 20pts (with broadened detection)\n- accessibilityDescription: 5pts → 10pts\n\n**Bonus signals** (CEM rarely captures, reward when present):\n- hasAriaRole: 20pts → 5pts (bonus — check tag-name inference too)\n- hasAriaAttributes: 15pts → 5pts (bonus)\n- hasFormAssociation: 10pts → 10pts (broadened detection)\n- hasKeyboardEvents: 10pts → 5pts (with focus/blur event proxy)\n\n### 2. Broaden detection patterns:\n\n**Focus method** — Also match:\n- `setFocus` (Ionic pattern)\n- Any method containing `focus` in name (e.g., `focusInput`, `setFocus`)\n\n**Form association** — Also match:\n- Components with `name` + `value` + `disabled` fields together (universal form element pattern)\n- `form` field/attribute (FAST pattern: member named `form` with attribute `form`)\n- Description mentioning \"form\" association\n\n**Keyboard events** — Also match:\n- Focus/blur events in the events array (components handling focus likely handle keyboard)\n- Events with \"key\" in the name\n- Description mentioning \"keyboard\" or \"key\"\n\n**ARIA role** — Also infer from tag name:\n- `*-button` → likely has role=button\n- `*-dialog`, `*-modal` → likely has role=dialog\n- `*-checkbox` → likely has role=checkbox\n- `*-radio` → likely has role=radio\n- `*-switch`, `*-toggle` → likely has role=switch\n- `*-tab`, `*-tabpanel` → likely has role=tab\n- `*-menu`, `*-menuitem` → likely has role=menu\n- `*-alert`, `*-toast` → likely has role=alert\n- `*-combobox`, `*-select` → likely has role=combobox\n- `*-slider`, `*-range` → likely has role=slider\n- `*-tooltip` → likely has role=tooltip\n- `*-tree`, `*-treeitem` → likely has role=tree\n\n### Files to modify:\n\n1. `packages/core/src/handlers/accessibility.ts` — Reweight, broaden detection, add tag-name heuristics\n2. `tests/handlers/accessibility.test.ts` — Update test expectations for new weights/detection\n3. `tests/handlers/multi-dimensional-health.test.ts` — May need score expectation updates\n\n### Acceptance Criteria:\n\n- [ ] No check has 0% pass rate across all 9 fixture libraries\n- [ ] A button component with `disabled` + `label` + focus method scores ≥50%\n- [ ] Tag-name inference correctly identifies common widget roles\n- [ ] Form detection catches `name`+`value`+`disabled` pattern\n- [ ] Focus detection catches `setFocus()` and focus-related method names\n- [ ] All existing tests pass (with updated expectations)\n- [ ] New tests cover broadened detection and tag-name heuristics\n- [ ] Total weights still sum to 100",
+  "title": "fix: reweight accessibility analyzer for CEM-realistic scoring",
+  "status": "done",
+  "complexity": "medium",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "c255bc1f-1bf8-4cb9-9966-339bdca23c5c",
+  "id": "feature-1773433708837-g9r5wy4wg",
+  "branchName": "feature/fix-reweight-accessibility-analyzer-for",
+  "descriptionHistory": [
+    {
+      "description": "## Problem\n\nThe accessibility dimension in multi-dimensional health scoring penalizes ALL web component libraries because 4 of 8 checks measure data the CEM standard doesn't capture. Cross-library validation against 9 major libraries shows:\n\n- hasAriaRole (20pts): 0/36 pass — CEM never carries role info\n- hasAriaAttributes (15pts): 0/36 pass — CEM never carries aria-* template bindings\n- hasFormAssociation (10pts): 0/36 pass — Only helix uses formAssociated/internals naming\n- hasKeyboardEvents (10pts): 0/36 pass — CEM never carries keyboard handlers\n\nThat's 55/100 points allocated to checks with 0% pass rate. Every library scores F.\n\nMeanwhile, checks that DO work:\n- hasDisabled (15pts): 63.9% pass — reliable CEM signal\n- hasLabelSupport (10pts): 36.1% pass — reliable CEM signal\n- hasFocusMethod (15pts): 2.8% pass — too narrow (only matches exact `focus()`, misses `setFocus()`)\n- accessibilityDescription (5pts): 11.1% pass — moderate signal\n\n## Solution\n\n### 1. Reweight dimensions (total still 100):\n\n**Primary signals** (CEM reliably captures these):\n- hasDisabled: 20pts → 25pts (most reliable a11y signal in CEM)\n- hasLabelSupport: 10pts → 20pts (second most reliable)\n- hasFocusMethod: 15pts → 20pts (with broadened detection)\n- accessibilityDescription: 5pts → 10pts\n\n**Bonus signals** (CEM rarely captures, reward when present):\n- hasAriaRole: 20pts → 5pts (bonus — check tag-name inference too)\n- hasAriaAttributes: 15pts → 5pts (bonus)\n- hasFormAssociation: 10pts → 10pts (broadened detection)\n- hasKeyboardEvents: 10pts → 5pts (with focus/blur event proxy)\n\n### 2. Broaden detection patterns:\n\n**Focus method** — Also match:\n- `setFocus` (Ionic pattern)\n- Any method containing `focus` in name (e.g., `focusInput`, `setFocus`)\n\n**Form association** — Also match:\n- Components with `name` + `value` + `disabled` fields together (universal form element pattern)\n- `form` field/attribute (FAST pattern: member named `form` with attribute `form`)\n- Description mentioning \"form\" association\n\n**Keyboard events** — Also match:\n- Focus/blur events in the events array (components handling focus likely handle keyboard)\n- Events with \"key\" in the name\n- Description mentioning \"keyboard\" or \"key\"\n\n**ARIA role** — Also infer from tag name:\n- `*-button` → likely has role=button\n- `*-dialog`, `*-modal` → likely has role=dialog\n- `*-checkbox` → likely has role=checkbox\n- `*-radio` → likely has role=radio\n- `*-switch`, `*-toggle` → likely has role=switch\n- `*-tab`, `*-tabpanel` → likely has role=tab\n- `*-menu`, `*-menuitem` → likely has role=menu\n- `*-alert`, `*-toast` → likely has role=alert\n- `*-combobox`, `*-select` → likely has role=combobox\n- `*-slider`, `*-range` → likely has role=slider\n- `*-tooltip` → likely has role=tooltip\n- `*-tree`, `*-treeitem` → likely has role=tree\n\n### Files to modify:\n\n1. `packages/core/src/handlers/accessibility.ts` — Reweight, broaden detection, add tag-name heuristics\n2. `tests/handlers/accessibility.test.ts` — Update test expectations for new weights/detection\n3. `tests/handlers/multi-dimensional-health.test.ts` — May need score expectation updates\n\n### Acceptance Criteria:\n\n- [ ] No check has 0% pass rate across all 9 fixture libraries\n- [ ] A button component with `disabled` + `label` + focus method scores ≥50%\n- [ ] Tag-name inference correctly identifies common widget roles\n- [ ] Form detection catches `name`+`value`+`disabled` pattern\n- [ ] Focus detection catches `setFocus()` and focus-related method names\n- [ ] All existing tests pass (with updated expectations)\n- [ ] New tests cover broadened detection and tag-name heuristics\n- [ ] Total weights still sum to 100",
+      "timestamp": "2026-03-13T20:28:28.837Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-13T20:28:28.837Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-13T20:28:28.837Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-13T20:28:45.802Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-13T20:32:33.242Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-13T20:45:02.437Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-13T20:28:47.945Z",
+  "costUsd": 0.88619675,
+  "lastSessionId": "8c17d092-5cc0-4056-b44e-a3aae1a7c833",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/64",
+  "prNumber": 64,
+  "prCreatedAt": "2026-03-13T20:32:31.951Z",
+  "reviewStartedAt": "2026-03-13T20:32:33.242Z",
+  "prTrackedSince": "2026-03-13T20:32:33.244Z",
+  "prLastPolledAt": "2026-03-13T20:44:53.185Z",
+  "completedAt": "2026-03-13T20:45:02.437Z"
+}

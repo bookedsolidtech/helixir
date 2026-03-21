@@ -1,0 +1,85 @@
+{
+  "category": "infrastructure",
+  "description": "## Problem\n\nThe Publish GitHub Action fails on every merge to main because `changeset publish` tries to publish `@helixir/core` and `@helixir/github-action` to npm. The `@helixir` scope doesn't exist on the npm registry, so both get 404 errors, and the entire publish step fails with exit code 1.\n\nThe root `helixir` package publishes fine (or is skipped if version is unchanged). The failure is exclusively from the two internal workspace packages.\n\n## Evidence\n\nPR #72 merge to main (2026-03-17): Publish workflow run 23172452954 failed.\n```\n🦋 error: E404 Not Found - PUT https://registry.npmjs.org/@helixir%2fcore - Not found\n🦋 error: E404 Not Found - PUT https://registry.npmjs.org/@helixir%2fgithub-action - Not found\n🦋 packages failed to publish:\n🦋  @helixir/core@0.1.0\n🦋  @helixir/github-action@0.1.0\n```\n\n## Fix\n\nAdd `\"private\": true` to both internal package.json files so changesets skips them entirely:\n\n1. `packages/core/package.json` — add `\"private\": true`\n2. `packages/github-action/package.json` — add `\"private\": true` (if this file exists; if the package is defined elsewhere, find and mark it)\n\n## Verification\n\nAfter fix, `changeset publish` should output:\n- `helixir` — published (or skipped if no version bump)\n- `@helixir/core` — skipped (private)\n- `@helixir/github-action` — skipped (private)\n\n## Acceptance Criteria\n\n- Both internal packages have `\"private\": true` in their package.json\n- No other changes needed\n- Tests still pass, type-check passes",
+  "title": "fix: mark internal packages as private to fix publish pipeline",
+  "status": "done",
+  "complexity": "small",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "15a52b4f-20ed-4bb1-9449-412a06eea270",
+  "id": "feature-1773709384268-hajnzugkz",
+  "branchName": "feature/fix-mark-internal-packages-as-private",
+  "descriptionHistory": [
+    {
+      "description": "## Problem\n\nThe Publish GitHub Action fails on every merge to main because `changeset publish` tries to publish `@helixir/core` and `@helixir/github-action` to npm. The `@helixir` scope doesn't exist on the npm registry, so both get 404 errors, and the entire publish step fails with exit code 1.\n\nThe root `helixir` package publishes fine (or is skipped if version is unchanged). The failure is exclusively from the two internal workspace packages.\n\n## Evidence\n\nPR #72 merge to main (2026-03-17): Publish workflow run 23172452954 failed.\n```\n🦋 error: E404 Not Found - PUT https://registry.npmjs.org/@helixir%2fcore - Not found\n🦋 error: E404 Not Found - PUT https://registry.npmjs.org/@helixir%2fgithub-action - Not found\n🦋 packages failed to publish:\n🦋  @helixir/core@0.1.0\n🦋  @helixir/github-action@0.1.0\n```\n\n## Fix\n\nAdd `\"private\": true` to both internal package.json files so changesets skips them entirely:\n\n1. `packages/core/package.json` — add `\"private\": true`\n2. `packages/github-action/package.json` — add `\"private\": true` (if this file exists; if the package is defined elsewhere, find and mark it)\n\n## Verification\n\nAfter fix, `changeset publish` should output:\n- `helixir` — published (or skipped if no version bump)\n- `@helixir/core` — skipped (private)\n- `@helixir/github-action` — skipped (private)\n\n## Acceptance Criteria\n\n- Both internal packages have `\"private\": true` in their package.json\n- No other changes needed\n- Tests still pass, type-check passes",
+      "timestamp": "2026-03-17T01:03:04.269Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-17T01:03:04.271Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "in-progress",
+      "timestamp": "2026-03-17T01:03:04.271Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-17T01:03:35.659Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-17T01:03:37.079Z",
+      "reason": "Pre-flight check failed: Worktree merge with origin/dev failed (conflicts or error): Command failed: git merge origin/dev\nerror: Your local changes to the following files would be overwritten by merge:\n\tCHANGELOG.md\n\tpackage.json\nPlease commit your changes or stash them before you merge.\nAborting\n"
+    },
+    {
+      "from": "blocked",
+      "to": "in-progress",
+      "timestamp": "2026-03-17T01:20:43.401Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-17T01:21:07.013Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-17T01:21:38.607Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-17T01:46:57.604Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "statusChangeReason": "Pre-flight check failed: Worktree merge with origin/dev failed (conflicts or error): Command failed: git merge origin/dev\nerror: Your local changes to the following files would be overwritten by merge:\n\tCHANGELOG.md\n\tpackage.json\nPlease commit your changes or stash them before you merge.\nAborting\n",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "merge_conflict",
+    "confidence": 0.95,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Merge conflict requires manual resolution: Pre-flight check failed: Worktree merge with origin/dev failed (conflicts or error): Command failed: git merge origin/dev\nerror: Your local changes to the following files would be overwritten by merge"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-17T01:03:37.079Z"
+  },
+  "updatedAt": "2026-03-17T01:21:08.922Z",
+  "costUsd": 0.27250225,
+  "lastSessionId": "1037601b-302d-4316-bd3e-73101ecbd404",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/73",
+  "prNumber": 73,
+  "prCreatedAt": "2026-03-17T01:21:37.907Z",
+  "reviewStartedAt": "2026-03-17T01:21:38.607Z",
+  "prTrackedSince": "2026-03-17T01:21:38.610Z",
+  "prLastPolledAt": "2026-03-17T01:46:49.312Z",
+  "completedAt": "2026-03-17T01:46:57.604Z"
+}

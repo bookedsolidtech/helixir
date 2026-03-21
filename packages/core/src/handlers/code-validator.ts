@@ -37,6 +37,7 @@ import { checkMethodCalls, type MethodCheckResult } from './method-checker.js';
 import { checkThemeCompatibility, type ThemeCheckResult } from './theme-checker.js';
 import { checkCssSpecificity, type SpecificityCheckResult } from './specificity-checker.js';
 import { checkLayoutPatterns, type LayoutCheckResult } from './layout-checker.js';
+import { checkCssScope, type ScopeCheckResult } from './scope-checker.js';
 import { parseCem } from './cem.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -66,6 +67,7 @@ export interface ValidateComponentCodeResult {
   themeCompat?: ThemeCheckResult;
   specificity?: SpecificityCheckResult;
   layout?: LayoutCheckResult;
+  scope?: ScopeCheckResult;
   imports?: ImportCheckResult;
 }
 
@@ -237,6 +239,17 @@ export function validateComponentCode(
       }
     } catch {
       // Skip on error
+    }
+
+    // 8f. CSS Scope — component tokens on wrong scope (:root, html, body)
+    try {
+      const scopeResult = checkCssScope(css, tagName, cem);
+      if (scopeResult.issues.length > 0) {
+        result.scope = scopeResult;
+        totalIssues += scopeResult.issues.length;
+      }
+    } catch {
+      // Skip if tag not found
     }
   }
 

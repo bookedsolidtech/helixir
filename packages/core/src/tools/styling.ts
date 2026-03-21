@@ -22,6 +22,7 @@ import { recommendChecks } from '../handlers/recommend-checks.js';
 import { suggestFix } from '../handlers/suggest-fix.js';
 import { checkCssSpecificity } from '../handlers/specificity-checker.js';
 import { checkLayoutPatterns } from '../handlers/layout-checker.js';
+import { checkCssScope } from '../handlers/scope-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -96,13 +97,27 @@ const CheckLayoutPatternsArgsSchema = z.object({
   cssText: z.string(),
 });
 
+const CheckCssScopeArgsSchema = z.object({
+  cssText: z.string(),
+  tagName: z.string(),
+  cem: z.any(),
+});
+
 const CheckCssSpecificityArgsSchema = z.object({
   code: z.string(),
   mode: z.enum(['css', 'html']).optional(),
 });
 
 const SuggestFixArgsSchema = z.object({
-  type: z.enum(['shadow-dom', 'token-fallback', 'theme-compat', 'method-call', 'event-usage']),
+  type: z.enum([
+    'shadow-dom',
+    'token-fallback',
+    'theme-compat',
+    'method-call',
+    'event-usage',
+    'specificity',
+    'layout',
+  ]),
   issue: z.string(),
   original: z.string(),
   tagName: z.string().optional(),
@@ -534,13 +549,21 @@ export const STYLING_TOOL_DEFINITIONS = [
   {
     name: 'suggest_fix',
     description:
-      'Generates concrete, copy-pasteable code fixes for validation issues. Pass the issue type (shadow-dom, token-fallback, theme-compat, method-call, event-usage), the specific issue kind, and the original code — returns a corrected code snippet with an explanation. Use this after any validator flags an issue to get the exact fix.',
+      'Generates concrete, copy-pasteable code fixes for validation issues. Pass the issue type (shadow-dom, token-fallback, theme-compat, method-call, event-usage, specificity, layout), the specific issue kind, and the original code — returns a corrected code snippet with an explanation. Use this after any validator flags an issue to get the exact fix.',
     inputSchema: {
       type: 'object' as const,
       properties: {
         type: {
           type: 'string',
-          enum: ['shadow-dom', 'token-fallback', 'theme-compat', 'method-call', 'event-usage'],
+          enum: [
+            'shadow-dom',
+            'token-fallback',
+            'theme-compat',
+            'method-call',
+            'event-usage',
+            'specificity',
+            'layout',
+          ],
           description: 'The category of validation issue.',
         },
         issue: {
@@ -617,6 +640,26 @@ export const STYLING_TOOL_DEFINITIONS = [
         },
       },
       required: ['cssText'],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'check_css_scope',
+    description:
+      'Detects when component-scoped CSS custom properties are set at the wrong scope. Catches component tokens placed on :root, html, body, or * selectors instead of on the component host element. Component tokens only take effect when set on the host — setting them on :root has no effect through shadow DOM.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        cssText: {
+          type: 'string',
+          description: 'The CSS code to check for scope mismatches.',
+        },
+        tagName: {
+          type: 'string',
+          description: 'The web component tag name (e.g. "sl-button").',
+        },
+      },
+      required: ['cssText', 'tagName'],
       additionalProperties: false,
     },
   },
@@ -747,6 +790,12 @@ export function handleStylingCall(
     if (name === 'check_layout_patterns') {
       const { cssText } = CheckLayoutPatternsArgsSchema.parse(args);
       const result = checkLayoutPatterns(cssText);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_css_scope') {
+      const { cssText, tagName } = CheckCssScopeArgsSchema.parse(args);
+      const result = checkCssScope(cssText, tagName, cem);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

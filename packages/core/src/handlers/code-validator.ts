@@ -12,6 +12,11 @@
  * 7. check_css_vars — custom property usage validation
  * 8. check_component_imports — unknown tag detection
  * 9. check_token_fallbacks — var() fallback chain validation
+ * 10. check_composition — cross-component pattern validation
+ * 11. check_method_calls — JS API method/property validation
+ * 12. check_theme_compatibility — dark mode/theme safety
+ * 13. check_css_specificity — !important/ID/nesting anti-patterns
+ * 14. check_layout_patterns — host display/dimension overrides
  */
 
 import type { Cem } from './cem.js';
@@ -30,6 +35,8 @@ import { checkTokenFallbacks, type TokenFallbackResult } from './token-fallback-
 import { checkComposition, type CompositionResult } from './composition-checker.js';
 import { checkMethodCalls, type MethodCheckResult } from './method-checker.js';
 import { checkThemeCompatibility, type ThemeCheckResult } from './theme-checker.js';
+import { checkCssSpecificity, type SpecificityCheckResult } from './specificity-checker.js';
+import { checkLayoutPatterns, type LayoutCheckResult } from './layout-checker.js';
 import { parseCem } from './cem.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -57,6 +64,8 @@ export interface ValidateComponentCodeResult {
   composition?: CompositionResult;
   methodCalls?: MethodCheckResult;
   themeCompat?: ThemeCheckResult;
+  specificity?: SpecificityCheckResult;
+  layout?: LayoutCheckResult;
   imports?: ImportCheckResult;
 }
 
@@ -186,6 +195,28 @@ export function validateComponentCode(
       if (themeResult.issues.length > 0) {
         result.themeCompat = themeResult;
         totalIssues += themeResult.issues.length;
+      }
+    } catch {
+      // Skip on error
+    }
+
+    // 8d. CSS Specificity — !important, ID selectors, deep nesting
+    try {
+      const specResult = checkCssSpecificity(css);
+      if (specResult.issues.length > 0) {
+        result.specificity = specResult;
+        totalIssues += specResult.issues.length;
+      }
+    } catch {
+      // Skip on error
+    }
+
+    // 8e. Layout Patterns — host display/dimension/position overrides
+    try {
+      const layoutResult = checkLayoutPatterns(css);
+      if (layoutResult.issues.length > 0) {
+        result.layout = layoutResult;
+        totalIssues += layoutResult.issues.length;
       }
     } catch {
       // Skip on error

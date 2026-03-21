@@ -1,4 +1,5 @@
 /** Barrel export for all handler modules. */
+export * from './a11y-usage-checker.js';
 export * from './accessibility.js';
 export * from './analyzers/index.js';
 export * from './audit-report.js';

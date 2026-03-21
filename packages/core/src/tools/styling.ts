@@ -8,6 +8,7 @@ import { checkHtmlUsage } from '../handlers/html-usage-checker.js';
 import { checkEventUsage } from '../handlers/event-usage-checker.js';
 import { getComponentQuickRef } from '../handlers/quick-ref.js';
 import { detectThemeSupport } from '../handlers/theme-detection.js';
+import { checkComponentImports } from '../handlers/import-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -177,6 +178,27 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'check_component_imports',
+    description:
+      'Scans HTML/JSX/template code for all custom element tags and verifies they exist in the loaded CEM. Catches non-existent components and misspelled tag names with fuzzy suggestions. Use this to verify that generated code only references real components.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+        codeText: {
+          type: 'string',
+          description: 'The HTML/JSX/template code to scan for custom element tags.',
+        },
+      },
+      required: ['codeText'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -232,6 +254,12 @@ export function handleStylingCall(
 
     if (name === 'detect_theme_support') {
       const result = detectThemeSupport(cem);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_component_imports') {
+      const codeText = z.string().parse(args.codeText);
+      const result = checkComponentImports(codeText, cem);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

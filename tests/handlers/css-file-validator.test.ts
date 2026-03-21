@@ -108,3 +108,48 @@ describe('validateCssFile — verdict', () => {
     expect(result.totalIssues).toBeGreaterThan(0);
   });
 });
+
+// ─── Anti-Patterns ──────────────────────────────────────────────────────────
+
+describe('validateCssFile — anti-patterns per component', () => {
+  it('returns antiPatterns for each detected component', () => {
+    const css = 'my-button { --my-button-bg: red; }';
+    const result = validateCssFile(css, FIXTURE_CEM);
+    expect(result.components['my-button']?.antiPatterns).toBeDefined();
+    expect(result.components['my-button']?.antiPatterns.length).toBeGreaterThan(0);
+  });
+
+  it('antiPatterns reference the component tag name', () => {
+    const css = 'my-button { --my-button-bg: red; }';
+    const result = validateCssFile(css, FIXTURE_CEM);
+    const patterns = result.components['my-button']?.antiPatterns ?? [];
+    expect(patterns.some((p) => p.includes('my-button'))).toBe(true);
+  });
+
+  it('includes shadow DOM warning', () => {
+    const css = 'my-button { --my-button-bg: red; }';
+    const result = validateCssFile(css, FIXTURE_CEM);
+    const patterns = result.components['my-button']?.antiPatterns ?? [];
+    expect(patterns.some((p) => p.includes('shadow') || p.includes('Shadow'))).toBe(true);
+  });
+});
+
+// ─── Inline Fixes ───────────────────────────────────────────────────────────
+
+describe('validateCssFile — inline fixes', () => {
+  it('shadow DOM issues include fix suggestions', () => {
+    const css = 'my-button .inner { color: red; }';
+    const result = validateCssFile(css, FIXTURE_CEM);
+    const issues = result.components['my-button']?.issues ?? [];
+    const shadowIssue = issues.find((i) => i.category === 'shadowDom');
+    expect(shadowIssue?.fix).toBeDefined();
+    expect(shadowIssue?.fix?.suggestion).toContain('::part(');
+  });
+
+  it('clean CSS produces no fixes', () => {
+    const css = 'my-button::part(base) { color: var(--my-theme, red); }';
+    const result = validateCssFile(css, FIXTURE_CEM);
+    const issues = result.components['my-button']?.issues ?? [];
+    expect(issues.filter((i) => i.fix)).toHaveLength(0);
+  });
+});

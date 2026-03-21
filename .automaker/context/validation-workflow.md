@@ -2,16 +2,30 @@
 
 When writing code that uses web components, follow this workflow to prevent Shadow DOM, styling, and API mistakes.
 
-## Quick Start: One-Call Validation
+## Quick Start: One-Call Styling Validation
 
-After generating any code that uses web components, call `validate_component_code` with your HTML, CSS, and JS. It runs 20 sub-validators in one shot:
+**For CSS/styling work**, call `styling_preflight` — it combines API discovery + validation in one call:
+
+```
+styling_preflight({
+  cssText: "hx-button::part(base) { --hx-button-bg: blue; }",
+  tagName: "hx-button",
+  htmlText: "<hx-button><span slot='prefix'>X</span></hx-button>"
+})
+```
+
+Returns: component's full style API (parts, tokens, slots), valid/invalid status for every `::part()` and token reference, Shadow DOM/theme issues, a correct CSS snippet, and a pass/fail verdict.
+
+## Full Code Validation
+
+For comprehensive validation (HTML + CSS + JS), call `validate_component_code`:
 
 ```
 validate_component_code({
-  html: "<sl-button variant='primary'>Click</sl-button>",
-  css: "sl-button { --sl-button-font-size: 1rem; }",
-  code: "button.addEventListener('sl-click', handler);",
-  tagName: "sl-button",
+  html: "<hx-button variant='primary'>Click</hx-button>",
+  css: "hx-button { --hx-button-bg: blue; }",
+  code: "button.addEventListener('hx-click', handler);",
+  tagName: "hx-button",
   framework: "html"  // or "react", "vue", "angular"
 })
 ```
@@ -20,10 +34,11 @@ validate_component_code({
 
 1. **get_component_quick_ref** — Get the full API surface (attributes, events, slots, CSS parts, CSS custom properties)
 2. **diagnose_styling** — Get Shadow DOM styling guide specific to that component
+3. **resolve_css_api** — Verify that every `::part()`, token, and slot name in your CSS/HTML actually exists on the component
 
 ## After Writing Code
 
-Run `validate_component_code` (all-in-one) OR individual validators:
+Run `styling_preflight` (CSS focus) or `validate_component_code` (full) or individual validators:
 
 ### HTML Validators
 | Tool | What it catches |
@@ -38,6 +53,8 @@ Run `validate_component_code` (all-in-one) OR individual validators:
 ### CSS Validators
 | Tool | What it catches |
 |---|---|
+| `styling_preflight` | **RECOMMENDED**: One-call CSS validation — API discovery + reference resolution + Shadow DOM + theme checks + correct snippet + pass/fail verdict |
+| `resolve_css_api` | Validates every `::part()`, CSS custom property, and slot reference against CEM data — catches hallucinated names with fuzzy-match suggestions |
 | `check_shadow_dom_usage` | 15 patterns: descendant piercing, ::part() misuse (chaining, structural combining, descendant selectors), deprecated /deep/>>>/::deep, ::slotted() in consumer CSS + compound/descendant misuse, :host/:host-context() in consumer CSS, !important on tokens, display:contents on host, unknown parts, misspelled tokens |
 | `check_css_vars` | Unknown CSS custom properties, typos |
 | `check_token_fallbacks` | Missing var() fallbacks, hardcoded colors |

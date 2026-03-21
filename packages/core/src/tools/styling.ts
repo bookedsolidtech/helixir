@@ -16,6 +16,7 @@ import { checkCssVars } from '../handlers/css-var-checker.js';
 import { validateComponentCode } from '../handlers/code-validator.js';
 import { checkTokenFallbacks } from '../handlers/token-fallback-checker.js';
 import { checkComposition } from '../handlers/composition-checker.js';
+import { checkMethodCalls } from '../handlers/method-checker.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -71,6 +72,11 @@ const CheckTokenFallbacksArgsSchema = z.object({
 
 const CheckCompositionArgsSchema = z.object({
   htmlText: z.string(),
+});
+
+const CheckMethodCallsArgsSchema = z.object({
+  codeText: z.string(),
+  tagName: z.string(),
 });
 
 const ValidateComponentCodeArgsSchema = z.object({
@@ -429,6 +435,31 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'check_method_calls',
+    description:
+      'Validates JavaScript/TypeScript code for correct method and property usage on web components — catches hallucinated API calls (methods that do not exist), properties called as methods (e.g. dialog.open() when open is a boolean), methods assigned as properties (e.g. dialog.show = true), and typos with suggestions. Run this on any JS code that interacts with web component APIs.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID to target a specific loaded library instead of the default.',
+        },
+        codeText: {
+          type: 'string',
+          description: 'The JavaScript/TypeScript code to validate for method/property usage.',
+        },
+        tagName: {
+          type: 'string',
+          description: 'The custom element tag name to validate against (e.g. "sl-dialog").',
+        },
+      },
+      required: ['codeText', 'tagName'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -514,6 +545,12 @@ export function handleStylingCall(
     if (name === 'check_css_vars') {
       const { cssText, tagName } = CheckCssVarsArgsSchema.parse(args);
       const result = checkCssVars(cssText, tagName, cem);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'check_method_calls') {
+      const { codeText, tagName } = CheckMethodCallsArgsSchema.parse(args);
+      const result = checkMethodCalls(codeText, tagName, cem);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

@@ -22,6 +22,7 @@ export * from './health.js';
 export * from './html-usage-checker.js';
 export * from './import-checker.js';
 export * from './attribute-conflict-checker.js';
+export * from './method-checker.js';
 export * from './migration.js';
 export * from './narrative.js';
 export * from './quick-ref.js';

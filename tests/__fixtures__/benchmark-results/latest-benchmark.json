@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-21T08:59:37.296Z",
+  "timestamp": "2026-03-21T09:09:08.872Z",
   "scorecards": {
     "material": {
       "library": "material",
@@ -187,7 +187,7 @@
         "heuristic": 426,
         "untested": 747
       },
-      "timestamp": "2026-03-21T08:59:37.291Z"
+      "timestamp": "2026-03-21T09:09:08.869Z"
     },
     "spectrum": {
       "library": "spectrum",
@@ -375,7 +375,7 @@
         "heuristic": 404,
         "untested": 601
       },
-      "timestamp": "2026-03-21T08:59:37.292Z"
+      "timestamp": "2026-03-21T09:09:08.869Z"
     },
     "vaadin": {
       "library": "vaadin",
@@ -563,7 +563,7 @@
         "heuristic": 439,
         "untested": 717
       },
-      "timestamp": "2026-03-21T08:59:37.292Z"
+      "timestamp": "2026-03-21T09:09:08.870Z"
     },
     "fluentui": {
       "library": "fluentui",
@@ -751,7 +751,7 @@
         "heuristic": 139,
         "untested": 293
       },
-      "timestamp": "2026-03-21T08:59:37.292Z"
+      "timestamp": "2026-03-21T09:09:08.870Z"
     },
     "carbon": {
       "library": "carbon",
@@ -939,7 +939,7 @@
         "heuristic": 397,
         "untested": 793
       },
-      "timestamp": "2026-03-21T08:59:37.292Z"
+      "timestamp": "2026-03-21T09:09:08.870Z"
     },
     "ui5": {
       "library": "ui5",
@@ -1127,7 +1127,7 @@
         "heuristic": 582,
         "untested": 1304
       },
-      "timestamp": "2026-03-21T08:59:37.293Z"
+      "timestamp": "2026-03-21T09:09:08.870Z"
     },
     "calcite": {
       "library": "calcite",
@@ -1315,7 +1315,7 @@
         "heuristic": 318,
         "untested": 848
       },
-      "timestamp": "2026-03-21T08:59:37.294Z"
+      "timestamp": "2026-03-21T09:09:08.871Z"
     },
     "porsche": {
       "library": "porsche",
@@ -1503,7 +1503,7 @@
         "heuristic": 304,
         "untested": 702
       },
-      "timestamp": "2026-03-21T08:59:37.294Z"
+      "timestamp": "2026-03-21T09:09:08.871Z"
     },
     "ionic": {
       "library": "ionic",
@@ -1691,7 +1691,7 @@
         "heuristic": 331,
         "untested": 744
       },
-      "timestamp": "2026-03-21T08:59:37.294Z"
+      "timestamp": "2026-03-21T09:09:08.871Z"
     },
     "wired": {
       "library": "wired",
@@ -1879,7 +1879,7 @@
         "heuristic": 78,
         "untested": 208
       },
-      "timestamp": "2026-03-21T08:59:37.294Z"
+      "timestamp": "2026-03-21T09:09:08.871Z"
     },
     "elix": {
       "library": "elix",
@@ -2067,7 +2067,7 @@
         "heuristic": 148,
         "untested": 740
       },
-      "timestamp": "2026-03-21T08:59:37.295Z"
+      "timestamp": "2026-03-21T09:09:08.871Z"
     },
     "helix": {
       "library": "helix",
@@ -2255,7 +2255,7 @@
         "heuristic": 440,
         "untested": 555
       },
-      "timestamp": "2026-03-21T08:59:37.295Z"
+      "timestamp": "2026-03-21T09:09:08.872Z"
     }
   },
   "comparisonTable": {
@@ -3278,74 +3278,74 @@
       "API Surface Quality",
       "Event Architecture"
     ],
-    "timestamp": "2026-03-21T08:59:37.296Z"
+    "timestamp": "2026-03-21T09:09:08.872Z"
   },
   "performance": {
-    "totalMs": 2876,
+    "totalMs": 2442,
     "phases": [
       {
         "name": "load-libraries",
-        "durationMs": 143
+        "durationMs": 151
       },
       {
         "name": "score-all-libraries",
-        "durationMs": 2727
+        "durationMs": 2288
       },
       {
         "name": "score-material",
-        "durationMs": 178
+        "durationMs": 220
       },
       {
         "name": "score-spectrum",
-        "durationMs": 148
+        "durationMs": 162
       },
       {
         "name": "score-vaadin",
-        "durationMs": 916
+        "durationMs": 696
       },
       {
         "name": "score-fluentui",
-        "durationMs": 38
+        "durationMs": 52
       },
       {
         "name": "score-carbon",
-        "durationMs": 132
+        "durationMs": 105
       },
       {
         "name": "score-ui5",
-        "durationMs": 225
+        "durationMs": 180
       },
       {
         "name": "score-calcite",
-        "durationMs": 578
+        "durationMs": 257
       },
       {
         "name": "score-porsche",
-        "durationMs": 62
+        "durationMs": 73
       },
       {
         "name": "score-ionic",
-        "durationMs": 119
+        "durationMs": 60
       },
       {
         "name": "score-wired",
-        "durationMs": 24
+        "durationMs": 46
       },
       {
         "name": "score-elix",
-        "durationMs": 236
+        "durationMs": 372
       },
       {
         "name": "score-helix",
-        "durationMs": 71
+        "durationMs": 65
       },
       {
         "name": "generate-scorecards",
-        "durationMs": 5
+        "durationMs": 3
       },
       {
         "name": "generate-comparison",
-        "durationMs": 1
+        "durationMs": 0
       }
     ],
     "withinGate": true

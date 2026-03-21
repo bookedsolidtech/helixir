@@ -44,6 +44,7 @@ export * from './theme-checker.js';
 export * from './theme-detection.js';
 export * from './token-fallback-checker.js';
 export * from './tokens.js';
+export * from './validation-summary.js';
 export * from './typegenerate.js';
 export * from './typescript.js';
 export * from './validate.js';

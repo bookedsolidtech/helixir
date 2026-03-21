@@ -36,6 +36,7 @@ export * from './specificity-checker.js';
 export * from './suggest-fix.js';
 export * from './story.js';
 export * from './shadow-dom-checker.js';
+export * from './shadow-dom-js-checker.js';
 export * from './slot-children-checker.js';
 export * from './styling-diagnostics.js';
 export * from './suggest.js';

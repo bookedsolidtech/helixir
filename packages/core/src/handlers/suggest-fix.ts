@@ -289,7 +289,39 @@ function fixThemeCompat(input: SuggestFixInput): FixSuggestion {
     return {
       original,
       suggestion: `background: var(${bgToken}); color: var(${fgToken});`,
-      explanation: `Light-on-light or dark-on-dark color pairs create contrast issues. Use semantic token pairs (surface + on-surface) that maintain readable contrast across themes.`,
+      explanation:
+        `Light-on-light or dark-on-dark color pairs create contrast issues. ` +
+        `Use semantic token pairs (surface + on-surface) that maintain readable contrast across themes.`,
+      severity: 'warning',
+    };
+  }
+
+  if (input.issue === 'mixed-token-hardcoded') {
+    const propMatch = original.match(/([a-z-]+)\s*:\s*([^;]+)/i);
+    if (propMatch) {
+      const [, prop, value] = propMatch;
+      const token = suggestTokenForProperty(prop ?? 'color', tokenPrefix);
+      return {
+        original,
+        suggestion: `${prop}: var(${token}, ${value?.trim()});`,
+        explanation:
+          `One property uses a design token while the paired property is hardcoded. ` +
+          `When the theme switches, the token adapts but the hardcoded value stays — ` +
+          `breaking the color pairing. Use tokens for both.`,
+        severity: 'warning',
+      };
+    }
+  }
+
+  if (input.issue === 'dark-mode-shadow-invisible') {
+    const shadowToken = tokenPrefix ? `${tokenPrefix}-shadow-md` : '--shadow-md';
+    return {
+      original,
+      suggestion: `box-shadow: var(${shadowToken});`,
+      explanation:
+        `Very low opacity shadows (alpha <= 0.1) are invisible on dark backgrounds. ` +
+        `Use a design token that adapts shadow intensity per theme, ` +
+        `or increase the opacity for dark mode.`,
       severity: 'warning',
     };
   }

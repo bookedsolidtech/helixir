@@ -358,6 +358,38 @@ describe('suggestFix — library-agnostic tokens', () => {
     expect(result.suggestion).not.toContain('--sl-');
   });
 
+  it('fixes mixed-token-hardcoded by wrapping in var()', () => {
+    const result = suggestFix({
+      type: 'theme-compat',
+      issue: 'mixed-token-hardcoded',
+      original: 'color: #333333;',
+    });
+    expect(result.suggestion).toContain('var(');
+    expect(result.explanation).toContain('token');
+    expect(result.severity).toBe('warning');
+  });
+
+  it('fixes dark-mode-shadow-invisible with token', () => {
+    const result = suggestFix({
+      type: 'theme-compat',
+      issue: 'dark-mode-shadow-invisible',
+      original: 'box-shadow: 0 2px 8px rgba(0,0,0,0.05);',
+    });
+    expect(result.suggestion).toContain('var(');
+    expect(result.suggestion).toContain('shadow');
+    expect(result.severity).toBe('warning');
+  });
+
+  it('uses tokenPrefix in dark-mode-shadow-invisible fix', () => {
+    const result = suggestFix({
+      type: 'theme-compat',
+      issue: 'dark-mode-shadow-invisible',
+      original: 'box-shadow: 0 2px 8px rgba(0,0,0,0.05);',
+      tokenPrefix: '--hx-',
+    });
+    expect(result.suggestion).toContain('--hx-');
+  });
+
   it('generates property-appropriate token names from prefix', () => {
     const result = suggestFix({
       type: 'token-fallback',

@@ -18,6 +18,7 @@ import { checkTokenFallbacks } from '../handlers/token-fallback-checker.js';
 import { checkComposition } from '../handlers/composition-checker.js';
 import { checkMethodCalls } from '../handlers/method-checker.js';
 import { checkThemeCompatibility } from '../handlers/theme-checker.js';
+import { recommendChecks } from '../handlers/recommend-checks.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
 import type { MCPToolResult } from '../shared/mcp-helpers.js';
 import { handleToolError } from '../shared/error-handling.js';
@@ -82,6 +83,10 @@ const CheckMethodCallsArgsSchema = z.object({
 
 const CheckThemeCompatibilityArgsSchema = z.object({
   cssText: z.string(),
+});
+
+const RecommendChecksArgsSchema = z.object({
+  codeText: z.string(),
 });
 
 const ValidateComponentCodeArgsSchema = z.object({
@@ -486,6 +491,22 @@ export const STYLING_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'recommend_checks',
+    description:
+      'Analyzes code to determine which validation tools are most relevant — detects HTML, CSS, JavaScript, and JSX patterns, identifies custom element tags, and returns a prioritized list of tool names. Use this as a meta-tool to discover which validators to run on a given piece of code without running them all.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        codeText: {
+          type: 'string',
+          description: 'The code to analyze for determining which validation tools are relevant.',
+        },
+      },
+      required: ['codeText'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 /**
@@ -589,6 +610,12 @@ export function handleStylingCall(
     if (name === 'check_composition') {
       const { htmlText } = CheckCompositionArgsSchema.parse(args);
       const result = checkComposition(htmlText, cem);
+      return createSuccessResponse(JSON.stringify(result, null, 2));
+    }
+
+    if (name === 'recommend_checks') {
+      const { codeText } = RecommendChecksArgsSchema.parse(args);
+      const result = recommendChecks(codeText);
       return createSuccessResponse(JSON.stringify(result, null, 2));
     }
 

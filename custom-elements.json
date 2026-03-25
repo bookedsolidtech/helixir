@@ -3062,6 +3062,63 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/core/src/handlers/extend.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "extendComponent",
+          "return": {
+            "type": {
+              "text": "ExtendComponentResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "parentTagName",
+              "type": {
+                "text": "string"
+              },
+              "description": "Tag name of the existing parent component (must exist in CEM)"
+            },
+            {
+              "name": "newTagName",
+              "type": {
+                "text": "string"
+              },
+              "description": "Tag name for the new subclass (must contain a hyphen)"
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              },
+              "description": "The Custom Elements Manifest to look up the parent"
+            },
+            {
+              "name": "newClassName",
+              "optional": true,
+              "type": {
+                "text": "string"
+              },
+              "description": "Optional explicit class name; defaults to PascalCase of newTagName"
+            }
+          ],
+          "description": "Generates a properly subclassed TypeScript component extending a parent web component.\n\nProduces:\n- Correct `class NewClass extends ParentClass` inheritance chain\n- `@customElement('new-tag-name')` CEM annotation\n- Inherited CSS parts and slots documented in the generated source\n- `exportparts` forwarding guidance for inherited CSS parts\n- `HTMLElementTagNameMap` TypeScript declaration for the new tag\n- Shadow DOM style encapsulation warnings"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "extendComponent",
+          "declaration": {
+            "name": "extendComponent",
+            "module": "packages/core/src/handlers/extend.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/core/src/handlers/framework.ts",
       "declarations": [
         {
@@ -3767,6 +3824,14 @@
           "declaration": {
             "name": "*",
             "module": "packages/core/src/handlers/event-usage-checker.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/extend.js"
           }
         },
         {
@@ -5729,6 +5794,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "packages/core/src/tools/extend.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "packages/core/src/tools/bundle.js"
           }
         },
@@ -7057,6 +7130,94 @@
           "declaration": {
             "name": "isDiscoveryTool",
             "module": "packages/core/src/tools/discovery.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/tools/extend.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "EXTEND_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'extend_component', description: 'Generates a properly subclassed TypeScript component extending an existing web component. ' + 'Produces the correct inheritance chain (class NewClass extends ParentClass), ' + 'CEM @customElement annotation, CSS part forwarding guidance (exportparts), ' + 'inherited slot documentation, TypeScript HTMLElementTagNameMap declaration, ' + 'and Shadow DOM style encapsulation warnings. ' + 'Prevents common extension anti-patterns such as broken inheritance chains, ' + 'missing exportparts declarations, and style isolation surprises.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, parentTagName: { type: 'string', description: 'Tag name of the existing parent component to extend (e.g. \"hx-button\").', }, newTagName: { type: 'string', description: 'Tag name for the new subclass component (e.g. \"my-custom-button\"). Must contain a hyphen.', }, newClassName: { type: 'string', description: 'Optional explicit class name for the new subclass. ' + 'Defaults to PascalCase derived from newTagName (e.g. \"MyCustomButton\").', }, }, required: ['parentTagName', 'newTagName'], additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleExtendCall",
+          "return": {
+            "type": {
+              "text": "MCPToolResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "Record<string, unknown>"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ],
+          "description": "Dispatches an extend tool call by name and returns an MCPToolResult.\nCalled by the server's consolidated CallToolRequestSchema handler."
+        },
+        {
+          "kind": "function",
+          "name": "isExtendTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the extend tool group.\nUsed by the consolidated CallToolRequestSchema handler to dispatch correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "EXTEND_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "EXTEND_TOOL_DEFINITIONS",
+            "module": "packages/core/src/tools/extend.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleExtendCall",
+          "declaration": {
+            "name": "handleExtendCall",
+            "module": "packages/core/src/tools/extend.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isExtendTool",
+          "declaration": {
+            "name": "isExtendTool",
+            "module": "packages/core/src/tools/extend.ts"
           }
         }
       ]

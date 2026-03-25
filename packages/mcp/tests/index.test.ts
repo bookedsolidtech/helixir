@@ -161,9 +161,7 @@ describe('listAllEvents', () => {
 
   it('filtered events all have the requested tagName', () => {
     const cem = loadFixtureCem();
-    listAllEvents(cem, 'my-button').forEach((row) =>
-      expect(row.tagName).toBe('my-button'),
-    );
+    listAllEvents(cem, 'my-button').forEach((row) => expect(row.tagName).toBe('my-button'));
   });
 });
 
@@ -188,12 +186,8 @@ describe('listAllCssParts', () => {
 describe('getInheritanceChain', () => {
   it('returns an array for a component declaration', () => {
     const cem = loadFixtureCem();
-    const module = cem.modules.find((m) =>
-      m.declarations?.some((d) => d.tagName === 'my-button'),
-    );
-    const decl = module?.declarations?.find(
-      (d): d is CemDeclaration => d.tagName === 'my-button',
-    );
+    const module = cem.modules.find((m) => m.declarations?.some((d) => d.tagName === 'my-button'));
+    const decl = module?.declarations?.find((d): d is CemDeclaration => d.tagName === 'my-button');
     if (decl) {
       expect(Array.isArray(getInheritanceChain(decl))).toBe(true);
     }

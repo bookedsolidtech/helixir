@@ -1,0 +1,60 @@
+{
+  "category": "Tier 1: Core Enterprise Tools",
+  "description": "**Milestone:** Tier 1: Core Enterprise Tools\n\nCreate the @helixui/mcp package in packages/mcp/ that re-exports helixir's core engine (CEM reader, token parser, template utilities) as a standalone npm package. Enterprise teams install this to build custom MCP tools on top of helixir's analysis engine. Must include TypeScript declarations and comprehensive JSDoc.\n\n**Files to Modify:**\n- packages/mcp/package.json\n- packages/mcp/src/index.ts\n- packages/mcp/tsconfig.json\n- pnpm-workspace.yaml\n\n**Acceptance Criteria:**\n- [ ] packages/mcp/ exists with package.json (@helixui/mcp)\n- [ ] Exports CEM reader, token parser, template engine, and type declarations\n- [ ] npm pack produces a valid package\n- [ ] README with API documentation and usage examples\n- [ ] At least 20 tests covering public API surface\n\n**Complexity:** large\n\n**Guardrails:** If this phase involves new or changed behavior, include tests that verify correctness. If this phase adds, removes, or changes a user-facing feature, API endpoint, configuration option, or service, update the relevant documentation in `docs/` to reflect those changes.",
+  "title": "feat: @helixui/mcp core package — CEM reader, token parser, template engine exports",
+  "status": "done",
+  "isEpic": false,
+  "epicId": "feature-1774410876078-opnch0ow7",
+  "branchName": "feature/tier-1-core-feat-helixuimcp",
+  "isFoundation": true,
+  "projectSlug": "enterprise-readiness",
+  "milestoneSlug": "01-tier-1-core-enterprise-tools",
+  "phaseSlug": "feat-helixui-mcp-core-package-cem-reader-token-parser-template-engine-exports",
+  "id": "feature-1774410876093-v8zcz9mcp",
+  "descriptionHistory": [
+    {
+      "description": "**Milestone:** Tier 1: Core Enterprise Tools\n\nCreate the @helixui/mcp package in packages/mcp/ that re-exports helixir's core engine (CEM reader, token parser, template utilities) as a standalone npm package. Enterprise teams install this to build custom MCP tools on top of helixir's analysis engine. Must include TypeScript declarations and comprehensive JSDoc.\n\n**Files to Modify:**\n- packages/mcp/package.json\n- packages/mcp/src/index.ts\n- packages/mcp/tsconfig.json\n- pnpm-workspace.yaml\n\n**Acceptance Criteria:**\n- [ ] packages/mcp/ exists with package.json (@helixui/mcp)\n- [ ] Exports CEM reader, token parser, template engine, and type declarations\n- [ ] npm pack produces a valid package\n- [ ] README with API documentation and usage examples\n- [ ] At least 20 tests covering public API surface\n\n**Complexity:** large\n\n**Guardrails:** If this phase involves new or changed behavior, include tests that verify correctness. If this phase adds, removes, or changes a user-facing feature, API endpoint, configuration option, or service, update the relevant documentation in `docs/` to reflect those changes.",
+      "timestamp": "2026-03-25T03:54:36.093Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-25T03:54:36.093Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-25T03:54:36.093Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-25T05:19:24.998Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-25T05:42:21.100Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-25T05:42:31.756Z"
+    }
+  ],
+  "featureType": "code",
+  "priority": 1,
+  "complexity": "medium",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-25T05:19:27.585Z",
+  "costUsd": 8.04059175,
+  "lastSessionId": "3b2d8d34-c6a9-42ae-824f-24e32c52f884",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/190",
+  "prNumber": 190,
+  "prCreatedAt": "2026-03-25T05:42:20.093Z",
+  "reviewStartedAt": "2026-03-25T05:42:21.100Z",
+  "prTrackedSince": "2026-03-25T05:42:21.114Z",
+  "prLastPolledAt": "2026-03-25T05:42:21.114Z",
+  "prMergedAt": "2026-03-25T05:42:25Z",
+  "completedAt": "2026-03-25T05:42:31.756Z"
+}

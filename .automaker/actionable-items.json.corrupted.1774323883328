@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "85708f16-1ffd-43cb-8d51-4c8381b3ba2c",
+      "actionType": "signal",
+      "priority": "medium",
+      "title": "[DECISION] PR has been in review status beyond the expected turnaround time.",
+      "message": "Signal: stale-review\nValue: 4288.7186 minutes (threshold: 2880 — PR in review > 48 hours)\nFeature: feature-1774061903423-x49q1mkke\nPR: #104\nAuto-action: Enable auto-merge at 30 minutes. Ping reviewer at 48 hours. Escalate at 96 hours.",
+      "createdAt": "2026-03-24T02:44:43.302Z",
+      "status": "pending",
+      "actionPayload": {
+        "signalName": "stale-review",
+        "currentValue": 4288.7186,
+        "unit": "minutes",
+        "category": "decision",
+        "autoAction": "Enable auto-merge at 30 minutes. Ping reviewer at 48 hours. Escalate at 96 hours.",
+        "projectPath": "/Volumes/Development/booked/helixir",
+        "featureId": "feature-1774061903423-x49q1mkke",
+        "prNumber": 104
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "decision"
+    },
+    {
+      "id": "330886d1-9773-488e-8132-018e90adbceb",
+      "actionType": "signal",
+      "priority": "medium",
+      "title": "[DECISION] PR has been in review status beyond the expected turnaround time.",
+      "message": "Signal: stale-review\nValue: 3774.755416666667 minutes (threshold: 2880 — PR in review > 48 hours)\nFeature: feature-1774062823574-jewtmwje2\nPR: #112\nAuto-action: Enable auto-merge at 30 minutes. Ping reviewer at 48 hours. Escalate at 96 hours.",
+      "createdAt": "2026-03-24T02:44:43.302Z",
+      "status": "pending",
+      "actionPayload": {
+        "signalName": "stale-review",
+        "currentValue": 3774.755416666667,
+        "unit": "minutes",
+        "category": "decision",
+        "autoAction": "Enable auto-merge at 30 minutes. Ping reviewer at 48 hours. Escalate at 96 hours.",
+        "projectPath": "/Volumes/Development/booked/helixir",
+        "featureId": "feature-1774062823574-jewtmwje2",
+        "prNumber": 112
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "decision"
+    },
+    {
+      "id": "0b60e481-03fd-43e1-b38e-8efa0cbda796",
+      "actionType": "signal",
+      "priority": "medium",
+      "title": "[DECISION] PR has been in review status beyond the expected turnaround time.",
+      "message": "Signal: stale-review\nValue: 3779.755183333333 minutes (threshold: 2880 — PR in review > 48 hours)\nFeature: feature-1774062823574-jewtmwje2\nPR: #112\nAuto-action: Enable auto-merge at 30 minutes. Ping reviewer at 48 hours. Escalate at 96 hours.",
+      "createdAt": "2026-03-24T02:49:43.300Z",
+      "status": "pending",
+      "actionPayload": {
+        "signalName": "stale-review",
+        "currentValue": 3779.755183333333,
+        "unit": "minutes",
+        "category": "decision",
+        "autoAction": "Enable auto-merge at 30 minutes. Ping reviewer at 48 hours. Escalate at 96 hours.",
+        "projectPath": "/Volumes/Development/booked/helixir",
+        "featureId": "feature-1774062823574-jewtmwje2",
+        "prNumber": 112
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "decision"
+    },
+    {
+      "id": "07bc67ee-5ead-48a3-9f23-8c8221f30780",
+      "actionType": "signal",
+      "priority": "medium",
+      "title": "[DECISION] PR has been in review status beyond the expected turnaround time.",
+      "message": "Signal: stale-review\nValue: 3829.756033333333 minutes (threshold: 2880 — PR in review > 48 hours)\nFeature: feature-1773944405390-jlt90cz8v\nPR: #112\nAuto-action: Enable auto-merge at 30 minutes. Ping reviewer at 48 hours. Escalate at 96 hours.",
+      "createdAt": "2026-03-24T03:39:43.306Z",
+      "status": "pending",
+      "actionPayload": {
+        "signalName": "stale-review",
+        "currentValue": 3829.756033333333,
+        "unit": "minutes",
+        "category": "decision",
+        "autoAction": "Enable auto-merge at 30 minutes. Ping reviewer at 48 hours. Escalate at 96 hours.",
+        "projectPath": "/Volumes/Development/booked/helixir",
+        "featureId": "feature-1773944405390-jlt90cz8v",
+        "prNumber": 112
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "decision"
+    }
+  ]
+}
+}

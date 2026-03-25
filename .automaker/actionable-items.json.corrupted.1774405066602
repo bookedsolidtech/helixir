@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "bdebbf95-f6fe-468c-8f1f-a52d02039086",
+      "actionType": "signal",
+      "priority": "medium",
+      "title": "[DECISION] PR has been in review status beyond the expected turnaround time.",
+      "message": "Signal: stale-review\nValue: 5696.7744 minutes (threshold: 2880 — PR in review > 48 hours)\nFeature: feature-1774061903423-x49q1mkke\nPR: #104\nAuto-action: Enable auto-merge at 30 minutes. Ping reviewer at 48 hours. Escalate at 96 hours.",
+      "createdAt": "2026-03-25T02:12:46.663Z",
+      "status": "pending",
+      "actionPayload": {
+        "signalName": "stale-review",
+        "currentValue": 5696.7744,
+        "unit": "minutes",
+        "category": "decision",
+        "autoAction": "Enable auto-merge at 30 minutes. Ping reviewer at 48 hours. Escalate at 96 hours.",
+        "projectPath": "/Volumes/Development/booked/helixir",
+        "featureId": "feature-1774061903423-x49q1mkke",
+        "prNumber": 104
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "decision"
+    }
+  ]
+}{
+      "id": "5b42c783-9a2d-436b-85f8-99107d3ea0c1",
+      "actionType": "signal",
+      "priority": "medium",
+      "title": "[DECISION] PR has been in review status beyond the expected turnaround time.",
+      "message": "Signal: stale-review\nValue: 5182.811233333333 minutes (threshold: 2880 — PR in review > 48 hours)\nFeature: feature-1774062823574-jewtmwje2\nPR: #112\nAuto-action: Enable auto-merge at 30 minutes. Ping reviewer at 48 hours. Escalate at 96 hours.",
+      "createdAt": "2026-03-25T02:12:46.663Z",
+      "status": "pending",
+      "actionPayload": {
+        "signalName": "stale-review",
+        "currentValue": 5182.811233333333,
+        "unit": "minutes",
+        "category": "decision",
+        "autoAction": "Enable auto-merge at 30 minutes. Ping reviewer at 48 hours. Escalate at 96 hours.",
+        "projectPath": "/Volumes/Development/booked/helixir",
+        "featureId": "feature-1774062823574-jewtmwje2",
+        "prNumber": 112
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "decision"
+    }
+  ]
+}

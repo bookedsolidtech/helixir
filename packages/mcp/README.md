@@ -23,13 +23,13 @@ pnpm add helixir @helixui/mcp
 
 `@helixui/mcp` exports three core engine modules plus config and error utilities:
 
-| Module | Description |
-|---|---|
-| **CEM Reader** | Parse Custom Elements Manifests, query components, events, slots, and CSS parts |
-| **Token Parser** | Parse W3C DTCG design token files and query token usage across components |
-| **Template Engine** | Generate framework-specific usage snippets (React, Vue, Svelte, Angular, HTML) |
-| **Config** | Load helixir configuration from env vars and config files |
-| **Error Utilities** | Structured error handling primitives for MCP tool implementations |
+| Module              | Description                                                                     |
+| ------------------- | ------------------------------------------------------------------------------- |
+| **CEM Reader**      | Parse Custom Elements Manifests, query components, events, slots, and CSS parts |
+| **Token Parser**    | Parse W3C DTCG design token files and query token usage across components       |
+| **Template Engine** | Generate framework-specific usage snippets (React, Vue, Svelte, Angular, HTML)  |
+| **Config**          | Load helixir configuration from env vars and config files                       |
+| **Error Utilities** | Structured error handling primitives for MCP tool implementations               |
 
 ---
 
@@ -53,11 +53,11 @@ const tags = listAllComponents(cem);
 
 // Get detailed metadata for a specific component
 const meta = parseCem('my-button', cem);
-console.log(meta.attributes);     // array of attribute descriptors
-console.log(meta.events);         // array of custom event descriptors
-console.log(meta.slots);          // array of slot descriptors
-console.log(meta.cssParts);       // array of CSS ::part() descriptors
-console.log(meta.cssProperties);  // array of CSS custom property descriptors
+console.log(meta.attributes); // array of attribute descriptors
+console.log(meta.events); // array of custom event descriptors
+console.log(meta.slots); // array of slot descriptors
+console.log(meta.cssParts); // array of CSS ::part() descriptors
+console.log(meta.cssProperties); // array of CSS custom property descriptors
 ```
 
 ### Check documentation completeness
@@ -66,8 +66,8 @@ console.log(meta.cssProperties);  // array of CSS custom property descriptors
 import { validateCompleteness } from '@helixui/mcp';
 
 const result = validateCompleteness('my-button', cem);
-console.log(result.score);    // 0–100
-console.log(result.missing);  // ['description', 'cssProperties', ...]
+console.log(result.score); // 0–100
+console.log(result.missing); // ['description', 'cssProperties', ...]
 ```
 
 ### Query across all components
@@ -116,7 +116,7 @@ const tokens = await parseTokens('./tokens/tokens.json');
 //   ...
 // ]
 
-const colorTokens = tokens.filter(t => t.category === 'color');
+const colorTokens = tokens.filter((t) => t.category === 'color');
 ```
 
 ### Find components using a token
@@ -167,9 +167,9 @@ console.log(result.snippet);
 //   );
 // }
 
-console.log(result.eventListeners);   // event binding examples
-console.log(result.styling.tokens);   // CSS custom properties to customize
-console.log(result.styling.parts);    // ::part() selectors available
+console.log(result.eventListeners); // event binding examples
+console.log(result.styling.tokens); // CSS custom properties to customize
+console.log(result.styling.parts); // ::part() selectors available
 ```
 
 ### Supported frameworks
@@ -188,8 +188,8 @@ const result = await suggestUsage(config, 'my-dialog', framework);
 import { generateImport } from '@helixui/mcp';
 
 const result = await generateImport(config, 'my-button');
-console.log(result.importStatement);  // "import '@my-lib/my-button';"
-console.log(result.cdnTag);           // optional CDN <script> tag
+console.log(result.importStatement); // "import '@my-lib/my-button';"
+console.log(result.cdnTag); // optional CDN <script> tag
 ```
 
 ---
@@ -213,13 +213,13 @@ const config: McpWcConfig = loadConfig();
 
 ### Environment variables
 
-| Variable | Description |
-|---|---|
-| `MCP_WC_PROJECT_ROOT` | Override the project root directory |
-| `MCP_WC_CEM_PATH` | Override the CEM file path |
-| `MCP_WC_COMPONENT_PREFIX` | Set the expected tag name prefix |
-| `MCP_WC_TOKENS_PATH` | Override the design token file path |
-| `MCP_WC_CDN_BASE` | Override the CDN base URL |
+| Variable                  | Description                         |
+| ------------------------- | ----------------------------------- |
+| `MCP_WC_PROJECT_ROOT`     | Override the project root directory |
+| `MCP_WC_CEM_PATH`         | Override the CEM file path          |
+| `MCP_WC_COMPONENT_PREFIX` | Set the expected tag name prefix    |
+| `MCP_WC_TOKENS_PATH`      | Override the design token file path |
+| `MCP_WC_CDN_BASE`         | Override the CDN base URL           |
 
 ---
 
@@ -255,12 +255,12 @@ async function myToolHandler(input: unknown) {
 
 ### Error categories
 
-| Category | When used |
-|---|---|
-| `ErrorCategory.NOT_FOUND` | Component or resource does not exist |
-| `ErrorCategory.INVALID_INPUT` | Malformed or missing input |
-| `ErrorCategory.INTERNAL` | Unexpected internal failure |
-| `ErrorCategory.UNSUPPORTED` | Feature not supported for this input |
+| Category                      | When used                            |
+| ----------------------------- | ------------------------------------ |
+| `ErrorCategory.NOT_FOUND`     | Component or resource does not exist |
+| `ErrorCategory.INVALID_INPUT` | Malformed or missing input           |
+| `ErrorCategory.INTERNAL`      | Unexpected internal failure          |
+| `ErrorCategory.UNSUPPORTED`   | Feature not supported for this input |
 
 ---
 
@@ -285,16 +285,21 @@ const config = loadConfig();
 const raw = JSON.parse(readFileSync(resolve(config.projectRoot, config.cemPath), 'utf-8'));
 const cem = CemSchema.parse(raw);
 
-const server = new Server({ name: 'my-quality-tool', version: '1.0.0' }, {
-  capabilities: { tools: {} },
-});
+const server = new Server(
+  { name: 'my-quality-tool', version: '1.0.0' },
+  {
+    capabilities: { tools: {} },
+  },
+);
 
 server.setRequestHandler('tools/list', async () => ({
-  tools: [{
-    name: 'check_documentation_scores',
-    description: 'Get documentation completeness scores for all components',
-    inputSchema: { type: 'object', properties: {}, required: [] },
-  }],
+  tools: [
+    {
+      name: 'check_documentation_scores',
+      description: 'Get documentation completeness scores for all components',
+      inputSchema: { type: 'object', properties: {}, required: [] },
+    },
+  ],
 }));
 
 server.setRequestHandler('tools/call', async (request) => {
@@ -303,15 +308,17 @@ server.setRequestHandler('tools/call', async (request) => {
   }
   try {
     const tags = listAllComponents(cem);
-    const scores = tags.map(tag => ({
+    const scores = tags.map((tag) => ({
       tag,
       ...validateCompleteness(tag, cem),
     }));
     return {
-      content: [{
-        type: 'text',
-        text: JSON.stringify(scores, null, 2),
-      }],
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(scores, null, 2),
+        },
+      ],
     };
   } catch (err) {
     const e = handleToolError(err);

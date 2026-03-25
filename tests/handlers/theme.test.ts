@@ -1,8 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  createTheme,
-  applyThemeTokens,
-} from '../../packages/core/src/handlers/theme.js';
+import { createTheme, applyThemeTokens } from '../../packages/core/src/handlers/theme.js';
 import type { Cem } from '../../packages/core/src/handlers/cem.js';
 
 // ─── Fixtures ──────────────────────────────────────────────────────────────────
@@ -64,9 +61,7 @@ const richCem = makeCem([
 
 const emptyCem = makeCem([]);
 
-const noCssCem = makeCem([
-  { tagName: 'my-icon', cssProperties: [] },
-]);
+const noCssCem = makeCem([{ tagName: 'my-icon', cssProperties: [] }]);
 
 // ─── createTheme ──────────────────────────────────────────────────────────────
 

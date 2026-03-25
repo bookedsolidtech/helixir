@@ -256,7 +256,8 @@ export function createTheme(cem: Cem, options: CreateThemeOptions = {}): CreateT
   const lightCategoryBlocks = categoryOrder
     .filter((cat) => (cats[cat]?.length ?? 0) > 0)
     .map((cat) => {
-      const label = cat === 'borderRadius' ? 'Border Radius' : cat.charAt(0).toUpperCase() + cat.slice(1);
+      const label =
+        cat === 'borderRadius' ? 'Border Radius' : cat.charAt(0).toUpperCase() + cat.slice(1);
       const tokenLines = (cats[cat] ?? [])
         .map((name) => `  ${name}: ${lightValues.get(name)};`)
         .join('\n');
@@ -275,14 +276,14 @@ export function createTheme(cem: Cem, options: CreateThemeOptions = {}): CreateT
     ` *               or let prefers-color-scheme apply it automatically\n` +
     ` */\n\n`;
 
-  fullThemeCSS +=
-    `:root,\n.${themeName}-light {\n  color-scheme: light;\n\n${lightCategoryBlocks}\n}\n\n`;
+  fullThemeCSS += `:root,\n.${themeName}-light {\n  color-scheme: light;\n\n${lightCategoryBlocks}\n}\n\n`;
 
   if (darkValues.size > 0) {
     const darkCategoryBlocks = categoryOrder
       .filter((cat) => (cats[cat] ?? []).some((name) => darkValues.has(name)))
       .map((cat) => {
-        const label = cat === 'borderRadius' ? 'Border Radius' : cat.charAt(0).toUpperCase() + cat.slice(1);
+        const label =
+          cat === 'borderRadius' ? 'Border Radius' : cat.charAt(0).toUpperCase() + cat.slice(1);
         const tokenLines = (cats[cat] ?? [])
           .filter((name) => darkValues.has(name))
           .map((name) => `  ${name}: ${darkValues.get(name)};`)

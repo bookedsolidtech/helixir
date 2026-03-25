@@ -24,7 +24,7 @@ export const THEME_TOOL_DEFINITIONS = [
   {
     name: 'create_theme',
     description:
-      'Scaffold a complete enterprise CSS theme from the component library\'s design tokens. ' +
+      "Scaffold a complete enterprise CSS theme from the component library's design tokens. " +
       'Analyzes the CEM to detect the token prefix and categories, then generates a ready-to-customize ' +
       'CSS file with light mode variables, dark mode overrides (via prefers-color-scheme and explicit class), ' +
       'and color-scheme declarations. Returns the full CSS content and per-category token counts.',

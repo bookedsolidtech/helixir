@@ -3934,6 +3934,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "packages/core/src/handlers/theme.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "packages/core/src/handlers/theme-checker.js"
           }
         },
@@ -3991,6 +3999,14 @@
           "declaration": {
             "name": "*",
             "module": "packages/core/src/handlers/validate.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/scaffold.js"
           }
         }
       ]
@@ -4277,6 +4293,89 @@
           "declaration": {
             "name": "recommendChecks",
             "module": "packages/core/src/handlers/recommend-checks.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/scaffold.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "detectConventions",
+          "return": {
+            "type": {
+              "text": "DetectedConventions"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            },
+            {
+              "name": "configPrefix",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Detect naming conventions from the existing CEM.\n\n- `prefix`: inferred from the most common tag name prefix in the library,\n  or overridden by `configPrefix` when supplied.\n- `baseClass`: the most commonly used superclass across all declarations.\n- `packageName`: the first package name found in an inherited member's origin."
+        },
+        {
+          "kind": "function",
+          "name": "scaffoldComponent",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "options",
+              "type": {
+                "text": "ScaffoldComponentOptions"
+              },
+              "description": "Component specification (tag name, properties, slots, etc.)"
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              },
+              "description": "Parsed Custom Elements Manifest for convention detection"
+            },
+            {
+              "name": "configPrefix",
+              "optional": true,
+              "type": {
+                "text": "string"
+              },
+              "description": "Optional override for the component prefix"
+            }
+          ],
+          "description": "Scaffold a new Helix-pattern web component from options and a CEM context.\n\nDetects library conventions (tag prefix, base class, package name) from the\nCEM so the generated code matches existing library patterns. Returns four\nfiles ready to write to disk: a Lit component class, a Vitest test stub, a\nStorybook CSF3 story, and a CSS structure file."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "detectConventions",
+          "declaration": {
+            "name": "detectConventions",
+            "module": "packages/core/src/handlers/scaffold.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "scaffoldComponent",
+          "declaration": {
+            "name": "scaffoldComponent",
+            "module": "packages/core/src/handlers/scaffold.ts"
           }
         }
       ]
@@ -5046,6 +5145,89 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/core/src/handlers/theme.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "createTheme",
+          "return": {
+            "type": {
+              "text": "CreateThemeResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            },
+            {
+              "name": "options",
+              "default": "{}",
+              "type": {
+                "text": "CreateThemeOptions"
+              }
+            }
+          ],
+          "description": "Generates a complete enterprise theme scaffold from a CEM analysis.\n\nUses detect_theme_support patterns to discover the token prefix and\ncategories, then produces a ready-to-customize CSS file with:\n- Light mode token values under `:root` and `.{themeName}-light`\n- Dark mode overrides via `@media (prefers-color-scheme: dark)` and `.{themeName}-dark`\n- `color-scheme` declarations for proper browser dark mode integration"
+        },
+        {
+          "kind": "function",
+          "name": "applyThemeTokens",
+          "return": {
+            "type": {
+              "text": "ApplyThemeTokensResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              },
+              "description": "Parsed Custom Elements Manifest"
+            },
+            {
+              "name": "themeTokens",
+              "type": {
+                "text": "Record<string, string>"
+              },
+              "description": "Map of CSS custom property name → value to apply"
+            },
+            {
+              "name": "tagNames",
+              "optional": true,
+              "type": {
+                "text": "string[]"
+              },
+              "description": "Optional list of component tag names to filter results;\n  when omitted all components with CSS properties are included"
+            }
+          ],
+          "description": "Maps a theme token definition to specific components, generating per-component\nCSS override blocks that apply the theme correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "createTheme",
+          "declaration": {
+            "name": "createTheme",
+            "module": "packages/core/src/handlers/theme.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "applyThemeTokens",
+          "declaration": {
+            "name": "applyThemeTokens",
+            "module": "packages/core/src/handlers/theme.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/core/src/handlers/token-fallback-checker.ts",
       "declarations": [
         {
@@ -5667,6 +5849,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "packages/core/src/tools/theme.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "packages/core/src/tools/tokens.js"
           }
         },
@@ -5684,6 +5874,14 @@
           "declaration": {
             "name": "*",
             "module": "packages/core/src/tools/validate.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/tools/scaffold.js"
           }
         }
       ]
@@ -7256,6 +7454,100 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/core/src/tools/scaffold.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "SCAFFOLD_TOOL_DEFINITIONS",
+          "type": {
+            "text": "[\n  {\n    name: 'scaffold_component',\n    description:\n      'Generate a complete Helix-pattern web component scaffold: Lit class with decorators, ' +\n      'CEM annotations (@slot, @csspart, @fires), Vitest test stub, Storybook CSF3 story, and ' +\n      'CSS structure. Conventions (tag prefix, base class) are auto-detected from the library CEM ' +\n      'so the generated code matches existing library patterns.',\n    inputSchema: {\n      type: 'object' as const,\n      properties: {\n        tagName: {\n          type: 'string',\n          description:\n            'Custom element tag name (e.g. \"hx-button\"). Must be lowercase and contain a hyphen.',\n        },\n        baseClass: {\n          type: 'string',\n          description:\n            'Base class to extend (e.g. \"LitElement\"). If omitted, detected from the CEM or defaults to \"LitElement\".',\n        },\n        slots: {\n          type: 'array',\n          description: 'Slots to expose. Use name \"\" or \"default\" for the unnamed default slot.',\n          items: {\n            type: 'object',\n            properties: {\n              name: { type: 'string', description: 'Slot name (empty string = default slot).' },\n              description: { type: 'string', description: 'Slot description for CEM annotation.' },\n            },\n            required: ['name'],\n            additionalProperties: false,\n          },\n        },\n        cssParts: {\n          type: 'array',\n          description: 'CSS parts to expose via ::part().',\n          items: {\n            type: 'object',\n            properties: {\n              name: { type: 'string', description: 'CSS part name.' },\n              description: {\n                type: 'string',\n                description: 'Part description for CEM annotation.',\n              },\n            },\n            required: ['name'],\n            additionalProperties: false,\n          },\n        },\n        events: {\n          type: 'array',\n          description: 'Custom events to dispatch.',\n          items: {\n            type: 'object',\n            properties: {\n              name: { type: 'string', description: 'Event name (e.g. \"hx-change\").' },\n              type: {\n                type: 'string',\n                description:\n                  'CustomEvent detail type (e.g. \"{ value: string }\"). Defaults to \"void\".',\n              },\n              description: { type: 'string', description: 'Event description.' },\n            },\n            required: ['name'],\n            additionalProperties: false,\n          },\n        },\n        properties: {\n          type: 'array',\n          description: 'Reactive properties / attributes to declare.',\n          items: {\n            type: 'object',\n            properties: {\n              name: { type: 'string', description: 'JavaScript property name.' },\n              type: {\n                type: 'string',\n                description: 'TypeScript type (e.g. \"string\", \"boolean\", \"number\").',\n              },\n              attribute: {\n                type: 'string',\n                description: 'HTML attribute name if different from the property name.',\n              },\n              default: {\n                type: 'string',\n                description: 'Default value as a source literal (e.g. \"\\'primary\\'\", \"false\").',\n              },\n              description: { type: 'string', description: 'Property description.' },\n              reflects: {\n                type: 'boolean',\n                description: 'Whether the property reflects to an attribute.',\n              },\n            },\n            required: ['name'],\n            additionalProperties: false,\n          },\n        },\n      },\n      required: ['tagName'],\n      additionalProperties: false,\n    },\n  },\n]"
+          },
+          "default": "[ { name: 'scaffold_component', description: 'Generate a complete Helix-pattern web component scaffold: Lit class with decorators, ' + 'CEM annotations (@slot, @csspart, @fires), Vitest test stub, Storybook CSF3 story, and ' + 'CSS structure. Conventions (tag prefix, base class) are auto-detected from the library CEM ' + 'so the generated code matches existing library patterns.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'Custom element tag name (e.g. \"hx-button\"). Must be lowercase and contain a hyphen.', }, baseClass: { type: 'string', description: 'Base class to extend (e.g. \"LitElement\"). If omitted, detected from the CEM or defaults to \"LitElement\".', }, slots: { type: 'array', description: 'Slots to expose. Use name \"\" or \"default\" for the unnamed default slot.', items: { type: 'object', properties: { name: { type: 'string', description: 'Slot name (empty string = default slot).' }, description: { type: 'string', description: 'Slot description for CEM annotation.' }, }, required: ['name'], additionalProperties: false, }, }, cssParts: { type: 'array', description: 'CSS parts to expose via ::part().', items: { type: 'object', properties: { name: { type: 'string', description: 'CSS part name.' }, description: { type: 'string', description: 'Part description for CEM annotation.', }, }, required: ['name'], additionalProperties: false, }, }, events: { type: 'array', description: 'Custom events to dispatch.', items: { type: 'object', properties: { name: { type: 'string', description: 'Event name (e.g. \"hx-change\").' }, type: { type: 'string', description: 'CustomEvent detail type (e.g. \"{ value: string }\"). Defaults to \"void\".', }, description: { type: 'string', description: 'Event description.' }, }, required: ['name'], additionalProperties: false, }, }, properties: { type: 'array', description: 'Reactive properties / attributes to declare.', items: { type: 'object', properties: { name: { type: 'string', description: 'JavaScript property name.' }, type: { type: 'string', description: 'TypeScript type (e.g. \"string\", \"boolean\", \"number\").', }, attribute: { type: 'string', description: 'HTML attribute name if different from the property name.', }, default: { type: 'string', description: 'Default value as a source literal (e.g. \"\\'primary\\'\", \"false\").', }, description: { type: 'string', description: 'Property description.' }, reflects: { type: 'boolean', description: 'Whether the property reflects to an attribute.', }, }, required: ['name'], additionalProperties: false, }, }, }, required: ['tagName'], additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleScaffoldCall",
+          "return": {
+            "type": {
+              "text": "MCPToolResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "Record<string, unknown>"
+              }
+            },
+            {
+              "name": "_config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ],
+          "description": "Dispatches a scaffold tool call by name and returns an MCPToolResult.\nCalled by the server's consolidated CallToolRequestSchema handler."
+        },
+        {
+          "kind": "function",
+          "name": "isScaffoldTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the scaffold tool group.\nUsed by the consolidated CallToolRequestSchema handler to dispatch correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "SCAFFOLD_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "SCAFFOLD_TOOL_DEFINITIONS",
+            "module": "packages/core/src/tools/scaffold.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleScaffoldCall",
+          "declaration": {
+            "name": "handleScaffoldCall",
+            "module": "packages/core/src/tools/scaffold.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isScaffoldTool",
+          "declaration": {
+            "name": "isScaffoldTool",
+            "module": "packages/core/src/tools/scaffold.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/core/src/tools/story.ts",
       "declarations": [
         {
@@ -7426,6 +7718,94 @@
           "declaration": {
             "name": "isStylingTool",
             "module": "packages/core/src/tools/styling.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/tools/theme.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "THEME_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'create_theme', description: \"Scaffold a complete enterprise CSS theme from the component library's design tokens. \" + 'Analyzes the CEM to detect the token prefix and categories, then generates a ready-to-customize ' + 'CSS file with light mode variables, dark mode overrides (via prefers-color-scheme and explicit class), ' + 'and color-scheme declarations. Returns the full CSS content and per-category token counts.', inputSchema: { type: 'object' as const, properties: { themeName: { type: 'string', description: 'Name for the theme (used in CSS class selectors). ' + 'E.g. \"brand\" generates \".brand-light\" and \".brand-dark\". Defaults to \"theme\".', }, prefix: { type: 'string', description: 'Override the CSS custom property prefix detected from the CEM. ' + 'E.g. \"--hx-\". When omitted, the prefix is detected automatically.', }, }, additionalProperties: false, }, }, { name: 'apply_theme_tokens', description: 'Map a theme token definition to specific components, showing how to apply it with correct ' + 'CSS custom property overrides. Accepts a map of CSS variable names to values, then generates ' + 'per-component CSS blocks and a global :root block. Use this after create_theme to wire ' + 'your theme tokens to individual component CSS properties.', inputSchema: { type: 'object' as const, properties: { themeTokens: { type: 'object', description: 'Map of CSS custom property names to their values. ' + 'E.g. { \"--hx-color-primary\": \"#0066cc\", \"--hx-spacing-md\": \"1rem\" }. ' + 'Property names that match component CSS properties generate per-component CSS blocks.', additionalProperties: { type: 'string' }, }, tagNames: { type: 'array', items: { type: 'string' }, description: 'Optional list of component tag names to filter results. ' + 'When omitted, all components with CSS properties are included.', }, }, required: ['themeTokens'], additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleThemeCall",
+          "return": {
+            "type": {
+              "text": "Promise<MCPToolResult>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "Record<string, unknown>"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ],
+          "description": "Dispatches a theme tool call by name and returns an MCPToolResult.\nCalled by the server's consolidated CallToolRequestSchema handler."
+        },
+        {
+          "kind": "function",
+          "name": "isThemeTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the theme tool group.\nUsed by the consolidated CallToolRequestSchema handler to dispatch correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "THEME_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "THEME_TOOL_DEFINITIONS",
+            "module": "packages/core/src/tools/theme.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleThemeCall",
+          "declaration": {
+            "name": "handleThemeCall",
+            "module": "packages/core/src/tools/theme.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isThemeTool",
+          "declaration": {
+            "name": "isThemeTool",
+            "module": "packages/core/src/tools/theme.ts"
           }
         }
       ]

@@ -22,6 +22,7 @@ Closes #
 
 ## Checklist
 
+- [ ] All commits are signed off with `git commit -s` (DCO requirement)
 - [ ] `pnpm run type-check` passes (zero TypeScript errors)
 - [ ] `pnpm run lint` passes
 - [ ] `pnpm run format:check` passes

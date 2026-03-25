@@ -1,0 +1,12 @@
+# DCO (Developer Certificate of Origin) configuration
+# https://github.com/apps/dco
+#
+# Requires all contributors to sign off their commits with:
+#   git commit -s -m "your message"
+# This appends: Signed-off-by: Your Name <your@email.com>
+#
+# See CONTRIBUTING.md for full instructions.
+
+require:
+  members: false
+  outsideCollaborators: true

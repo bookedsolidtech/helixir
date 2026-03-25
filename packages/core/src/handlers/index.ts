@@ -51,3 +51,4 @@ export * from './validation-summary.js';
 export * from './typegenerate.js';
 export * from './typescript.js';
 export * from './validate.js';
+export * from './scaffold.js';

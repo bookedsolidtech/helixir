@@ -36,6 +36,7 @@ protoLabs.report.html
 # Env
 .env
 .env.local
+.env*.local
 MCP: Web Components/
 .automaker/settings.json.bak*
 .automaker-lock

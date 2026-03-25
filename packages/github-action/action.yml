@@ -19,6 +19,10 @@ inputs:
     description: 'Fail the check if breaking changes are detected'
     required: false
     default: 'true'
+  fail-on-warning:
+    description: 'Fail the check if minor (warning-level) breaking changes are detected'
+    required: false
+    default: 'false'
   comment:
     description: 'Post a summary comment on the pull request'
     required: false
@@ -64,10 +68,10 @@ runs:
         fi
         helixir --version || echo "helixir installed via npm global"
 
-    - name: Install action dependencies
+    - name: Install and build action
       shell: bash
       working-directory: ${{ github.action_path }}
-      run: npm install --production
+      run: npm install && npm run build
 
     - name: Run helixir quality gates
       shell: bash
@@ -77,6 +81,7 @@ runs:
         INPUT_CHECKS: ${{ inputs.checks }}
         INPUT_HEALTH-THRESHOLD: ${{ inputs.health-threshold }}
         INPUT_FAIL-ON-BREAKING: ${{ inputs.fail-on-breaking }}
+        INPUT_FAIL-ON-WARNING: ${{ inputs.fail-on-warning }}
         INPUT_COMMENT: ${{ inputs.comment }}
         INPUT_CONFIG-PATH: ${{ inputs.config-path }}
       run: node ${{ github.action_path }}/dist/index.js

@@ -50,7 +50,7 @@
           ],
           "complexity": "large",
           "featureId": "feature-1774410876103-lzb62e1kp",
-          "executionStatus": "blocked"
+          "executionStatus": "in-progress"
         },
         {
           "number": 3,
@@ -69,7 +69,8 @@
             "Tests verify inheritance chain and generated type declarations"
           ],
           "complexity": "medium",
-          "featureId": "feature-1774410876112-nwujiaj98"
+          "featureId": "feature-1774410876112-nwujiaj98",
+          "executionStatus": "in-progress"
         },
         {
           "number": 4,
@@ -89,7 +90,7 @@
           ],
           "complexity": "large",
           "featureId": "feature-1774410876121-avccqenh1",
-          "executionStatus": "blocked"
+          "executionStatus": "in-progress"
         }
       ],
       "status": "pending",
@@ -118,7 +119,8 @@
             "Screenshots or code examples for each step"
           ],
           "complexity": "medium",
-          "featureId": "feature-1774410876140-osyn4tf8y"
+          "featureId": "feature-1774410876140-osyn4tf8y",
+          "executionStatus": "in-progress"
         },
         {
           "number": 2,
@@ -137,7 +139,8 @@
             "Recipes tested against actual helixir tool inventory"
           ],
           "complexity": "medium",
-          "featureId": "feature-1774410876149-o94sf8geg"
+          "featureId": "feature-1774410876149-o94sf8geg",
+          "executionStatus": "in-progress"
         },
         {
           "number": 3,
@@ -172,7 +175,7 @@
           ],
           "complexity": "large",
           "featureId": "feature-1774410876167-csue90o5n",
-          "executionStatus": "blocked"
+          "executionStatus": "in-progress"
         }
       ],
       "status": "pending",
@@ -188,6 +191,6 @@
     "generatedAt": "2026-03-25T03:54:27.861Z"
   },
   "createdAt": "2026-03-25T03:54:27.864Z",
-  "updatedAt": "2026-03-25T12:30:04.507Z",
-  "health": "at-risk"
+  "updatedAt": "2026-03-25T13:24:28.754Z",
+  "health": "on-track"
 }

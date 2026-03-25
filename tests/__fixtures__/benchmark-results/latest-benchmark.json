@@ -3345,7 +3345,7 @@
       },
       {
         "name": "generate-comparison",
-        "durationMs": 1
+        "durationMs": 0
       }
     ],
     "withinGate": true

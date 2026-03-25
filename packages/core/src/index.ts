@@ -41,3 +41,4 @@ export * from './tools/theme.js';
 export * from './tools/tokens.js';
 export * from './tools/typescript.js';
 export * from './tools/validate.js';
+export * from './tools/scaffold.js';

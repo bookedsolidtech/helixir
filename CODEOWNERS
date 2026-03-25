@@ -1,0 +1,9 @@
+# CODEOWNERS — Sensitive path reviewers
+# These paths require manual review by @himerus before any merge.
+# GitHub enforces this on all pull requests touching these files.
+
+.env*                   @himerus
+.gitleaks.toml          @himerus
+.github/workflows/      @himerus
+package.json            @himerus
+CODEOWNERS              @himerus

@@ -1,0 +1,61 @@
+title = "HELiXiR Secret Scanning"
+
+# Enable all default gitleaks provider rules
+[extend]
+useDefault = true
+
+# Custom rule: npm authentication tokens
+[[rules]]
+id = "npm-token"
+description = "npm authentication token"
+regex = '''npm_[A-Za-z0-9]{36}'''
+tags = ["npm", "token"]
+
+# Custom rule: Discord bot tokens and webhooks
+[[rules]]
+id = "discord-bot-token"
+description = "Discord bot token"
+regex = '''[A-Za-z0-9]{24}\.[A-Za-z0-9_-]{6}\.[A-Za-z0-9_-]{27}'''
+tags = ["discord", "token"]
+
+[[rules]]
+id = "discord-webhook"
+description = "Discord webhook URL"
+regex = '''https://discord(?:app)?\.com/api/webhooks/[0-9]{17,19}/[A-Za-z0-9_-]{68}'''
+tags = ["discord", "webhook"]
+
+# Custom rule: Vercel authentication tokens
+[[rules]]
+id = "vercel-token"
+description = "Vercel authentication token"
+regex = '''(?i)vercel[_\s-]*token[\s]*[=:]\s*["']?[A-Za-z0-9_-]{20,}["']?'''
+tags = ["vercel", "token"]
+
+[[rules]]
+id = "vercel-api-token"
+description = "Vercel API token (bare format)"
+regex = '''["']?[A-Za-z0-9]{24}["']?\s*#\s*vercel'''
+tags = ["vercel", "token"]
+
+# Custom rule: Generic env var secrets (covers API keys, passwords, secrets assigned in .env files)
+[[rules]]
+id = "generic-env-secret"
+description = "Generic environment variable containing a secret value"
+regex = '''(?i)(?:secret|password|passwd|pwd|api_key|apikey|auth_token|access_token|private_key)[\s]*[=:][\s]*["']?[A-Za-z0-9+/=_\-]{16,}["']?'''
+tags = ["generic", "secret"]
+
+[allowlist]
+description = "Allowlisted paths and patterns"
+
+# Paths to skip during scanning
+paths = [
+  '''node_modules/''',
+  '''pnpm-lock.yaml''',
+  '''CHANGELOG.md''',
+  '''\.gitleaks\.toml''',
+]
+
+# GitHub Actions expression syntax — not real secrets
+regexes = [
+  '''\$\{\{\s*.*?\s*\}\}''',
+]

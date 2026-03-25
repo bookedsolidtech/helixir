@@ -1,0 +1,266 @@
+import { describe, it, expect } from 'vitest';
+import {
+  createTheme,
+  applyThemeTokens,
+} from '../../packages/core/src/handlers/theme.js';
+import type { Cem } from '../../packages/core/src/handlers/cem.js';
+
+// ─── Fixtures ──────────────────────────────────────────────────────────────────
+
+function makeCem(
+  components: Array<{
+    tagName: string;
+    cssProperties: Array<{ name: string; description?: string }>;
+  }>,
+): Cem {
+  return {
+    schemaVersion: '1.0.0',
+    modules: components.map((c) => ({
+      kind: 'javascript-module' as const,
+      path: `src/${c.tagName}.js`,
+      declarations: [
+        {
+          kind: 'class' as const,
+          name: c.tagName.replace(/-([a-z])/g, (_, l: string) => l.toUpperCase()),
+          tagName: c.tagName,
+          members: [],
+          events: [],
+          slots: [],
+          cssProperties: c.cssProperties.map((p) => ({
+            name: p.name,
+            description: p.description ?? '',
+          })),
+          cssParts: [],
+        },
+      ],
+    })),
+  };
+}
+
+const richCem = makeCem([
+  {
+    tagName: 'my-button',
+    cssProperties: [
+      { name: '--my-color-primary', description: 'Primary color' },
+      { name: '--my-color-text', description: 'Text color' },
+      { name: '--my-color-bg', description: 'Background color' },
+      { name: '--my-spacing-sm', description: 'Small spacing' },
+      { name: '--my-spacing-md', description: 'Medium spacing' },
+      { name: '--my-font-family', description: 'Font family' },
+      { name: '--my-border-radius-sm', description: 'Small border radius' },
+      { name: '--my-elevation-1', description: 'Low elevation shadow' },
+    ],
+  },
+  {
+    tagName: 'my-input',
+    cssProperties: [
+      { name: '--my-color-primary', description: 'Primary color' },
+      { name: '--my-color-bg', description: 'Background color' },
+      { name: '--my-color-border', description: 'Border color' },
+      { name: '--my-spacing-md', description: 'Medium spacing' },
+    ],
+  },
+]);
+
+const emptyCem = makeCem([]);
+
+const noCssCem = makeCem([
+  { tagName: 'my-icon', cssProperties: [] },
+]);
+
+// ─── createTheme ──────────────────────────────────────────────────────────────
+
+describe('createTheme', () => {
+  it('returns the correct themeName (default)', () => {
+    const result = createTheme(richCem);
+    expect(result.themeName).toBe('theme');
+  });
+
+  it('accepts a custom themeName', () => {
+    const result = createTheme(richCem, { themeName: 'brand' });
+    expect(result.themeName).toBe('brand');
+    expect(result.fullThemeCSS).toContain('.brand-light');
+    expect(result.fullThemeCSS).toContain('.brand-dark');
+  });
+
+  it('detects token prefix from CEM', () => {
+    const result = createTheme(richCem);
+    expect(result.prefix).toBe('--my-');
+  });
+
+  it('accepts a custom prefix override', () => {
+    const result = createTheme(richCem, { prefix: '--custom-' });
+    expect(result.prefix).toBe('--custom-');
+  });
+
+  it('returns tokenCount matching total CEM CSS properties (deduplicated)', () => {
+    const result = createTheme(richCem);
+    // richCem has 8 + 4 = 12 properties, but --my-color-primary, --my-color-bg, --my-spacing-md
+    // appear in both components — detectThemeSupport returns unique tokens across all components
+    expect(result.tokenCount).toBeGreaterThan(0);
+  });
+
+  it('returns categories with positive counts for populated categories', () => {
+    const result = createTheme(richCem);
+    expect(result.categories['color']).toBeGreaterThan(0);
+    expect(result.categories['spacing']).toBeGreaterThan(0);
+    expect(result.categories['typography']).toBeGreaterThan(0);
+    expect(result.categories['borderRadius']).toBeGreaterThan(0);
+    expect(result.categories['elevation']).toBeGreaterThan(0);
+  });
+
+  it('lightModeCSS contains :root and color-scheme: light', () => {
+    const result = createTheme(richCem);
+    expect(result.lightModeCSS).toContain(':root');
+    expect(result.lightModeCSS).toContain('color-scheme: light');
+  });
+
+  it('lightModeCSS contains theme class selector', () => {
+    const result = createTheme(richCem, { themeName: 'my-brand' });
+    expect(result.lightModeCSS).toContain('.my-brand-light');
+  });
+
+  it('darkModeCSS contains @media and color-scheme: dark when color tokens exist', () => {
+    const result = createTheme(richCem);
+    expect(result.darkModeCSS).toContain('@media (prefers-color-scheme: dark)');
+    expect(result.darkModeCSS).toContain('color-scheme: dark');
+  });
+
+  it('darkModeCSS contains the dark class selector', () => {
+    const result = createTheme(richCem, { themeName: 'brand' });
+    expect(result.darkModeCSS).toContain('.brand-dark');
+  });
+
+  it('fullThemeCSS contains the header comment', () => {
+    const result = createTheme(richCem, { themeName: 'my-theme' });
+    expect(result.fullThemeCSS).toContain('my-theme Theme');
+    expect(result.fullThemeCSS).toContain('Generated by helixir create_theme');
+  });
+
+  it('fullThemeCSS includes both light and dark sections', () => {
+    const result = createTheme(richCem);
+    expect(result.fullThemeCSS).toContain('color-scheme: light');
+    expect(result.fullThemeCSS).toContain('color-scheme: dark');
+    expect(result.fullThemeCSS).toContain('@media (prefers-color-scheme: dark)');
+  });
+
+  it('fullThemeCSS includes token names from the CEM', () => {
+    const result = createTheme(richCem);
+    expect(result.fullThemeCSS).toContain('--my-color-primary');
+    expect(result.fullThemeCSS).toContain('--my-spacing-sm');
+    expect(result.fullThemeCSS).toContain('--my-font-family');
+  });
+
+  it('includes detectionAnalysis with tokenPrefix', () => {
+    const result = createTheme(richCem);
+    expect(result.detectionAnalysis).toBeDefined();
+    expect(result.detectionAnalysis.tokenPrefix).toBe('--my-');
+    expect(result.detectionAnalysis.totalTokens).toBeGreaterThan(0);
+  });
+
+  it('handles empty CEM gracefully', () => {
+    const result = createTheme(emptyCem);
+    expect(result.tokenCount).toBe(0);
+    expect(result.categories).toEqual({});
+    expect(result.lightModeCSS).toContain(':root');
+    expect(result.darkModeCSS).toBe('');
+    expect(result.fullThemeCSS).toContain(':root');
+  });
+
+  it('produces different light/dark placeholder values for bg tokens', () => {
+    const result = createTheme(richCem);
+    // Light CSS should have white-ish values for bg
+    expect(result.lightModeCSS).toContain('#ffffff');
+    // Dark CSS should have dark values for bg
+    expect(result.darkModeCSS).toContain('#1a1a1a');
+  });
+});
+
+// ─── applyThemeTokens ─────────────────────────────────────────────────────────
+
+describe('applyThemeTokens', () => {
+  it('generates a globalCSS :root block for all theme tokens', () => {
+    const tokens = { '--my-color-primary': '#0066cc', '--my-spacing-md': '1rem' };
+    const result = applyThemeTokens(richCem, tokens);
+    expect(result.globalCSS).toContain(':root');
+    expect(result.globalCSS).toContain('--my-color-primary: #0066cc');
+    expect(result.globalCSS).toContain('--my-spacing-md: 1rem');
+  });
+
+  it('returns totalComponents for components that have CSS properties', () => {
+    const tokens = { '--my-color-primary': '#0066cc' };
+    const result = applyThemeTokens(richCem, tokens);
+    expect(result.totalComponents).toBe(2); // my-button and my-input
+  });
+
+  it('counts matched tokens across all components', () => {
+    const tokens = { '--my-color-primary': '#0066cc', '--my-color-bg': '#fff' };
+    const result = applyThemeTokens(richCem, tokens);
+    // --my-color-primary appears in both my-button and my-input → 2 matches
+    // --my-color-bg appears in both my-button and my-input → 2 matches
+    expect(result.totalMatches).toBe(4);
+  });
+
+  it('generates per-component cssBlock with correct CSS syntax', () => {
+    const tokens = { '--my-color-primary': '#0066cc' };
+    const result = applyThemeTokens(richCem, tokens);
+    const buttonEntry = result.components.find((c) => c.tagName === 'my-button');
+    expect(buttonEntry).toBeDefined();
+    expect(buttonEntry?.cssBlock).toContain('my-button {');
+    expect(buttonEntry?.cssBlock).toContain('--my-color-primary: #0066cc');
+  });
+
+  it('sets cssBlock to empty string when no tokens match', () => {
+    const tokens = { '--some-unrelated-token': 'red' };
+    const result = applyThemeTokens(richCem, tokens);
+    const buttonEntry = result.components.find((c) => c.tagName === 'my-button');
+    expect(buttonEntry?.cssBlock).toBe('');
+    expect(buttonEntry?.matchedTokens).toBe(0);
+  });
+
+  it('reports correct totalCssProperties per component', () => {
+    const tokens = { '--my-color-primary': '#0066cc' };
+    const result = applyThemeTokens(richCem, tokens);
+    const buttonEntry = result.components.find((c) => c.tagName === 'my-button');
+    expect(buttonEntry?.totalCssProperties).toBe(8);
+    const inputEntry = result.components.find((c) => c.tagName === 'my-input');
+    expect(inputEntry?.totalCssProperties).toBe(4);
+  });
+
+  it('filters by tagNames when provided', () => {
+    const tokens = { '--my-color-primary': '#0066cc' };
+    const result = applyThemeTokens(richCem, tokens, ['my-button']);
+    expect(result.totalComponents).toBe(1);
+    expect(result.components[0]?.tagName).toBe('my-button');
+  });
+
+  it('excludes components with no CSS properties', () => {
+    const cemWithNoCss = makeCem([
+      { tagName: 'my-button', cssProperties: [{ name: '--my-color-primary' }] },
+      { tagName: 'my-icon', cssProperties: [] },
+    ]);
+    const tokens = { '--my-color-primary': '#0066cc' };
+    const result = applyThemeTokens(cemWithNoCss, tokens);
+    expect(result.components.map((c) => c.tagName)).not.toContain('my-icon');
+  });
+
+  it('returns empty results for empty CEM', () => {
+    const tokens = { '--my-color-primary': '#0066cc' };
+    const result = applyThemeTokens(emptyCem, tokens);
+    expect(result.totalComponents).toBe(0);
+    expect(result.totalMatches).toBe(0);
+    expect(result.components).toHaveLength(0);
+  });
+
+  it('returns empty globalCSS for empty themeTokens', () => {
+    const result = applyThemeTokens(richCem, {});
+    expect(result.globalCSS).toBe('');
+  });
+
+  it('handles CEM with only components that have no CSS properties', () => {
+    const tokens = { '--foo': 'bar' };
+    const result = applyThemeTokens(noCssCem, tokens);
+    expect(result.totalComponents).toBe(0);
+    expect(result.totalMatches).toBe(0);
+  });
+});

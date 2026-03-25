@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-25T05:27:14.493Z",
+  "timestamp": "2026-03-25T13:14:08.377Z",
   "scorecards": {
     "material": {
       "library": "material",
@@ -187,7 +187,7 @@
         "heuristic": 426,
         "untested": 747
       },
-      "timestamp": "2026-03-25T05:27:14.491Z"
+      "timestamp": "2026-03-25T13:14:08.374Z"
     },
     "spectrum": {
       "library": "spectrum",
@@ -375,7 +375,7 @@
         "heuristic": 404,
         "untested": 601
       },
-      "timestamp": "2026-03-25T05:27:14.491Z"
+      "timestamp": "2026-03-25T13:14:08.375Z"
     },
     "vaadin": {
       "library": "vaadin",
@@ -563,7 +563,7 @@
         "heuristic": 439,
         "untested": 717
       },
-      "timestamp": "2026-03-25T05:27:14.491Z"
+      "timestamp": "2026-03-25T13:14:08.375Z"
     },
     "fluentui": {
       "library": "fluentui",
@@ -751,7 +751,7 @@
         "heuristic": 139,
         "untested": 293
       },
-      "timestamp": "2026-03-25T05:27:14.491Z"
+      "timestamp": "2026-03-25T13:14:08.375Z"
     },
     "carbon": {
       "library": "carbon",
@@ -939,7 +939,7 @@
         "heuristic": 397,
         "untested": 793
       },
-      "timestamp": "2026-03-25T05:27:14.491Z"
+      "timestamp": "2026-03-25T13:14:08.375Z"
     },
     "ui5": {
       "library": "ui5",
@@ -1127,7 +1127,7 @@
         "heuristic": 582,
         "untested": 1304
       },
-      "timestamp": "2026-03-25T05:27:14.492Z"
+      "timestamp": "2026-03-25T13:14:08.376Z"
     },
     "calcite": {
       "library": "calcite",
@@ -1315,7 +1315,7 @@
         "heuristic": 318,
         "untested": 848
       },
-      "timestamp": "2026-03-25T05:27:14.492Z"
+      "timestamp": "2026-03-25T13:14:08.376Z"
     },
     "porsche": {
       "library": "porsche",
@@ -1503,7 +1503,7 @@
         "heuristic": 304,
         "untested": 702
       },
-      "timestamp": "2026-03-25T05:27:14.492Z"
+      "timestamp": "2026-03-25T13:14:08.376Z"
     },
     "ionic": {
       "library": "ionic",
@@ -1691,7 +1691,7 @@
         "heuristic": 331,
         "untested": 744
       },
-      "timestamp": "2026-03-25T05:27:14.492Z"
+      "timestamp": "2026-03-25T13:14:08.376Z"
     },
     "wired": {
       "library": "wired",
@@ -1879,7 +1879,7 @@
         "heuristic": 78,
         "untested": 208
       },
-      "timestamp": "2026-03-25T05:27:14.492Z"
+      "timestamp": "2026-03-25T13:14:08.376Z"
     },
     "elix": {
       "library": "elix",
@@ -2067,34 +2067,34 @@
         "heuristic": 148,
         "untested": 740
       },
-      "timestamp": "2026-03-25T05:27:14.492Z"
+      "timestamp": "2026-03-25T13:14:08.376Z"
     },
     "helix": {
       "library": "helix",
-      "componentCount": 100,
-      "averageScore": 85.79,
+      "componentCount": 101,
+      "averageScore": 85.7,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
         "C": 10,
         "D": 29,
-        "F": 61
+        "F": 62
       },
       "dimensionAverages": {
         "CEM Completeness": 99.73,
-        "Accessibility": 44.51,
-        "Type Coverage": 94.55,
-        "API Surface Quality": 89.31,
-        "CSS Architecture": 96.7,
-        "Event Architecture": 56,
+        "Accessibility": 44.35,
+        "Type Coverage": 94.56,
+        "API Surface Quality": 89.07,
+        "CSS Architecture": 96.73,
+        "Event Architecture": 56.44,
         "Test Coverage": 0,
         "Bundle Size": 0,
         "Story Coverage": 0,
         "Performance": 0,
         "Drupal Readiness": 0,
-        "CEM-Source Fidelity": 71.21,
-        "Slot Architecture": 72.06,
-        "Naming Consistency": 98.64
+        "CEM-Source Fidelity": 71,
+        "Slot Architecture": 72.14,
+        "Naming Consistency": 98.55
       },
       "top5": [
         {
@@ -2188,56 +2188,56 @@
         },
         {
           "dimension": "Accessibility",
-          "average": 44.51,
+          "average": 44.35,
           "tier": "critical",
           "confidence": "heuristic",
           "note": "Near average."
         },
         {
           "dimension": "Event Architecture",
-          "average": 56,
+          "average": 56.44,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "heuristic",
           "note": "Near average."
         },
         {
           "dimension": "CEM-Source Fidelity",
-          "average": 71.21,
+          "average": 71,
           "tier": "critical",
           "confidence": "heuristic",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "Slot Architecture",
-          "average": 72.06,
+          "average": 72.14,
           "tier": "important",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "API Surface Quality",
-          "average": 89.31,
+          "average": 89.07,
           "tier": "important",
           "confidence": "heuristic",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "Type Coverage",
-          "average": 94.55,
+          "average": 94.56,
           "tier": "critical",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "CSS Architecture",
-          "average": 96.7,
+          "average": 96.73,
           "tier": "important",
           "confidence": "heuristic",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "Naming Consistency",
-          "average": 98.64,
+          "average": 98.55,
           "tier": "important",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
@@ -2251,11 +2251,11 @@
         }
       ],
       "confidenceBreakdown": {
-        "verified": 384,
-        "heuristic": 448,
-        "untested": 568
+        "verified": 388,
+        "heuristic": 453,
+        "untested": 573
       },
-      "timestamp": "2026-03-25T05:27:14.492Z"
+      "timestamp": "2026-03-25T13:14:08.376Z"
     }
   },
   "comparisonTable": {
@@ -2263,8 +2263,8 @@
       {
         "rank": 1,
         "library": "helix",
-        "averageScore": 85.79,
-        "componentCount": 100,
+        "averageScore": 85.7,
+        "componentCount": 101,
         "grade": "B"
       },
       {
@@ -2417,7 +2417,7 @@
         "rankings": [
           {
             "library": "helix",
-            "average": 44.51,
+            "average": 44.35,
             "rank": 1
           },
           {
@@ -2476,14 +2476,14 @@
             "rank": 12
           }
         ],
-        "spread": 43.36
+        "spread": 43.2
       },
       {
         "dimension": "Type Coverage",
         "rankings": [
           {
             "library": "helix",
-            "average": 94.55,
+            "average": 94.56,
             "rank": 1
           },
           {
@@ -2542,14 +2542,14 @@
             "rank": 12
           }
         ],
-        "spread": 94.55
+        "spread": 94.56
       },
       {
         "dimension": "API Surface Quality",
         "rankings": [
           {
             "library": "helix",
-            "average": 89.31,
+            "average": 89.07,
             "rank": 1
           },
           {
@@ -2608,14 +2608,14 @@
             "rank": 12
           }
         ],
-        "spread": 89.31
+        "spread": 89.07
       },
       {
         "dimension": "CSS Architecture",
         "rankings": [
           {
             "library": "helix",
-            "average": 96.7,
+            "average": 96.73,
             "rank": 1
           },
           {
@@ -2674,7 +2674,7 @@
             "rank": 12
           }
         ],
-        "spread": 96.7
+        "spread": 96.73
       },
       {
         "dimension": "Event Architecture",
@@ -2686,7 +2686,7 @@
           },
           {
             "library": "helix",
-            "average": 56,
+            "average": 56.44,
             "rank": 2
           },
           {
@@ -3097,7 +3097,7 @@
           },
           {
             "library": "helix",
-            "average": 71.21,
+            "average": 71,
             "rank": 5
           },
           {
@@ -3143,7 +3143,7 @@
         "rankings": [
           {
             "library": "helix",
-            "average": 72.06,
+            "average": 72.14,
             "rank": 1
           },
           {
@@ -3202,7 +3202,7 @@
             "rank": 12
           }
         ],
-        "spread": 72.06
+        "spread": 72.14
       },
       {
         "dimension": "Naming Consistency",
@@ -3244,7 +3244,7 @@
           },
           {
             "library": "helix",
-            "average": 98.64,
+            "average": 98.55,
             "rank": 8
           },
           {
@@ -3278,66 +3278,66 @@
       "Slot Architecture",
       "Event Architecture"
     ],
-    "timestamp": "2026-03-25T05:27:14.493Z"
+    "timestamp": "2026-03-25T13:14:08.377Z"
   },
   "performance": {
-    "totalMs": 3181,
+    "totalMs": 2702,
     "phases": [
       {
         "name": "load-libraries",
-        "durationMs": 157
+        "durationMs": 216
       },
       {
         "name": "score-all-libraries",
-        "durationMs": 3021
+        "durationMs": 2483
       },
       {
         "name": "score-material",
-        "durationMs": 372
+        "durationMs": 293
       },
       {
         "name": "score-spectrum",
-        "durationMs": 248
+        "durationMs": 144
       },
       {
         "name": "score-vaadin",
-        "durationMs": 1031
+        "durationMs": 765
       },
       {
         "name": "score-fluentui",
-        "durationMs": 44
+        "durationMs": 25
       },
       {
         "name": "score-carbon",
-        "durationMs": 155
+        "durationMs": 153
       },
       {
         "name": "score-ui5",
-        "durationMs": 238
+        "durationMs": 280
       },
       {
         "name": "score-calcite",
-        "durationMs": 255
+        "durationMs": 246
       },
       {
         "name": "score-porsche",
-        "durationMs": 126
+        "durationMs": 91
       },
       {
         "name": "score-ionic",
-        "durationMs": 75
+        "durationMs": 73
       },
       {
         "name": "score-wired",
-        "durationMs": 11
+        "durationMs": 68
       },
       {
         "name": "score-elix",
-        "durationMs": 367
+        "durationMs": 211
       },
       {
         "name": "score-helix",
-        "durationMs": 99
+        "durationMs": 134
       },
       {
         "name": "generate-scorecards",

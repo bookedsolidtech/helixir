@@ -1,6 +1,6 @@
 {
-  "totalComponents": 100,
-  "averageScore": 85.79,
+  "totalComponents": 101,
+  "averageScore": 85.7,
   "componentBreakdown": [
     {
       "tagName": "hx-phi-field",
@@ -433,6 +433,69 @@
           "tier": "advanced",
           "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
           "severity": "warning"
+        }
+      ]
+    },
+    {
+      "tagName": "hx-clinical-status",
+      "score": 79.3,
+      "grade": "F",
+      "issues": [
+        {
+          "tagName": "hx-clinical-status",
+          "dimension": "Accessibility",
+          "score": 39,
+          "tier": "critical",
+          "description": "Critical dimension \"Accessibility\" scores 39/100",
+          "severity": "critical"
+        },
+        {
+          "tagName": "hx-clinical-status",
+          "dimension": "Test Coverage",
+          "score": 0,
+          "tier": "critical",
+          "description": "Critical dimension \"Test Coverage\" scores 0/100",
+          "severity": "critical"
+        },
+        {
+          "tagName": "hx-clinical-status",
+          "dimension": "Bundle Size",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Bundle Size\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-clinical-status",
+          "dimension": "Story Coverage",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Story Coverage\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-clinical-status",
+          "dimension": "Performance",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Performance\" scores very low at 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-clinical-status",
+          "dimension": "Drupal Readiness",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-clinical-status",
+          "dimension": "CEM-Source Fidelity",
+          "score": 47,
+          "tier": "critical",
+          "description": "Critical dimension \"CEM-Source Fidelity\" scores 47/100",
+          "severity": "critical"
         }
       ]
     },
@@ -973,6 +1036,61 @@
       ]
     },
     {
+      "tagName": "hx-text-input",
+      "score": 81.3,
+      "grade": "F",
+      "issues": [
+        {
+          "tagName": "hx-text-input",
+          "dimension": "Test Coverage",
+          "score": 0,
+          "tier": "critical",
+          "description": "Critical dimension \"Test Coverage\" scores 0/100",
+          "severity": "critical"
+        },
+        {
+          "tagName": "hx-text-input",
+          "dimension": "Bundle Size",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Bundle Size\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-text-input",
+          "dimension": "Story Coverage",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Story Coverage\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-text-input",
+          "dimension": "Performance",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Performance\" scores very low at 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-text-input",
+          "dimension": "Drupal Readiness",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-text-input",
+          "dimension": "CEM-Source Fidelity",
+          "score": 45,
+          "tier": "critical",
+          "description": "Critical dimension \"CEM-Source Fidelity\" scores 45/100",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
       "tagName": "hx-toggle-button",
       "score": 81.9,
       "grade": "F",
@@ -1360,7 +1478,7 @@
     },
     {
       "tagName": "hx-stat",
-      "score": 83.4,
+      "score": 83.5,
       "grade": "F",
       "issues": [
         {
@@ -1721,61 +1839,6 @@
       ]
     },
     {
-      "tagName": "hx-text-input",
-      "score": 84.1,
-      "grade": "F",
-      "issues": [
-        {
-          "tagName": "hx-text-input",
-          "dimension": "Test Coverage",
-          "score": 0,
-          "tier": "critical",
-          "description": "Critical dimension \"Test Coverage\" scores 0/100",
-          "severity": "critical"
-        },
-        {
-          "tagName": "hx-text-input",
-          "dimension": "Bundle Size",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Bundle Size\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-text-input",
-          "dimension": "Story Coverage",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Story Coverage\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-text-input",
-          "dimension": "Performance",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"Performance\" scores very low at 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-text-input",
-          "dimension": "Drupal Readiness",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-text-input",
-          "dimension": "CEM-Source Fidelity",
-          "score": 45,
-          "tier": "critical",
-          "description": "Critical dimension \"CEM-Source Fidelity\" scores 45/100",
-          "severity": "critical"
-        }
-      ]
-    },
-    {
       "tagName": "hx-badge",
       "score": 84.3,
       "grade": "F",
@@ -2075,53 +2138,6 @@
       ]
     },
     {
-      "tagName": "hx-button",
-      "score": 84.5,
-      "grade": "D",
-      "issues": [
-        {
-          "tagName": "hx-button",
-          "dimension": "Test Coverage",
-          "score": 0,
-          "tier": "critical",
-          "description": "Critical dimension \"Test Coverage\" scores 0/100",
-          "severity": "critical"
-        },
-        {
-          "tagName": "hx-button",
-          "dimension": "Bundle Size",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Bundle Size\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-button",
-          "dimension": "Story Coverage",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Story Coverage\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-button",
-          "dimension": "Performance",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"Performance\" scores very low at 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-button",
-          "dimension": "Drupal Readiness",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-          "severity": "warning"
-        }
-      ]
-    },
-    {
       "tagName": "hx-carousel",
       "score": 84.6,
       "grade": "D",
@@ -2240,6 +2256,53 @@
       ]
     },
     {
+      "tagName": "hx-button",
+      "score": 84.7,
+      "grade": "D",
+      "issues": [
+        {
+          "tagName": "hx-button",
+          "dimension": "Test Coverage",
+          "score": 0,
+          "tier": "critical",
+          "description": "Critical dimension \"Test Coverage\" scores 0/100",
+          "severity": "critical"
+        },
+        {
+          "tagName": "hx-button",
+          "dimension": "Bundle Size",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Bundle Size\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-button",
+          "dimension": "Story Coverage",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Story Coverage\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-button",
+          "dimension": "Performance",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Performance\" scores very low at 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-button",
+          "dimension": "Drupal Readiness",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+          "severity": "warning"
+        }
+      ]
+    },
+    {
       "tagName": "hx-checkbox-group",
       "score": 85.1,
       "grade": "D",
@@ -2278,61 +2341,6 @@
         },
         {
           "tagName": "hx-checkbox-group",
-          "dimension": "Drupal Readiness",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-          "severity": "warning"
-        }
-      ]
-    },
-    {
-      "tagName": "hx-popup",
-      "score": 85.3,
-      "grade": "F",
-      "issues": [
-        {
-          "tagName": "hx-popup",
-          "dimension": "Accessibility",
-          "score": 42,
-          "tier": "critical",
-          "description": "Critical dimension \"Accessibility\" scores 42/100",
-          "severity": "critical"
-        },
-        {
-          "tagName": "hx-popup",
-          "dimension": "Test Coverage",
-          "score": 0,
-          "tier": "critical",
-          "description": "Critical dimension \"Test Coverage\" scores 0/100",
-          "severity": "critical"
-        },
-        {
-          "tagName": "hx-popup",
-          "dimension": "Bundle Size",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Bundle Size\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-popup",
-          "dimension": "Story Coverage",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Story Coverage\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-popup",
-          "dimension": "Performance",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"Performance\" scores very low at 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-popup",
           "dimension": "Drupal Readiness",
           "score": 0,
           "tier": "advanced",
@@ -2396,6 +2404,61 @@
         },
         {
           "tagName": "hx-progress-ring",
+          "dimension": "Drupal Readiness",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+          "severity": "warning"
+        }
+      ]
+    },
+    {
+      "tagName": "hx-popup",
+      "score": 85.3,
+      "grade": "F",
+      "issues": [
+        {
+          "tagName": "hx-popup",
+          "dimension": "Accessibility",
+          "score": 42,
+          "tier": "critical",
+          "description": "Critical dimension \"Accessibility\" scores 42/100",
+          "severity": "critical"
+        },
+        {
+          "tagName": "hx-popup",
+          "dimension": "Test Coverage",
+          "score": 0,
+          "tier": "critical",
+          "description": "Critical dimension \"Test Coverage\" scores 0/100",
+          "severity": "critical"
+        },
+        {
+          "tagName": "hx-popup",
+          "dimension": "Bundle Size",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Bundle Size\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-popup",
+          "dimension": "Story Coverage",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Story Coverage\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-popup",
+          "dimension": "Performance",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Performance\" scores very low at 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-popup",
           "dimension": "Drupal Readiness",
           "score": 0,
           "tier": "advanced",
@@ -2554,69 +2617,6 @@
       ]
     },
     {
-      "tagName": "hx-container",
-      "score": 85.7,
-      "grade": "F",
-      "issues": [
-        {
-          "tagName": "hx-container",
-          "dimension": "Accessibility",
-          "score": 10,
-          "tier": "critical",
-          "description": "Critical dimension \"Accessibility\" scores 10/100",
-          "severity": "critical"
-        },
-        {
-          "tagName": "hx-container",
-          "dimension": "Event Architecture",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Event Architecture\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-container",
-          "dimension": "Test Coverage",
-          "score": 0,
-          "tier": "critical",
-          "description": "Critical dimension \"Test Coverage\" scores 0/100",
-          "severity": "critical"
-        },
-        {
-          "tagName": "hx-container",
-          "dimension": "Bundle Size",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Bundle Size\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-container",
-          "dimension": "Story Coverage",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Story Coverage\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-container",
-          "dimension": "Performance",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"Performance\" scores very low at 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-container",
-          "dimension": "Drupal Readiness",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-          "severity": "warning"
-        }
-      ]
-    },
-    {
       "tagName": "hx-field-label",
       "score": 85.7,
       "grade": "F",
@@ -2671,6 +2671,69 @@
         },
         {
           "tagName": "hx-field-label",
+          "dimension": "Drupal Readiness",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+          "severity": "warning"
+        }
+      ]
+    },
+    {
+      "tagName": "hx-container",
+      "score": 85.7,
+      "grade": "F",
+      "issues": [
+        {
+          "tagName": "hx-container",
+          "dimension": "Accessibility",
+          "score": 10,
+          "tier": "critical",
+          "description": "Critical dimension \"Accessibility\" scores 10/100",
+          "severity": "critical"
+        },
+        {
+          "tagName": "hx-container",
+          "dimension": "Event Architecture",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Event Architecture\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-container",
+          "dimension": "Test Coverage",
+          "score": 0,
+          "tier": "critical",
+          "description": "Critical dimension \"Test Coverage\" scores 0/100",
+          "severity": "critical"
+        },
+        {
+          "tagName": "hx-container",
+          "dimension": "Bundle Size",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Bundle Size\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-container",
+          "dimension": "Story Coverage",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Story Coverage\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-container",
+          "dimension": "Performance",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Performance\" scores very low at 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-container",
           "dimension": "Drupal Readiness",
           "score": 0,
           "tier": "advanced",
@@ -3277,6 +3340,69 @@
       ]
     },
     {
+      "tagName": "hx-pagination",
+      "score": 86.9,
+      "grade": "F",
+      "issues": [
+        {
+          "tagName": "hx-pagination",
+          "dimension": "Test Coverage",
+          "score": 0,
+          "tier": "critical",
+          "description": "Critical dimension \"Test Coverage\" scores 0/100",
+          "severity": "critical"
+        },
+        {
+          "tagName": "hx-pagination",
+          "dimension": "Bundle Size",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Bundle Size\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-pagination",
+          "dimension": "Story Coverage",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Story Coverage\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-pagination",
+          "dimension": "Performance",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Performance\" scores very low at 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-pagination",
+          "dimension": "Drupal Readiness",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-pagination",
+          "dimension": "CEM-Source Fidelity",
+          "score": 48,
+          "tier": "critical",
+          "description": "Critical dimension \"CEM-Source Fidelity\" scores 48/100",
+          "severity": "critical"
+        },
+        {
+          "tagName": "hx-pagination",
+          "dimension": "Slot Architecture",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Slot Architecture\" scores 0/100",
+          "severity": "warning"
+        }
+      ]
+    },
+    {
       "tagName": "hx-side-nav",
       "score": 86.9,
       "grade": "D",
@@ -3740,61 +3866,6 @@
       ]
     },
     {
-      "tagName": "hx-select",
-      "score": 87.4,
-      "grade": "F",
-      "issues": [
-        {
-          "tagName": "hx-select",
-          "dimension": "Test Coverage",
-          "score": 0,
-          "tier": "critical",
-          "description": "Critical dimension \"Test Coverage\" scores 0/100",
-          "severity": "critical"
-        },
-        {
-          "tagName": "hx-select",
-          "dimension": "Bundle Size",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Bundle Size\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-select",
-          "dimension": "Story Coverage",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Story Coverage\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-select",
-          "dimension": "Performance",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"Performance\" scores very low at 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-select",
-          "dimension": "Drupal Readiness",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-select",
-          "dimension": "CEM-Source Fidelity",
-          "score": 45,
-          "tier": "critical",
-          "description": "Critical dimension \"CEM-Source Fidelity\" scores 45/100",
-          "severity": "critical"
-        }
-      ]
-    },
-    {
       "tagName": "hx-top-nav",
       "score": 87.4,
       "grade": "D",
@@ -3932,6 +4003,61 @@
           "tier": "advanced",
           "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
           "severity": "warning"
+        }
+      ]
+    },
+    {
+      "tagName": "hx-select",
+      "score": 87.5,
+      "grade": "F",
+      "issues": [
+        {
+          "tagName": "hx-select",
+          "dimension": "Test Coverage",
+          "score": 0,
+          "tier": "critical",
+          "description": "Critical dimension \"Test Coverage\" scores 0/100",
+          "severity": "critical"
+        },
+        {
+          "tagName": "hx-select",
+          "dimension": "Bundle Size",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Bundle Size\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-select",
+          "dimension": "Story Coverage",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Story Coverage\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-select",
+          "dimension": "Performance",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Performance\" scores very low at 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-select",
+          "dimension": "Drupal Readiness",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-select",
+          "dimension": "CEM-Source Fidelity",
+          "score": 46,
+          "tier": "critical",
+          "description": "Critical dimension \"CEM-Source Fidelity\" scores 46/100",
+          "severity": "critical"
         }
       ]
     },
@@ -4243,69 +4369,6 @@
       ]
     },
     {
-      "tagName": "hx-pagination",
-      "score": 88.1,
-      "grade": "F",
-      "issues": [
-        {
-          "tagName": "hx-pagination",
-          "dimension": "Test Coverage",
-          "score": 0,
-          "tier": "critical",
-          "description": "Critical dimension \"Test Coverage\" scores 0/100",
-          "severity": "critical"
-        },
-        {
-          "tagName": "hx-pagination",
-          "dimension": "Bundle Size",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Bundle Size\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-pagination",
-          "dimension": "Story Coverage",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Story Coverage\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-pagination",
-          "dimension": "Performance",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"Performance\" scores very low at 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-pagination",
-          "dimension": "Drupal Readiness",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-pagination",
-          "dimension": "CEM-Source Fidelity",
-          "score": 48,
-          "tier": "critical",
-          "description": "Critical dimension \"CEM-Source Fidelity\" scores 48/100",
-          "severity": "critical"
-        },
-        {
-          "tagName": "hx-pagination",
-          "dimension": "Slot Architecture",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Slot Architecture\" scores 0/100",
-          "severity": "warning"
-        }
-      ]
-    },
-    {
       "tagName": "hx-split-button",
       "score": 88.3,
       "grade": "F",
@@ -4361,53 +4424,6 @@
       ]
     },
     {
-      "tagName": "hx-file-upload",
-      "score": 88.4,
-      "grade": "D",
-      "issues": [
-        {
-          "tagName": "hx-file-upload",
-          "dimension": "Test Coverage",
-          "score": 0,
-          "tier": "critical",
-          "description": "Critical dimension \"Test Coverage\" scores 0/100",
-          "severity": "critical"
-        },
-        {
-          "tagName": "hx-file-upload",
-          "dimension": "Bundle Size",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Bundle Size\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-file-upload",
-          "dimension": "Story Coverage",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Story Coverage\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-file-upload",
-          "dimension": "Performance",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"Performance\" scores very low at 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-file-upload",
-          "dimension": "Drupal Readiness",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-          "severity": "warning"
-        }
-      ]
-    },
-    {
       "tagName": "hx-accordion-item",
       "score": 88.5,
       "grade": "C",
@@ -4446,6 +4462,53 @@
         },
         {
           "tagName": "hx-accordion-item",
+          "dimension": "Drupal Readiness",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+          "severity": "warning"
+        }
+      ]
+    },
+    {
+      "tagName": "hx-file-upload",
+      "score": 88.5,
+      "grade": "D",
+      "issues": [
+        {
+          "tagName": "hx-file-upload",
+          "dimension": "Test Coverage",
+          "score": 0,
+          "tier": "critical",
+          "description": "Critical dimension \"Test Coverage\" scores 0/100",
+          "severity": "critical"
+        },
+        {
+          "tagName": "hx-file-upload",
+          "dimension": "Bundle Size",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Bundle Size\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-file-upload",
+          "dimension": "Story Coverage",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Story Coverage\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-file-upload",
+          "dimension": "Performance",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Performance\" scores very low at 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-file-upload",
           "dimension": "Drupal Readiness",
           "score": 0,
           "tier": "advanced",
@@ -4752,53 +4815,6 @@
         },
         {
           "tagName": "hx-combobox",
-          "dimension": "Drupal Readiness",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-          "severity": "warning"
-        }
-      ]
-    },
-    {
-      "tagName": "hx-dropdown",
-      "score": 89.2,
-      "grade": "C",
-      "issues": [
-        {
-          "tagName": "hx-dropdown",
-          "dimension": "Test Coverage",
-          "score": 0,
-          "tier": "critical",
-          "description": "Critical dimension \"Test Coverage\" scores 0/100",
-          "severity": "critical"
-        },
-        {
-          "tagName": "hx-dropdown",
-          "dimension": "Bundle Size",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Bundle Size\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-dropdown",
-          "dimension": "Story Coverage",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Story Coverage\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-dropdown",
-          "dimension": "Performance",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"Performance\" scores very low at 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-dropdown",
           "dimension": "Drupal Readiness",
           "score": 0,
           "tier": "advanced",
@@ -5272,6 +5288,53 @@
       ]
     },
     {
+      "tagName": "hx-dropdown",
+      "score": 90,
+      "grade": "C",
+      "issues": [
+        {
+          "tagName": "hx-dropdown",
+          "dimension": "Test Coverage",
+          "score": 0,
+          "tier": "critical",
+          "description": "Critical dimension \"Test Coverage\" scores 0/100",
+          "severity": "critical"
+        },
+        {
+          "tagName": "hx-dropdown",
+          "dimension": "Bundle Size",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Bundle Size\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-dropdown",
+          "dimension": "Story Coverage",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Story Coverage\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-dropdown",
+          "dimension": "Performance",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Performance\" scores very low at 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-dropdown",
+          "dimension": "Drupal Readiness",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+          "severity": "warning"
+        }
+      ]
+    },
+    {
       "tagName": "hx-tree-view",
       "score": 90,
       "grade": "C",
@@ -5366,6 +5429,61 @@
       ]
     },
     {
+      "tagName": "hx-step",
+      "score": 90.9,
+      "grade": "D",
+      "issues": [
+        {
+          "tagName": "hx-step",
+          "dimension": "Event Architecture",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Event Architecture\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-step",
+          "dimension": "Test Coverage",
+          "score": 0,
+          "tier": "critical",
+          "description": "Critical dimension \"Test Coverage\" scores 0/100",
+          "severity": "critical"
+        },
+        {
+          "tagName": "hx-step",
+          "dimension": "Bundle Size",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Bundle Size\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-step",
+          "dimension": "Story Coverage",
+          "score": 0,
+          "tier": "important",
+          "description": "Important dimension \"Story Coverage\" scores 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-step",
+          "dimension": "Performance",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Performance\" scores very low at 0/100",
+          "severity": "warning"
+        },
+        {
+          "tagName": "hx-step",
+          "dimension": "Drupal Readiness",
+          "score": 0,
+          "tier": "advanced",
+          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+          "severity": "warning"
+        }
+      ]
+    },
+    {
       "tagName": "hx-tr",
       "score": 90.9,
       "grade": "F",
@@ -5420,61 +5538,6 @@
         },
         {
           "tagName": "hx-tr",
-          "dimension": "Drupal Readiness",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-          "severity": "warning"
-        }
-      ]
-    },
-    {
-      "tagName": "hx-step",
-      "score": 90.9,
-      "grade": "D",
-      "issues": [
-        {
-          "tagName": "hx-step",
-          "dimension": "Event Architecture",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Event Architecture\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-step",
-          "dimension": "Test Coverage",
-          "score": 0,
-          "tier": "critical",
-          "description": "Critical dimension \"Test Coverage\" scores 0/100",
-          "severity": "critical"
-        },
-        {
-          "tagName": "hx-step",
-          "dimension": "Bundle Size",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Bundle Size\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-step",
-          "dimension": "Story Coverage",
-          "score": 0,
-          "tier": "important",
-          "description": "Important dimension \"Story Coverage\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-step",
-          "dimension": "Performance",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"Performance\" scores very low at 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-step",
           "dimension": "Drupal Readiness",
           "score": 0,
           "tier": "advanced",
@@ -5778,42 +5841,42 @@
     },
     {
       "dimension": "Accessibility",
-      "helixAverage": 44.51,
+      "helixAverage": 44.35,
       "materialAverage": 16.46,
       "carbonAverage": 19.55,
-      "gap": 24.96,
+      "gap": 24.8,
       "status": "ahead"
     },
     {
       "dimension": "Type Coverage",
-      "helixAverage": 94.55,
+      "helixAverage": 94.56,
       "materialAverage": 46.32,
       "carbonAverage": 30.74,
-      "gap": 48.23,
+      "gap": 48.24,
       "status": "ahead"
     },
     {
       "dimension": "API Surface Quality",
-      "helixAverage": 89.31,
+      "helixAverage": 89.07,
       "materialAverage": 38.08,
       "carbonAverage": 39.55,
-      "gap": 49.76,
+      "gap": 49.52,
       "status": "ahead"
     },
     {
       "dimension": "CSS Architecture",
-      "helixAverage": 96.7,
+      "helixAverage": 96.73,
       "materialAverage": 0,
       "carbonAverage": 27.27,
-      "gap": 69.43,
+      "gap": 69.46,
       "status": "ahead"
     },
     {
       "dimension": "Event Architecture",
-      "helixAverage": 56,
+      "helixAverage": 56.44,
       "materialAverage": 34.28,
       "carbonAverage": 18.78,
-      "gap": 21.72,
+      "gap": 22.16,
       "status": "ahead"
     },
     {
@@ -5858,46 +5921,30 @@
     },
     {
       "dimension": "CEM-Source Fidelity",
-      "helixAverage": 71.21,
+      "helixAverage": 71,
       "materialAverage": 59.36,
       "carbonAverage": 50.33,
-      "gap": 11.85,
+      "gap": 11.64,
       "status": "ahead"
     },
     {
       "dimension": "Slot Architecture",
-      "helixAverage": 72.06,
+      "helixAverage": 72.14,
       "materialAverage": 0,
       "carbonAverage": 10.18,
-      "gap": 61.88,
+      "gap": 61.96,
       "status": "ahead"
     },
     {
       "dimension": "Naming Consistency",
-      "helixAverage": 98.64,
+      "helixAverage": 98.55,
       "materialAverage": 97.88,
       "carbonAverage": 87.59,
-      "gap": 0.76,
+      "gap": 0.67,
       "status": "competitive"
     }
   ],
   "actionableIssues": [
-    {
-      "tagName": "hx-avatar",
-      "dimension": "Accessibility",
-      "score": 20,
-      "tier": "critical",
-      "description": "Critical dimension \"Accessibility\" scores 20/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-avatar",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
     {
       "tagName": "hx-accordion-item",
       "dimension": "Test Coverage",
@@ -5916,6 +5963,38 @@
     },
     {
       "tagName": "hx-accordion",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-action-bar",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-alert",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-avatar",
+      "dimension": "Accessibility",
+      "score": 20,
+      "tier": "critical",
+      "description": "Critical dimension \"Accessibility\" scores 20/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-avatar",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -5987,14 +6066,6 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-action-bar",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
       "tagName": "hx-button",
       "dimension": "Test Coverage",
       "score": 0,
@@ -6003,23 +6074,7 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-alert",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-button-group",
-      "dimension": "Accessibility",
-      "score": 47,
-      "tier": "critical",
-      "description": "Critical dimension \"Accessibility\" scores 47/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-button-group",
+      "tagName": "hx-card",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -6051,7 +6106,15 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-card",
+      "tagName": "hx-button-group",
+      "dimension": "Accessibility",
+      "score": 47,
+      "tier": "critical",
+      "description": "Critical dimension \"Accessibility\" scores 47/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-button-group",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -6075,11 +6138,27 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-checkbox-group",
+      "tagName": "hx-clinical-status",
+      "dimension": "Accessibility",
+      "score": 39,
+      "tier": "critical",
+      "description": "Critical dimension \"Accessibility\" scores 39/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-clinical-status",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
       "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-clinical-status",
+      "dimension": "CEM-Source Fidelity",
+      "score": 47,
+      "tier": "critical",
+      "description": "Critical dimension \"CEM-Source Fidelity\" scores 47/100",
       "severity": "critical"
     },
     {
@@ -6099,7 +6178,7 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-color-picker",
+      "tagName": "hx-checkbox-group",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -6108,22 +6187,6 @@
     },
     {
       "tagName": "hx-combobox",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-container",
-      "dimension": "Accessibility",
-      "score": 10,
-      "tier": "critical",
-      "description": "Critical dimension \"Accessibility\" scores 10/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-container",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -6155,6 +6218,14 @@
       "severity": "critical"
     },
     {
+      "tagName": "hx-color-picker",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
       "tagName": "hx-counter",
       "dimension": "Accessibility",
       "score": 20,
@@ -6164,14 +6235,6 @@
     },
     {
       "tagName": "hx-counter",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-data-table",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -6187,7 +6250,7 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-dialog",
+      "tagName": "hx-data-table",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -6195,15 +6258,7 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-divider",
-      "dimension": "Accessibility",
-      "score": 20,
-      "tier": "critical",
-      "description": "Critical dimension \"Accessibility\" scores 20/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-divider",
+      "tagName": "hx-dialog",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -6259,14 +6314,6 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-file-upload",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
       "tagName": "hx-form",
       "dimension": "Accessibility",
       "score": 46,
@@ -6283,15 +6330,7 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-format-date",
-      "dimension": "Accessibility",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Accessibility\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-format-date",
+      "tagName": "hx-file-upload",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -6299,31 +6338,15 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-grid",
+      "tagName": "hx-container",
       "dimension": "Accessibility",
-      "score": 0,
+      "score": 10,
       "tier": "critical",
-      "description": "Critical dimension \"Accessibility\" scores 0/100",
+      "description": "Critical dimension \"Accessibility\" scores 10/100",
       "severity": "critical"
     },
     {
-      "tagName": "hx-grid",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-grid-item",
-      "dimension": "Accessibility",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Accessibility\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-grid-item",
+      "tagName": "hx-container",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -6347,7 +6370,55 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-icon",
+      "tagName": "hx-format-date",
+      "dimension": "Accessibility",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Accessibility\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-format-date",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-grid",
+      "dimension": "Accessibility",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Accessibility\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-grid",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-grid-item",
+      "dimension": "Accessibility",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Accessibility\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-grid-item",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-divider",
       "dimension": "Accessibility",
       "score": 20,
       "tier": "critical",
@@ -6355,7 +6426,7 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-icon",
+      "tagName": "hx-divider",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -6388,30 +6459,6 @@
     },
     {
       "tagName": "hx-image",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-link",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-list-item",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-list",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -6459,6 +6506,22 @@
       "severity": "critical"
     },
     {
+      "tagName": "hx-list-item",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-list",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
       "tagName": "hx-meter",
       "dimension": "Accessibility",
       "score": 48,
@@ -6492,6 +6555,22 @@
     },
     {
       "tagName": "hx-overflow-menu",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-icon",
+      "dimension": "Accessibility",
+      "score": 20,
+      "tier": "critical",
+      "description": "Critical dimension \"Accessibility\" scores 20/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-icon",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -6539,30 +6618,6 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-popover",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-popup",
-      "dimension": "Accessibility",
-      "score": 42,
-      "tier": "critical",
-      "description": "Critical dimension \"Accessibility\" scores 42/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-popup",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
       "tagName": "hx-progress-bar",
       "dimension": "Accessibility",
       "score": 20,
@@ -6595,15 +6650,7 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-prose",
-      "dimension": "Accessibility",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Accessibility\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-prose",
+      "tagName": "hx-link",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -6627,7 +6674,7 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-rating",
+      "tagName": "hx-popover",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -6645,9 +6692,9 @@
     {
       "tagName": "hx-select",
       "dimension": "CEM-Source Fidelity",
-      "score": 45,
+      "score": 46,
       "tier": "critical",
-      "description": "Critical dimension \"CEM-Source Fidelity\" scores 45/100",
+      "description": "Critical dimension \"CEM-Source Fidelity\" scores 46/100",
       "severity": "critical"
     },
     {
@@ -6676,6 +6723,22 @@
     },
     {
       "tagName": "hx-skeleton",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-popup",
+      "dimension": "Accessibility",
+      "score": 42,
+      "tier": "critical",
+      "description": "Critical dimension \"Accessibility\" scores 42/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-popup",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -6715,7 +6778,63 @@
       "severity": "critical"
     },
     {
+      "tagName": "hx-prose",
+      "dimension": "Accessibility",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Accessibility\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-prose",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-rating",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
       "tagName": "hx-split-panel",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-split-button",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-split-button",
+      "dimension": "CEM-Source Fidelity",
+      "score": 48,
+      "tier": "critical",
+      "description": "Critical dimension \"CEM-Source Fidelity\" scores 48/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-stat",
+      "dimension": "Accessibility",
+      "score": 20,
+      "tier": "critical",
+      "description": "Critical dimension \"Accessibility\" scores 20/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-stat",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -6739,15 +6858,23 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-stat",
+      "tagName": "hx-step",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-steps",
       "dimension": "Accessibility",
-      "score": 20,
+      "score": 31,
       "tier": "critical",
-      "description": "Critical dimension \"Accessibility\" scores 20/100",
+      "description": "Critical dimension \"Accessibility\" scores 31/100",
       "severity": "critical"
     },
     {
-      "tagName": "hx-stat",
+      "tagName": "hx-steps",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -6755,35 +6882,11 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-status-indicator",
-      "dimension": "Accessibility",
-      "score": 35,
-      "tier": "critical",
-      "description": "Critical dimension \"Accessibility\" scores 35/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-status-indicator",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-split-button",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-split-button",
+      "tagName": "hx-steps",
       "dimension": "CEM-Source Fidelity",
-      "score": 48,
+      "score": 43,
       "tier": "critical",
-      "description": "Critical dimension \"CEM-Source Fidelity\" scores 48/100",
+      "description": "Critical dimension \"CEM-Source Fidelity\" scores 43/100",
       "severity": "critical"
     },
     {
@@ -6995,23 +7098,15 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-step",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-steps",
+      "tagName": "hx-tag",
       "dimension": "Accessibility",
-      "score": 31,
+      "score": 29,
       "tier": "critical",
-      "description": "Critical dimension \"Accessibility\" scores 31/100",
+      "description": "Critical dimension \"Accessibility\" scores 29/100",
       "severity": "critical"
     },
     {
-      "tagName": "hx-steps",
+      "tagName": "hx-tag",
       "dimension": "Test Coverage",
       "score": 0,
       "tier": "critical",
@@ -7019,11 +7114,51 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-steps",
-      "dimension": "CEM-Source Fidelity",
-      "score": 43,
+      "tagName": "hx-text-input",
+      "dimension": "Test Coverage",
+      "score": 0,
       "tier": "critical",
-      "description": "Critical dimension \"CEM-Source Fidelity\" scores 43/100",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-text-input",
+      "dimension": "CEM-Source Fidelity",
+      "score": 45,
+      "tier": "critical",
+      "description": "Critical dimension \"CEM-Source Fidelity\" scores 45/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-text",
+      "dimension": "Accessibility",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Accessibility\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-text",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-status-indicator",
+      "dimension": "Accessibility",
+      "score": 35,
+      "tier": "critical",
+      "description": "Critical dimension \"Accessibility\" scores 35/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-status-indicator",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
       "severity": "critical"
     },
     {
@@ -7064,54 +7199,6 @@
       "score": 0,
       "tier": "critical",
       "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-tag",
-      "dimension": "Accessibility",
-      "score": 29,
-      "tier": "critical",
-      "description": "Critical dimension \"Accessibility\" scores 29/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-tag",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-text",
-      "dimension": "Accessibility",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Accessibility\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-text",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-text-input",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-text-input",
-      "dimension": "CEM-Source Fidelity",
-      "score": 45,
-      "tier": "critical",
-      "description": "Critical dimension \"CEM-Source Fidelity\" scores 45/100",
       "severity": "critical"
     },
     {
@@ -7211,6 +7298,22 @@
       "severity": "critical"
     },
     {
+      "tagName": "hx-tree-item",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-tree-view",
+      "dimension": "Test Coverage",
+      "score": 0,
+      "tier": "critical",
+      "description": "Critical dimension \"Test Coverage\" scores 0/100",
+      "severity": "critical"
+    },
+    {
       "tagName": "hx-visually-hidden",
       "dimension": "Accessibility",
       "score": 10,
@@ -7227,62 +7330,6 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-tree-item",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-tree-view",
-      "dimension": "Test Coverage",
-      "score": 0,
-      "tier": "critical",
-      "description": "Critical dimension \"Test Coverage\" scores 0/100",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-avatar",
-      "dimension": "Event Architecture",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Event Architecture\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-avatar",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-avatar",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-avatar",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-avatar",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-accordion-item",
       "dimension": "Bundle Size",
       "score": 0,
@@ -7348,6 +7395,118 @@
     },
     {
       "tagName": "hx-accordion",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-action-bar",
+      "dimension": "Event Architecture",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Event Architecture\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-action-bar",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-action-bar",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-action-bar",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-action-bar",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-alert",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-alert",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-alert",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-alert",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-avatar",
+      "dimension": "Event Architecture",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Event Architecture\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-avatar",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-avatar",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-avatar",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-avatar",
       "dimension": "Drupal Readiness",
       "score": 0,
       "tier": "advanced",
@@ -7515,46 +7674,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-action-bar",
-      "dimension": "Event Architecture",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Event Architecture\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-action-bar",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-action-bar",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-action-bar",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-action-bar",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-button",
       "dimension": "Bundle Size",
       "score": 0,
@@ -7587,7 +7706,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-alert",
+      "tagName": "hx-card",
       "dimension": "Bundle Size",
       "score": 0,
       "tier": "important",
@@ -7595,7 +7714,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-alert",
+      "tagName": "hx-card",
       "dimension": "Story Coverage",
       "score": 0,
       "tier": "important",
@@ -7603,7 +7722,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-alert",
+      "tagName": "hx-card",
       "dimension": "Performance",
       "score": 0,
       "tier": "advanced",
@@ -7611,47 +7730,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-alert",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-button-group",
-      "dimension": "Event Architecture",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Event Architecture\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-button-group",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-button-group",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-button-group",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-button-group",
+      "tagName": "hx-card",
       "dimension": "Drupal Readiness",
       "score": 0,
       "tier": "advanced",
@@ -7731,199 +7810,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-card",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-card",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-card",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-card",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-checkbox",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-checkbox",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-checkbox",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-checkbox",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-checkbox-group",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-checkbox-group",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-checkbox-group",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-checkbox-group",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-code-snippet",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-code-snippet",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-code-snippet",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-code-snippet",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-color-picker",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-color-picker",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-color-picker",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-color-picker",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-combobox",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-combobox",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-combobox",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-combobox",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-container",
+      "tagName": "hx-button-group",
       "dimension": "Event Architecture",
       "score": 0,
       "tier": "important",
@@ -7931,7 +7818,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-container",
+      "tagName": "hx-button-group",
       "dimension": "Bundle Size",
       "score": 0,
       "tier": "important",
@@ -7939,7 +7826,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-container",
+      "tagName": "hx-button-group",
       "dimension": "Story Coverage",
       "score": 0,
       "tier": "important",
@@ -7947,7 +7834,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-container",
+      "tagName": "hx-button-group",
       "dimension": "Performance",
       "score": 0,
       "tier": "advanced",
@@ -7955,7 +7842,167 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-container",
+      "tagName": "hx-button-group",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-checkbox",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-checkbox",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-checkbox",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-checkbox",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-clinical-status",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-clinical-status",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-clinical-status",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-clinical-status",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-code-snippet",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-code-snippet",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-code-snippet",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-code-snippet",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-checkbox-group",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-checkbox-group",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-checkbox-group",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-checkbox-group",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-combobox",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-combobox",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-combobox",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-combobox",
       "dimension": "Drupal Readiness",
       "score": 0,
       "tier": "advanced",
@@ -7988,6 +8035,38 @@
     },
     {
       "tagName": "hx-copy-button",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-color-picker",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-color-picker",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-color-picker",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-color-picker",
       "dimension": "Drupal Readiness",
       "score": 0,
       "tier": "advanced",
@@ -8043,38 +8122,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-data-table",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-data-table",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-data-table",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-data-table",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-date-picker",
       "dimension": "Bundle Size",
       "score": 0,
@@ -8107,7 +8154,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-dialog",
+      "tagName": "hx-data-table",
       "dimension": "Bundle Size",
       "score": 0,
       "tier": "important",
@@ -8115,7 +8162,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-dialog",
+      "tagName": "hx-data-table",
       "dimension": "Story Coverage",
       "score": 0,
       "tier": "important",
@@ -8123,7 +8170,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-dialog",
+      "tagName": "hx-data-table",
       "dimension": "Performance",
       "score": 0,
       "tier": "advanced",
@@ -8131,7 +8178,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-dialog",
+      "tagName": "hx-data-table",
       "dimension": "Drupal Readiness",
       "score": 0,
       "tier": "advanced",
@@ -8139,15 +8186,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-divider",
-      "dimension": "Event Architecture",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Event Architecture\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-divider",
+      "tagName": "hx-dialog",
       "dimension": "Bundle Size",
       "score": 0,
       "tier": "important",
@@ -8155,7 +8194,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-divider",
+      "tagName": "hx-dialog",
       "dimension": "Story Coverage",
       "score": 0,
       "tier": "important",
@@ -8163,7 +8202,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-divider",
+      "tagName": "hx-dialog",
       "dimension": "Performance",
       "score": 0,
       "tier": "advanced",
@@ -8171,7 +8210,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-divider",
+      "tagName": "hx-dialog",
       "dimension": "Drupal Readiness",
       "score": 0,
       "tier": "advanced",
@@ -8323,6 +8362,38 @@
       "severity": "warning"
     },
     {
+      "tagName": "hx-form",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-form",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-form",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-form",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
       "tagName": "hx-file-upload",
       "dimension": "Bundle Size",
       "score": 0,
@@ -8355,7 +8426,15 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-form",
+      "tagName": "hx-container",
+      "dimension": "Event Architecture",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Event Architecture\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-container",
       "dimension": "Bundle Size",
       "score": 0,
       "tier": "important",
@@ -8363,7 +8442,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-form",
+      "tagName": "hx-container",
       "dimension": "Story Coverage",
       "score": 0,
       "tier": "important",
@@ -8371,7 +8450,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-form",
+      "tagName": "hx-container",
       "dimension": "Performance",
       "score": 0,
       "tier": "advanced",
@@ -8379,7 +8458,47 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-form",
+      "tagName": "hx-container",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-help-text",
+      "dimension": "Event Architecture",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Event Architecture\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-help-text",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-help-text",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-help-text",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-help-text",
       "dimension": "Drupal Readiness",
       "score": 0,
       "tier": "advanced",
@@ -8523,7 +8642,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-help-text",
+      "tagName": "hx-divider",
       "dimension": "Event Architecture",
       "score": 0,
       "tier": "important",
@@ -8531,7 +8650,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-help-text",
+      "tagName": "hx-divider",
       "dimension": "Bundle Size",
       "score": 0,
       "tier": "important",
@@ -8539,7 +8658,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-help-text",
+      "tagName": "hx-divider",
       "dimension": "Story Coverage",
       "score": 0,
       "tier": "important",
@@ -8547,7 +8666,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-help-text",
+      "tagName": "hx-divider",
       "dimension": "Performance",
       "score": 0,
       "tier": "advanced",
@@ -8555,59 +8674,11 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-help-text",
+      "tagName": "hx-divider",
       "dimension": "Drupal Readiness",
       "score": 0,
       "tier": "advanced",
       "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-icon",
-      "dimension": "Event Architecture",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Event Architecture\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-icon",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-icon",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-icon",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-icon",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-icon",
-      "dimension": "Slot Architecture",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Slot Architecture\" scores 0/100",
       "severity": "warning"
     },
     {
@@ -8668,102 +8739,6 @@
     },
     {
       "tagName": "hx-image",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-link",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-link",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-link",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-link",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-list-item",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-list-item",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-list-item",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-list-item",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-list",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-list",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-list",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-list",
       "dimension": "Drupal Readiness",
       "score": 0,
       "tier": "advanced",
@@ -8891,6 +8866,70 @@
       "severity": "warning"
     },
     {
+      "tagName": "hx-list-item",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-list-item",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-list-item",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-list-item",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-list",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-list",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-list",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-list",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
       "tagName": "hx-meter",
       "dimension": "Event Architecture",
       "score": 0,
@@ -9035,6 +9074,54 @@
       "severity": "warning"
     },
     {
+      "tagName": "hx-icon",
+      "dimension": "Event Architecture",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Event Architecture\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-icon",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-icon",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-icon",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-icon",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-icon",
+      "dimension": "Slot Architecture",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Slot Architecture\" scores 0/100",
+      "severity": "warning"
+    },
+    {
       "tagName": "hx-pagination",
       "dimension": "Bundle Size",
       "score": 0,
@@ -9115,70 +9202,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-popover",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-popover",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-popover",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-popover",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-popup",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-popup",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-popup",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-popup",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-progress-bar",
       "dimension": "Bundle Size",
       "score": 0,
@@ -9251,15 +9274,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-prose",
-      "dimension": "Event Architecture",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Event Architecture\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-prose",
+      "tagName": "hx-link",
       "dimension": "Bundle Size",
       "score": 0,
       "tier": "important",
@@ -9267,7 +9282,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-prose",
+      "tagName": "hx-link",
       "dimension": "Story Coverage",
       "score": 0,
       "tier": "important",
@@ -9275,7 +9290,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-prose",
+      "tagName": "hx-link",
       "dimension": "Performance",
       "score": 0,
       "tier": "advanced",
@@ -9283,7 +9298,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-prose",
+      "tagName": "hx-link",
       "dimension": "Drupal Readiness",
       "score": 0,
       "tier": "advanced",
@@ -9363,7 +9378,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-rating",
+      "tagName": "hx-popover",
       "dimension": "Bundle Size",
       "score": 0,
       "tier": "important",
@@ -9371,7 +9386,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-rating",
+      "tagName": "hx-popover",
       "dimension": "Story Coverage",
       "score": 0,
       "tier": "important",
@@ -9379,7 +9394,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-rating",
+      "tagName": "hx-popover",
       "dimension": "Performance",
       "score": 0,
       "tier": "advanced",
@@ -9387,7 +9402,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-rating",
+      "tagName": "hx-popover",
       "dimension": "Drupal Readiness",
       "score": 0,
       "tier": "advanced",
@@ -9539,6 +9554,38 @@
       "severity": "warning"
     },
     {
+      "tagName": "hx-popup",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-popup",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-popup",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-popup",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
       "tagName": "hx-slider",
       "dimension": "Bundle Size",
       "score": 0,
@@ -9619,6 +9666,78 @@
       "severity": "warning"
     },
     {
+      "tagName": "hx-prose",
+      "dimension": "Event Architecture",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Event Architecture\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-prose",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-prose",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-prose",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-prose",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-rating",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-rating",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-rating",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-rating",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
       "tagName": "hx-split-panel",
       "dimension": "Bundle Size",
       "score": 0,
@@ -9644,6 +9763,78 @@
     },
     {
       "tagName": "hx-split-panel",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-split-button",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-split-button",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-split-button",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-split-button",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-stat",
+      "dimension": "Event Architecture",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Event Architecture\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-stat",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-stat",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-stat",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-stat",
       "dimension": "Drupal Readiness",
       "score": 0,
       "tier": "advanced",
@@ -9691,7 +9882,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-stat",
+      "tagName": "hx-step",
       "dimension": "Event Architecture",
       "score": 0,
       "tier": "important",
@@ -9699,7 +9890,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-stat",
+      "tagName": "hx-step",
       "dimension": "Bundle Size",
       "score": 0,
       "tier": "important",
@@ -9707,7 +9898,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-stat",
+      "tagName": "hx-step",
       "dimension": "Story Coverage",
       "score": 0,
       "tier": "important",
@@ -9715,7 +9906,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-stat",
+      "tagName": "hx-step",
       "dimension": "Performance",
       "score": 0,
       "tier": "advanced",
@@ -9723,7 +9914,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-stat",
+      "tagName": "hx-step",
       "dimension": "Drupal Readiness",
       "score": 0,
       "tier": "advanced",
@@ -9731,15 +9922,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-status-indicator",
-      "dimension": "Event Architecture",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Event Architecture\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-status-indicator",
+      "tagName": "hx-steps",
       "dimension": "Bundle Size",
       "score": 0,
       "tier": "important",
@@ -9747,7 +9930,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-status-indicator",
+      "tagName": "hx-steps",
       "dimension": "Story Coverage",
       "score": 0,
       "tier": "important",
@@ -9755,7 +9938,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-status-indicator",
+      "tagName": "hx-steps",
       "dimension": "Performance",
       "score": 0,
       "tier": "advanced",
@@ -9763,47 +9946,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-status-indicator",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-status-indicator",
-      "dimension": "Slot Architecture",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Slot Architecture\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-split-button",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-split-button",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-split-button",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-split-button",
+      "tagName": "hx-steps",
       "dimension": "Drupal Readiness",
       "score": 0,
       "tier": "advanced",
@@ -10275,7 +10418,71 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-step",
+      "tagName": "hx-tag",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-tag",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-tag",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-tag",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-text-input",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-text-input",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-text-input",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-text-input",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-text",
       "dimension": "Event Architecture",
       "score": 0,
       "tier": "important",
@@ -10283,7 +10490,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-step",
+      "tagName": "hx-text",
       "dimension": "Bundle Size",
       "score": 0,
       "tier": "important",
@@ -10291,7 +10498,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-step",
+      "tagName": "hx-text",
       "dimension": "Story Coverage",
       "score": 0,
       "tier": "important",
@@ -10299,7 +10506,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-step",
+      "tagName": "hx-text",
       "dimension": "Performance",
       "score": 0,
       "tier": "advanced",
@@ -10307,7 +10514,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-step",
+      "tagName": "hx-text",
       "dimension": "Drupal Readiness",
       "score": 0,
       "tier": "advanced",
@@ -10315,7 +10522,15 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-steps",
+      "tagName": "hx-status-indicator",
+      "dimension": "Event Architecture",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Event Architecture\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-status-indicator",
       "dimension": "Bundle Size",
       "score": 0,
       "tier": "important",
@@ -10323,7 +10538,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-steps",
+      "tagName": "hx-status-indicator",
       "dimension": "Story Coverage",
       "score": 0,
       "tier": "important",
@@ -10331,7 +10546,7 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-steps",
+      "tagName": "hx-status-indicator",
       "dimension": "Performance",
       "score": 0,
       "tier": "advanced",
@@ -10339,11 +10554,19 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-steps",
+      "tagName": "hx-status-indicator",
       "dimension": "Drupal Readiness",
       "score": 0,
       "tier": "advanced",
       "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-status-indicator",
+      "dimension": "Slot Architecture",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Slot Architecture\" scores 0/100",
       "severity": "warning"
     },
     {
@@ -10452,110 +10675,6 @@
     },
     {
       "tagName": "hx-tabs",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-tag",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-tag",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-tag",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-tag",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-text",
-      "dimension": "Event Architecture",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Event Architecture\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-text",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-text",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-text",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-text",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-text-input",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-text-input",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-text-input",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-text-input",
       "dimension": "Drupal Readiness",
       "score": 0,
       "tier": "advanced",
@@ -10843,6 +10962,70 @@
       "severity": "warning"
     },
     {
+      "tagName": "hx-tree-item",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-tree-item",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-tree-item",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-tree-item",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-tree-view",
+      "dimension": "Bundle Size",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Bundle Size\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-tree-view",
+      "dimension": "Story Coverage",
+      "score": 0,
+      "tier": "important",
+      "description": "Important dimension \"Story Coverage\" scores 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-tree-view",
+      "dimension": "Performance",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Performance\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-tree-view",
+      "dimension": "Drupal Readiness",
+      "score": 0,
+      "tier": "advanced",
+      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
+      "severity": "warning"
+    },
+    {
       "tagName": "hx-visually-hidden",
       "dimension": "Event Architecture",
       "score": 0,
@@ -10876,70 +11059,6 @@
     },
     {
       "tagName": "hx-visually-hidden",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-tree-item",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-tree-item",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-tree-item",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-tree-item",
-      "dimension": "Drupal Readiness",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Drupal Readiness\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-tree-view",
-      "dimension": "Bundle Size",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Bundle Size\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-tree-view",
-      "dimension": "Story Coverage",
-      "score": 0,
-      "tier": "important",
-      "description": "Important dimension \"Story Coverage\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-tree-view",
-      "dimension": "Performance",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"Performance\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-tree-view",
       "dimension": "Drupal Readiness",
       "score": 0,
       "tier": "advanced",
@@ -10949,19 +11068,35 @@
   ],
   "cemSourceFidelityFindings": [
     {
-      "tagName": "hx-avatar",
-      "dimension": "CEM-Source Fidelity",
-      "score": 83,
-      "tier": "critical",
-      "description": "CEM-Source Fidelity score: 83/100. No events declared or dispatched; 6 properties matched; Missing reflections: hx-size; Extra in source: size",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-accordion-item",
       "dimension": "CEM-Source Fidelity",
       "score": 60,
       "tier": "critical",
       "description": "CEM-Source Fidelity score: 60/100. Phantom: hx-expand, hx-collapse; 3 properties matched; 2 reflections matched",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-action-bar",
+      "dimension": "CEM-Source Fidelity",
+      "score": 90,
+      "tier": "critical",
+      "description": "CEM-Source Fidelity score: 90/100. No events declared or dispatched; 5 properties matched; Missing reflections: hx-size; Extra in source: size",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-alert",
+      "dimension": "CEM-Source Fidelity",
+      "score": 56,
+      "tier": "critical",
+      "description": "CEM-Source Fidelity score: 56/100. Phantom: hx-close, hx-after-close; 9 properties matched; Extra in source: showicon",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-avatar",
+      "dimension": "CEM-Source Fidelity",
+      "score": 83,
+      "tier": "critical",
+      "description": "CEM-Source Fidelity score: 83/100. No events declared or dispatched; 6 properties matched; Missing reflections: hx-size; Extra in source: size",
       "severity": "warning"
     },
     {
@@ -10989,43 +11124,11 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-action-bar",
-      "dimension": "CEM-Source Fidelity",
-      "score": 90,
-      "tier": "critical",
-      "description": "CEM-Source Fidelity score: 90/100. No events declared or dispatched; 5 properties matched; Missing reflections: hx-size; Extra in source: size",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-button",
       "dimension": "CEM-Source Fidelity",
-      "score": 50,
+      "score": 51,
       "tier": "critical",
-      "description": "CEM-Source Fidelity score: 50/100. Phantom: hx-click; Missing in source: form; Missing reflections: hx-size; Extra in source: size, arialabel",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-alert",
-      "dimension": "CEM-Source Fidelity",
-      "score": 56,
-      "tier": "critical",
-      "description": "CEM-Source Fidelity score: 56/100. Phantom: hx-close, hx-after-close; 8 properties matched; Extra in source: showicon",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-button-group",
-      "dimension": "CEM-Source Fidelity",
-      "score": 73,
-      "tier": "critical",
-      "description": "CEM-Source Fidelity score: 73/100. No events declared or dispatched; Missing in source: internals, role; Missing reflections: hx-size; Extra in source: size",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-carousel",
-      "dimension": "CEM-Source Fidelity",
-      "score": 56,
-      "tier": "critical",
-      "description": "CEM-Source Fidelity score: 56/100. Phantom: hx-slide-change; 13 properties matched; Extra in source: mousedragging",
+      "description": "CEM-Source Fidelity score: 51/100. Phantom: hx-click; Missing in source: form; Missing reflections: hx-size; Extra in source: size",
       "severity": "warning"
     },
     {
@@ -11037,6 +11140,22 @@
       "severity": "warning"
     },
     {
+      "tagName": "hx-carousel",
+      "dimension": "CEM-Source Fidelity",
+      "score": 56,
+      "tier": "critical",
+      "description": "CEM-Source Fidelity score: 56/100. Phantom: hx-slide-change; 13 properties matched; Extra in source: mousedragging",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-button-group",
+      "dimension": "CEM-Source Fidelity",
+      "score": 73,
+      "tier": "critical",
+      "description": "CEM-Source Fidelity score: 73/100. No events declared or dispatched; Missing in source: internals, role; Missing reflections: hx-size; Extra in source: size",
+      "severity": "warning"
+    },
+    {
       "tagName": "hx-checkbox",
       "dimension": "CEM-Source Fidelity",
       "score": 45,
@@ -11045,12 +11164,12 @@
       "severity": "critical"
     },
     {
-      "tagName": "hx-checkbox-group",
+      "tagName": "hx-clinical-status",
       "dimension": "CEM-Source Fidelity",
-      "score": 51,
+      "score": 47,
       "tier": "critical",
-      "description": "CEM-Source Fidelity score: 51/100. Phantom: hx-change; Missing in source: form, validationMessage, validity; 3 reflections matched",
-      "severity": "warning"
+      "description": "CEM-Source Fidelity score: 47/100. Phantom: hx-dismiss, hx-acknowledge; Missing in source: _componentId, _isAssertive, _role, _requiresAcknowledgment, _effectivePersistent; 4 reflections matched",
+      "severity": "critical"
     },
     {
       "tagName": "hx-code-snippet",
@@ -11061,11 +11180,11 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-color-picker",
+      "tagName": "hx-checkbox-group",
       "dimension": "CEM-Source Fidelity",
-      "score": 54,
+      "score": 51,
       "tier": "critical",
-      "description": "CEM-Source Fidelity score: 54/100. Phantom: hx-input, hx-change; Missing in source: validity, validationMessage; Extra in source: swatchesonly",
+      "description": "CEM-Source Fidelity score: 51/100. Phantom: hx-change; Missing in source: form, validationMessage, validity; 3 reflections matched",
       "severity": "warning"
     },
     {
@@ -11081,8 +11200,16 @@
       "dimension": "CEM-Source Fidelity",
       "score": 43,
       "tier": "critical",
-      "description": "CEM-Source Fidelity score: 43/100. Phantom: hx-copy-error, hx-copy; 6 properties matched; Missing reflections: hx-size; Extra in source: size",
+      "description": "CEM-Source Fidelity score: 43/100. Phantom: hx-copy-error, hx-copy; 7 properties matched; Missing reflections: hx-size; Extra in source: size",
       "severity": "critical"
+    },
+    {
+      "tagName": "hx-color-picker",
+      "dimension": "CEM-Source Fidelity",
+      "score": 54,
+      "tier": "critical",
+      "description": "CEM-Source Fidelity score: 54/100. Phantom: hx-input, hx-change; Missing in source: validity, validationMessage; Extra in source: swatchesonly",
+      "severity": "warning"
     },
     {
       "tagName": "hx-counter",
@@ -11093,19 +11220,19 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-data-table",
-      "dimension": "CEM-Source Fidelity",
-      "score": 54,
-      "tier": "critical",
-      "description": "CEM-Source Fidelity score: 54/100. Phantom: hx-sort, hx-row-click, hx-select; 12 properties matched; Extra in source: stickyheader",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-date-picker",
       "dimension": "CEM-Source Fidelity",
       "score": 55,
       "tier": "critical",
       "description": "CEM-Source Fidelity score: 55/100. Phantom: hx-change; Missing in source: form, validationMessage, validity; 2 reflections matched",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-data-table",
+      "dimension": "CEM-Source Fidelity",
+      "score": 54,
+      "tier": "critical",
+      "description": "CEM-Source Fidelity score: 54/100. Phantom: hx-sort, hx-row-click, hx-select; 12 properties matched; Extra in source: stickyheader",
       "severity": "warning"
     },
     {
@@ -11129,7 +11256,7 @@
       "dimension": "CEM-Source Fidelity",
       "score": 60,
       "tier": "critical",
-      "description": "CEM-Source Fidelity score: 60/100. Phantom: hx-show, hx-hide, hx-select; 4 properties matched; 3 reflections matched",
+      "description": "CEM-Source Fidelity score: 60/100. Phantom: hx-show, hx-hide, hx-select; 5 properties matched; 3 reflections matched",
       "severity": "warning"
     },
     {
@@ -11141,19 +11268,19 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-file-upload",
-      "dimension": "CEM-Source Fidelity",
-      "score": 52,
-      "tier": "critical",
-      "description": "CEM-Source Fidelity score: 52/100. Phantom: hx-error, hx-upload, hx-remove; Missing in source: form, validationMessage, validity, files; 1 reflections matched",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-form",
       "dimension": "CEM-Source Fidelity",
       "score": 60,
       "tier": "critical",
       "description": "CEM-Source Fidelity score: 60/100. Phantom: hx-submit, hx-invalid, hx-reset; 5 properties matched; No reflected attributes",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-file-upload",
+      "dimension": "CEM-Source Fidelity",
+      "score": 53,
+      "tier": "critical",
+      "description": "CEM-Source Fidelity score: 53/100. Phantom: hx-error, hx-upload, hx-remove; Missing in source: form, validationMessage, validity, files; 1 reflections matched",
       "severity": "warning"
     },
     {
@@ -11173,14 +11300,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-icon",
-      "dimension": "CEM-Source Fidelity",
-      "score": 75,
-      "tier": "critical",
-      "description": "CEM-Source Fidelity score: 75/100. No events declared or dispatched; 5 properties matched; Missing reflections: hx-size; Extra in source: size",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-icon-button",
       "dimension": "CEM-Source Fidelity",
       "score": 45,
@@ -11197,11 +11316,19 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-link",
+      "tagName": "hx-menu-item",
       "dimension": "CEM-Source Fidelity",
       "score": 60,
       "tier": "critical",
-      "description": "CEM-Source Fidelity score: 60/100. Phantom: hx-click; 6 properties matched; 2 reflections matched",
+      "description": "CEM-Source Fidelity score: 60/100. Phantom: hx-item-select, hx-item-submenu-open; 5 properties matched; 4 reflections matched",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-menu",
+      "dimension": "CEM-Source Fidelity",
+      "score": 60,
+      "tier": "critical",
+      "description": "CEM-Source Fidelity score: 60/100. Phantom: hx-close, hx-select; 1 properties matched; 1 reflections matched",
       "severity": "warning"
     },
     {
@@ -11218,22 +11345,6 @@
       "score": 60,
       "tier": "critical",
       "description": "CEM-Source Fidelity score: 60/100. Phantom: hx-select; 3 properties matched; 2 reflections matched",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-menu-item",
-      "dimension": "CEM-Source Fidelity",
-      "score": 60,
-      "tier": "critical",
-      "description": "CEM-Source Fidelity score: 60/100. Phantom: hx-item-select, hx-item-submenu-open; 5 properties matched; 4 reflections matched",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-menu",
-      "dimension": "CEM-Source Fidelity",
-      "score": 60,
-      "tier": "critical",
-      "description": "CEM-Source Fidelity score: 60/100. Phantom: hx-close, hx-select; 1 properties matched; 1 reflections matched",
       "severity": "warning"
     },
     {
@@ -11261,11 +11372,19 @@
       "severity": "warning"
     },
     {
+      "tagName": "hx-icon",
+      "dimension": "CEM-Source Fidelity",
+      "score": 75,
+      "tier": "critical",
+      "description": "CEM-Source Fidelity score: 75/100. No events declared or dispatched; 5 properties matched; Missing reflections: hx-size; Extra in source: size",
+      "severity": "warning"
+    },
+    {
       "tagName": "hx-pagination",
       "dimension": "CEM-Source Fidelity",
       "score": 48,
       "tier": "critical",
-      "description": "CEM-Source Fidelity score: 48/100. Phantom: hx-page-change, hx-page-size-change; 13 properties matched; Extra in source: totalpages, siblingcount, boundarycount, showfirstlast, pagesize, showpagesize",
+      "description": "CEM-Source Fidelity score: 48/100. Phantom: hx-page-change, hx-page-size-change; 15 properties matched; Extra in source: totalpages, siblingcount, boundarycount, showfirstlast, pagesize, showpagesize",
       "severity": "critical"
     },
     {
@@ -11275,22 +11394,6 @@
       "tier": "critical",
       "description": "CEM-Source Fidelity score: 39/100. Phantom: hx-phi-access; Missing in source: _masked, _clipboardTimer; Extra in source: fieldtype",
       "severity": "critical"
-    },
-    {
-      "tagName": "hx-popover",
-      "dimension": "CEM-Source Fidelity",
-      "score": 60,
-      "tier": "critical",
-      "description": "CEM-Source Fidelity score: 60/100. Phantom: hx-show, hx-after-show, hx-hide, hx-after-hide; 7 properties matched; 7 reflections matched",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-popup",
-      "dimension": "CEM-Source Fidelity",
-      "score": 53,
-      "tier": "critical",
-      "description": "CEM-Source Fidelity score: 53/100. Phantom: hx-reposition; Missing in source: flipFallbackPlacements; Extra in source: arrowplacement, autosize",
-      "severity": "warning"
     },
     {
       "tagName": "hx-progress-bar",
@@ -11309,11 +11412,11 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-prose",
+      "tagName": "hx-link",
       "dimension": "CEM-Source Fidelity",
-      "score": 81,
+      "score": 60,
       "tier": "critical",
-      "description": "CEM-Source Fidelity score: 81/100. No events declared or dispatched; 2 properties matched; Missing reflections: hx-size; Extra in source: size, maxwidth",
+      "description": "CEM-Source Fidelity score: 60/100. Phantom: hx-click; 6 properties matched; 2 reflections matched",
       "severity": "warning"
     },
     {
@@ -11325,19 +11428,19 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-rating",
+      "tagName": "hx-popover",
       "dimension": "CEM-Source Fidelity",
-      "score": 55,
+      "score": 60,
       "tier": "critical",
-      "description": "CEM-Source Fidelity score: 55/100. Phantom: hx-change, hx-hover; Missing in source: validity, validationMessage; 6 reflections matched",
+      "description": "CEM-Source Fidelity score: 60/100. Phantom: hx-show, hx-after-show, hx-hide, hx-after-hide; 7 properties matched; 7 reflections matched",
       "severity": "warning"
     },
     {
       "tagName": "hx-select",
       "dimension": "CEM-Source Fidelity",
-      "score": 45,
+      "score": 46,
       "tier": "critical",
-      "description": "CEM-Source Fidelity score: 45/100. Phantom: hx-change; Missing in source: form, validationMessage, validity; Missing reflections: hx-size; Extra in source: size",
+      "description": "CEM-Source Fidelity score: 46/100. Phantom: hx-change; Missing in source: form, validationMessage, validity; Missing reflections: hx-size; Extra in source: size",
       "severity": "critical"
     },
     {
@@ -11357,6 +11460,14 @@
       "severity": "warning"
     },
     {
+      "tagName": "hx-popup",
+      "dimension": "CEM-Source Fidelity",
+      "score": 53,
+      "tier": "critical",
+      "description": "CEM-Source Fidelity score: 53/100. Phantom: hx-reposition; Missing in source: flipFallbackPlacements; Extra in source: arrowplacement, autosize",
+      "severity": "warning"
+    },
+    {
       "tagName": "hx-slider",
       "dimension": "CEM-Source Fidelity",
       "score": 36,
@@ -11373,6 +11484,22 @@
       "severity": "warning"
     },
     {
+      "tagName": "hx-prose",
+      "dimension": "CEM-Source Fidelity",
+      "score": 81,
+      "tier": "critical",
+      "description": "CEM-Source Fidelity score: 81/100. No events declared or dispatched; 2 properties matched; Missing reflections: hx-size; Extra in source: size, maxwidth",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-rating",
+      "dimension": "CEM-Source Fidelity",
+      "score": 55,
+      "tier": "critical",
+      "description": "CEM-Source Fidelity score: 55/100. Phantom: hx-change, hx-hover; Missing in source: validity, validationMessage; 6 reflections matched",
+      "severity": "warning"
+    },
+    {
       "tagName": "hx-split-panel",
       "dimension": "CEM-Source Fidelity",
       "score": 60,
@@ -11381,27 +11508,27 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-stat",
-      "dimension": "CEM-Source Fidelity",
-      "score": 90,
-      "tier": "critical",
-      "description": "CEM-Source Fidelity score: 90/100. No events declared or dispatched; 4 properties matched; Missing reflections: hx-size; Extra in source: size",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-status-indicator",
-      "dimension": "CEM-Source Fidelity",
-      "score": 88,
-      "tier": "critical",
-      "description": "CEM-Source Fidelity score: 88/100. No events declared or dispatched; 4 properties matched; Missing reflections: hx-size; Extra in source: size",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-split-button",
       "dimension": "CEM-Source Fidelity",
       "score": 48,
       "tier": "critical",
       "description": "CEM-Source Fidelity score: 48/100. Phantom: hx-click, hx-select; 7 properties matched; Missing reflections: hx-size; Extra in source: size",
+      "severity": "critical"
+    },
+    {
+      "tagName": "hx-stat",
+      "dimension": "CEM-Source Fidelity",
+      "score": 90,
+      "tier": "critical",
+      "description": "CEM-Source Fidelity score: 90/100. No events declared or dispatched; 5 properties matched; Missing reflections: hx-size; Extra in source: size",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-steps",
+      "dimension": "CEM-Source Fidelity",
+      "score": 43,
+      "tier": "critical",
+      "description": "CEM-Source Fidelity score: 43/100. Phantom: hx-step-click; 3 properties matched; Missing reflections: hx-size; Extra in source: size",
       "severity": "critical"
     },
     {
@@ -11437,22 +11564,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-steps",
-      "dimension": "CEM-Source Fidelity",
-      "score": 43,
-      "tier": "critical",
-      "description": "CEM-Source Fidelity score: 43/100. Phantom: hx-step-click; 3 properties matched; Missing reflections: hx-size; Extra in source: size",
-      "severity": "critical"
-    },
-    {
-      "tagName": "hx-tabs",
-      "dimension": "CEM-Source Fidelity",
-      "score": 55,
-      "tier": "critical",
-      "description": "CEM-Source Fidelity score: 55/100. Phantom: hx-tab-change; Missing in source: selectedIndex; 3 reflections matched",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-tag",
       "dimension": "CEM-Source Fidelity",
       "score": 52,
@@ -11469,6 +11580,22 @@
       "severity": "critical"
     },
     {
+      "tagName": "hx-status-indicator",
+      "dimension": "CEM-Source Fidelity",
+      "score": 88,
+      "tier": "critical",
+      "description": "CEM-Source Fidelity score: 88/100. No events declared or dispatched; 4 properties matched; Missing reflections: hx-size; Extra in source: size",
+      "severity": "warning"
+    },
+    {
+      "tagName": "hx-tabs",
+      "dimension": "CEM-Source Fidelity",
+      "score": 55,
+      "tier": "critical",
+      "description": "CEM-Source Fidelity score: 55/100. Phantom: hx-tab-change; Missing in source: selectedIndex; 3 reflections matched",
+      "severity": "warning"
+    },
+    {
       "tagName": "hx-textarea",
       "dimension": "CEM-Source Fidelity",
       "score": 55,
@@ -11481,7 +11608,7 @@
       "dimension": "CEM-Source Fidelity",
       "score": 90,
       "tier": "critical",
-      "description": "CEM-Source Fidelity score: 90/100. No events declared or dispatched; Missing in source: effectiveTheme, effectiveContrast; 4 reflections matched",
+      "description": "CEM-Source Fidelity score: 90/100. No events declared or dispatched; Missing in source: effectiveTheme, effectiveMotion; 4 reflections matched",
       "severity": "warning"
     },
     {

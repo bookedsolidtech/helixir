@@ -37,6 +37,7 @@ export * from './tools/library.js';
 export * from './tools/safety.js';
 export * from './tools/story.js';
 export * from './tools/styling.js';
+export * from './tools/theme.js';
 export * from './tools/tokens.js';
 export * from './tools/typescript.js';
 export * from './tools/validate.js';

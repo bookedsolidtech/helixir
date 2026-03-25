@@ -39,6 +39,30 @@ jobs:
       - name: Build
         run: pnpm run build
 
+      - name: Install gitleaks
+        run: |
+          GITLEAKS_VERSION="8.18.4"
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz -C /usr/local/bin gitleaks
+
+      - name: Scan publish payload for secrets
+        run: |
+          PAYLOAD=$(pnpm pack --dry-run 2>&1)
+          if echo "$PAYLOAD" | grep -qE '(^|\s)\.env'; then
+            echo "ERROR: .env files detected in publish payload"
+            echo "$PAYLOAD"
+            exit 1
+          fi
+          if echo "$PAYLOAD" | grep -qE '(^|\s)\.automaker'; then
+            echo "ERROR: .automaker files detected in publish payload"
+            echo "$PAYLOAD"
+            exit 1
+          fi
+          echo "Publish payload clean - no .env or .automaker files detected"
+
+      - name: Scan build artifacts for secrets
+        run: gitleaks detect --config .gitleaks.toml --source ./build --no-git --verbose --redact
+
       - name: Version and Publish
         uses: changesets/action@v1
         with:

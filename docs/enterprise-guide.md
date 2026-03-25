@@ -446,57 +446,46 @@ With `watch: true`, HELiXiR monitors `cemPath` and reloads automatically when th
 
 ## Step 6 — Create Your First Theme
 
-HELiXiR's theming tools work with design token JSON files. Tokens must follow W3C DTCG format or be compatible with Style Dictionary / Theo.
+HELiXiR's theming tools scan your component library's CEM to discover all available tokens and generate ready-to-customize CSS theme files. No manual token list required — the tools derive everything from your CEM.
 
-### Create a theme
+### Scaffold a complete theme from your library's tokens
 
 ```
 create_theme({
-  themeName: "brand-light",
-  baseTokens: {
-    "--hx-color-primary": "#1a56db",
-    "--hx-color-primary-hover": "#1e429f",
-    "--hx-color-surface": "#ffffff",
-    "--hx-color-surface-secondary": "#f8fafc",
-    "--hx-color-text": "#0f172a",
-    "--hx-color-text-secondary": "#475569",
-    "--hx-color-border": "#e2e8f0",
-    "--hx-radius-md": "0.5rem",
-    "--hx-spacing-md": "1rem"
-  }
+  themeName: "brand"
 })
 ```
 
-This generates a CSS file and a token JSON file that can be loaded as a theme.
+This analyzes the CEM to detect your token prefix and categories, then generates a complete CSS file with:
+- Light mode variables under `.brand-light`
+- Dark mode overrides under `.brand-dark` and `@media (prefers-color-scheme: dark)`
+- `color-scheme` declarations for each mode
 
-### Update token values in an existing theme
+The `prefix` parameter overrides the auto-detected CSS custom property prefix if needed (e.g. `"--hx-"` for a library whose tokens don't follow a detectable convention).
+
+### Apply token overrides to specific components
+
+After scaffolding a theme, use `apply_theme_tokens` to generate per-component CSS blocks that wire your brand values to individual component properties:
 
 ```
 apply_theme_tokens({
-  themeName: "brand-light",
-  tokens: {
+  themeTokens: {
     "--hx-color-primary": "#2563eb",
     "--hx-color-primary-hover": "#1d4ed8"
   }
 })
 ```
 
-This patches only the specified tokens without affecting the rest of the theme.
+This returns a global `:root` block and per-component CSS blocks showing exactly which component CSS properties map to each token. Use the output as the starting point for your brand theme file.
 
-### Create a dark theme variant
+To limit output to specific components:
 
 ```
-create_theme({
-  themeName: "brand-dark",
-  baseTokens: {
-    "--hx-color-primary": "#60a5fa",
-    "--hx-color-primary-hover": "#93c5fd",
-    "--hx-color-surface": "#0f172a",
-    "--hx-color-surface-secondary": "#1e293b",
-    "--hx-color-text": "#f1f5f9",
-    "--hx-color-text-secondary": "#94a3b8",
-    "--hx-color-border": "#334155"
-  }
+apply_theme_tokens({
+  themeTokens: {
+    "--hx-color-primary": "#2563eb"
+  },
+  tagNames: ["hx-button", "hx-input", "hx-link"]
 })
 ```
 

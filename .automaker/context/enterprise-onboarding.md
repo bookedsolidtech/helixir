@@ -231,27 +231,33 @@ get_component({ tagName: "hx-my-widget" })
 
 ## Creating Your First Theme
 
-The `create_theme` MCP tool generates a design token theme file:
+The `create_theme` MCP tool scaffolds a complete CSS theme by scanning the CEM for all available tokens:
 
 ```
 create_theme({
-  themeName: "brand-dark",
-  baseTokens: {
-    "--hx-color-primary": "#1a56db",
-    "--hx-color-surface": "#0f172a",
-    "--hx-color-text": "#f1f5f9"
+  themeName: "brand"
+})
+```
+
+This generates a ready-to-customize CSS file with light (`.brand-light`) and dark (`.brand-dark`) mode classes and `color-scheme` declarations. The `prefix` parameter overrides the auto-detected token prefix if needed.
+
+The `apply_theme_tokens` tool maps your token values to specific component CSS properties, generating per-component CSS blocks:
+
+```
+apply_theme_tokens({
+  themeTokens: {
+    "--hx-color-primary": "#2563eb",
+    "--hx-color-surface": "#0f172a"
   }
 })
 ```
 
-The `apply_theme_tokens` tool patches an existing theme file with updated token values:
+Use `tagNames` to filter output to specific components:
 
 ```
 apply_theme_tokens({
-  themeName: "brand-dark",
-  tokens: {
-    "--hx-color-primary": "#2563eb"
-  }
+  themeTokens: { "--hx-color-primary": "#2563eb" },
+  tagNames: ["hx-button", "hx-input"]
 })
 ```
 

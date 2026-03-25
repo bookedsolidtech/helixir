@@ -1,8 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  scaffoldComponent,
-  detectConventions,
-} from '../../packages/core/src/handlers/scaffold.js';
+import { scaffoldComponent, detectConventions } from '../../packages/core/src/handlers/scaffold.js';
 import type { ScaffoldComponentOptions } from '../../packages/core/src/handlers/scaffold.js';
 import type { Cem } from '../../packages/core/src/handlers/cem.js';
 

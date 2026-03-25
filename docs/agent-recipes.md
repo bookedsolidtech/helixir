@@ -40,9 +40,9 @@ then run get_health_summary to show me:
 
 ### Tools invoked
 
-| Tool | Purpose |
-|------|---------|
-| `audit_library` | Generates a JSONL file with every component scored across 11 dimensions |
+| Tool                 | Purpose                                                                                  |
+| -------------------- | ---------------------------------------------------------------------------------------- |
+| `audit_library`      | Generates a JSONL file with every component scored across 11 dimensions                  |
 | `get_health_summary` | Returns aggregate stats: average, grade distribution, dimension averages, attention list |
 
 ### Example output
@@ -59,11 +59,7 @@ then run get_health_summary to show me:
     "Test Coverage": 55.1,
     "CEM-Source Fidelity": 79.6
   },
-  "componentsNeedingAttention": [
-    "hx-data-grid",
-    "hx-tree",
-    "hx-rich-text"
-  ],
+  "componentsNeedingAttention": ["hx-data-grid", "hx-tree", "hx-rich-text"],
   "timestamp": "2026-03-25T10:00:00.000Z"
 }
 ```
@@ -113,10 +109,10 @@ After scaffolding, run get_project_diagnostics to confirm there are no type erro
 
 ### Tools invoked
 
-| Tool | Purpose |
-|------|---------|
-| `scaffold_component` | Generates Lit source with decorators, CEM annotations, Vitest stub, and Storybook CSF3 story |
-| `get_project_diagnostics` | Verifies no TypeScript errors were introduced |
+| Tool                      | Purpose                                                                                      |
+| ------------------------- | -------------------------------------------------------------------------------------------- |
+| `scaffold_component`      | Generates Lit source with decorators, CEM annotations, Vitest stub, and Storybook CSF3 story |
+| `get_project_diagnostics` | Verifies no TypeScript errors were introduced                                                |
 
 ### Example output
 
@@ -185,10 +181,10 @@ renamed events, or type changes — and explain what consumers will need to upda
 
 ### Tools invoked
 
-| Tool | Purpose |
-|------|---------|
+| Tool                     | Purpose                                                                          |
+| ------------------------ | -------------------------------------------------------------------------------- |
 | `check_breaking_changes` | Scans all components against base branch CEM, returns per-component emoji status |
-| `diff_cem` | (Follow-up) Detailed migration guide for a specific component |
+| `diff_cem`               | (Follow-up) Detailed migration guide for a specific component                    |
 
 ### Example output
 
@@ -215,7 +211,7 @@ to generate a full migration guide for consumers.
 
 Migration guide output:
 
-```markdown
+````markdown
 ## hx-dialog — Migration Guide
 
 ### Renamed event: `close` → `hx-close`
@@ -224,15 +220,19 @@ The `close` event has been renamed to `hx-close` to match the library's
 event naming convention.
 
 **Before:**
+
 ```js
 dialog.addEventListener('close', handler);
 ```
+````
 
 **After:**
+
 ```js
 dialog.addEventListener('hx-close', handler);
 ```
-```
+
+````
 
 ### CI integration
 
@@ -245,7 +245,7 @@ Add to your GitHub Actions workflow:
     npx helixir check_breaking_changes --baseBranch main
   env:
     MCP_WC_PROJECT_ROOT: ${{ github.workspace }}/packages/web-components
-```
+````
 
 ---
 
@@ -271,10 +271,10 @@ After saving, run get_file_diagnostics on helix.d.ts to confirm no syntax errors
 
 ### Tools invoked
 
-| Tool | Purpose |
-|------|---------|
-| `generate_types` | Generates `.d.ts` content from CEM, using the `attribute` field for attribute interface names |
-| `get_file_diagnostics` | Runs TypeScript diagnostics on the saved declaration file |
+| Tool                   | Purpose                                                                                       |
+| ---------------------- | --------------------------------------------------------------------------------------------- |
+| `generate_types`       | Generates `.d.ts` content from CEM, using the `attribute` field for attribute interface names |
+| `get_file_diagnostics` | Runs TypeScript diagnostics on the saved declaration file                                     |
 
 ### Example output
 
@@ -342,15 +342,16 @@ Finally, generate the CSS theme file for these brand colors:
 
 ### Tools invoked
 
-| Tool | Purpose |
-|------|---------|
-| `get_design_tokens` | Lists all design tokens by category (color, spacing, typography, etc.) |
-| `find_token` | Finds tokens by name pattern or value substring |
-| `find_components_using_token` | Shows which components consume a given token — impact analysis |
+| Tool                          | Purpose                                                                |
+| ----------------------------- | ---------------------------------------------------------------------- |
+| `get_design_tokens`           | Lists all design tokens by category (color, spacing, typography, etc.) |
+| `find_token`                  | Finds tokens by name pattern or value substring                        |
+| `find_components_using_token` | Shows which components consume a given token — impact analysis         |
 
 ### Example output
 
 **Token discovery:**
+
 ```
 Color tokens: 128 tokens
 
@@ -363,6 +364,7 @@ Key primary tokens:
 ```
 
 **Components affected by --hx-color-primary-500:**
+
 ```
 14 components use --hx-color-primary-500:
   hx-button, hx-badge, hx-progress, hx-spinner,
@@ -372,6 +374,7 @@ Key primary tokens:
 ```
 
 **Generated theme CSS:**
+
 ```css
 .theme-brand-dark {
   color-scheme: dark;
@@ -400,6 +403,7 @@ Key primary tokens:
 ```
 
 **To apply the theme:**
+
 ```html
 <body class="theme-brand-dark">
   <!-- All hx-* components inherit the theme tokens -->
@@ -442,14 +446,15 @@ components to get detailed sub-metric breakdowns and remediation guidance.
 
 ### Tools invoked
 
-| Tool | Purpose |
-|------|---------|
-| `analyze_accessibility` | Checks all components for ARIA roles, keyboard events, focus management, form association, label support, and disabled state |
-| `score_component` (multiDimensional) | Returns the full Accessibility Compliance dimension with sub-metrics and confidence level |
+| Tool                                 | Purpose                                                                                                                      |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `analyze_accessibility`              | Checks all components for ARIA roles, keyboard events, focus management, form association, label support, and disabled state |
+| `score_component` (multiDimensional) | Returns the full Accessibility Compliance dimension with sub-metrics and confidence level                                    |
 
 ### Example output
 
 **Library-wide accessibility report:**
+
 ```json
 {
   "summary": {
@@ -474,10 +479,7 @@ components to get detailed sub-metric breakdowns and remediation guidance.
     {
       "tagName": "hx-tree",
       "score": 24,
-      "issues": [
-        "Missing aria-expanded state",
-        "No keyboard navigation (ArrowUp/Down/Left/Right)"
-      ]
+      "issues": ["Missing aria-expanded state", "No keyboard navigation (ArrowUp/Down/Left/Right)"]
     }
   ],
   "noKeyboard": ["hx-data-grid", "hx-tree", "hx-rich-text", "hx-color-picker"],
@@ -486,6 +488,7 @@ components to get detailed sub-metric breakdowns and remediation guidance.
 ```
 
 **Detailed score for hx-data-grid:**
+
 ```json
 {
   "tagName": "hx-data-grid",
@@ -522,71 +525,71 @@ components to get detailed sub-metric breakdowns and remediation guidance.
 
 ### Discovery
 
-| Tool | Input | Returns |
-|------|-------|---------|
-| `list_components` | `libraryId?` | All components in the CEM |
-| `find_component` | `query` | Top 3 semantic matches |
-| `get_component` | `tagName` | Full API metadata (members, events, slots, parts, CSS props) |
-| `get_component_narrative` | `tagName` | Prose description with usage examples |
-| `get_component_quick_ref` | `tagName` | Compact API surface |
-| `get_component_dependencies` | `tagName` | Internal dependency tree |
+| Tool                         | Input        | Returns                                                      |
+| ---------------------------- | ------------ | ------------------------------------------------------------ |
+| `list_components`            | `libraryId?` | All components in the CEM                                    |
+| `find_component`             | `query`      | Top 3 semantic matches                                       |
+| `get_component`              | `tagName`    | Full API metadata (members, events, slots, parts, CSS props) |
+| `get_component_narrative`    | `tagName`    | Prose description with usage examples                        |
+| `get_component_quick_ref`    | `tagName`    | Compact API surface                                          |
+| `get_component_dependencies` | `tagName`    | Internal dependency tree                                     |
 
 ### Health Scoring
 
-| Tool | Input | Returns |
-|------|-------|---------|
-| `score_component` | `tagName`, `multiDimensional?` | Grade, score, dimension breakdown |
-| `score_all_components` | `multiDimensional?` | Scores for every component |
-| `get_health_summary` | `libraryId?` | Aggregate stats, grade distribution, attention list |
-| `get_health_trend` | `tagName`, `days?` | Score history and trend direction |
-| `get_health_diff` | `tagName`, `baseBranch?` | Before/after comparison |
-| `audit_library` | `outputPath?` | JSONL audit report for all components |
-| `analyze_accessibility` | `tagName?` | Accessibility profile (one or all) |
+| Tool                    | Input                          | Returns                                             |
+| ----------------------- | ------------------------------ | --------------------------------------------------- |
+| `score_component`       | `tagName`, `multiDimensional?` | Grade, score, dimension breakdown                   |
+| `score_all_components`  | `multiDimensional?`            | Scores for every component                          |
+| `get_health_summary`    | `libraryId?`                   | Aggregate stats, grade distribution, attention list |
+| `get_health_trend`      | `tagName`, `days?`             | Score history and trend direction                   |
+| `get_health_diff`       | `tagName`, `baseBranch?`       | Before/after comparison                             |
+| `audit_library`         | `outputPath?`                  | JSONL audit report for all components               |
+| `analyze_accessibility` | `tagName?`                     | Accessibility profile (one or all)                  |
 
 ### Safety & Validation
 
-| Tool | Input | Returns |
-|------|-------|---------|
-| `check_breaking_changes` | `baseBranch` | Per-component emoji status for all components |
-| `diff_cem` | `tagName`, `baseBranch` | Detailed diff + migration guide for one component |
-| `validate_usage` | `tagName`, `html` | Pass/fail with attribute and slot issues |
-| `validate_component_code` | `html`, `css`, `code`, `tagName` | 20-validator full check |
+| Tool                      | Input                            | Returns                                           |
+| ------------------------- | -------------------------------- | ------------------------------------------------- |
+| `check_breaking_changes`  | `baseBranch`                     | Per-component emoji status for all components     |
+| `diff_cem`                | `tagName`, `baseBranch`          | Detailed diff + migration guide for one component |
+| `validate_usage`          | `tagName`, `html`                | Pass/fail with attribute and slot issues          |
+| `validate_component_code` | `html`, `css`, `code`, `tagName` | 20-validator full check                           |
 
 ### Scaffolding
 
-| Tool | Input | Returns |
-|------|-------|---------|
+| Tool                 | Input                                                      | Returns                                    |
+| -------------------- | ---------------------------------------------------------- | ------------------------------------------ |
 | `scaffold_component` | `tagName`, `properties?`, `events?`, `slots?`, `cssParts?` | Lit source + Vitest stub + Storybook story |
 
 ### TypeScript
 
-| Tool | Input | Returns |
-|------|-------|---------|
-| `generate_types` | `libraryId?` | `.d.ts` declarations for all components |
-| `get_file_diagnostics` | `filePath` | Type errors for a single file |
-| `get_project_diagnostics` | — | Full project TypeScript diagnostic pass |
+| Tool                      | Input        | Returns                                 |
+| ------------------------- | ------------ | --------------------------------------- |
+| `generate_types`          | `libraryId?` | `.d.ts` declarations for all components |
+| `get_file_diagnostics`    | `filePath`   | Type errors for a single file           |
+| `get_project_diagnostics` | —            | Full project TypeScript diagnostic pass |
 
 ### Design Tokens
 
-| Tool | Input | Returns |
-|------|-------|---------|
-| `get_design_tokens` | `category?` | All tokens, optionally filtered by category |
-| `find_token` | `query` | Tokens matching name or value substring |
-| `find_components_using_token` | `tokenName` | Components that consume the token |
-| `find_components_by_token` | `tokenName` | CEM-level token usage |
+| Tool                          | Input       | Returns                                     |
+| ----------------------------- | ----------- | ------------------------------------------- |
+| `get_design_tokens`           | `category?` | All tokens, optionally filtered by category |
+| `find_token`                  | `query`     | Tokens matching name or value substring     |
+| `find_components_using_token` | `tokenName` | Components that consume the token           |
+| `find_components_by_token`    | `tokenName` | CEM-level token usage                       |
 
 ### Styling Validation
 
-| Tool | Input | Returns |
-|------|-------|---------|
-| `styling_preflight` | `cssText`, `tagName` | API discovery + full CSS validation + corrected snippet |
-| `suggest_fix` | `type`, `issue`, `original` | Copy-pasteable corrected code |
-| `resolve_css_api` | `cssText`, `tagName` | Validates `::part()`, token, and slot references |
+| Tool                | Input                       | Returns                                                 |
+| ------------------- | --------------------------- | ------------------------------------------------------- |
+| `styling_preflight` | `cssText`, `tagName`        | API discovery + full CSS validation + corrected snippet |
+| `suggest_fix`       | `type`, `issue`, `original` | Copy-pasteable corrected code                           |
+| `resolve_css_api`   | `cssText`, `tagName`        | Validates `::part()`, token, and slot references        |
 
 ### Multi-Library
 
-| Tool | Input | Returns |
-|------|-------|---------|
-| `load_library` | `libraryId`, `cemPath\|packageName` | Loads an additional CEM into memory |
-| `list_libraries` | — | All loaded libraries with component counts |
-| `unload_library` | `libraryId` | Removes a loaded library from memory |
+| Tool             | Input                               | Returns                                    |
+| ---------------- | ----------------------------------- | ------------------------------------------ |
+| `load_library`   | `libraryId`, `cemPath\|packageName` | Loads an additional CEM into memory        |
+| `list_libraries` | —                                   | All loaded libraries with component counts |
+| `unload_library` | `libraryId`                         | Removes a loaded library from memory       |

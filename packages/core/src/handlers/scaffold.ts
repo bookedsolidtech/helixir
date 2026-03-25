@@ -250,7 +250,9 @@ function generateComponentSource(
       lines.push(`      <div part="${mainPartName}">`);
       for (const slot of slots) {
         const isDefault = slot.name === '' || slot.name === 'default';
-        lines.push(isDefault ? '        <slot></slot>' : `        <slot name="${slot.name}"></slot>`);
+        lines.push(
+          isDefault ? '        <slot></slot>' : `        <slot name="${slot.name}"></slot>`,
+        );
       }
       lines.push('      </div>');
     } else {

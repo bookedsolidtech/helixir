@@ -34,12 +34,12 @@ HELiXiR is an MCP (Model Context Protocol) server that gives AI coding assistant
 
 ## Prerequisites
 
-| Requirement | Minimum Version |
-|-------------|-----------------|
-| Node.js | 20+ |
-| npm / pnpm / yarn | Any current version |
-| Custom Elements Manifest | `custom-elements.json` at a known path |
-| IDE | Claude Code, Claude Desktop, Cursor, VS Code, or Zed |
+| Requirement              | Minimum Version                                      |
+| ------------------------ | ---------------------------------------------------- |
+| Node.js                  | 20+                                                  |
+| npm / pnpm / yarn        | Any current version                                  |
+| Custom Elements Manifest | `custom-elements.json` at a known path               |
+| IDE                      | Claude Code, Claude Desktop, Cursor, VS Code, or Zed |
 
 **Generate a CEM if you don't have one:**
 
@@ -104,15 +104,15 @@ Open `mcpwc.config.json` and fill in the details for your library:
 
 ### Configuration fields explained
 
-| Field | What to set |
-|-------|------------|
-| `cemPath` | Path to `custom-elements.json`, relative to `projectRoot`. Auto-discovered if omitted. |
-| `projectRoot` | Absolute path to your component library. This is the base for all relative paths. |
-| `componentPrefix` | Your tag-name prefix (e.g. `"hx-"`, `"sl-"`, `"ds-"`). Scopes discovery to your library. |
+| Field              | What to set                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------------- |
+| `cemPath`          | Path to `custom-elements.json`, relative to `projectRoot`. Auto-discovered if omitted.                  |
+| `projectRoot`      | Absolute path to your component library. This is the base for all relative paths.                       |
+| `componentPrefix`  | Your tag-name prefix (e.g. `"hx-"`, `"sl-"`, `"ds-"`). Scopes discovery to your library.                |
 | `healthHistoryDir` | Where health score snapshots are stored. Leave as default unless you have a specific reason to move it. |
-| `tsconfigPath` | Path to your `tsconfig.json`. Required for TypeScript diagnostics tools. |
-| `tokensPath` | Path to your design tokens JSON (W3C DTCG format). Set to `null` to disable token tools. |
-| `watch` | Set to `true` for local development — HELiXiR reloads when the CEM file changes. |
+| `tsconfigPath`     | Path to your `tsconfig.json`. Required for TypeScript diagnostics tools.                                |
+| `tokensPath`       | Path to your design tokens JSON (W3C DTCG format). Set to `null` to disable token tools.                |
+| `watch`            | Set to `true` for local development — HELiXiR reloads when the CEM file changes.                        |
 
 ### Monorepo setup
 
@@ -369,6 +369,7 @@ check_breaking_changes({ baseBranch: "main" })
 ```
 
 Scans all components in the current branch against the base branch CEM and flags:
+
 - Removed attributes
 - Changed types
 - Renamed events
@@ -578,10 +579,10 @@ jobs:
 ### GitHub Actions — breaking change detection
 
 ```yaml
-      - name: Check for breaking changes
-        run: npx helixir check_breaking_changes --baseBranch main
-        env:
-          MCP_WC_PROJECT_ROOT: ${{ github.workspace }}/packages/web-components
+- name: Check for breaking changes
+  run: npx helixir check_breaking_changes --baseBranch main
+  env:
+    MCP_WC_PROJECT_ROOT: ${{ github.workspace }}/packages/web-components
 ```
 
 This runs the breaking-change scanner against `main` on every PR. If an attribute is removed, a type changes, or an event is renamed, the step fails with a detailed report.
@@ -616,18 +617,21 @@ Or run it explicitly in CI before the health check step:
 **Causes and fixes:**
 
 1. **Wrong `cemPath`** — verify the path is correct relative to `projectRoot`:
+
    ```bash
    cat mcpwc.config.json
    ls -la /path/to/your/library/custom-elements.json
    ```
 
 2. **CEM is empty or malformed** — check the file has content:
+
    ```bash
    cat custom-elements.json | head -30
    # Should show: {"schemaVersion":"2.0.0","modules":[...]}
    ```
 
 3. **CEM not regenerated after adding components** — run:
+
    ```bash
    npm run analyze:cem
    ```
@@ -645,6 +649,7 @@ Or run it explicitly in CI before the health check step:
 **Causes and fixes:**
 
 1. **Relative vs absolute path** — `MCP_WC_PROJECT_ROOT` must be an absolute path:
+
    ```json
    // WRONG
    "MCP_WC_PROJECT_ROOT": "./packages/web-components"
@@ -654,15 +659,19 @@ Or run it explicitly in CI before the health check step:
    ```
 
 2. **`helixir` not installed** — verify:
+
    ```bash
    npx helixir --version
    ```
+
    If it fails, run `npm install helixir` in the component library.
 
 3. **`mcpwc.config.json` missing** — the server looks for this file at `projectRoot`:
+
    ```bash
    ls /path/to/your/library/mcpwc.config.json
    ```
+
    If missing, run `npx helixir init` in the library root.
 
 4. **IDE needs a restart** — most IDEs cache MCP server configs. After any change to MCP config files, fully restart the IDE.
@@ -678,12 +687,14 @@ Or run it explicitly in CI before the health check step:
 **Causes and fixes:**
 
 1. **Stale CEM** — the most common cause. Regenerate from source:
+
    ```bash
    npm run analyze:cem
    stat custom-elements.json  # check the modification timestamp
    ```
 
 2. **Watch mode not enabled** — during active development, enable CEM auto-reload:
+
    ```json
    { "watch": true }
    ```

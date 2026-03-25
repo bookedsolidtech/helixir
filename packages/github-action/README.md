@@ -14,25 +14,25 @@ GitHub Action that runs [helixir](https://github.com/bookedsolidtech/helixir) qu
 
 ## Inputs
 
-| Input | Description | Default |
-|-------|-------------|---------|
-| `checks` | Comma-separated checks to run: `health`, `breaking-changes`, `accessibility` | `health,breaking-changes,accessibility` |
-| `health-threshold` | Minimum health score (0–100) required to pass | `70` |
-| `fail-on-breaking` | Fail if breaking changes are detected | `true` |
-| `fail-on-warning` | Fail if minor (warning-level) breaking changes are detected | `false` |
-| `comment` | Post a summary comment on the pull request | `true` |
-| `config-path` | Path to `mcpwc.config.json` (auto-discovered if empty) | `""` |
-| `node-version` | Node.js version to use | `20` |
-| `helixir-version` | Version of helixir to install | `latest` |
+| Input              | Description                                                                  | Default                                 |
+| ------------------ | ---------------------------------------------------------------------------- | --------------------------------------- |
+| `checks`           | Comma-separated checks to run: `health`, `breaking-changes`, `accessibility` | `health,breaking-changes,accessibility` |
+| `health-threshold` | Minimum health score (0–100) required to pass                                | `70`                                    |
+| `fail-on-breaking` | Fail if breaking changes are detected                                        | `true`                                  |
+| `fail-on-warning`  | Fail if minor (warning-level) breaking changes are detected                  | `false`                                 |
+| `comment`          | Post a summary comment on the pull request                                   | `true`                                  |
+| `config-path`      | Path to `mcpwc.config.json` (auto-discovered if empty)                       | `""`                                    |
+| `node-version`     | Node.js version to use                                                       | `20`                                    |
+| `helixir-version`  | Version of helixir to install                                                | `latest`                                |
 
 ## Outputs
 
-| Output | Description |
-|--------|-------------|
-| `health-score` | Average health score across all components |
-| `failing-components` | Number of components below the threshold |
-| `breaking-changes-count` | Number of breaking changes detected |
-| `passed` | Whether all quality gates passed (`true`/`false`) |
+| Output                   | Description                                       |
+| ------------------------ | ------------------------------------------------- |
+| `health-score`           | Average health score across all components        |
+| `failing-components`     | Number of components below the threshold          |
+| `breaking-changes-count` | Number of breaking changes detected               |
+| `passed`                 | Whether all quality gates passed (`true`/`false`) |
 
 ## Examples
 

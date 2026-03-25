@@ -4,7 +4,7 @@ Transform helixir from an analysis-focused MCP server into a complete enterprise
 
 **Status:** active
 **Created:** 2026-03-25T03:54:27.864Z
-**Updated:** 2026-03-25T12:30:04.507Z
+**Updated:** 2026-03-25T13:05:15.189Z
 
 ## PRD
 

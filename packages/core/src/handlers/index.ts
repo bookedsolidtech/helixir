@@ -43,6 +43,7 @@ export * from './shadow-dom-js-checker.js';
 export * from './slot-children-checker.js';
 export * from './styling-diagnostics.js';
 export * from './suggest.js';
+export * from './theme.js';
 export * from './theme-checker.js';
 export * from './theme-detection.js';
 export * from './token-fallback-checker.js';

@@ -44,10 +44,7 @@ const UNTYPED: CemDeclaration = {
     { kind: 'field', name: 'count' },
     { kind: 'method', name: 'reset' },
   ],
-  events: [
-    { name: 'change' },
-    { name: 'update' },
-  ],
+  events: [{ name: 'change' }, { name: 'update' }],
 };
 
 const EMPTY_COMPONENT: CemDeclaration = {

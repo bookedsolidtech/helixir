@@ -416,9 +416,7 @@ describe('isInteractiveComponent', () => {
   });
 
   it('returns true when source has @click handler template expression', () => {
-    expect(isInteractiveComponent(ALL_FALSE, LAYOUT_DECL, '@click=${this.handleClick}')).toBe(
-      true,
-    );
+    expect(isInteractiveComponent(ALL_FALSE, LAYOUT_DECL, '@click=${this.handleClick}')).toBe(true);
   });
 
   it('returns true when source has addEventListener click', () => {
@@ -449,7 +447,8 @@ describe('isInteractiveComponent', () => {
 });
 
 describe('resolveComponentSourceFilePath', () => {
-  const WORKTREE = '/Volumes/Development/booked/helixir/.worktrees/feature-test-add-test-suites-for-8-untested';
+  const WORKTREE =
+    '/Volumes/Development/booked/helixir/.worktrees/feature-test-add-test-suites-for-8-untested';
 
   it('returns null for paths outside project root (security)', () => {
     const result = resolveComponentSourceFilePath(WORKTREE, '../../../etc/passwd');

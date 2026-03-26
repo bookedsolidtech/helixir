@@ -25,7 +25,8 @@ import type { CemDeclaration } from '../../../packages/core/src/handlers/cem.js'
 
 // ─── Fixtures ──────────────────────────────────────────────────────────────────
 
-const WORKTREE = '/Volumes/Development/booked/helixir/.worktrees/feature-test-add-test-suites-for-8-untested';
+const WORKTREE =
+  '/Volumes/Development/booked/helixir/.worktrees/feature-test-add-test-suites-for-8-untested';
 
 // A minimal component source with no a11y patterns
 const MINIMAL_SOURCE = `
@@ -180,9 +181,7 @@ describe('resolveInheritanceChain', () => {
         SIMPLE_DECL,
         WORKTREE,
       );
-      expect(['inline', 'mixin-heavy', 'controller-based', 'hybrid']).toContain(
-        chain.architecture,
-      );
+      expect(['inline', 'mixin-heavy', 'controller-based', 'hybrid']).toContain(chain.architecture);
     });
   });
 

@@ -18,9 +18,10 @@ vi.mock('../../packages/core/src/handlers/typegenerate.js', () => ({
     const count = cem.modules.length;
     return {
       componentCount: count,
-      content: count === 0
-        ? '// No components found\n'
-        : 'declare global {\n  interface HTMLElementTagNameMap {\n    "hx-button": HxButton;\n  }\n}\nexport interface HxButton {\n  variant?: string;\n  disabled?: boolean;\n}\n',
+      content:
+        count === 0
+          ? '// No components found\n'
+          : 'declare global {\n  interface HTMLElementTagNameMap {\n    "hx-button": HxButton;\n  }\n}\nexport interface HxButton {\n  variant?: string;\n  disabled?: boolean;\n}\n',
     };
   }),
 }));
@@ -44,9 +45,7 @@ const BUTTON_CEM: Cem = {
             { kind: 'field', name: 'variant', type: { text: 'string' } },
             { kind: 'field', name: 'disabled', type: { text: 'boolean' } },
           ],
-          attributes: [
-            { name: 'variant', type: { text: 'string' } },
-          ],
+          attributes: [{ name: 'variant', type: { text: 'string' } }],
         },
       ],
     },
@@ -59,16 +58,12 @@ const MULTI_CEM: Cem = {
     {
       kind: 'javascript-module',
       path: 'src/hx-button.ts',
-      declarations: [
-        { kind: 'class', name: 'HxButton', tagName: 'hx-button', members: [] },
-      ],
+      declarations: [{ kind: 'class', name: 'HxButton', tagName: 'hx-button', members: [] }],
     },
     {
       kind: 'javascript-module',
       path: 'src/hx-card.ts',
-      declarations: [
-        { kind: 'class', name: 'HxCard', tagName: 'hx-card', members: [] },
-      ],
+      declarations: [{ kind: 'class', name: 'HxCard', tagName: 'hx-card', members: [] }],
     },
   ],
 };

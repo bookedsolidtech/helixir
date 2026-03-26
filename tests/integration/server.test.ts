@@ -140,7 +140,7 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
       });
     });
 
-    it('returns all expected tool names (68 core + 2 token when configured)', async () => {
+    it('returns all expected tool names (70 core + 2 token when configured)', async () => {
       sendRequest('tools/list', {});
       const response = await recv();
 
@@ -234,6 +234,9 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
         // theme scaffolding
         'create_theme',
         'apply_theme_tokens',
+        // component scaffolding
+        'scaffold_component',
+        'extend_component',
       ];
       const tokenTools = ['get_design_tokens', 'find_token'];
       const expectedTools = [...coreTools, ...tokenTools];

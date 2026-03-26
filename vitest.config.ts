@@ -1,8 +1,15 @@
 import { defineConfig } from 'vitest/config';
+import { resolve } from 'path';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      // Allows packages/mcp tests to resolve helixir/core to the source
+      'helixir/core': resolve(__dirname, 'packages/core/src/index.ts'),
+    },
+  },
   test: {
-    include: ['tests/**/*.test.ts'],
+    include: ['tests/**/*.test.ts', 'packages/mcp/tests/**/*.test.ts'],
     exclude: ['.worktrees/**', 'node_modules/**'],
     coverage: {
       provider: 'v8',

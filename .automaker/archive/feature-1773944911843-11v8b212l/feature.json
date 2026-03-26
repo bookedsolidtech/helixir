@@ -1,0 +1,58 @@
+{
+  "category": "infrastructure",
+  "description": "## Context\n\nHELiXiR's accessibility health dimension (weight 10, Critical tier) currently uses **heuristic-only** CEM analysis. It detects 8 signals: disabled field, label support, focus method, accessibility description, form association, ARIA role, ARIA attributes, keyboard events. All inferred from CEM metadata — no runtime analysis, no source inspection.\n\n**Confidence: heuristic** — known to have false positives (e.g., inferring ARIA role from tag name `-button` suffix) and false negatives (missing runtime a11y patterns not documented in CEM).\n\n## Agent Task\n\n**Use the `accessibility-engineer` agent persona** to perform a deep audit of the accessibility scoring dimension. The goal is to produce an **enhancement proposal** — a detailed document recommending how to improve the accessibility scorer.\n\n### Research Phase\n1. Read `src/analyzers/accessibility-analyzer.ts` (or wherever the a11y scorer lives) — understand every signal it detects\n2. Read the CEM for a real library (use HELiXiR's own MCP tools: `score_component` and `analyze_accessibility` on a helix component like `hx-button`) to see what the current scorer actually produces\n3. Compare the 8 signals against WCAG 2.1 AA requirements — what's missing?\n4. Review the `health-scanning-audit-workflow.md` and `scoring-calibration-workflow.md` for audit context\n\n### Enhancement Proposal\nProduce a document (in `.automaker/context/` or similar) that recommends:\n\n1. **Source-level a11y analysis** — Can we inspect actual component source for patterns like:\n   - `@aria-*` Lit decorators or reflected ARIA properties\n   - `focusable` elements within Shadow DOM\n   - Keyboard event handlers (keydown, keyup, keypress)\n   - `role` attribute on host element\n   - `tabindex` management\n   - Color contrast metadata (if available in design tokens)\n\n2. **New sub-metrics** that could be added to the accessibility scorer:\n   - ARIA pattern completeness (does a dialog component have `role=\"dialog\"`, `aria-modal`, `aria-labelledby`?)\n   - Keyboard interaction coverage (are expected key handlers present for the component type?)\n   - Focus trap detection for overlay components\n   - Screen reader announcement patterns (`aria-live`, `aria-atomic`)\n\n3. **Weight rebalancing** — Should accessibility's weight increase from 10 to match its critical importance? Currently CEM Completeness is weighted 15 but accessibility only 10.\n\n4. **Confidence upgrade path** — What would it take to move from heuristic to verified confidence?\n\n5. **Cross-reference with Lit patterns** — Lit-specific a11y patterns (e.g., `@query` for focus targets, `connectedCallback` focus restoration)\n\n### Acceptance Criteria\n- [ ] Current accessibility scorer fully documented with identified gaps\n- [ ] Enhancement proposal with specific sub-metric additions\n- [ ] Weight rebalancing recommendation with justification\n- [ ] At least 3 concrete, implementable improvements ranked by impact",
+  "title": "Expert audit: accessibility dimension enhancement proposal",
+  "status": "done",
+  "complexity": "architectural",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "8f02f226-6046-44c7-849f-952b8dc43ac4",
+  "id": "feature-1773944911843-11v8b212l",
+  "branchName": "feature/expert-audit-accessibility-dimension",
+  "descriptionHistory": [
+    {
+      "description": "## Context\n\nHELiXiR's accessibility health dimension (weight 10, Critical tier) currently uses **heuristic-only** CEM analysis. It detects 8 signals: disabled field, label support, focus method, accessibility description, form association, ARIA role, ARIA attributes, keyboard events. All inferred from CEM metadata — no runtime analysis, no source inspection.\n\n**Confidence: heuristic** — known to have false positives (e.g., inferring ARIA role from tag name `-button` suffix) and false negatives (missing runtime a11y patterns not documented in CEM).\n\n## Agent Task\n\n**Use the `accessibility-engineer` agent persona** to perform a deep audit of the accessibility scoring dimension. The goal is to produce an **enhancement proposal** — a detailed document recommending how to improve the accessibility scorer.\n\n### Research Phase\n1. Read `src/analyzers/accessibility-analyzer.ts` (or wherever the a11y scorer lives) — understand every signal it detects\n2. Read the CEM for a real library (use HELiXiR's own MCP tools: `score_component` and `analyze_accessibility` on a helix component like `hx-button`) to see what the current scorer actually produces\n3. Compare the 8 signals against WCAG 2.1 AA requirements — what's missing?\n4. Review the `health-scanning-audit-workflow.md` and `scoring-calibration-workflow.md` for audit context\n\n### Enhancement Proposal\nProduce a document (in `.automaker/context/` or similar) that recommends:\n\n1. **Source-level a11y analysis** — Can we inspect actual component source for patterns like:\n   - `@aria-*` Lit decorators or reflected ARIA properties\n   - `focusable` elements within Shadow DOM\n   - Keyboard event handlers (keydown, keyup, keypress)\n   - `role` attribute on host element\n   - `tabindex` management\n   - Color contrast metadata (if available in design tokens)\n\n2. **New sub-metrics** that could be added to the accessibility scorer:\n   - ARIA pattern completeness (does a dialog component have `role=\"dialog\"`, `aria-modal`, `aria-labelledby`?)\n   - Keyboard interaction coverage (are expected key handlers present for the component type?)\n   - Focus trap detection for overlay components\n   - Screen reader announcement patterns (`aria-live`, `aria-atomic`)\n\n3. **Weight rebalancing** — Should accessibility's weight increase from 10 to match its critical importance? Currently CEM Completeness is weighted 15 but accessibility only 10.\n\n4. **Confidence upgrade path** — What would it take to move from heuristic to verified confidence?\n\n5. **Cross-reference with Lit patterns** — Lit-specific a11y patterns (e.g., `@query` for focus targets, `connectedCallback` focus restoration)\n\n### Acceptance Criteria\n- [ ] Current accessibility scorer fully documented with identified gaps\n- [ ] Enhancement proposal with specific sub-metric additions\n- [ ] Weight rebalancing recommendation with justification\n- [ ] At least 3 concrete, implementable improvements ranked by impact",
+      "timestamp": "2026-03-19T18:28:31.843Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-19T18:28:31.845Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-19T18:28:31.845Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-19T18:29:14.162Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-19T18:37:48.074Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-21T11:53:53.379Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-19T18:32:47.582Z",
+  "costUsd": 1.11169725,
+  "lastSessionId": "61c6e544-729b-4d08-84d5-0d2873019282",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/99",
+  "prNumber": 99,
+  "prCreatedAt": "2026-03-19T18:37:46.564Z",
+  "reviewStartedAt": "2026-03-19T18:37:48.074Z",
+  "prTrackedSince": "2026-03-19T18:37:48.086Z",
+  "prLastPolledAt": "2026-03-21T14:01:46.217Z",
+  "prMergedAt": "2026-03-21T11:53:47Z",
+  "completedAt": "2026-03-21T11:53:53.379Z"
+}

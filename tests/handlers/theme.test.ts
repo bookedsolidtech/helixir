@@ -169,6 +169,18 @@ describe('createTheme', () => {
     // Dark CSS should have dark values for bg
     expect(result.darkModeCSS).toContain('#1a1a1a');
   });
+
+  it('produces a var() fallback for tokens with unknown categories', () => {
+    // --my-custom-widget does not match any known category pattern,
+    // so it lands in "other" and hits the default case in lightPlaceholder.
+    const cem = makeCem([
+      { tagName: 'my-widget', cssProperties: [{ name: '--my-custom-widget' }] },
+    ]);
+    const result = createTheme(cem);
+    // The generated CSS should contain var(--my-custom-widget) instead of a TODO comment
+    expect(result.lightModeCSS).toContain('var(--my-custom-widget)');
+    expect(result.lightModeCSS).not.toContain('TODO');
+  });
 });
 
 // ─── applyThemeTokens ─────────────────────────────────────────────────────────

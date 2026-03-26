@@ -145,7 +145,7 @@ function lightPlaceholder(tokenName: string, category: string): string {
       return '200ms';
 
     default:
-      return '/* TODO: set value */';
+      return `var(${tokenName})`;
   }
 }
 

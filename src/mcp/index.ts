@@ -4,6 +4,7 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprot
 import { existsSync, readFileSync, watch as fsWatch } from 'fs';
 import { resolve, relative, sep } from 'path';
 import { loadConfig } from '../../packages/core/src/config.js';
+import { handleToolError } from '../../packages/core/src/shared/error-handling.js';
 import { CemSchema, loadLibrary, resolveCem } from '../../packages/core/src/handlers/cem.js';
 import type { Cem } from '../../packages/core/src/handlers/cem.js';
 import {
@@ -148,7 +149,7 @@ function startCemWatcher(cemAbsPath: string): void {
         );
         prevCount = componentCount;
       } catch (err) {
-        process.stderr.write(`[helixir] CEM reload failed: ${String(err)}\n`);
+        process.stderr.write(`[helixir] CEM reload failed: ${handleToolError(err).message}\n`);
       } finally {
         cemReloading = false;
       }
@@ -183,7 +184,7 @@ export async function main(): Promise<void> {
     loadCem(cemAbsPath);
   } catch (err) {
     const relPath = relative(resolvedProjectRoot, cemAbsPath);
-    process.stderr.write(`Fatal: CEM file at ${relPath} is invalid: ${String(err)}\n`);
+    process.stderr.write(`Fatal: CEM file at ${relPath} is invalid: ${handleToolError(err).message}\n`);
     process.exit(1);
   }
 

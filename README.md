@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD041 -->
 <div align="center">
 
+<img src="assets/social-card.webp" alt="HELiXiR — MCP Server for Web Component Libraries" width="600">
+
 # HELiXiR
 
 **Give AI agents full situational awareness of any web component library.**
@@ -13,6 +15,9 @@ Stop AI hallucinations. Ground every component suggestion in your actual Custom 
 [![Node 20+](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
 [![Build](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/helixir/build.yml?branch=main&label=build)](https://github.com/bookedsolidtech/helixir/actions/workflows/build.yml)
 [![Tests](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/helixir/test.yml?branch=main&label=tests)](https://github.com/bookedsolidtech/helixir/actions/workflows/test.yml)
+[![MCP Protocol](https://img.shields.io/badge/MCP-protocol-purple)](https://modelcontextprotocol.io)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript)](https://www.typescriptlang.org)
+[![Tools](https://img.shields.io/badge/tools-87%2B-purple)](https://www.npmjs.com/package/helixir)
 
 [Quick Start](#quick-start) · [Why HELiXiR](#why-helixir) · [Tools Reference](#tools-reference) · [Configuration](#configuration) · [AI Tool Configs](#ai-tool-configs)
 

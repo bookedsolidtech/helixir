@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { readFileSync } from 'fs';
+import { readFile } from 'fs/promises';
 import { resolve, sep } from 'path';
 
 import type { McpWcConfig } from '../config.js';
@@ -124,7 +124,7 @@ export async function handleLibraryCall(
         }
         let raw: string;
         try {
-          raw = readFileSync(absPath, 'utf-8');
+          raw = await readFile(absPath, 'utf-8');
         } catch {
           return createErrorResponse(`CEM file not found at ${absPath}`);
         }

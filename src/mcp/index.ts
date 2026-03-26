@@ -92,6 +92,16 @@ import {
   handleThemeCall,
   isThemeTool,
 } from '../../packages/core/src/tools/theme.js';
+import {
+  SCAFFOLD_TOOL_DEFINITIONS,
+  handleScaffoldCall,
+  isScaffoldTool,
+} from '../../packages/core/src/tools/scaffold.js';
+import {
+  EXTEND_TOOL_DEFINITIONS,
+  handleExtendCall,
+  isExtendTool,
+} from '../../packages/core/src/tools/extend.js';
 import { createErrorResponse } from '../../packages/core/src/shared/mcp-helpers.js';
 import type { MCPToolResult } from '../../packages/core/src/shared/mcp-helpers.js';
 
@@ -199,6 +209,8 @@ export async function main(): Promise<void> {
     ...TYPEGENERATE_TOOL_DEFINITIONS,
     ...STYLING_TOOL_DEFINITIONS,
     ...THEME_TOOL_DEFINITIONS,
+    ...SCAFFOLD_TOOL_DEFINITIONS,
+    ...EXTEND_TOOL_DEFINITIONS,
     ...tsTools,
   ];
 
@@ -289,6 +301,20 @@ export async function main(): Promise<void> {
             'CEM not yet loaded — server is still initializing. Please retry.',
           );
         return handleThemeCall(name, typedArgs, resolveCem(libraryId, cemCache));
+      }
+      if (isScaffoldTool(name)) {
+        if (cemCache === null || cemReloading)
+          return createErrorResponse(
+            'CEM not yet loaded — server is still initializing. Please retry.',
+          );
+        return handleScaffoldCall(name, typedArgs, config, resolveCem(libraryId, cemCache));
+      }
+      if (isExtendTool(name)) {
+        if (cemCache === null || cemReloading)
+          return createErrorResponse(
+            'CEM not yet loaded — server is still initializing. Please retry.',
+          );
+        return handleExtendCall(name, typedArgs, resolveCem(libraryId, cemCache));
       }
       if (isBenchmarkTool(name)) return handleBenchmarkCall(name, typedArgs, config);
       if (isTypegenerateTool(name)) {

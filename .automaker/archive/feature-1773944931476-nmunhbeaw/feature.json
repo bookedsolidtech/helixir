@@ -1,0 +1,87 @@
+{
+  "category": "infrastructure",
+  "description": "## Context\n\nHELiXiR scores 14 health dimensions but **none are Lit-specific**. The system analyzes generic web component patterns (CEM completeness, accessibility signals, event architecture, slot architecture, naming conventions) but misses Lit framework best practices entirely.\n\nSince HELiX (the primary target library) is built with Lit, and HELiXiR is \"THE web component developer platform,\" there's a clear opportunity to add Lit-aware scoring that provides value no other tool offers.\n\n## Agent Task\n\n**Use the `lit-specialist` agent persona** (Kenji T. Nakamura) to audit the current scoring system from a Lit expert perspective and propose enhancements.\n\n### Research Phase\n1. Read all existing analyzers in `src/analyzers/` — understand what's already scored\n2. Use HELiXiR MCP tools (`score_component`, `score_all_components`) on helix components to see current output\n3. Read the CEM-Source Fidelity analyzer — it already does source analysis, which is the pattern to follow\n4. Review the dimension registry in `src/analyzers/health-dimensions.ts` (or similar) for the weight/tier system\n\n### Lit Best Practices to Evaluate\n\nPropose scoring criteria for these Lit patterns:\n\n1. **Reactive Property Usage**\n   - `@property()` vs `@state()` distinction (public API vs internal state)\n   - Proper `type` declarations in property options\n   - `reflect: true` for attribute-mirrored properties\n   - `attribute: false` for non-serializable properties\n   - Custom converters for complex types\n\n2. **Lifecycle Best Practices**\n   - `connectedCallback` / `disconnectedCallback` cleanup patterns\n   - `willUpdate` vs `updated` usage appropriateness\n   - `requestUpdate()` usage (should be rare — sign of anti-pattern if overused)\n   - Event listener cleanup in `disconnectedCallback`\n\n3. **Render Efficiency**\n   - Template composition (using nothing/guard/cache directives properly)\n   - Avoiding unnecessary re-renders\n   - Proper use of `@query` / `@queryAll` vs repeated DOM lookups\n   - Static styles usage vs inline styles\n\n4. **Shadow DOM Patterns**\n   - CSS custom property exposure for theming\n   - `::part()` export strategy\n   - Slot composition patterns\n   - adoptedStyleSheets usage\n\n5. **Event Patterns**\n   - Custom event typing (extending CustomEvent with typed detail)\n   - Event bubbling/composed configuration\n   - Event cleanup on disconnect\n\n### Enhancement Proposal\nProduce a document recommending:\n\n1. **New \"Lit Patterns\" dimension** — or integration into existing dimensions?\n2. **Specific sub-metrics** with scoring weights\n3. **Detection methods** — CEM-only? Source analysis? Both?\n4. **Which tier** (Critical/Important/Advanced) and what weight?\n5. **Impact on existing scores** — Would adding this dimension change grade distributions?\n\n### Acceptance Criteria\n- [ ] Audit of current analyzers with Lit-specific gaps identified\n- [ ] Proposed dimension definition with sub-metrics and weights\n- [ ] Detection method for each sub-metric (CEM vs source analysis)\n- [ ] Tier/weight recommendation with justification\n- [ ] At least 5 scorable Lit patterns that aren't currently measured",
+  "title": "Expert audit: Lit web component best practices scoring dimension proposal",
+  "status": "done",
+  "complexity": "architectural",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "ff341c4b-027a-4934-825c-bdc5afa62d6d",
+  "id": "feature-1773944931476-nmunhbeaw",
+  "branchName": "feature/expert-audit-lit-web-component-best",
+  "descriptionHistory": [
+    {
+      "description": "## Context\n\nHELiXiR scores 14 health dimensions but **none are Lit-specific**. The system analyzes generic web component patterns (CEM completeness, accessibility signals, event architecture, slot architecture, naming conventions) but misses Lit framework best practices entirely.\n\nSince HELiX (the primary target library) is built with Lit, and HELiXiR is \"THE web component developer platform,\" there's a clear opportunity to add Lit-aware scoring that provides value no other tool offers.\n\n## Agent Task\n\n**Use the `lit-specialist` agent persona** (Kenji T. Nakamura) to audit the current scoring system from a Lit expert perspective and propose enhancements.\n\n### Research Phase\n1. Read all existing analyzers in `src/analyzers/` — understand what's already scored\n2. Use HELiXiR MCP tools (`score_component`, `score_all_components`) on helix components to see current output\n3. Read the CEM-Source Fidelity analyzer — it already does source analysis, which is the pattern to follow\n4. Review the dimension registry in `src/analyzers/health-dimensions.ts` (or similar) for the weight/tier system\n\n### Lit Best Practices to Evaluate\n\nPropose scoring criteria for these Lit patterns:\n\n1. **Reactive Property Usage**\n   - `@property()` vs `@state()` distinction (public API vs internal state)\n   - Proper `type` declarations in property options\n   - `reflect: true` for attribute-mirrored properties\n   - `attribute: false` for non-serializable properties\n   - Custom converters for complex types\n\n2. **Lifecycle Best Practices**\n   - `connectedCallback` / `disconnectedCallback` cleanup patterns\n   - `willUpdate` vs `updated` usage appropriateness\n   - `requestUpdate()` usage (should be rare — sign of anti-pattern if overused)\n   - Event listener cleanup in `disconnectedCallback`\n\n3. **Render Efficiency**\n   - Template composition (using nothing/guard/cache directives properly)\n   - Avoiding unnecessary re-renders\n   - Proper use of `@query` / `@queryAll` vs repeated DOM lookups\n   - Static styles usage vs inline styles\n\n4. **Shadow DOM Patterns**\n   - CSS custom property exposure for theming\n   - `::part()` export strategy\n   - Slot composition patterns\n   - adoptedStyleSheets usage\n\n5. **Event Patterns**\n   - Custom event typing (extending CustomEvent with typed detail)\n   - Event bubbling/composed configuration\n   - Event cleanup on disconnect\n\n### Enhancement Proposal\nProduce a document recommending:\n\n1. **New \"Lit Patterns\" dimension** — or integration into existing dimensions?\n2. **Specific sub-metrics** with scoring weights\n3. **Detection methods** — CEM-only? Source analysis? Both?\n4. **Which tier** (Critical/Important/Advanced) and what weight?\n5. **Impact on existing scores** — Would adding this dimension change grade distributions?\n\n### Acceptance Criteria\n- [ ] Audit of current analyzers with Lit-specific gaps identified\n- [ ] Proposed dimension definition with sub-metrics and weights\n- [ ] Detection method for each sub-metric (CEM vs source analysis)\n- [ ] Tier/weight recommendation with justification\n- [ ] At least 5 scorable Lit patterns that aren't currently measured",
+      "timestamp": "2026-03-19T18:28:51.476Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-19T18:28:51.478Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-19T18:28:51.478Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-19T18:29:14.382Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-19T18:42:02.175Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-19T23:49:09.494Z",
+      "reason": "PR #100 has been pending CI/review for 307 minute(s) (configured timeout: 45 min). Possible causes: (1) CI workflow triggers do not include the PR base branch — check .github/workflows/ and ensure the 'branches:' list includes your configured prBaseBranch; (2) CodeRabbit was rate-limited — check the PR for a CodeRabbit FAILURE commit status; (3) Required reviewers have not been assigned. Adjust the timeout via the REVIEW_PENDING_TIMEOUT_MINUTES environment variable."
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-21T11:49:16.959Z"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-21T11:49:57.956Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-21T11:53:53.398Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-19T18:33:02.677Z",
+  "costUsd": 2.4945215000000003,
+  "lastSessionId": "4c6c946a-a783-4ec4-97c5-3e4901f99c2f",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/100",
+  "prNumber": 100,
+  "prCreatedAt": "2026-03-19T18:42:00.938Z",
+  "reviewStartedAt": "2026-03-19T18:42:02.175Z",
+  "prTrackedSince": "2026-03-19T18:42:02.188Z",
+  "prLastPolledAt": "2026-03-21T14:01:46.705Z",
+  "statusChangeReason": "PR #100 has been pending CI/review for 307 minute(s) (configured timeout: 45 min). Possible causes: (1) CI workflow triggers do not include the PR base branch — check .github/workflows/ and ensure the 'branches:' list includes your configured prBaseBranch; (2) CodeRabbit was rate-limited — check the PR for a CodeRabbit FAILURE commit status; (3) Required reviewers have not been assigned. Adjust the timeout via the REVIEW_PENDING_TIMEOUT_MINUTES environment variable.",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "rate_limit",
+    "confidence": 0.95,
+    "recoveryStrategy": {
+      "type": "pause_and_wait",
+      "duration": 60000,
+      "reason": "API rate limit reached, waiting for quota reset"
+    },
+    "retryable": true,
+    "timestamp": "2026-03-19T23:49:09.494Z"
+  },
+  "prMergedAt": "2026-03-21T11:53:48Z",
+  "completedAt": "2026-03-21T11:53:53.398Z"
+}

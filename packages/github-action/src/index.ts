@@ -187,6 +187,7 @@ async function run(): Promise<void> {
       .filter(Boolean);
     const threshold = parseInt(getInput('health-threshold', '70'), 10);
     const failOnBreaking = getBooleanInput('fail-on-breaking', true);
+    const failOnWarning = getBooleanInput('fail-on-warning', false);
     const postComment = getBooleanInput('comment', true);
     const configPath = getInput('config-path', '');
 
@@ -240,6 +241,7 @@ async function run(): Promise<void> {
     const components = healthData?.components ?? [];
     const failingComponents = components.filter((c) => c.score < threshold);
     const hasBreaking = (diffData?.breaking ?? []).length > 0;
+    const hasWarnings = (diffData?.minor ?? []).length > 0;
 
     const avgScore = components.length
       ? Math.round(components.reduce((s, c) => s + c.score, 0) / components.length)
@@ -250,7 +252,11 @@ async function run(): Promise<void> {
     core.setOutput('breaking-changes-count', String((diffData?.breaking ?? []).length));
     core.setOutput(
       'passed',
-      String(failingComponents.length === 0 && (!failOnBreaking || !hasBreaking)),
+      String(
+        failingComponents.length === 0 &&
+          (!failOnBreaking || !hasBreaking) &&
+          (!failOnWarning || !hasWarnings),
+      ),
     );
 
     // ── Post PR comment ───────────────────────────────────────────────────────
@@ -308,6 +314,12 @@ async function run(): Promise<void> {
     if (failOnBreaking && hasBreaking) {
       const count = diffData?.breaking.length ?? 0;
       core.setFailed(`Breaking changes detected: ${count} breaking change(s) found`);
+      return;
+    }
+
+    if (failOnWarning && hasWarnings) {
+      const count = diffData?.minor.length ?? 0;
+      core.setFailed(`Warning-level changes detected: ${count} minor change(s) found`);
       return;
     }
 

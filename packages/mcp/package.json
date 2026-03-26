@@ -1,0 +1,61 @@
+{
+  "name": "@helixui/mcp",
+  "version": "0.1.0",
+  "description": "Standalone SDK for building custom MCP tools on top of helixir's web component analysis engine",
+  "type": "module",
+  "main": "./build/index.js",
+  "types": "./build/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./build/index.js",
+      "types": "./build/index.d.ts"
+    }
+  },
+  "files": [
+    "build",
+    "!build/**/*.map",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "web-components",
+    "custom-elements",
+    "cem",
+    "design-tokens",
+    "helixir",
+    "ai",
+    "developer-tools",
+    "sdk"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "Booked Solid",
+    "url": "https://github.com/bookedsolidtech"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bookedsolidtech/helixir.git",
+    "directory": "packages/mcp"
+  },
+  "homepage": "https://github.com/bookedsolidtech/helixir/tree/main/packages/mcp#readme",
+  "peerDependencies": {
+    "helixir": ">=0.5.0",
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "helixir": "workspace:*",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

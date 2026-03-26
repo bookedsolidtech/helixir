@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-21T09:09:08.872Z",
+  "timestamp": "2026-03-26T00:21:46.680Z",
   "scorecards": {
     "material": {
       "library": "material",
@@ -187,18 +187,18 @@
         "heuristic": 426,
         "untested": 747
       },
-      "timestamp": "2026-03-21T09:09:08.869Z"
+      "timestamp": "2026-03-26T00:21:46.678Z"
     },
     "spectrum": {
       "library": "spectrum",
       "componentCount": 89,
-      "averageScore": 54.4,
+      "averageScore": 54.52,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
         "C": 0,
-        "D": 1,
-        "F": 88
+        "D": 3,
+        "F": 86
       },
       "dimensionAverages": {
         "CEM Completeness": 60.11,
@@ -212,11 +212,16 @@
         "Story Coverage": 0,
         "Performance": 0,
         "Drupal Readiness": 0,
-        "CEM-Source Fidelity": 46.3,
+        "CEM-Source Fidelity": 47.15,
         "Slot Architecture": 57.67,
         "Naming Consistency": 98
       },
       "top5": [
+        {
+          "tagName": "sp-table-head-cell",
+          "score": 65.5,
+          "grade": "D"
+        },
         {
           "tagName": "sp-table-checkbox-cell",
           "score": 64.8,
@@ -235,11 +240,6 @@
         {
           "tagName": "sp-tab-panel",
           "score": 64,
-          "grade": "F"
-        },
-        {
-          "tagName": "sp-toast",
-          "score": 63.8,
           "grade": "F"
         }
       ],
@@ -336,7 +336,7 @@
         },
         {
           "dimension": "CEM-Source Fidelity",
-          "average": 46.3,
+          "average": 47.15,
           "tier": "critical",
           "confidence": "heuristic",
           "note": "Above average. Strong dimension."
@@ -375,7 +375,7 @@
         "heuristic": 404,
         "untested": 601
       },
-      "timestamp": "2026-03-21T09:09:08.869Z"
+      "timestamp": "2026-03-26T00:21:46.678Z"
     },
     "vaadin": {
       "library": "vaadin",
@@ -563,7 +563,7 @@
         "heuristic": 439,
         "untested": 717
       },
-      "timestamp": "2026-03-21T09:09:08.870Z"
+      "timestamp": "2026-03-26T00:21:46.678Z"
     },
     "fluentui": {
       "library": "fluentui",
@@ -751,7 +751,7 @@
         "heuristic": 139,
         "untested": 293
       },
-      "timestamp": "2026-03-21T09:09:08.870Z"
+      "timestamp": "2026-03-26T00:21:46.678Z"
     },
     "carbon": {
       "library": "carbon",
@@ -939,7 +939,7 @@
         "heuristic": 397,
         "untested": 793
       },
-      "timestamp": "2026-03-21T09:09:08.870Z"
+      "timestamp": "2026-03-26T00:21:46.679Z"
     },
     "ui5": {
       "library": "ui5",
@@ -1127,7 +1127,7 @@
         "heuristic": 582,
         "untested": 1304
       },
-      "timestamp": "2026-03-21T09:09:08.870Z"
+      "timestamp": "2026-03-26T00:21:46.679Z"
     },
     "calcite": {
       "library": "calcite",
@@ -1315,7 +1315,7 @@
         "heuristic": 318,
         "untested": 848
       },
-      "timestamp": "2026-03-21T09:09:08.871Z"
+      "timestamp": "2026-03-26T00:21:46.679Z"
     },
     "porsche": {
       "library": "porsche",
@@ -1503,7 +1503,7 @@
         "heuristic": 304,
         "untested": 702
       },
-      "timestamp": "2026-03-21T09:09:08.871Z"
+      "timestamp": "2026-03-26T00:21:46.679Z"
     },
     "ionic": {
       "library": "ionic",
@@ -1691,7 +1691,7 @@
         "heuristic": 331,
         "untested": 744
       },
-      "timestamp": "2026-03-21T09:09:08.871Z"
+      "timestamp": "2026-03-26T00:21:46.680Z"
     },
     "wired": {
       "library": "wired",
@@ -1879,7 +1879,7 @@
         "heuristic": 78,
         "untested": 208
       },
-      "timestamp": "2026-03-21T09:09:08.871Z"
+      "timestamp": "2026-03-26T00:21:46.680Z"
     },
     "elix": {
       "library": "elix",
@@ -2067,86 +2067,86 @@
         "heuristic": 148,
         "untested": 740
       },
-      "timestamp": "2026-03-21T09:09:08.871Z"
+      "timestamp": "2026-03-26T00:21:46.680Z"
     },
     "helix": {
       "library": "helix",
-      "componentCount": 98,
-      "averageScore": 80.73,
+      "componentCount": 101,
+      "averageScore": 88.42,
       "gradeDistribution": {
         "A": 0,
-        "B": 0,
-        "C": 6,
-        "D": 26,
-        "F": 66
+        "B": 19,
+        "C": 14,
+        "D": 15,
+        "F": 53
       },
       "dimensionAverages": {
-        "CEM Completeness": 97.01,
-        "Accessibility": 44.81,
-        "Type Coverage": 89.86,
-        "API Surface Quality": 65.91,
-        "CSS Architecture": 97.65,
-        "Event Architecture": 56.12,
+        "CEM Completeness": 99.73,
+        "Accessibility": 44.35,
+        "Type Coverage": 94.56,
+        "API Surface Quality": 89.07,
+        "CSS Architecture": 96.73,
+        "Event Architecture": 56.44,
         "Test Coverage": 0,
         "Bundle Size": 0,
         "Story Coverage": 0,
         "Performance": 0,
         "Drupal Readiness": 0,
-        "CEM-Source Fidelity": 67.87,
-        "Slot Architecture": 72.71,
-        "Naming Consistency": 94.93
+        "CEM-Source Fidelity": 91.33,
+        "Slot Architecture": 72.14,
+        "Naming Consistency": 98.55
       },
       "top5": [
         {
-          "tagName": "hx-field",
-          "score": 92.1,
+          "tagName": "hx-menu",
+          "score": 96.1,
+          "grade": "B"
+        },
+        {
+          "tagName": "hx-dropdown",
+          "score": 95.3,
+          "grade": "B"
+        },
+        {
+          "tagName": "hx-tree-view",
+          "score": 95.3,
           "grade": "C"
         },
         {
-          "tagName": "hx-step",
-          "score": 90.9,
-          "grade": "D"
+          "tagName": "hx-menu-item",
+          "score": 95.1,
+          "grade": "B"
         },
         {
-          "tagName": "hx-tr",
-          "score": 90.9,
-          "grade": "F"
-        },
-        {
-          "tagName": "hx-carousel-item",
-          "score": 89.9,
-          "grade": "F"
-        },
-        {
-          "tagName": "hx-tooltip",
-          "score": 89.4,
-          "grade": "C"
+          "tagName": "hx-overflow-menu",
+          "score": 94.7,
+          "grade": "B"
         }
       ],
       "bottom5": [
         {
-          "tagName": "hx-progress-bar",
-          "score": 68.7,
-          "grade": "F"
-        },
-        {
-          "tagName": "hx-prose",
-          "score": 71.1,
-          "grade": "F"
-        },
-        {
-          "tagName": "hx-counter",
-          "score": 71.5,
-          "grade": "F"
-        },
-        {
           "tagName": "hx-grid-item",
-          "score": 71.8,
+          "score": 74.8,
           "grade": "F"
         },
         {
-          "tagName": "hx-alert",
-          "score": 72.3,
+          "tagName": "hx-button-group",
+          "score": 75.7,
+          "grade": "F"
+        },
+        {
+          "tagName": "hx-theme",
+          "score": 76.9,
+          "grade": "F"
+        },
+        {
+          "tagName": "hx-menu-divider",
+          "score": 77.8,
+          "grade": "F"
+        },
+        {
+          "tagName": "hx-structured-list-row",
+          "score": 78.3,
           "grade": "F"
         }
       ],
@@ -2156,106 +2156,106 @@
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (49). Major drag on scores."
+          "note": "Significantly below average (53). Major drag on scores."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (49). Major drag on scores."
+          "note": "Significantly below average (53). Major drag on scores."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (49). Major drag on scores."
+          "note": "Significantly below average (53). Major drag on scores."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (49). Major drag on scores."
+          "note": "Significantly below average (53). Major drag on scores."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (49). Major drag on scores."
+          "note": "Significantly below average (53). Major drag on scores."
         },
         {
           "dimension": "Accessibility",
-          "average": 44.81,
+          "average": 44.35,
           "tier": "critical",
           "confidence": "heuristic",
           "note": "Near average."
         },
         {
           "dimension": "Event Architecture",
-          "average": 56.12,
+          "average": 56.44,
           "tier": "important",
           "confidence": "heuristic",
           "note": "Near average."
         },
         {
+          "dimension": "Slot Architecture",
+          "average": 72.14,
+          "tier": "important",
+          "confidence": "verified",
+          "note": "Above average. Strong dimension."
+        },
+        {
           "dimension": "API Surface Quality",
-          "average": 65.91,
+          "average": 89.07,
           "tier": "important",
           "confidence": "heuristic",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "CEM-Source Fidelity",
-          "average": 67.87,
+          "average": 91.33,
           "tier": "critical",
           "confidence": "heuristic",
           "note": "Above average. Strong dimension."
         },
         {
-          "dimension": "Slot Architecture",
-          "average": 72.71,
-          "tier": "important",
-          "confidence": "verified",
-          "note": "Above average. Strong dimension."
-        },
-        {
           "dimension": "Type Coverage",
-          "average": 89.86,
-          "tier": "critical",
-          "confidence": "verified",
-          "note": "Above average. Strong dimension."
-        },
-        {
-          "dimension": "Naming Consistency",
-          "average": 94.93,
-          "tier": "important",
-          "confidence": "verified",
-          "note": "Above average. Strong dimension."
-        },
-        {
-          "dimension": "CEM Completeness",
-          "average": 97.01,
+          "average": 94.56,
           "tier": "critical",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "CSS Architecture",
-          "average": 97.65,
+          "average": 96.73,
           "tier": "important",
           "confidence": "heuristic",
+          "note": "Above average. Strong dimension."
+        },
+        {
+          "dimension": "Naming Consistency",
+          "average": 98.55,
+          "tier": "important",
+          "confidence": "verified",
+          "note": "Above average. Strong dimension."
+        },
+        {
+          "dimension": "CEM Completeness",
+          "average": 99.73,
+          "tier": "critical",
+          "confidence": "verified",
           "note": "Above average. Strong dimension."
         }
       ],
       "confidenceBreakdown": {
-        "verified": 377,
-        "heuristic": 440,
-        "untested": 555
+        "verified": 388,
+        "heuristic": 453,
+        "untested": 573
       },
-      "timestamp": "2026-03-21T09:09:08.872Z"
+      "timestamp": "2026-03-26T00:21:46.680Z"
     }
   },
   "comparisonTable": {
@@ -2263,8 +2263,8 @@
       {
         "rank": 1,
         "library": "helix",
-        "averageScore": 80.73,
-        "componentCount": 98,
+        "averageScore": 88.42,
+        "componentCount": 101,
         "grade": "B"
       },
       {
@@ -2298,7 +2298,7 @@
       {
         "rank": 6,
         "library": "spectrum",
-        "averageScore": 54.4,
+        "averageScore": 54.52,
         "componentCount": 89,
         "grade": "F"
       },
@@ -2350,13 +2350,13 @@
         "dimension": "CEM Completeness",
         "rankings": [
           {
-            "library": "vaadin",
-            "average": 98.79,
+            "library": "helix",
+            "average": 99.73,
             "rank": 1
           },
           {
-            "library": "helix",
-            "average": 97.01,
+            "library": "vaadin",
+            "average": 98.79,
             "rank": 2
           },
           {
@@ -2410,14 +2410,14 @@
             "rank": 12
           }
         ],
-        "spread": 44.2
+        "spread": 45.14
       },
       {
         "dimension": "Accessibility",
         "rankings": [
           {
             "library": "helix",
-            "average": 44.81,
+            "average": 44.35,
             "rank": 1
           },
           {
@@ -2476,24 +2476,24 @@
             "rank": 12
           }
         ],
-        "spread": 43.66
+        "spread": 43.2
       },
       {
         "dimension": "Type Coverage",
         "rankings": [
           {
+            "library": "helix",
+            "average": 94.56,
+            "rank": 1
+          },
+          {
             "library": "porsche",
             "average": 94.51,
-            "rank": 1
+            "rank": 2
           },
           {
             "library": "ionic",
             "average": 91.75,
-            "rank": 2
-          },
-          {
-            "library": "helix",
-            "average": 89.86,
             "rank": 3
           },
           {
@@ -2542,14 +2542,14 @@
             "rank": 12
           }
         ],
-        "spread": 94.51
+        "spread": 94.56
       },
       {
         "dimension": "API Surface Quality",
         "rankings": [
           {
             "library": "helix",
-            "average": 65.91,
+            "average": 89.07,
             "rank": 1
           },
           {
@@ -2608,14 +2608,14 @@
             "rank": 12
           }
         ],
-        "spread": 65.91
+        "spread": 89.07
       },
       {
         "dimension": "CSS Architecture",
         "rankings": [
           {
             "library": "helix",
-            "average": 97.65,
+            "average": 96.73,
             "rank": 1
           },
           {
@@ -2674,7 +2674,7 @@
             "rank": 12
           }
         ],
-        "spread": 97.65
+        "spread": 96.73
       },
       {
         "dimension": "Event Architecture",
@@ -2686,7 +2686,7 @@
           },
           {
             "library": "helix",
-            "average": 56.12,
+            "average": 56.44,
             "rank": 2
           },
           {
@@ -3081,23 +3081,23 @@
             "rank": 1
           },
           {
+            "library": "helix",
+            "average": 91.33,
+            "rank": 2
+          },
+          {
             "library": "wired",
             "average": 78.96,
-            "rank": 2
+            "rank": 3
           },
           {
             "library": "ui5",
             "average": 76.98,
-            "rank": 3
+            "rank": 4
           },
           {
             "library": "calcite",
             "average": 71.55,
-            "rank": 4
-          },
-          {
-            "library": "helix",
-            "average": 67.87,
             "rank": 5
           },
           {
@@ -3127,7 +3127,7 @@
           },
           {
             "library": "spectrum",
-            "average": 46.3,
+            "average": 47.15,
             "rank": 11
           },
           {
@@ -3143,7 +3143,7 @@
         "rankings": [
           {
             "library": "helix",
-            "average": 72.71,
+            "average": 72.14,
             "rank": 1
           },
           {
@@ -3202,7 +3202,7 @@
             "rank": 12
           }
         ],
-        "spread": 72.71
+        "spread": 72.14
       },
       {
         "dimension": "Naming Consistency",
@@ -3243,18 +3243,18 @@
             "rank": 7
           },
           {
+            "library": "helix",
+            "average": 98.55,
+            "rank": 8
+          },
+          {
             "library": "spectrum",
             "average": 98,
-            "rank": 8
+            "rank": 9
           },
           {
             "library": "material",
             "average": 97.88,
-            "rank": 9
-          },
-          {
-            "library": "helix",
-            "average": 94.93,
             "rank": 10
           },
           {
@@ -3274,74 +3274,74 @@
     "differentiatingDimensions": [
       "CSS Architecture",
       "Type Coverage",
-      "Slot Architecture",
       "API Surface Quality",
+      "Slot Architecture",
       "Event Architecture"
     ],
-    "timestamp": "2026-03-21T09:09:08.872Z"
+    "timestamp": "2026-03-26T00:21:46.680Z"
   },
   "performance": {
-    "totalMs": 2442,
+    "totalMs": 3228,
     "phases": [
       {
         "name": "load-libraries",
-        "durationMs": 151
+        "durationMs": 179
       },
       {
         "name": "score-all-libraries",
-        "durationMs": 2288
+        "durationMs": 3042
       },
       {
         "name": "score-material",
-        "durationMs": 220
+        "durationMs": 248
       },
       {
         "name": "score-spectrum",
-        "durationMs": 162
+        "durationMs": 174
       },
       {
         "name": "score-vaadin",
-        "durationMs": 696
+        "durationMs": 847
       },
       {
         "name": "score-fluentui",
-        "durationMs": 52
+        "durationMs": 80
       },
       {
         "name": "score-carbon",
-        "durationMs": 105
+        "durationMs": 143
       },
       {
         "name": "score-ui5",
-        "durationMs": 180
+        "durationMs": 264
       },
       {
         "name": "score-calcite",
-        "durationMs": 257
+        "durationMs": 396
       },
       {
         "name": "score-porsche",
-        "durationMs": 73
+        "durationMs": 214
       },
       {
         "name": "score-ionic",
-        "durationMs": 60
+        "durationMs": 146
       },
       {
         "name": "score-wired",
-        "durationMs": 46
+        "durationMs": 52
       },
       {
         "name": "score-elix",
-        "durationMs": 372
+        "durationMs": 377
       },
       {
         "name": "score-helix",
-        "durationMs": 65
+        "durationMs": 101
       },
       {
         "name": "generate-scorecards",
-        "durationMs": 3
+        "durationMs": 7
       },
       {
         "name": "generate-comparison",

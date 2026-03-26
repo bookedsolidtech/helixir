@@ -1,0 +1,1147 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "a3de2b11-897e-41da-9d7f-1239ca2d43f7",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"fix: use NOT_FOUND error category for missing component history\" completed successfully.",
+      "createdAt": "2026-03-12T03:50:01.696Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772670336213-nx9kiz4f3",
+        "notificationId": "9188cc53-3365-4e2a-b4fb-990bf07fe793"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "dd27ebbe-2678-45bd-a045-0772a234cfa7",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"fix: add edge case tests for get_prop_constraints and find_components_by_token\" completed successfully.",
+      "createdAt": "2026-03-12T03:50:14.159Z",
+      "status": "dismissed",
+      "actionPayload": {
+        "featureId": "feature-1772670348463-41osl67ov",
+        "notificationId": "4c040704-adcd-4130-8aef-65cc996e729c"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "c44a6742-47c6-4371-b5d6-119d807c713f",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: fix: add edge case tests for get_prop_constraints and find_components_by_token",
+      "message": "Max remediation cycles exceeded (4)",
+      "createdAt": "2026-03-12T03:54:47.723Z",
+      "status": "dismissed",
+      "actionPayload": {
+        "featureId": "feature-1772670348463-41osl67ov",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772670348463-41osl67ov"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "564c353c-8754-4e6c-89d1-b0b00ead3dbb",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: fix: use NOT_FOUND error category for missing component history",
+      "message": "Merge failed: Command failed: gh pr merge 32 --squash\nGraphQL: Squash merges are not allowed on this repository. (mergePullRequest)\n",
+      "createdAt": "2026-03-12T03:56:03.810Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772670336213-nx9kiz4f3",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772670336213-nx9kiz4f3"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "92962fcf-171b-4012-810c-4c835b873915",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"chore: add NPM provenance signing to release workflow\" completed successfully.",
+      "createdAt": "2026-03-12T05:48:03.341Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773288817273-ra092bcju",
+        "notificationId": "60d61e18-ffaf-4712-98b8-ae59a6c8a51d"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "f6f7a4ad-c5a6-4df3-acda-cd95073891a5",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"chore: remove redundant test re-run from release workflow\" completed successfully.",
+      "createdAt": "2026-03-12T05:48:58.726Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773288822948-u4yrx5hoe",
+        "notificationId": "3d6e3d2d-8c38-43b1-b33a-6c4d42859eec"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "f619471a-6f33-4821-b2e0-28f4f71a08c7",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"fix: clarify cdnBase config description in README\" completed successfully.",
+      "createdAt": "2026-03-12T05:49:37.549Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772670351930-0gfm24qu9",
+        "notificationId": "825af6dc-c4a4-48f3-a96a-a958830b4db7"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "be189cd4-333e-411e-a968-cab586445625",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"fix: document estimate_bundle_size package derivation logic\" completed successfully.",
+      "createdAt": "2026-03-12T05:50:31.545Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772670355365-htxzmgmqe",
+        "notificationId": "6b2e9c8f-1e4f-4a7e-9a0e-f54b4138e237"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "5c34a291-d865-4e94-bda6-d328ffe93302",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"chore: strip source maps from npm package\" completed successfully.",
+      "createdAt": "2026-03-12T05:51:34.710Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772670364556-hun60j8tm",
+        "notificationId": "be53bbb0-daab-4b99-a086-d3a7fc6e5610"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "10eaa818-9687-4cd6-8dc8-7bf77cc7a6aa",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: fix: clarify cdnBase config description in README",
+      "message": "Max remediation cycles exceeded (4)",
+      "createdAt": "2026-03-12T06:16:43.317Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772670351930-0gfm24qu9",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772670351930-0gfm24qu9"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "20a11a71-88cb-44da-a161-bd1fdb3d1d24",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"fix: validate design token files against a Zod schema\" completed successfully.",
+      "createdAt": "2026-03-12T06:18:11.291Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772670375494-sgp75plnz",
+        "notificationId": "a78c9ea7-df27-45c8-b16e-3c3577b43e85"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "cb18ba15-0b67-4b02-bea9-fb2175f75fea",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"fix: add edge case tests for suggest, benchmark, and compare handlers\" completed successfully.",
+      "createdAt": "2026-03-12T06:18:25.260Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772670379172-0dbvw9sa8",
+        "notificationId": "5b6c84ce-d2f5-4595-a4ae-164d7d0af95b"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "5521de4d-1cd1-441e-bdbe-89c8e5794b1f",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: fix: validate design token files against a Zod schema",
+      "message": "Max remediation cycles exceeded (4)",
+      "createdAt": "2026-03-12T06:22:44.775Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772670375494-sgp75plnz",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772670375494-sgp75plnz"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "6e6785ab-76a6-4672-9e16-8899905a6396",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: fix: document estimate_bundle_size package derivation logic",
+      "message": "Max same-state transitions exceeded in REVIEW (100 loops)",
+      "createdAt": "2026-03-12T06:40:36.558Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772670355365-htxzmgmqe",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772670355365-htxzmgmqe"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "e8a592d6-c6fe-4715-be37-24e3c9a3309c",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: fix: add edge case tests for suggest, benchmark, and compare handlers",
+      "message": "Max same-state transitions exceeded in REVIEW (100 loops)",
+      "createdAt": "2026-03-12T07:08:31.390Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772670379172-0dbvw9sa8",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772670379172-0dbvw9sa8"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "651c3930-d487-49e0-91cb-e21c4e32bb0a",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"fix: harden release pipeline for reliable unattended npm publish\" completed successfully.",
+      "createdAt": "2026-03-12T18:13:52.309Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773339119651-1xjcrl511",
+        "notificationId": "486f05bb-d463-4e5d-a614-72589d861b72"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "2aaa48ed-9b01-49d8-b20b-a11e4ef62db9",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"Migrate release pipeline to changesets (PUBLISHING.md standard)\" completed successfully.",
+      "createdAt": "2026-03-12T21:29:32.100Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773350826704-5r95z8olv",
+        "notificationId": "bdb76076-0e5d-4148-bc55-e400001fcfdf"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "91bddd79-244e-46c0-9fca-dfc81e3d77db",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: Migrate release pipeline to changesets (PUBLISHING.md standard)",
+      "message": "Max remediation cycles exceeded (4)",
+      "createdAt": "2026-03-12T21:33:35.880Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773350826704-5r95z8olv",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1773350826704-5r95z8olv"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "69d9b0a2-f908-4468-a091-c493c51da51f",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"P0-001: Fix HELiXiR LICENSE copyright holder\" completed successfully.",
+      "createdAt": "2026-03-12T23:52:04.163Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773276834298-7ccaf0fjk",
+        "notificationId": "eab726f1-117f-486b-bd4c-0e7e45ca6754"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "793338a9-4565-4c9e-8387-4f4eb6c3e2f8",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"P0-005: Add NOTICE file to HELiXiR repo\" completed successfully.",
+      "createdAt": "2026-03-12T23:52:11.375Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773276836431-3gpi1l78y",
+        "notificationId": "ae51f85c-8c20-4b77-b5f5-9e2d2e7a75cf"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "d21b83d1-8efd-4144-ab51-ea1bd211682d",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"P2-001: Optimize HELiXiR GitHub README as a landing page\" completed successfully.",
+      "createdAt": "2026-03-12T23:53:54.254Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773276882771-1x0vqerg0",
+        "notificationId": "a4b4388e-84d9-4c77-a74f-058080b939b5"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "7473cc98-7e0d-4b63-922b-f8250b75eb3a",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"Enforce auto-format before push (prevent unformatted code reaching GitHub)\" completed successfully.",
+      "createdAt": "2026-03-12T23:54:46.128Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773338021088-yqhyvupfi",
+        "notificationId": "dcfd3834-9406-4ca5-a672-e959ef66f6bc"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "1cd9f8e2-fb48-4d67-b0ac-beda334e5675",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: P0-001: Fix HELiXiR LICENSE copyright holder",
+      "message": "Merge failed: Command failed: gh pr merge 53 --squash\nGraphQL: Squash merges are not allowed on this repository. (mergePullRequest)\n",
+      "createdAt": "2026-03-12T23:57:06.174Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773276834298-7ccaf0fjk",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1773276834298-7ccaf0fjk"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "4cedc8b9-e242-4992-bc33-bb467642e711",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"bug: auto-mode uses --squash merge despite prMergeStrategy: merge setting\" completed successfully.",
+      "createdAt": "2026-03-13T00:07:34.800Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773359961211-u1fc5jwo9",
+        "notificationId": "9ad6063c-593f-4360-b5a5-0c6103f012e1"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "54ec3cfe-1306-4ff5-bce5-84325dd4ad20",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: bug: auto-mode uses --squash merge despite prMergeStrategy: merge setting",
+      "message": "Merge failed: Command failed: gh pr merge 57 --squash\nGraphQL: Squash merges are not allowed on this repository. (mergePullRequest)\n",
+      "createdAt": "2026-03-13T00:10:06.531Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773359961211-u1fc5jwo9",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1773359961211-u1fc5jwo9"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "f88d90e3-3a99-40a1-b08d-833e8b3ca6aa",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"feat: add /update-helixir slash command to self-update from npm\" completed successfully.",
+      "createdAt": "2026-03-13T01:59:09.194Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773362508747-tofsvptsd",
+        "notificationId": "ee72d4df-47c8-4225-992e-b4c07d7a34d9"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "adb8f8f4-472c-437a-a5f1-4d59d59f7ef3",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feat: add /update-helixir slash command to self-update from npm",
+      "message": "Max remediation cycles exceeded (4)",
+      "createdAt": "2026-03-13T02:23:45.317Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773362508747-tofsvptsd",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1773362508747-tofsvptsd"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "37985674-738a-4e0c-9d9c-dcff7031e061",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"fix: reweight accessibility analyzer for CEM-realistic scoring\" completed successfully.",
+      "createdAt": "2026-03-13T20:32:33.250Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773433708837-g9r5wy4wg",
+        "notificationId": "d3d5d8ec-4d5d-401c-a77c-b2a46d6ae531"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "ad291a59-d3b7-46c7-8e09-b6dc7a9fa0f6",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: Deep antagonistic audit: full-system bug fix and architectural hardening sweep",
+      "message": "Max agent retries exceeded (3)",
+      "createdAt": "2026-03-16T23:09:00.860Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773696714010-ssi3tefig",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1773696714010-ssi3tefig"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "81b56cf6-238a-484d-866a-e32f700e33d0",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: fix: mark internal packages as private to fix publish pipeline",
+      "message": "Pre-flight check failed: Worktree merge with origin/dev failed (conflicts or error): Command failed: git merge origin/dev\nerror: Your local changes to the following files would be overwritten by merge:\n\tCHANGELOG.md\n\tpackage.json\nPlease commit your changes or stash them before you merge.\nAborting\n",
+      "createdAt": "2026-03-17T01:03:37.086Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773709384268-hajnzugkz",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1773709384268-hajnzugkz"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "435b1f6d-fd2c-4539-aecd-532b92ac161e",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"fix: mark internal packages as private to fix publish pipeline\" completed successfully.",
+      "createdAt": "2026-03-17T01:21:38.624Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773709384268-hajnzugkz",
+        "notificationId": "1d9dfcb4-3a8a-4208-9ebe-54412b700d3f"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "1f93f41c-91cd-46bb-b324-e9e04a756bcd",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"bug: CEM reports hx-carousel event as `hx-slide-change` but actual component fires `hx-slide`\" completed successfully.",
+      "createdAt": "2026-03-18T02:05:21.280Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773794206852-6w7fsgtfc",
+        "notificationId": "60b3b327-0d9e-4da4-8199-a4a9a30b3f17"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "41b3688f-9c17-4fb6-b81d-b4e8472f9058",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"fix: helix.d.ts HxSkeletonAttributes and HxSpinnerAttributes property drift\" completed successfully.",
+      "createdAt": "2026-03-18T02:31:01.987Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773800469009-8fv2tksuq",
+        "notificationId": "66a086e3-ac57-4baa-8653-29e187c5db3c"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "7ee2afed-a767-4bd7-a352-e3502fa000e2",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"fix: helix.d.ts HxTabsAttributes properties drift from CEM\" completed successfully.",
+      "createdAt": "2026-03-18T02:32:11.219Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773800462021-pezxbfca9",
+        "notificationId": "df1f0077-710d-4586-83d7-2277e1df506d"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "51ec01b5-6b17-4964-a88a-6c3476e95a2c",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"feat: automated CEM sync CI gate to prevent stale published manifests\" completed successfully.",
+      "createdAt": "2026-03-18T02:39:50.475Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773800482350-362rmu94f",
+        "notificationId": "569ddf13-19e3-4974-a09c-e4e74edbe496"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "cbb59099-1488-4db0-b202-f2c8b02bc24b",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"feat: add validate_type_definitions MCP tool to catch CEM-to-types drift\" completed successfully.",
+      "createdAt": "2026-03-18T02:42:24.874Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773800476733-u113nxlw2",
+        "notificationId": "9e5998cd-b4e5-4d84-bf9f-0c1aa6c978bb"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "e51c9664-22cf-4192-a87b-5ba880a9c1e1",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"feat: CEM-Source Fidelity analyzer — cross-reference CEM declarations against actual source code\" completed successfully.",
+      "createdAt": "2026-03-18T02:54:16.590Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773801240034-o1w52j8t6",
+        "notificationId": "1f083043-cba1-4654-86c4-2f2c3c678266"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "6ff8ceec-4641-480e-8423-16bbfdf7060c",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"feat: CEM-Source Fidelity analyzer — cross-reference CEM declarations against actual source code\" completed successfully.",
+      "createdAt": "2026-03-18T03:33:36.969Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773801240034-o1w52j8t6",
+        "notificationId": "f5107926-5ec5-4035-99ff-c80f4818b6bc"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "811d341e-d9f0-421c-bfab-98f1737a3ed2",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Verified",
+      "message": "\"feat: CEM-Source Fidelity analyzer — cross-reference CEM declarations against actual source code\" has been verified and is complete.",
+      "createdAt": "2026-03-18T03:34:47.793Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773801240034-o1w52j8t6",
+        "notificationId": "67099f8f-a38a-4c7c-bf03-599c6802293c"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "80623fda-faff-462d-ad3e-ebcf006d41a9",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"feat: Slot Architecture analyzer — score slot documentation, default slot, and slot-property coherence\" completed successfully.",
+      "createdAt": "2026-03-18T03:42:43.286Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773801180845-zcxtn5lhu",
+        "notificationId": "cdbe5e02-b314-4de0-80d5-1af72e75ac2e"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "c13815af-c3e8-4a9c-84b1-102faabbbb48",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"feat: Naming Convention Consistency analyzer — library-wide naming pattern scoring\" completed successfully.",
+      "createdAt": "2026-03-18T03:44:38.303Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773801193733-jc6x78jqf",
+        "notificationId": "95d8b2aa-1c22-4823-89f1-348a0895cf09"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "58d9cdcc-785c-4021-a0ce-9bf4e3e785ce",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"feat: Cross-Library Benchmark Suite — validate scorer against 11 real libraries + generate Helix report\" completed successfully.",
+      "createdAt": "2026-03-18T04:01:15.157Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773801257896-sczpc2dyd",
+        "notificationId": "296b10d1-98cb-4d4e-94cf-91ea2f3818bd"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "50ccfe90-cffc-441f-8da1-4dfdd2147a1f",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"fix: exempt promotion PRs from \"Changeset Required\" CI check\" completed successfully.",
+      "createdAt": "2026-03-18T10:56:22.977Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773831284719-fn9ektkpw",
+        "notificationId": "ee2c3f64-cead-4483-949f-f4252d615e74"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "aff2cf12-63c4-4672-84b3-d3fa714814f8",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"Fix CI checks never running on changeset release PRs\" completed successfully.",
+      "createdAt": "2026-03-19T03:34:01.568Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773891063027-5mc2nvzhi",
+        "notificationId": "ea3aa769-0a87-4eab-a55e-eca9576a5c5d"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "1a9fff12-bf9e-45be-ac33-b432d1137a41",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: integrate custom agent system — health scanning audit workflow and delegation matrix",
+      "message": "Max agent retries exceeded (3)",
+      "createdAt": "2026-03-19T05:57:43.982Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773899514816-1oluo0wc3",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1773899514816-1oluo0wc3"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "d320587c-fe98-4c32-822a-2cad0b6611eb",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"integrate custom agent system — health scanning audit workflow and delegation matrix\" completed successfully.",
+      "createdAt": "2026-03-19T06:04:25.801Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773899514816-1oluo0wc3",
+        "notificationId": "1df57ed6-78a8-4ee4-86e0-402f57b5d2eb"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "31e55304-967d-41d3-90fd-ebd1a4ad193e",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: Standardize pnpm monorepo setup to match helix org pattern",
+      "message": "Max agent retries exceeded (3)",
+      "createdAt": "2026-03-19T18:12:49.323Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773276893746-d7j69dx84",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1773276893746-d7j69dx84"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "391c305e-318e-474b-91bf-83ccd6e3c632",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"Standardize pnpm monorepo setup to match helix org pattern\" completed successfully.",
+      "createdAt": "2026-03-19T18:16:49.097Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773276893746-d7j69dx84",
+        "notificationId": "c83129b1-2066-4f5f-862e-1dc5689d004a"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "43909139-7e72-418d-80fe-4e2a65e62e06",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: pr_warning_feedback",
+      "message": "pr_feedback — high severity",
+      "createdAt": "2026-03-19T18:20:05.393Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773276893746-d7j69dx84",
+        "escalationSource": "pr_feedback",
+        "escalationType": "pr_warning_feedback",
+        "deduplicationKey": "pr_warning_98_1"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "64fb76f4-ad34-46bd-a281-1651fb4e24f2",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"Expert audit: accessibility dimension enhancement proposal\" completed successfully.",
+      "createdAt": "2026-03-19T18:37:48.101Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773944911843-11v8b212l",
+        "notificationId": "4a8256b5-a3f9-46e2-aabb-c041cb6e0c06"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "70b904ab-5a4e-48b5-82e1-1982849cab26",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"Expert audit: Lit web component best practices scoring dimension proposal\" completed successfully.",
+      "createdAt": "2026-03-19T18:42:02.201Z",
+      "status": "dismissed",
+      "actionPayload": {
+        "featureId": "feature-1773944931476-nmunhbeaw",
+        "notificationId": "e59689ee-3a55-4136-b28b-f4a3469045a7"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "06d7fc3b-6f38-4389-8f49-06659586c086",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: Expert audit: Lit web component best practices scoring dimension proposal",
+      "message": "PR #100 has been pending CI/review for 307 minute(s) (configured timeout: 45 min). Possible causes: (1) CI workflow triggers do not include the PR base branch — check .github/workflows/ and ensure the 'branches:' list includes your configured prBaseBranch; (2) CodeRabbit was rate-limited — check the PR for a CodeRabbit FAILURE commit status; (3) Required reviewers have not been assigned. Adjust the timeout via the REVIEW_PENDING_TIMEOUT_MINUTES environment variable.",
+      "createdAt": "2026-03-19T23:49:09.522Z",
+      "status": "dismissed",
+      "actionPayload": {
+        "featureId": "feature-1773944931476-nmunhbeaw",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1773944931476-nmunhbeaw"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "d84f3cbc-2faf-4a94-8a04-e7bd288546ec",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: New MCP tool: diagnose_styling — Shadow DOM styling guide per component",
+      "message": "Max agent retries exceeded (3)",
+      "createdAt": "2026-03-21T03:03:37.200Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1774061864326-ks0nbi6wg",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1774061864326-ks0nbi6wg"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "022eb86e-9044-48c6-a4d8-afda263cac8f",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: New MCP tool: check_shadow_dom_usage — anti-pattern detector for consumer code",
+      "message": "Max agent retries exceeded (3)",
+      "createdAt": "2026-03-21T03:03:59.021Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1774061872384-1bqxjj22g",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1774061872384-1bqxjj22g"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "54910a7b-ff25-4c3f-8ef1-bc9b438af075",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"New MCP tool: check_shadow_dom_usage — anti-pattern detector for consumer code\" completed successfully.",
+      "createdAt": "2026-03-21T03:05:07.238Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1774061872384-1bqxjj22g",
+        "notificationId": "6d9325ce-a94c-462c-9b40-87a1ed6adf12"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "5df9fdab-46f6-4480-b711-51ea60dcc133",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"New MCP tool: diagnose_styling — Shadow DOM styling guide per component\" completed successfully.",
+      "createdAt": "2026-03-21T03:06:01.104Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1774061864326-ks0nbi6wg",
+        "notificationId": "be129436-40dd-47e9-ac31-88a7845557e2"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "5cf98e3f-4253-44db-83fa-1348fc259be9",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"Enhance suggest_usage to include styling guidance section\" completed successfully.",
+      "createdAt": "2026-03-21T03:08:42.446Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1774061879988-x3cs4jzhp",
+        "notificationId": "b9245477-b655-4364-a833-ca8e79053cc3"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "053e19d3-4d99-4a8a-bb21-9608bb37ab96",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"New scoring sub-dimension: Shadow DOM theming quality in CSS Architecture\" completed successfully.",
+      "createdAt": "2026-03-21T03:11:58.537Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1774061894190-ciwt20ovd",
+        "notificationId": "c3e476a7-43ab-438a-bd9a-7260212e6dbd"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "f104a63a-88c8-415f-8a60-a235474cd395",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: pr_warning_feedback",
+      "message": "pr_feedback — high severity",
+      "createdAt": "2026-03-21T03:13:43.575Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1774061879988-x3cs4jzhp",
+        "escalationSource": "pr_feedback",
+        "escalationType": "pr_warning_feedback",
+        "deduplicationKey": "pr_warning_101_1"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "ecb9c869-1678-4262-9b04-2c0aa636d8be",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"Enhance suggest_usage to include styling guidance section\" completed successfully.",
+      "createdAt": "2026-03-21T03:15:06.464Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1774061879988-x3cs4jzhp",
+        "notificationId": "d5c44187-6d3a-4957-b11a-ce92a0d65ed3"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "f282cc9d-b0fa-415d-85a6-8885ec926b9c",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"New MCP tool: detect_theme_support — light/dark mode readiness checker\" completed successfully.",
+      "createdAt": "2026-03-21T03:16:00.209Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1774061903423-x49q1mkke",
+        "notificationId": "656a0285-2a97-457e-a3c8-568c3d1f80ea"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "70ec77d5-97d3-48da-9ec3-23e72cc84e0d",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: pr_warning_feedback",
+      "message": "pr_feedback — high severity",
+      "createdAt": "2026-03-21T03:17:43.495Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1774061894190-ciwt20ovd",
+        "escalationSource": "pr_feedback",
+        "escalationType": "pr_warning_feedback",
+        "deduplicationKey": "pr_warning_102_1"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "1deb7587-e14d-46f1-a563-4ae9ef8ceddb",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"New scoring sub-dimension: Shadow DOM theming quality in CSS Architecture\" completed successfully.",
+      "createdAt": "2026-03-21T03:21:09.759Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1774061894190-ciwt20ovd",
+        "notificationId": "fb960034-d0d3-431c-b9be-92b1866d0b21"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "53b93631-2589-4be6-830d-08f57dc9f7f6",
+      "actionType": "approval",
+      "priority": "urgent",
+      "title": "Approval required: escalate",
+      "message": "Agent pr-feedback-service requests \"escalate\" on \"feature-1774061894190-ciwt20ovd\". Reason: Remediation budget exceeded",
+      "createdAt": "2026-03-21T03:22:44.617Z",
+      "status": "pending",
+      "actionPayload": {
+        "proposalWho": "pr-feedback-service",
+        "proposalWhat": "escalate",
+        "proposalTarget": "feature-1774061894190-ciwt20ovd",
+        "proposalRisk": "high",
+        "proposalJustification": "PR #102 exceeded remediation budget (review): Review remediation budget exhausted: 2/2 review cycles used."
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "authority"
+    },
+    {
+      "id": "f4830d8a-8962-46e6-b171-f74a4dc38176",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Verified",
+      "message": "\"[Escalation] pr_warning_feedback - feature-1774061879988-x3cs4jzhp (PR #101)\" has been verified and is complete.",
+      "createdAt": "2026-03-21T04:19:16.137Z",
+      "status": "dismissed",
+      "actionPayload": {
+        "featureId": "feature-1774062823574-jewtmwje2",
+        "notificationId": "9ac77db8-ea92-44b9-ab44-35c171c77ed1"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "2bbf04fb-7fbf-411d-ad7f-bd23f7228fc9",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: [Escalation] pr_warning_feedback - feature-1773276893746-d7j69dx84 (PR #98)",
+      "message": "Max agent retries exceeded (3)",
+      "createdAt": "2026-03-21T04:42:12.362Z",
+      "status": "dismissed",
+      "actionPayload": {
+        "featureId": "feature-1773944405390-jlt90cz8v",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1773944405390-jlt90cz8v"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "ee85ed35-eee9-46be-8a59-6a25bd667fb8",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Completed",
+      "message": "\"Align audit workflow docs with 14-dimension scoring system\" completed successfully.",
+      "createdAt": "2026-03-21T11:57:16.306Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1773944939667-8adhuygzh",
+        "notificationId": "9628969f-469b-46c2-ba75-85f42c9c9f8f"
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "6794404d-c42c-4e0f-94e0-6061d6b0bab6",
+      "actionType": "signal",
+      "priority": "medium",
+      "title": "[DECISION] PR has been in review status beyond the expected turnaround time.",
+      "message": "Signal: stale-review\nValue: 4283.7182 minutes (threshold: 2880 — PR in review > 48 hours)\nFeature: feature-1774061903423-x49q1mkke\nPR: #104\nAuto-action: Enable auto-merge at 30 minutes. Ping reviewer at 48 hours. Escalate at 96 hours.",
+      "createdAt": "2026-03-24T02:39:43.282Z",
+      "status": "pending",
+      "actionPayload": {
+        "signalName": "stale-review",
+        "currentValue": 4283.7182,
+        "unit": "minutes",
+        "category": "decision",
+        "autoAction": "Enable auto-merge at 30 minutes. Ping reviewer at 48 hours. Escalate at 96 hours.",
+        "projectPath": "/Volumes/Development/booked/helixir",
+        "featureId": "feature-1774061903423-x49q1mkke",
+        "prNumber": 104
+      },
+      "projectPath": "/Volumes/Development/booked/helixir",
+      "read": false,
+      "category": "decision"
+    }
+  ]
+}ision"
+    }
+  ]
+}

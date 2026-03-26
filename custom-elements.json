@@ -3062,6 +3062,63 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/core/src/handlers/extend.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "extendComponent",
+          "return": {
+            "type": {
+              "text": "ExtendComponentResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "parentTagName",
+              "type": {
+                "text": "string"
+              },
+              "description": "Tag name of the existing parent component (must exist in CEM)"
+            },
+            {
+              "name": "newTagName",
+              "type": {
+                "text": "string"
+              },
+              "description": "Tag name for the new subclass (must contain a hyphen)"
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              },
+              "description": "The Custom Elements Manifest to look up the parent"
+            },
+            {
+              "name": "newClassName",
+              "optional": true,
+              "type": {
+                "text": "string"
+              },
+              "description": "Optional explicit class name; defaults to PascalCase of newTagName"
+            }
+          ],
+          "description": "Generates a properly subclassed TypeScript component extending a parent web component.\n\nProduces:\n- Correct `class NewClass extends ParentClass` inheritance chain\n- `@customElement('new-tag-name')` CEM annotation\n- Inherited CSS parts and slots documented in the generated source\n- `exportparts` forwarding guidance for inherited CSS parts\n- `HTMLElementTagNameMap` TypeScript declaration for the new tag\n- Shadow DOM style encapsulation warnings"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "extendComponent",
+          "declaration": {
+            "name": "extendComponent",
+            "module": "packages/core/src/handlers/extend.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/core/src/handlers/framework.ts",
       "declarations": [
         {
@@ -3774,6 +3831,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "packages/core/src/handlers/extend.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "packages/core/src/handlers/health.js"
           }
         },
@@ -3934,6 +3999,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "packages/core/src/handlers/theme.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "packages/core/src/handlers/theme-checker.js"
           }
         },
@@ -3991,6 +4064,14 @@
           "declaration": {
             "name": "*",
             "module": "packages/core/src/handlers/validate.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/handlers/scaffold.js"
           }
         }
       ]
@@ -4277,6 +4358,89 @@
           "declaration": {
             "name": "recommendChecks",
             "module": "packages/core/src/handlers/recommend-checks.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/scaffold.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "detectConventions",
+          "return": {
+            "type": {
+              "text": "DetectedConventions"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            },
+            {
+              "name": "configPrefix",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Detect naming conventions from the existing CEM.\n\n- `prefix`: inferred from the most common tag name prefix in the library,\n  or overridden by `configPrefix` when supplied.\n- `baseClass`: the most commonly used superclass across all declarations.\n- `packageName`: the first package name found in an inherited member's origin."
+        },
+        {
+          "kind": "function",
+          "name": "scaffoldComponent",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "options",
+              "type": {
+                "text": "ScaffoldComponentOptions"
+              },
+              "description": "Component specification (tag name, properties, slots, etc.)"
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              },
+              "description": "Parsed Custom Elements Manifest for convention detection"
+            },
+            {
+              "name": "configPrefix",
+              "optional": true,
+              "type": {
+                "text": "string"
+              },
+              "description": "Optional override for the component prefix"
+            }
+          ],
+          "description": "Scaffold a new Helix-pattern web component from options and a CEM context.\n\nDetects library conventions (tag prefix, base class, package name) from the\nCEM so the generated code matches existing library patterns. Returns four\nfiles ready to write to disk: a Lit component class, a Vitest test stub, a\nStorybook CSF3 story, and a CSS structure file."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "detectConventions",
+          "declaration": {
+            "name": "detectConventions",
+            "module": "packages/core/src/handlers/scaffold.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "scaffoldComponent",
+          "declaration": {
+            "name": "scaffoldComponent",
+            "module": "packages/core/src/handlers/scaffold.ts"
           }
         }
       ]
@@ -5046,6 +5210,89 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/core/src/handlers/theme.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "createTheme",
+          "return": {
+            "type": {
+              "text": "CreateThemeResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            },
+            {
+              "name": "options",
+              "default": "{}",
+              "type": {
+                "text": "CreateThemeOptions"
+              }
+            }
+          ],
+          "description": "Generates a complete enterprise theme scaffold from a CEM analysis.\n\nUses detect_theme_support patterns to discover the token prefix and\ncategories, then produces a ready-to-customize CSS file with:\n- Light mode token values under `:root` and `.{themeName}-light`\n- Dark mode overrides via `@media (prefers-color-scheme: dark)` and `.{themeName}-dark`\n- `color-scheme` declarations for proper browser dark mode integration"
+        },
+        {
+          "kind": "function",
+          "name": "applyThemeTokens",
+          "return": {
+            "type": {
+              "text": "ApplyThemeTokensResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              },
+              "description": "Parsed Custom Elements Manifest"
+            },
+            {
+              "name": "themeTokens",
+              "type": {
+                "text": "Record<string, string>"
+              },
+              "description": "Map of CSS custom property name → value to apply"
+            },
+            {
+              "name": "tagNames",
+              "optional": true,
+              "type": {
+                "text": "string[]"
+              },
+              "description": "Optional list of component tag names to filter results;\n  when omitted all components with CSS properties are included"
+            }
+          ],
+          "description": "Maps a theme token definition to specific components, generating per-component\nCSS override blocks that apply the theme correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "createTheme",
+          "declaration": {
+            "name": "createTheme",
+            "module": "packages/core/src/handlers/theme.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "applyThemeTokens",
+          "declaration": {
+            "name": "applyThemeTokens",
+            "module": "packages/core/src/handlers/theme.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/core/src/handlers/token-fallback-checker.ts",
       "declarations": [
         {
@@ -5547,6 +5794,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "packages/core/src/tools/extend.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "packages/core/src/tools/bundle.js"
           }
         },
@@ -5667,6 +5922,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "packages/core/src/tools/theme.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "packages/core/src/tools/tokens.js"
           }
         },
@@ -5684,6 +5947,14 @@
           "declaration": {
             "name": "*",
             "module": "packages/core/src/tools/validate.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/core/src/tools/scaffold.js"
           }
         }
       ]
@@ -6865,6 +7136,94 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/core/src/tools/extend.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "EXTEND_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'extend_component', description: 'Generates a properly subclassed TypeScript component extending an existing web component. ' + 'Produces the correct inheritance chain (class NewClass extends ParentClass), ' + 'CEM @customElement annotation, CSS part forwarding guidance (exportparts), ' + 'inherited slot documentation, TypeScript HTMLElementTagNameMap declaration, ' + 'and Shadow DOM style encapsulation warnings. ' + 'Prevents common extension anti-patterns such as broken inheritance chains, ' + 'missing exportparts declarations, and style isolation surprises.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, parentTagName: { type: 'string', description: 'Tag name of the existing parent component to extend (e.g. \"hx-button\").', }, newTagName: { type: 'string', description: 'Tag name for the new subclass component (e.g. \"my-custom-button\"). Must contain a hyphen.', }, newClassName: { type: 'string', description: 'Optional explicit class name for the new subclass. ' + 'Defaults to PascalCase derived from newTagName (e.g. \"MyCustomButton\").', }, }, required: ['parentTagName', 'newTagName'], additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleExtendCall",
+          "return": {
+            "type": {
+              "text": "MCPToolResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "Record<string, unknown>"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ],
+          "description": "Dispatches an extend tool call by name and returns an MCPToolResult.\nCalled by the server's consolidated CallToolRequestSchema handler."
+        },
+        {
+          "kind": "function",
+          "name": "isExtendTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the extend tool group.\nUsed by the consolidated CallToolRequestSchema handler to dispatch correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "EXTEND_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "EXTEND_TOOL_DEFINITIONS",
+            "module": "packages/core/src/tools/extend.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleExtendCall",
+          "declaration": {
+            "name": "handleExtendCall",
+            "module": "packages/core/src/tools/extend.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isExtendTool",
+          "declaration": {
+            "name": "isExtendTool",
+            "module": "packages/core/src/tools/extend.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/core/src/tools/framework.ts",
       "declarations": [
         {
@@ -7256,6 +7615,100 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/core/src/tools/scaffold.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "SCAFFOLD_TOOL_DEFINITIONS",
+          "type": {
+            "text": "[\n  {\n    name: 'scaffold_component',\n    description:\n      'Generate a complete Helix-pattern web component scaffold: Lit class with decorators, ' +\n      'CEM annotations (@slot, @csspart, @fires), Vitest test stub, Storybook CSF3 story, and ' +\n      'CSS structure. Conventions (tag prefix, base class) are auto-detected from the library CEM ' +\n      'so the generated code matches existing library patterns.',\n    inputSchema: {\n      type: 'object' as const,\n      properties: {\n        tagName: {\n          type: 'string',\n          description:\n            'Custom element tag name (e.g. \"hx-button\"). Must be lowercase and contain a hyphen.',\n        },\n        baseClass: {\n          type: 'string',\n          description:\n            'Base class to extend (e.g. \"LitElement\"). If omitted, detected from the CEM or defaults to \"LitElement\".',\n        },\n        slots: {\n          type: 'array',\n          description: 'Slots to expose. Use name \"\" or \"default\" for the unnamed default slot.',\n          items: {\n            type: 'object',\n            properties: {\n              name: { type: 'string', description: 'Slot name (empty string = default slot).' },\n              description: { type: 'string', description: 'Slot description for CEM annotation.' },\n            },\n            required: ['name'],\n            additionalProperties: false,\n          },\n        },\n        cssParts: {\n          type: 'array',\n          description: 'CSS parts to expose via ::part().',\n          items: {\n            type: 'object',\n            properties: {\n              name: { type: 'string', description: 'CSS part name.' },\n              description: {\n                type: 'string',\n                description: 'Part description for CEM annotation.',\n              },\n            },\n            required: ['name'],\n            additionalProperties: false,\n          },\n        },\n        events: {\n          type: 'array',\n          description: 'Custom events to dispatch.',\n          items: {\n            type: 'object',\n            properties: {\n              name: { type: 'string', description: 'Event name (e.g. \"hx-change\").' },\n              type: {\n                type: 'string',\n                description:\n                  'CustomEvent detail type (e.g. \"{ value: string }\"). Defaults to \"void\".',\n              },\n              description: { type: 'string', description: 'Event description.' },\n            },\n            required: ['name'],\n            additionalProperties: false,\n          },\n        },\n        properties: {\n          type: 'array',\n          description: 'Reactive properties / attributes to declare.',\n          items: {\n            type: 'object',\n            properties: {\n              name: { type: 'string', description: 'JavaScript property name.' },\n              type: {\n                type: 'string',\n                description: 'TypeScript type (e.g. \"string\", \"boolean\", \"number\").',\n              },\n              attribute: {\n                type: 'string',\n                description: 'HTML attribute name if different from the property name.',\n              },\n              default: {\n                type: 'string',\n                description: 'Default value as a source literal (e.g. \"\\'primary\\'\", \"false\").',\n              },\n              description: { type: 'string', description: 'Property description.' },\n              reflects: {\n                type: 'boolean',\n                description: 'Whether the property reflects to an attribute.',\n              },\n            },\n            required: ['name'],\n            additionalProperties: false,\n          },\n        },\n      },\n      required: ['tagName'],\n      additionalProperties: false,\n    },\n  },\n]"
+          },
+          "default": "[ { name: 'scaffold_component', description: 'Generate a complete Helix-pattern web component scaffold: Lit class with decorators, ' + 'CEM annotations (@slot, @csspart, @fires), Vitest test stub, Storybook CSF3 story, and ' + 'CSS structure. Conventions (tag prefix, base class) are auto-detected from the library CEM ' + 'so the generated code matches existing library patterns.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'Custom element tag name (e.g. \"hx-button\"). Must be lowercase and contain a hyphen.', }, baseClass: { type: 'string', description: 'Base class to extend (e.g. \"LitElement\"). If omitted, detected from the CEM or defaults to \"LitElement\".', }, slots: { type: 'array', description: 'Slots to expose. Use name \"\" or \"default\" for the unnamed default slot.', items: { type: 'object', properties: { name: { type: 'string', description: 'Slot name (empty string = default slot).' }, description: { type: 'string', description: 'Slot description for CEM annotation.' }, }, required: ['name'], additionalProperties: false, }, }, cssParts: { type: 'array', description: 'CSS parts to expose via ::part().', items: { type: 'object', properties: { name: { type: 'string', description: 'CSS part name.' }, description: { type: 'string', description: 'Part description for CEM annotation.', }, }, required: ['name'], additionalProperties: false, }, }, events: { type: 'array', description: 'Custom events to dispatch.', items: { type: 'object', properties: { name: { type: 'string', description: 'Event name (e.g. \"hx-change\").' }, type: { type: 'string', description: 'CustomEvent detail type (e.g. \"{ value: string }\"). Defaults to \"void\".', }, description: { type: 'string', description: 'Event description.' }, }, required: ['name'], additionalProperties: false, }, }, properties: { type: 'array', description: 'Reactive properties / attributes to declare.', items: { type: 'object', properties: { name: { type: 'string', description: 'JavaScript property name.' }, type: { type: 'string', description: 'TypeScript type (e.g. \"string\", \"boolean\", \"number\").', }, attribute: { type: 'string', description: 'HTML attribute name if different from the property name.', }, default: { type: 'string', description: 'Default value as a source literal (e.g. \"\\'primary\\'\", \"false\").', }, description: { type: 'string', description: 'Property description.' }, reflects: { type: 'boolean', description: 'Whether the property reflects to an attribute.', }, }, required: ['name'], additionalProperties: false, }, }, }, required: ['tagName'], additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleScaffoldCall",
+          "return": {
+            "type": {
+              "text": "MCPToolResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "Record<string, unknown>"
+              }
+            },
+            {
+              "name": "_config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ],
+          "description": "Dispatches a scaffold tool call by name and returns an MCPToolResult.\nCalled by the server's consolidated CallToolRequestSchema handler."
+        },
+        {
+          "kind": "function",
+          "name": "isScaffoldTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the scaffold tool group.\nUsed by the consolidated CallToolRequestSchema handler to dispatch correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "SCAFFOLD_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "SCAFFOLD_TOOL_DEFINITIONS",
+            "module": "packages/core/src/tools/scaffold.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleScaffoldCall",
+          "declaration": {
+            "name": "handleScaffoldCall",
+            "module": "packages/core/src/tools/scaffold.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isScaffoldTool",
+          "declaration": {
+            "name": "isScaffoldTool",
+            "module": "packages/core/src/tools/scaffold.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/core/src/tools/story.ts",
       "declarations": [
         {
@@ -7352,7 +7805,7 @@
           "type": {
             "text": "array"
           },
-          "default": "[ { name: 'diagnose_styling', description: 'Generates a Shadow DOM styling guide for a web component — token prefix, theming approach, dark mode support, anti-pattern warnings, and correct CSS usage snippets. Use this before writing any component CSS to prevent Shadow DOM mistakes.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, tagName: { type: 'string', description: 'The custom element tag name to diagnose (e.g. \"sl-button\").', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'check_shadow_dom_usage', description: 'Scans consumer CSS code for Shadow DOM anti-patterns — descendant selectors piercing shadow boundaries, ::slotted() misuse, invalid ::part() chaining, !important on tokens, unknown part names, and typo detection. Run this on any CSS targeting web components to catch mistakes before they reach production.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The CSS code to scan for Shadow DOM anti-patterns.', }, tagName: { type: 'string', description: 'Optional tag name to scope checks. When provided, enables CEM-based validation (unknown parts, typo detection).', }, }, required: ['cssText'], additionalProperties: false, }, }, { name: 'check_html_usage', description: 'Validates consumer HTML against a component CEM — catches invalid slot names, wrong enum attribute values, boolean attribute misuse, and unknown attributes with typo suggestions. Run this on any HTML using web components to catch markup mistakes.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, htmlText: { type: 'string', description: 'The HTML code to validate against the component CEM.', }, tagName: { type: 'string', description: 'The custom element tag name to validate against (e.g. \"sl-button\").', }, }, required: ['htmlText', 'tagName'], additionalProperties: false, }, }, { name: 'check_event_usage', description: \"Validates event listener patterns against a component CEM — catches React onXxx props for custom events (won't work), unknown event names, misspelled events, and framework-specific binding mistakes. Supports React, Vue, and Angular patterns.\", inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, codeText: { type: 'string', description: 'The code (JSX, template, etc.) to validate event usage in.', }, tagName: { type: 'string', description: 'The custom element tag name to validate against (e.g. \"sl-button\").', }, framework: { type: 'string', enum: ['react', 'vue', 'angular', 'html'], description: 'Optional framework hint. Enables framework-specific checks (e.g. React onXxx prop detection).', }, }, required: ['codeText', 'tagName'], additionalProperties: false, }, }, { name: 'get_component_quick_ref', description: 'Returns a complete quick reference for a web component — all attributes with types and valid enum values, methods, events, slots, CSS custom properties with examples, CSS parts with ::part() selectors, a ready-to-use CSS snippet, Shadow DOM warnings, and antiPatterns (component-specific \"don\\'t do this\" negative examples using real tag/part/token names). Use this as the FIRST call when working with any web component to get the complete API surface and avoid common mistakes.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, tagName: { type: 'string', description: 'The custom element tag name (e.g. \"sl-button\").', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'detect_theme_support', description: 'Analyzes a component library for theming capabilities — token categories (color, spacing, typography, etc.), semantic naming patterns, dark mode readiness, and coverage score. Library-wide analysis, not per-component.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, }, additionalProperties: false, }, }, { name: 'check_component_imports', description: 'Scans HTML/JSX/template code for all custom element tags and verifies they exist in the loaded CEM. Catches non-existent components and misspelled tag names with fuzzy suggestions. Use this to verify that generated code only references real components.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, codeText: { type: 'string', description: 'The HTML/JSX/template code to scan for custom element tags.', }, }, required: ['codeText'], additionalProperties: false, }, }, { name: 'check_slot_children', description: 'Validates that children placed inside a web component\\'s slots match the expected element types from the CEM — catches wrong child elements in constrained slots (e.g. putting a <div> inside <sl-select> which requires <sl-option>). Parses slot descriptions for \"Must be\", \"Works best with\", and \"Accepts\" patterns.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, htmlText: { type: 'string', description: 'The HTML code containing the component and its children to validate.', }, tagName: { type: 'string', description: 'The parent custom element tag name to check slot children for (e.g. \"sl-select\").', }, }, required: ['htmlText', 'tagName'], additionalProperties: false, }, }, { name: 'check_attribute_conflicts', description: 'Detects conditional attributes used without their guard conditions — catches \"target\" without \"href\", \"min\"/\"max\" on non-number inputs, \"checked\" without type=\"checkbox\", and other attribute interaction mistakes. Parses CEM member descriptions for \"Only used when\" and \"Only applies to\" patterns.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, htmlText: { type: 'string', description: 'The HTML code containing the component to check for attribute conflicts.', }, tagName: { type: 'string', description: 'The custom element tag name to validate against (e.g. \"sl-button\").', }, }, required: ['htmlText', 'tagName'], additionalProperties: false, }, }, { name: 'check_a11y_usage', description: 'Validates consumer HTML for accessibility mistakes when using web components — catches missing accessible labels on icon buttons/dialogs/selects, and manual role overrides on components that self-assign ARIA roles. Run this on any HTML using web components to catch a11y issues.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, htmlText: { type: 'string', description: 'The HTML code to validate for accessibility issues.', }, tagName: { type: 'string', description: 'The custom element tag name to check accessibility for (e.g. \"sl-icon-button\").', }, }, required: ['htmlText', 'tagName'], additionalProperties: false, }, }, { name: 'check_css_vars', description: 'Validates consumer CSS for custom property usage against a component CEM — catches unknown CSS custom properties with typo suggestions, and !important on design tokens (anti-pattern). Run this on any CSS that sets component-scoped custom properties.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The CSS code to validate for custom property usage.', }, tagName: { type: 'string', description: 'The custom element tag name to validate against (e.g. \"sl-button\").', }, }, required: ['cssText', 'tagName'], additionalProperties: false, }, }, { name: 'validate_component_code', description: 'ALL-IN-ONE validator — runs 19 anti-hallucination sub-validators on agent-generated code in a single call. Validates HTML attributes, slot children, attribute conflicts, a11y patterns, Shadow DOM CSS, custom properties, token fallbacks, theme compatibility, CSS specificity, layout patterns, inline styles, event bindings, method calls, composition patterns, component imports, color contrast, CSS scope, shorthand safety, and transition/animation patterns. Returns antiPatterns (component-specific negative examples) and auto-generated fix suggestions on issues. Use this as the FINAL check before submitting any code that uses web components.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, html: { type: 'string', description: 'The HTML markup to validate.', }, css: { type: 'string', description: 'Optional CSS code to validate for Shadow DOM and custom property issues.', }, code: { type: 'string', description: 'Optional JS/JSX/template code to validate event bindings.', }, tagName: { type: 'string', description: 'The primary custom element tag name to validate against.', }, framework: { type: 'string', enum: ['react', 'vue', 'angular', 'html'], description: 'Optional framework hint for event validation.', }, }, required: ['html', 'tagName'], additionalProperties: false, }, }, { name: 'check_token_fallbacks', description: 'Validates consumer CSS for proper var() fallback chains and detects hardcoded colors that break theme switching. Catches var() calls without fallback values (fragile if token undefined), hardcoded hex/rgb/hsl/named colors on color properties (breaks dark mode), and named CSS colors used directly instead of tokens. Run this on any CSS that references design tokens.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The CSS code to validate for token fallback usage.', }, tagName: { type: 'string', description: 'The custom element tag name to validate against (e.g. \"sl-button\").', }, }, required: ['cssText', 'tagName'], additionalProperties: false, }, }, { name: 'check_composition', description: 'Validates cross-component composition patterns — catches tab/panel count mismatches, unlinked cross-references (tab panel=\"x\" without matching panel name=\"x\"), and empty containers (select with no options). Detects component pairs automatically from CEM slot descriptions. Run this on any HTML using compound components like tab-groups, selects, accordions, etc.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, htmlText: { type: 'string', description: 'The HTML code containing compound component patterns to validate.', }, }, required: ['htmlText'], additionalProperties: false, }, }, { name: 'check_method_calls', description: 'Validates JavaScript/TypeScript code for correct method and property usage on web components — catches hallucinated API calls (methods that do not exist), properties called as methods (e.g. dialog.open() when open is a boolean), methods assigned as properties (e.g. dialog.show = true), and typos with suggestions. Run this on any JS code that interacts with web component APIs.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, codeText: { type: 'string', description: 'The JavaScript/TypeScript code to validate for method/property usage.', }, tagName: { type: 'string', description: 'The custom element tag name to validate against (e.g. \"sl-dialog\").', }, }, required: ['codeText', 'tagName'], additionalProperties: false, }, }, { name: 'check_theme_compatibility', description: 'Validates consumer CSS for dark mode and theme compatibility — catches hardcoded colors on background/color/border properties, hardcoded shadow colors, and potential contrast issues (light-on-light or dark-on-dark pairings). Does NOT require a CEM — works on any CSS. Run this on styling code to ensure it adapts to theme changes.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The CSS code to check for theme compatibility issues.', }, }, required: ['cssText'], additionalProperties: false, }, }, { name: 'recommend_checks', description: 'Analyzes code to determine which validation tools are most relevant — detects HTML, CSS, JavaScript, and JSX patterns, identifies custom element tags, and returns a prioritized list of tool names. Use this as a meta-tool to discover which validators to run on a given piece of code without running them all.', inputSchema: { type: 'object' as const, properties: { codeText: { type: 'string', description: 'The code to analyze for determining which validation tools are relevant.', }, }, required: ['codeText'], additionalProperties: false, }, }, { name: 'suggest_fix', description: 'Generates concrete, copy-pasteable code fixes for validation issues. Pass the issue type (shadow-dom, token-fallback, theme-compat, method-call, event-usage, specificity, layout), the specific issue kind, and the original code — returns a corrected code snippet with an explanation. NOTE: styling_preflight and validate_css_file now embed fixes inline in each issue — only call suggest_fix directly for issues from other validators or when you need a fix for code not already validated.', inputSchema: { type: 'object' as const, properties: { type: { type: 'string', enum: [ 'shadow-dom', 'token-fallback', 'theme-compat', 'method-call', 'event-usage', 'specificity', 'layout', ], description: 'The category of validation issue.', }, issue: { type: 'string', description: 'The specific issue kind (e.g. \"descendant-piercing\", \"missing-fallback\", \"hardcoded-color\", \"property-as-method\", \"react-custom-event\").', }, original: { type: 'string', description: 'The original problematic code.', }, tagName: { type: 'string', description: 'Optional tag name of the component.', }, partNames: { type: 'array', items: { type: 'string' }, description: 'Optional list of CSS part names exposed by the component.', }, property: { type: 'string', description: 'Optional CSS property name for token/theme fixes.', }, memberName: { type: 'string', description: 'Optional method/property name for method call fixes.', }, suggestedName: { type: 'string', description: 'Optional corrected name for typo fixes.', }, eventName: { type: 'string', description: 'Optional event name for event usage fixes.', }, tokenPrefix: { type: 'string', description: 'Optional token prefix from the component library (e.g. \"--hx-\", \"--fast-\", \"--md-\"). When provided, suggested replacement tokens use this prefix. Get this from diagnose_styling.', }, }, required: ['type', 'issue', 'original'], additionalProperties: false, }, }, { name: 'check_css_specificity', description: 'Detects CSS specificity anti-patterns that cause styling issues with web components — catches !important usage, ID selectors targeting components, deeply nested selectors (4+ levels), and inline style attributes. Supports both CSS and HTML mode. Run this on any CSS or HTML to prevent specificity wars.', inputSchema: { type: 'object' as const, properties: { code: { type: 'string', description: 'The CSS or HTML code to analyze for specificity issues.', }, mode: { type: 'string', enum: ['css', 'html'], description: 'Analysis mode — \"css\" checks stylesheets for !important/ID/nesting issues, \"html\" checks for inline style attributes on web components. Defaults to \"css\".', }, }, required: ['code'], additionalProperties: false, }, }, { name: 'check_layout_patterns', description: 'Detects layout anti-patterns when styling web component host elements — catches display overrides (components manage their own display), fixed pixel dimensions (breaks responsive), position absolute/fixed (conflicts with component positioning), and overflow: hidden (clips shadow DOM popups/tooltips). Run this on any CSS that sets layout properties on web components.', inputSchema: { type: 'object' as const, properties: { cssText: { type: 'string', description: 'The CSS code to check for layout anti-patterns on web component hosts.', }, }, required: ['cssText'], additionalProperties: false, }, }, { name: 'check_css_scope', description: 'Detects when component-scoped CSS custom properties are set at the wrong scope. Catches component tokens placed on :root, html, body, or * selectors instead of on the component host element. Component tokens only take effect when set on the host — setting them on :root has no effect through shadow DOM.', inputSchema: { type: 'object' as const, properties: { cssText: { type: 'string', description: 'The CSS code to check for scope mismatches.', }, tagName: { type: 'string', description: 'The web component tag name (e.g. \"sl-button\").', }, }, required: ['cssText', 'tagName'], additionalProperties: false, }, }, { name: 'check_css_shorthand', description: 'Detects risky CSS shorthand + var() combinations that can fail silently. When var() is mixed with literal values in shorthand properties (border, background, font, margin, etc.), if any var() is undefined the ENTIRE declaration fails — not just the dynamic part. Suggests decomposing into longhand properties.', inputSchema: { type: 'object' as const, properties: { cssText: { type: 'string', description: 'The CSS code to check for risky shorthand + var() patterns.', }, }, required: ['cssText'], additionalProperties: false, }, }, { name: 'check_color_contrast', description: 'Detects color contrast issues in CSS: low-contrast hardcoded color pairs (light-on-light, dark-on-dark), mixed color sources (one design token + one hardcoded), and low opacity on text. Catches patterns that break readability across theme changes.', inputSchema: { type: 'object' as const, properties: { cssText: { type: 'string', description: 'CSS code to analyze for color contrast issues' }, }, required: ['cssText'], }, }, { name: 'check_transition_animation', description: 'Detects CSS transitions and animations on web component hosts that target standard properties which cannot cross Shadow DOM boundaries. Transitions on standard properties (color, background, opacity) only affect the host element box, not the component internals. Use CSS custom properties for animations that the component consumes.', inputSchema: { type: 'object' as const, properties: { cssText: { type: 'string', description: 'CSS code to analyze' }, tagName: { type: 'string', description: 'Tag name of the web component (e.g., \"sl-button\")', }, }, required: ['cssText', 'tagName'], }, }, { name: 'check_shadow_dom_js', description: 'Detects JavaScript anti-patterns that violate Shadow DOM encapsulation from consumer code. Catches: accessing .shadowRoot.querySelector() to bypass encapsulation, calling attachShadow() on existing components, setting innerHTML on web components (overwriting slot content), and using style.cssText instead of CSS custom properties.', inputSchema: { type: 'object' as const, properties: { codeText: { type: 'string', description: 'JavaScript/TypeScript code to analyze' }, tagName: { type: 'string', description: 'Optional tag name of the web component for context-aware checks (e.g., \"sl-button\")', }, }, required: ['codeText'], }, }, { name: 'resolve_css_api', description: 'Resolves every ::part(), CSS custom property, and slot reference in agent-generated code against the actual component CEM data. Returns a structured report showing which references are valid, which are hallucinated, and suggests the closest valid alternatives. Call this BEFORE shipping any CSS to verify that every part name, token name, and slot name actually exists on the target component.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The CSS code to resolve against the component API.', }, tagName: { type: 'string', description: 'The custom element tag name (e.g. \"sl-dialog\").', }, htmlText: { type: 'string', description: 'Optional HTML code to validate slot attribute references against the component API.', }, }, required: ['cssText', 'tagName'], }, }, { name: 'styling_preflight', description: \"Single-call styling validation that combines component API discovery, CSS reference resolution, and anti-pattern detection. Returns: the component's full style API surface (parts, tokens, slots), valid/invalid status for every ::part() and token reference, Shadow DOM and theme validation issues with inline fix suggestions (each issue includes a `fix` object with corrected code + explanation), antiPatterns (component-specific negative examples), a correct CSS snippet, and a pass/fail verdict. Call this ONCE before finalizing any component CSS — fixes are embedded in each issue so you don't need a separate suggest_fix call.\", inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The CSS code to validate against the component API.', }, tagName: { type: 'string', description: 'The custom element tag name (e.g. \"hx-button\").', }, htmlText: { type: 'string', description: 'Optional HTML code to validate slot attribute references against the component API.', }, }, required: ['cssText', 'tagName'], }, }, { name: 'validate_css_file', description: 'Validates an entire CSS file targeting multiple web components in one call. Auto-detects all web component tag names in selectors, runs per-component validation (Shadow DOM, ::part() resolution, token validation, scope checks) and global validation (theme compatibility, color contrast, specificity, shorthand). Each component result includes antiPatterns (negative examples) and each issue includes an inline `fix` object with corrected code + explanation. Returns issues grouped by component plus global issues. Use this when reviewing a CSS file that styles multiple components — no need to know which components are used.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The full CSS file content to validate.', }, }, required: ['cssText'], }, }, { name: 'check_dark_mode_patterns', description: 'Detects dark mode styling anti-patterns specific to web components with Shadow DOM. Catches: (1) theme-scoped selectors (.dark, [data-theme], @media prefers-color-scheme) setting standard CSS properties on web component hosts — these won\\'t reach shadow DOM internals, (2) descendant selectors inside theme scopes trying to pierce shadow boundaries. Suggests using CSS custom properties to communicate theme changes through shadow DOM. Run this on any CSS that implements dark mode or theming for web components.', inputSchema: { type: 'object' as const, properties: { cssText: { type: 'string', description: 'The CSS code to check for dark mode anti-patterns.', }, }, required: ['cssText'], }, }, ]"
+          "default": "[ { name: 'diagnose_styling', description: 'Generates a Shadow DOM styling guide for a web component — token prefix, theming approach, dark mode support, anti-pattern warnings, and correct CSS usage snippets. Use this before writing any component CSS to prevent Shadow DOM mistakes.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, tagName: { type: 'string', description: 'The custom element tag name to diagnose (e.g. \"sl-button\").', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'check_shadow_dom_usage', description: 'Scans consumer CSS code for Shadow DOM anti-patterns — descendant selectors piercing shadow boundaries, ::slotted() misuse, invalid ::part() chaining, !important on tokens, unknown part names, and typo detection. Run this on any CSS targeting web components to catch mistakes before they reach production.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The CSS code to scan for Shadow DOM anti-patterns.', }, tagName: { type: 'string', description: 'Optional tag name to scope checks. When provided, enables CEM-based validation (unknown parts, typo detection).', }, }, required: ['cssText'], additionalProperties: false, }, }, { name: 'check_html_usage', description: 'Validates consumer HTML against a component CEM — catches invalid slot names, wrong enum attribute values, boolean attribute misuse, and unknown attributes with typo suggestions. Run this on any HTML using web components to catch markup mistakes.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, htmlText: { type: 'string', description: 'The HTML code to validate against the component CEM.', }, tagName: { type: 'string', description: 'The custom element tag name to validate against (e.g. \"sl-button\").', }, }, required: ['htmlText', 'tagName'], additionalProperties: false, }, }, { name: 'check_event_usage', description: \"Validates event listener patterns against a component CEM — catches React onXxx props for custom events (won't work), unknown event names, misspelled events, and framework-specific binding mistakes. Supports React, Vue, and Angular patterns.\", inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, codeText: { type: 'string', description: 'The code (JSX, template, etc.) to validate event usage in.', }, tagName: { type: 'string', description: 'The custom element tag name to validate against (e.g. \"sl-button\").', }, framework: { type: 'string', enum: ['react', 'vue', 'angular', 'html'], description: 'Optional framework hint. Enables framework-specific checks (e.g. React onXxx prop detection).', }, }, required: ['codeText', 'tagName'], additionalProperties: false, }, }, { name: 'get_component_quick_ref', description: 'Returns a complete quick reference for a web component — all attributes with types and valid enum values, methods, events, slots, CSS custom properties with examples, CSS parts with ::part() selectors, a ready-to-use CSS snippet, Shadow DOM warnings, and antiPatterns (component-specific \"don\\'t do this\" negative examples using real tag/part/token names). Use this as the FIRST call when working with any web component to get the complete API surface and avoid common mistakes.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, tagName: { type: 'string', description: 'The custom element tag name (e.g. \"sl-button\").', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'detect_theme_support', description: 'Analyzes a component library for theming capabilities — token categories (color, spacing, typography, etc.), semantic naming patterns, dark mode readiness, and coverage score. Library-wide analysis, not per-component.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, }, additionalProperties: false, }, }, { name: 'check_component_imports', description: 'Scans HTML/JSX/template code for all custom element tags and verifies they exist in the loaded CEM. Catches non-existent components and misspelled tag names with fuzzy suggestions. Use this to verify that generated code only references real components.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, codeText: { type: 'string', description: 'The HTML/JSX/template code to scan for custom element tags.', }, }, required: ['codeText'], additionalProperties: false, }, }, { name: 'check_slot_children', description: 'Validates that children placed inside a web component\\'s slots match the expected element types from the CEM — catches wrong child elements in constrained slots (e.g. putting a <div> inside <sl-select> which requires <sl-option>). Parses slot descriptions for \"Must be\", \"Works best with\", and \"Accepts\" patterns.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, htmlText: { type: 'string', description: 'The HTML code containing the component and its children to validate.', }, tagName: { type: 'string', description: 'The parent custom element tag name to check slot children for (e.g. \"sl-select\").', }, }, required: ['htmlText', 'tagName'], additionalProperties: false, }, }, { name: 'check_attribute_conflicts', description: 'Detects conditional attributes used without their guard conditions — catches \"target\" without \"href\", \"min\"/\"max\" on non-number inputs, \"checked\" without type=\"checkbox\", and other attribute interaction mistakes. Parses CEM member descriptions for \"Only used when\" and \"Only applies to\" patterns.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, htmlText: { type: 'string', description: 'The HTML code containing the component to check for attribute conflicts.', }, tagName: { type: 'string', description: 'The custom element tag name to validate against (e.g. \"sl-button\").', }, }, required: ['htmlText', 'tagName'], additionalProperties: false, }, }, { name: 'check_a11y_usage', description: 'Validates consumer HTML for accessibility mistakes when using web components — catches missing accessible labels on icon buttons/dialogs/selects, and manual role overrides on components that self-assign ARIA roles. Run this on any HTML using web components to catch a11y issues.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, htmlText: { type: 'string', description: 'The HTML code to validate for accessibility issues.', }, tagName: { type: 'string', description: 'The custom element tag name to check accessibility for (e.g. \"sl-icon-button\").', }, }, required: ['htmlText', 'tagName'], additionalProperties: false, }, }, { name: 'check_css_vars', description: 'Validates consumer CSS for custom property usage against a component CEM — catches unknown CSS custom properties with typo suggestions, and !important on design tokens (anti-pattern). Run this on any CSS that sets component-scoped custom properties.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The CSS code to validate for custom property usage.', }, tagName: { type: 'string', description: 'The custom element tag name to validate against (e.g. \"sl-button\").', }, }, required: ['cssText', 'tagName'], additionalProperties: false, }, }, { name: 'validate_component_code', description: 'ALL-IN-ONE validator — runs 19 anti-hallucination sub-validators on agent-generated code in a single call. Validates HTML attributes, slot children, attribute conflicts, a11y patterns, Shadow DOM CSS, custom properties, token fallbacks, theme compatibility, CSS specificity, layout patterns, inline styles, event bindings, method calls, composition patterns, component imports, color contrast, CSS scope, shorthand safety, and transition/animation patterns. Returns antiPatterns (component-specific negative examples) and auto-generated fix suggestions on issues. Use this as the FINAL check before submitting any code that uses web components.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, html: { type: 'string', description: 'The HTML markup to validate.', }, css: { type: 'string', description: 'Optional CSS code to validate for Shadow DOM and custom property issues.', }, code: { type: 'string', description: 'Optional JS/JSX/template code to validate event bindings.', }, tagName: { type: 'string', description: 'The primary custom element tag name to validate against.', }, framework: { type: 'string', enum: ['react', 'vue', 'angular', 'html'], description: 'Optional framework hint for event validation.', }, }, required: ['html', 'tagName'], additionalProperties: false, }, }, { name: 'check_token_fallbacks', description: 'Validates consumer CSS for proper var() fallback chains and detects hardcoded colors that break theme switching. Catches var() calls without fallback values (fragile if token undefined), hardcoded hex/rgb/hsl/named colors on color properties (breaks dark mode), and named CSS colors used directly instead of tokens. Run this on any CSS that references design tokens.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The CSS code to validate for token fallback usage.', }, tagName: { type: 'string', description: 'The custom element tag name to validate against (e.g. \"sl-button\").', }, }, required: ['cssText', 'tagName'], additionalProperties: false, }, }, { name: 'check_composition', description: 'Validates cross-component composition patterns — catches tab/panel count mismatches, unlinked cross-references (tab panel=\"x\" without matching panel name=\"x\"), and empty containers (select with no options). Detects component pairs automatically from CEM slot descriptions. Run this on any HTML using compound components like tab-groups, selects, accordions, etc.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, htmlText: { type: 'string', description: 'The HTML code containing compound component patterns to validate.', }, }, required: ['htmlText'], additionalProperties: false, }, }, { name: 'check_method_calls', description: 'Validates JavaScript/TypeScript code for correct method and property usage on web components — catches hallucinated API calls (methods that do not exist), properties called as methods (e.g. dialog.open() when open is a boolean), methods assigned as properties (e.g. dialog.show = true), and typos with suggestions. Run this on any JS code that interacts with web component APIs.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, codeText: { type: 'string', description: 'The JavaScript/TypeScript code to validate for method/property usage.', }, tagName: { type: 'string', description: 'The custom element tag name to validate against (e.g. \"sl-dialog\").', }, }, required: ['codeText', 'tagName'], additionalProperties: false, }, }, { name: 'check_theme_compatibility', description: 'Validates consumer CSS for dark mode and theme compatibility — catches hardcoded colors on background/color/border properties, hardcoded shadow colors, and potential contrast issues (light-on-light or dark-on-dark pairings). Does NOT require a CEM — works on any CSS. Run this on styling code to ensure it adapts to theme changes.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The CSS code to check for theme compatibility issues.', }, }, required: ['cssText'], additionalProperties: false, }, }, { name: 'recommend_checks', description: 'Analyzes code to determine which validation tools are most relevant — detects HTML, CSS, JavaScript, and JSX patterns, identifies custom element tags, and returns a prioritized list of tool names. Use this as a meta-tool to discover which validators to run on a given piece of code without running them all.', inputSchema: { type: 'object' as const, properties: { codeText: { type: 'string', description: 'The code to analyze for determining which validation tools are relevant.', }, }, required: ['codeText'], additionalProperties: false, }, }, { name: 'suggest_fix', description: 'Generates concrete, copy-pasteable code fixes for validation issues. Pass the issue type (shadow-dom, token-fallback, theme-compat, method-call, event-usage, specificity, layout), the specific issue kind, and the original code — returns a corrected code snippet with an explanation. NOTE: styling_preflight and validate_css_file now embed fixes inline in each issue — only call suggest_fix directly for issues from other validators or when you need a fix for code not already validated.', inputSchema: { type: 'object' as const, properties: { type: { type: 'string', enum: [ 'shadow-dom', 'token-fallback', 'theme-compat', 'method-call', 'event-usage', 'specificity', 'layout', ], description: 'The category of validation issue.', }, issue: { type: 'string', description: 'The specific issue kind (e.g. \"descendant-piercing\", \"missing-fallback\", \"hardcoded-color\", \"property-as-method\", \"react-custom-event\").', }, original: { type: 'string', description: 'The original problematic code.', }, tagName: { type: 'string', description: 'Optional tag name of the component.', }, partNames: { type: 'array', items: { type: 'string' }, description: 'Optional list of CSS part names exposed by the component.', }, property: { type: 'string', description: 'Optional CSS property name for token/theme fixes.', }, memberName: { type: 'string', description: 'Optional method/property name for method call fixes.', }, suggestedName: { type: 'string', description: 'Optional corrected name for typo fixes.', }, eventName: { type: 'string', description: 'Optional event name for event usage fixes.', }, tokenPrefix: { type: 'string', description: 'Optional token prefix from the component library (e.g. \"--hx-\", \"--fast-\", \"--md-\"). When provided, suggested replacement tokens use this prefix. Get this from diagnose_styling.', }, }, required: ['type', 'issue', 'original'], additionalProperties: false, }, }, { name: 'check_css_specificity', description: 'Detects CSS specificity anti-patterns that cause styling issues with web components — catches !important usage, ID selectors targeting components, deeply nested selectors (4+ levels), and inline style attributes. Supports both CSS and HTML mode. Run this on any CSS or HTML to prevent specificity wars.', inputSchema: { type: 'object' as const, properties: { code: { type: 'string', description: 'The CSS or HTML code to analyze for specificity issues.', }, mode: { type: 'string', enum: ['css', 'html'], description: 'Analysis mode — \"css\" checks stylesheets for !important/ID/nesting issues, \"html\" checks for inline style attributes on web components. Defaults to \"css\".', }, }, required: ['code'], additionalProperties: false, }, }, { name: 'check_layout_patterns', description: 'Detects layout anti-patterns when styling web component host elements — catches display overrides (components manage their own display), fixed pixel dimensions (breaks responsive), position absolute/fixed (conflicts with component positioning), and overflow: hidden (clips shadow DOM popups/tooltips). Run this on any CSS that sets layout properties on web components.', inputSchema: { type: 'object' as const, properties: { cssText: { type: 'string', description: 'The CSS code to check for layout anti-patterns on web component hosts.', }, }, required: ['cssText'], additionalProperties: false, }, }, { name: 'check_css_scope', description: 'Detects when component-scoped CSS custom properties are set at the wrong scope. Catches component tokens placed on :root, html, body, or * selectors instead of on the component host element. Component tokens only take effect when set on the host — setting them on :root has no effect through shadow DOM.', inputSchema: { type: 'object' as const, properties: { cssText: { type: 'string', description: 'The CSS code to check for scope mismatches.', }, tagName: { type: 'string', description: 'The web component tag name (e.g. \"sl-button\").', }, }, required: ['cssText', 'tagName'], additionalProperties: false, }, }, { name: 'check_css_shorthand', description: 'Detects risky CSS shorthand + var() combinations that can fail silently. When var() is mixed with literal values in shorthand properties (border, background, font, margin, etc.), if any var() is undefined the ENTIRE declaration fails — not just the dynamic part. Suggests decomposing into longhand properties.', inputSchema: { type: 'object' as const, properties: { cssText: { type: 'string', description: 'The CSS code to check for risky shorthand + var() patterns.', }, }, required: ['cssText'], additionalProperties: false, }, }, { name: 'check_color_contrast', description: 'Detects color contrast issues in CSS: low-contrast hardcoded color pairs (light-on-light, dark-on-dark), mixed color sources (one design token + one hardcoded), and low opacity on text. Catches patterns that break readability across theme changes.', inputSchema: { type: 'object' as const, properties: { cssText: { type: 'string', description: 'CSS code to analyze for color contrast issues' }, }, required: ['cssText'], }, }, { name: 'check_transition_animation', description: 'Detects CSS transitions and animations on web component hosts that target standard properties which cannot cross Shadow DOM boundaries. Transitions on standard properties (color, background, opacity) only affect the host element box, not the component internals. Use CSS custom properties for animations that the component consumes.', inputSchema: { type: 'object' as const, properties: { cssText: { type: 'string', description: 'CSS code to analyze' }, tagName: { type: 'string', description: 'Tag name of the web component (e.g., \"sl-button\")', }, }, required: ['cssText', 'tagName'], }, }, { name: 'check_shadow_dom_js', description: 'Detects JavaScript anti-patterns that violate Shadow DOM encapsulation from consumer code. Catches: accessing .shadowRoot.querySelector() to bypass encapsulation, calling attachShadow() on existing components, setting innerHTML on web components (overwriting slot content), and using style.cssText instead of CSS custom properties.', inputSchema: { type: 'object' as const, properties: { codeText: { type: 'string', description: 'JavaScript/TypeScript code to analyze' }, tagName: { type: 'string', description: 'Optional tag name of the web component for context-aware checks (e.g., \"sl-button\")', }, }, required: ['codeText'], }, }, { name: 'resolve_css_api', description: 'Resolves every ::part(), CSS custom property, and slot reference in agent-generated code against the actual component CEM data. Returns a structured report showing which references are valid, which are hallucinated, and suggests the closest valid alternatives. Call this BEFORE shipping any CSS to verify that every part name, token name, and slot name actually exists on the target component.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The CSS code to resolve against the component API.', }, tagName: { type: 'string', description: 'The custom element tag name (e.g. \"sl-dialog\").', }, htmlText: { type: 'string', description: 'Optional HTML code to validate slot attribute references against the component API.', }, }, required: ['cssText', 'tagName'], }, }, { name: 'styling_preflight', description: \"Single-call styling validation that combines component API discovery, CSS reference resolution, and anti-pattern detection. Returns: the component's full style API surface (parts, tokens, slots), valid/invalid status for every ::part() and token reference, Shadow DOM and theme validation issues with inline fix suggestions (each issue includes a `fix` object with corrected code + explanation), antiPatterns (component-specific negative examples), a correct CSS snippet, and a pass/fail verdict. Call this ONCE before finalizing any component CSS — fixes are embedded in each issue so you don't need a separate suggest_fix call.\", inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The CSS code to validate against the component API.', }, tagName: { type: 'string', description: 'The custom element tag name (e.g. \"hx-button\").', }, htmlText: { type: 'string', description: 'Optional HTML code to validate slot attribute references against the component API.', }, }, required: ['cssText', 'tagName'], }, }, { name: 'validate_css_file', description: 'Validates an entire CSS file targeting multiple web components in one call. Auto-detects all web component tag names in selectors, runs per-component validation (Shadow DOM, ::part() resolution, token validation, scope checks) and global validation (theme compatibility, color contrast, specificity, shorthand). Each component result includes antiPatterns (negative examples) and each issue includes an inline `fix` object with corrected code + explanation. Returns issues grouped by component plus global issues. Use this when reviewing a CSS file that styles multiple components — no need to know which components are used.', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, cssText: { type: 'string', description: 'The full CSS file content to validate.', }, }, required: ['cssText'], }, }, { name: 'check_dark_mode_patterns', description: \"Detects dark mode styling anti-patterns specific to web components with Shadow DOM. Catches: (1) theme-scoped selectors (.dark, [data-theme], @media prefers-color-scheme) setting standard CSS properties on web component hosts — these won't reach shadow DOM internals, (2) descendant selectors inside theme scopes trying to pierce shadow boundaries. Suggests using CSS custom properties to communicate theme changes through shadow DOM. Run this on any CSS that implements dark mode or theming for web components.\", inputSchema: { type: 'object' as const, properties: { cssText: { type: 'string', description: 'The CSS code to check for dark mode anti-patterns.', }, }, required: ['cssText'], }, }, ]"
         },
         {
           "kind": "function",
@@ -7426,6 +7879,94 @@
           "declaration": {
             "name": "isStylingTool",
             "module": "packages/core/src/tools/styling.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/tools/theme.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "THEME_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'create_theme', description: \"Scaffold a complete enterprise CSS theme from the component library's design tokens. \" + 'Analyzes the CEM to detect the token prefix and categories, then generates a ready-to-customize ' + 'CSS file with light mode variables, dark mode overrides (via prefers-color-scheme and explicit class), ' + 'and color-scheme declarations. Returns the full CSS content and per-category token counts.', inputSchema: { type: 'object' as const, properties: { themeName: { type: 'string', description: 'Name for the theme (used in CSS class selectors). ' + 'E.g. \"brand\" generates \".brand-light\" and \".brand-dark\". Defaults to \"theme\".', }, prefix: { type: 'string', description: 'Override the CSS custom property prefix detected from the CEM. ' + 'E.g. \"--hx-\". When omitted, the prefix is detected automatically.', }, }, additionalProperties: false, }, }, { name: 'apply_theme_tokens', description: 'Map a theme token definition to specific components, showing how to apply it with correct ' + 'CSS custom property overrides. Accepts a map of CSS variable names to values, then generates ' + 'per-component CSS blocks and a global :root block. Use this after create_theme to wire ' + 'your theme tokens to individual component CSS properties.', inputSchema: { type: 'object' as const, properties: { themeTokens: { type: 'object', description: 'Map of CSS custom property names to their values. ' + 'E.g. { \"--hx-color-primary\": \"#0066cc\", \"--hx-spacing-md\": \"1rem\" }. ' + 'Property names that match component CSS properties generate per-component CSS blocks.', additionalProperties: { type: 'string' }, }, tagNames: { type: 'array', items: { type: 'string' }, description: 'Optional list of component tag names to filter results. ' + 'When omitted, all components with CSS properties are included.', }, }, required: ['themeTokens'], additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleThemeCall",
+          "return": {
+            "type": {
+              "text": "Promise<MCPToolResult>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "Record<string, unknown>"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ],
+          "description": "Dispatches a theme tool call by name and returns an MCPToolResult.\nCalled by the server's consolidated CallToolRequestSchema handler."
+        },
+        {
+          "kind": "function",
+          "name": "isThemeTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Returns true if the given tool name belongs to the theme tool group.\nUsed by the consolidated CallToolRequestSchema handler to dispatch correctly."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "THEME_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "THEME_TOOL_DEFINITIONS",
+            "module": "packages/core/src/tools/theme.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleThemeCall",
+          "declaration": {
+            "name": "handleThemeCall",
+            "module": "packages/core/src/tools/theme.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isThemeTool",
+          "declaration": {
+            "name": "isThemeTool",
+            "module": "packages/core/src/tools/theme.ts"
           }
         }
       ]

@@ -1,0 +1,139 @@
+{
+  "phase": "EXECUTE",
+  "summary": "Agent completed execution. PR: #99",
+  "discoveries": [],
+  "modifiedFiles": [],
+  "outstandingQuestions": [],
+  "scopeLimits": [],
+  "testCoverage": "Tests mentioned in output",
+  "verdict": "APPROVE",
+  "createdAt": "2026-03-19T18:37:48.128Z",
+  "structuredPlan": {
+    "goal": "Audit HELiXiR's accessibility scoring dimension and produce an enhancement proposal that upgrades from heuristic-only analysis to source-level analysis with new sub-metrics and improved confidence levels.",
+    "acceptanceCriteria": [
+      {
+        "description": "Current accessibility scorer fully documented with all 8 detected signals explained and gaps identified against WCAG 2.1 AA requirements",
+        "verifyCommand": "find .automaker/context -name '*accessibility*audit*' -o -name '*enhancement*' | wc -l"
+      },
+      {
+        "description": "Enhancement proposal document created with specific sub-metric additions (ARIA pattern completeness, keyboard interaction coverage, focus trap detection, screen reader announcements)",
+        "verifyCommand": "grep -l 'sub-metric\\|keyboard.*interaction\\|focus.*trap' .automaker/context/*.md 2>/dev/null"
+      },
+      {
+        "description": "Weight rebalancing recommendation documented with justification comparing accessibility (current 10) to CEM Completeness (15) and Critical tier importance",
+        "verifyCommand": "grep -l 'weight.*rebalancing\\|weight.*15\\|Critical.*tier' .automaker/context/*.md"
+      },
+      {
+        "description": "At least 3 concrete, implementable improvements ranked by impact with feasibility assessment and implementation steps",
+        "verifyCommand": "grep -c '^##.*Improvement\\|^###.*Impact' .automaker/context/*.md"
+      }
+    ],
+    "tasks": [
+      {
+        "title": "Audit current accessibility analyzer implementation",
+        "description": "Read and document the accessibility analyzer source code. Identify the 8 signals currently detected (disabled field, label support, focus method, accessibility description, form association, ARIA role, ARIA attributes, keyboard events), their implementation, known limitations, false positives/negatives, and gaps against WCAG 2.1 AA requirements.",
+        "files": [
+          "src/analyzers/accessibility-analyzer.ts"
+        ],
+        "verifyCommand": "test -f src/analyzers/accessibility-analyzer.ts"
+      },
+      {
+        "title": "Research current accessibility scoring via MCP tools",
+        "description": "Use HELiXiR's MCP tools (score_component and analyze_accessibility) on example components like hx-button to understand actual output format, confidence levels, and what metadata is currently available from CEM. Document observed signals and any gaps.",
+        "files": [
+          "src/mcp/tools/score-component.ts",
+          "src/mcp/tools/analyze-accessibility.ts"
+        ],
+        "verifyCommand": "grep -r 'analyze_accessibility\\|score_component' src/mcp --include='*.ts' | wc -l"
+      },
+      {
+        "title": "Review audit and calibration workflows",
+        "description": "Read health-scanning-audit-workflow.md and scoring-calibration-workflow.md to understand the current audit methodology, scoring calibration approach, confidence level determination, and how accessibility fits into the overall health model.",
+        "files": [
+          "docs/health-scanning-audit-workflow.md",
+          "docs/scoring-calibration-workflow.md"
+        ],
+        "verifyCommand": "test -f docs/health-scanning-audit-workflow.md && test -f docs/scoring-calibration-workflow.md"
+      },
+      {
+        "title": "Analyze Lit-specific accessibility patterns",
+        "description": "Research how Lit components expose accessibility metadata. Identify source-level patterns: @aria-* decorators, @query for focus targets, reflected ARIA properties, connectedCallback focus restoration, Shadow DOM focus management, and keyboard event handlers that could enable source-level analysis.",
+        "files": [
+          "src/analyzers/accessibility-analyzer.ts",
+          "src/components/"
+        ],
+        "verifyCommand": "grep -r '@aria\\|@query\\|connectedCallback' src/components --include='*.ts' | wc -l"
+      },
+      {
+        "title": "Compare against WCAG 2.1 AA requirements",
+        "description": "Map the current 8 signals against WCAG 2.1 AA Level AA success criteria. Document which requirements are covered by current signals, which are missing, identify false positive/negative patterns, and highlight accessibility patterns most relevant to a component library.",
+        "files": [
+          ".automaker/context/"
+        ],
+        "verifyCommand": "echo 'Manual verification against WCAG 2.1 AA checklist'"
+      },
+      {
+        "title": "Define new accessibility sub-metrics",
+        "description": "Design 4+ specific sub-metrics: (1) ARIA pattern completeness (dialog has role, aria-modal, aria-labelledby), (2) keyboard interaction coverage (handlers for expected keys), (3) focus trap detection (overlay components), (4) screen reader announcements (aria-live, aria-atomic). Define criteria and scoring rules for each.",
+        "files": [
+          ".automaker/context/accessibility-enhancement-proposal.md"
+        ],
+        "verifyCommand": "grep -c 'ARIA.*pattern\\|keyboard.*interaction\\|focus.*trap\\|screen.*reader' .automaker/context/accessibility-enhancement-proposal.md"
+      },
+      {
+        "title": "Document weight rebalancing recommendation",
+        "description": "Analyze whether accessibility weight should increase from 10 to 15 (matching CEM Completeness) or higher given Critical tier importance. Provide recommendation with quantified justification: impact on overall health scores, component guidance implications, and precedent from similar scoring systems.",
+        "files": [
+          ".automaker/context/accessibility-enhancement-proposal.md"
+        ],
+        "verifyCommand": "grep -l 'weight.*rebalancing' .automaker/context/*.md"
+      },
+      {
+        "title": "Create confidence upgrade path strategy",
+        "description": "Document requirements to move from 'heuristic' to 'verified' confidence. Include: source code inspection capabilities, runtime analysis integration approach, validation methodology against real component behavior, and effort estimation for each phase.",
+        "files": [
+          ".automaker/context/accessibility-enhancement-proposal.md"
+        ],
+        "verifyCommand": "grep -l 'confidence.*upgrade\\|verified' .automaker/context/*.md"
+      },
+      {
+        "title": "Rank improvements by impact and feasibility",
+        "description": "Evaluate and rank at least 3 concrete improvements: (1) source-level ARIA analysis, (2) keyboard event detection, (3) ARIA pattern templates. For each: describe improvement, impact (high/medium/low), feasibility (easy/medium/hard), provide implementation steps, estimate effort, and list dependencies.",
+        "files": [
+          ".automaker/context/accessibility-enhancement-proposal.md"
+        ],
+        "verifyCommand": "grep -c '^##.*Improvement' .automaker/context/accessibility-enhancement-proposal.md"
+      },
+      {
+        "title": "Produce final enhancement proposal document",
+        "description": "Compile comprehensive proposal in .automaker/context/accessibility-enhancement-proposal.md with sections: executive summary, current state assessment, WCAG 2.1 AA gaps analysis, new sub-metrics definitions with scoring rules, weight recommendation with justification, confidence upgrade path, and ranked improvement list with implementation roadmap.",
+        "files": [
+          ".automaker/context/accessibility-enhancement-proposal.md"
+        ],
+        "verifyCommand": "test -f .automaker/context/accessibility-enhancement-proposal.md && wc -l .automaker/context/accessibility-enhancement-proposal.md"
+      }
+    ],
+    "deviationRules": [
+      {
+        "condition": "If src/analyzers/accessibility-analyzer.ts cannot be located",
+        "action": "Use find src -name '*accessibility*' -o -name '*a11y*' to locate analyzer, or examine score_component MCP tool for the actual scoring logic"
+      },
+      {
+        "condition": "If HELiXiR MCP tools are unavailable or require authentication",
+        "action": "Manually inspect component source code (hx-button, hx-dialog, etc.) to understand CEM structure and available metadata"
+      },
+      {
+        "condition": "If workflow documentation doesn't exist",
+        "action": "Infer methodology by examining analyzer code structure, confidence levels in scoring output, and calibration patterns in codebase"
+      },
+      {
+        "condition": "If .automaker/context directory doesn't exist",
+        "action": "Create directory structure with mkdir -p .automaker/context/ and document findings there"
+      },
+      {
+        "condition": "If unable to access Lit internals or component source directly",
+        "action": "Reference official Lit documentation and WCAG patterns, create theoretical mapping of source-level patterns to accessibility improvements"
+      }
+    ]
+  }
+}

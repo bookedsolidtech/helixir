@@ -19,6 +19,7 @@ export * from './shared/index.js';
 // Tool definitions and dispatchers
 // Re-export most tools via export *, but handle scoreComponent conflict explicitly.
 export * from './tools/benchmark.js';
+export * from './tools/extend.js';
 export * from './tools/bundle.js';
 export * from './tools/cdn.js';
 export * from './tools/component.js';
@@ -37,6 +38,8 @@ export * from './tools/library.js';
 export * from './tools/safety.js';
 export * from './tools/story.js';
 export * from './tools/styling.js';
+export * from './tools/theme.js';
 export * from './tools/tokens.js';
 export * from './tools/typescript.js';
 export * from './tools/validate.js';
+export * from './tools/scaffold.js';

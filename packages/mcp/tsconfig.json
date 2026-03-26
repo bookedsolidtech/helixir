@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "build",
+    "declarationDir": "build",
+    "declaration": true,
+    "baseUrl": ".",
+    "paths": {
+      "helixir/core": ["../../build/packages/core/src/index.d.ts"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "build"]
+}

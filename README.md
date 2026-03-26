@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD041 -->
 <div align="center">
 
+<img src="assets/social-card.png" alt="HELiXiR — MCP Server for Web Component Libraries" width="600">
+
 # HELiXiR
 
 **Give AI agents full situational awareness of any web component library.**
@@ -13,6 +15,9 @@ Stop AI hallucinations. Ground every component suggestion in your actual Custom 
 [![Node 20+](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
 [![Build](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/helixir/build.yml?branch=main&label=build)](https://github.com/bookedsolidtech/helixir/actions/workflows/build.yml)
 [![Tests](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/helixir/test.yml?branch=main&label=tests)](https://github.com/bookedsolidtech/helixir/actions/workflows/test.yml)
+[![MCP Protocol](https://img.shields.io/badge/MCP-protocol-purple)](https://modelcontextprotocol.io)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript)](https://www.typescriptlang.org)
+[![Tools](https://img.shields.io/badge/tools-73-purple)](https://www.npmjs.com/package/helixir)
 
 [Quick Start](#quick-start) · [Why HELiXiR](#why-helixir) · [Tools Reference](#tools-reference) · [Configuration](#configuration) · [AI Tool Configs](#ai-tool-configs)
 
@@ -23,7 +28,7 @@ Stop AI hallucinations. Ground every component suggestion in your actual Custom 
 ## Why HELiXiR
 
 - **No more hallucinations** — AI reads your real component API from the Custom Elements Manifest, not from training data. Every attribute, event, slot, and CSS part is sourced directly from your library.
-- **30+ MCP tools out of the box** — Component discovery, health scoring, design token lookup, TypeScript diagnostics, breaking-change detection, and Storybook story generation — all callable by any MCP-compatible AI agent.
+- **87+ MCP tools out of the box** — Component discovery, health scoring, design token lookup, TypeScript diagnostics, breaking-change detection, Storybook story generation, Shadow DOM styling validators, theme scaffolding, and scaffold/extend tools — all callable by any MCP-compatible AI agent.
 - **Works with any web component framework** — Shoelace, Lit, Stencil, FAST, Spectrum, Vaadin, and any library that produces a `custom-elements.json` CEM file.
 - **Any AI editor, zero lock-in** — Claude Code, Claude Desktop, Cursor, VS Code (Cline/Continue), Zed — one config, any tool.
 
@@ -281,14 +286,15 @@ All tools are exposed over the [Model Context Protocol](https://modelcontextprot
 
 ### Health
 
-| Tool                    | Description                                                                         | Required Args          |
-| ----------------------- | ----------------------------------------------------------------------------------- | ---------------------- |
-| `score_component`       | Latest health score for a component: grade (A–F), dimension scores, and issues      | `tagName`              |
-| `score_all_components`  | Health scores for every component in the library                                    | —                      |
-| `get_health_trend`      | Health trend for a component over the last N days with trend direction              | `tagName`              |
-| `get_health_diff`       | Before/after health comparison between current branch and a base branch             | `tagName`              |
-| `get_health_summary`    | Aggregate health stats for all components: average score, grade distribution        | —                      |
-| `analyze_accessibility` | Accessibility profile: ARIA roles, keyboard events, focus management, label support | `tagName` _(optional)_ |
+| Tool                    | Description                                                                                                                            | Required Args          |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| `score_component`       | Latest health score for a component: grade (A–F), dimension scores, and issues                                                         | `tagName`              |
+| `score_all_components`  | Health scores for every component in the library                                                                                       | —                      |
+| `get_health_trend`      | Health trend for a component over the last N days with trend direction                                                                 | `tagName`              |
+| `get_health_diff`       | Before/after health comparison between current branch and a base branch                                                                | `tagName`              |
+| `get_health_summary`    | Aggregate health stats for all components: average score, grade distribution                                                           | —                      |
+| `analyze_accessibility` | Accessibility profile: ARIA roles, keyboard events, focus management, label support                                                    | `tagName` _(optional)_ |
+| `audit_library`         | Generates a JSONL audit report scoring every component across 11 dimensions; returns file path (if outputPath given) and summary stats | —                      |
 
 ### Library
 
@@ -367,6 +373,67 @@ _(Requires `tokensPath` to be configured)_
 | ------------------- | ------------------------------------------------------------------------------------- | ------------- |
 | `get_design_tokens` | List all design tokens, optionally filtered by category (e.g. `"color"`, `"spacing"`) | —             |
 | `find_token`        | Search for a design token by name or value (case-insensitive substring match)         | `query`       |
+
+### TypeGenerate
+
+| Tool             | Description                                                                              | Required Args |
+| ---------------- | ---------------------------------------------------------------------------------------- | ------------- |
+| `generate_types` | Generates TypeScript type definitions (.d.ts content) for all custom elements in the CEM | —             |
+
+### Theme
+
+| Tool                 | Description                                                                                                                                 | Required Args |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| `create_theme`       | Scaffold a complete enterprise CSS theme from the component library's design tokens with light/dark mode variables and color-scheme support | —             |
+| `apply_theme_tokens` | Map a theme token definition to specific components, generating per-component CSS blocks and a global `:root` block                         | `themeTokens` |
+
+### Scaffold
+
+| Tool                 | Description                                                                                       | Required Args |
+| -------------------- | ------------------------------------------------------------------------------------------------- | ------------- |
+| `scaffold_component` | Scaffold a new web component with boilerplate code based on an existing component's CEM structure | `tagName`     |
+
+### Extend
+
+| Tool               | Description                                                                                                      | Required Args |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------- | ------------- |
+| `extend_component` | Generate extension boilerplate for a web component, providing a subclass with overridable methods and properties | `tagName`     |
+
+### Styling
+
+29 anti-hallucination validators that ground every component styling decision in real CEM data. Run `validate_component_code` as the all-in-one final check, or use individual tools for targeted validation.
+
+| Tool                         | Description                                                                                                                                                                                                    | Required Args               |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| `diagnose_styling`           | Generates a Shadow DOM styling guide for a component — token prefix, theming approach, dark mode support, anti-pattern warnings, and correct CSS usage snippets                                                | `tagName`                   |
+| `get_component_quick_ref`    | Complete quick reference for a component — attributes, methods, events, slots, CSS custom properties, CSS parts, Shadow DOM warnings, and anti-patterns. Use as the FIRST call when working with any component | `tagName`                   |
+| `validate_component_code`    | ALL-IN-ONE validator — runs 19 anti-hallucination sub-validators (HTML, CSS, JS, a11y, events, methods, composition) in a single call. Use as the FINAL check before submitting any code                       | `html`, `tagName`           |
+| `styling_preflight`          | Single-call styling validation combining API discovery, CSS reference resolution, and anti-pattern detection with inline fix suggestions. Call ONCE before finalizing component CSS                            | `cssText`, `tagName`        |
+| `validate_css_file`          | Validates an entire CSS file targeting multiple components — auto-detects component tags, runs per-component and global validation with inline fixes                                                           | `cssText`                   |
+| `check_shadow_dom_usage`     | Scans CSS for Shadow DOM anti-patterns: descendant selectors piercing shadow boundaries, `::slotted()` misuse, invalid `::part()` chaining, `!important` on tokens, unknown part names                         | `cssText`                   |
+| `check_html_usage`           | Validates consumer HTML against a component CEM — catches invalid slot names, wrong enum values, boolean attribute misuse, and unknown attributes with typo suggestions                                        | `htmlText`, `tagName`       |
+| `check_event_usage`          | Validates event listener patterns against a component CEM — catches React `onXxx` props for custom events, unknown event names, and framework-specific binding mistakes                                        | `codeText`, `tagName`       |
+| `check_component_imports`    | Scans HTML/JSX/template code for all custom element tags and verifies they exist in the loaded CEM; catches non-existent components with fuzzy suggestions                                                     | `codeText`                  |
+| `check_slot_children`        | Validates that children placed inside slots match expected element types from the CEM — catches wrong child elements in constrained slots (e.g. `<div>` inside `<sl-select>`)                                  | `htmlText`, `tagName`       |
+| `check_attribute_conflicts`  | Detects conditional attributes used without their guard conditions — catches `target` without `href`, `min`/`max` on non-number inputs, and other attribute interaction mistakes                               | `htmlText`, `tagName`       |
+| `check_a11y_usage`           | Validates consumer HTML for accessibility mistakes — catches missing accessible labels on icon buttons/dialogs/selects, and manual role overrides on components that self-assign ARIA roles                    | `htmlText`, `tagName`       |
+| `check_css_vars`             | Validates CSS for custom property usage against a component CEM — catches unknown CSS custom properties with typo suggestions and `!important` on design tokens                                                | `cssText`, `tagName`        |
+| `check_token_fallbacks`      | Validates CSS for proper `var()` fallback chains and detects hardcoded colors that break theme switching                                                                                                       | `cssText`, `tagName`        |
+| `check_composition`          | Validates cross-component composition patterns — catches tab/panel count mismatches, unlinked cross-references, and empty containers                                                                           | `htmlText`                  |
+| `check_method_calls`         | Validates JS/TS code for correct method and property usage — catches hallucinated API calls, properties called as methods, and methods assigned as properties                                                  | `codeText`, `tagName`       |
+| `check_theme_compatibility`  | Validates CSS for dark mode and theme compatibility — catches hardcoded colors on background/color/border properties and potential contrast issues                                                             | `cssText`                   |
+| `check_css_specificity`      | Detects CSS specificity anti-patterns — catches `!important` usage, ID selectors, deeply nested selectors (4+ levels), and inline style attributes                                                             | `code`                      |
+| `check_layout_patterns`      | Detects layout anti-patterns when styling web component host elements — catches display overrides, fixed dimensions, absolute/fixed positioning, and `overflow: hidden`                                        | `cssText`                   |
+| `check_css_scope`            | Detects component-scoped CSS custom properties set at the wrong scope (e.g. on `:root` instead of the component host)                                                                                          | `cssText`, `tagName`        |
+| `check_css_shorthand`        | Detects risky CSS shorthand + `var()` combinations that can fail silently when any token is undefined                                                                                                          | `cssText`                   |
+| `check_color_contrast`       | Detects color contrast issues: low-contrast hardcoded color pairs, mixed color sources (token + hardcoded), and low opacity on text                                                                            | `cssText`                   |
+| `check_transition_animation` | Detects CSS transitions and animations on component hosts targeting properties that cannot cross Shadow DOM boundaries                                                                                         | `cssText`, `tagName`        |
+| `check_shadow_dom_js`        | Detects JavaScript anti-patterns that violate Shadow DOM encapsulation — catches `.shadowRoot.querySelector()`, `attachShadow()` on existing components, and `innerHTML` overwriting slot content              | `codeText`                  |
+| `check_dark_mode_patterns`   | Detects dark mode styling anti-patterns — catches theme-scoped selectors setting standard CSS properties that won't reach shadow DOM internals                                                                 | `cssText`                   |
+| `resolve_css_api`            | Resolves every `::part()`, CSS custom property, and slot reference in agent-generated code against actual CEM data — reports valid/hallucinated references with closest valid alternatives                     | `cssText`, `tagName`        |
+| `detect_theme_support`       | Analyzes a component library for theming capabilities — token categories, semantic naming patterns, dark mode readiness, and coverage score                                                                    | —                           |
+| `recommend_checks`           | Analyzes code to determine which validation tools are most relevant — returns a prioritized list of tool names without running them all                                                                        | `codeText`                  |
+| `suggest_fix`                | Generates concrete, copy-pasteable code fixes for validation issues by type (shadow-dom, token-fallback, theme-compat, method-call, event-usage, specificity, layout)                                          | `type`, `issue`, `original` |
 
 ---
 

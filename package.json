@@ -36,6 +36,7 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "type-check": "tsc --noEmit",
+    "typecheck": "pnpm run type-check",
     "lint": "eslint src packages/core/src",
     "lint:fix": "eslint src packages/core/src --fix",
     "format": "prettier --write .",

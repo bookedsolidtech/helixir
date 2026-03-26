@@ -3,6 +3,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { loadConfig } from '../../packages/core/src/config.js';
+import { handleToolError } from '../../packages/core/src/shared/error-handling.js';
 import { CemSchema } from '../../packages/core/src/handlers/cem.js';
 import type { Cem, CemDeclaration } from '../../packages/core/src/handlers/cem.js';
 import { parseCem, diffCem, listAllComponents } from '../../packages/core/src/handlers/cem.js';
@@ -179,11 +180,11 @@ async function cmdHealth(args: string[], opts: CliOptions): Promise<void> {
   const config = loadConfig();
 
   if (opts.trend) {
-    const tag = args[0];
-    if (!tag) {
+    if (args.length < 1) {
       process.stderr.write('Error: --trend requires a tag name\n');
       process.exit(1);
     }
+    const tag = args[0] as string;
     const trend = await getHealthTrend(config, tag);
     if (opts.format === 'json') {
       output(trend, 'json');
@@ -283,12 +284,12 @@ async function cmdDiff(args: string[], opts: CliOptions): Promise<void> {
 async function cmdMigrate(args: string[], opts: CliOptions): Promise<void> {
   const config = loadConfig();
   const cem = loadCem(config.cemPath, config.projectRoot);
-  const tag = args[0];
 
-  if (!tag) {
+  if (args.length < 1) {
     process.stderr.write('Error: migrate requires a tag name\n');
     process.exit(1);
   }
+  const tag = args[0] as string;
 
   const guide = await generateMigrationGuide(tag, opts.base, config, cem);
 
@@ -302,12 +303,12 @@ async function cmdMigrate(args: string[], opts: CliOptions): Promise<void> {
 async function cmdSuggest(args: string[], opts: CliOptions): Promise<void> {
   const config = loadConfig();
   const cem = loadCem(config.cemPath, config.projectRoot);
-  const tag = args[0];
 
-  if (!tag) {
+  if (args.length < 1) {
     process.stderr.write('Error: suggest requires a tag name\n');
     process.exit(1);
   }
+  const tag = args[0] as string;
 
   const result = await suggestUsage(tag, config, cem);
 
@@ -324,12 +325,12 @@ async function cmdSuggest(args: string[], opts: CliOptions): Promise<void> {
 
 async function cmdBundle(args: string[], opts: CliOptions): Promise<void> {
   const config = loadConfig();
-  const tag = args[0];
 
-  if (!tag) {
+  if (args.length < 1) {
     process.stderr.write('Error: bundle requires a tag name\n');
     process.exit(1);
   }
+  const tag = args[0] as string;
 
   const result = await estimateBundleSize(tag, config);
   const fp = result.estimates.full_package;
@@ -372,13 +373,13 @@ async function cmdTokens(args: string[], opts: CliOptions): Promise<void> {
 
 async function cmdCompare(args: string[], opts: CliOptions): Promise<void> {
   const config = loadConfig();
-  const cemA = args[0];
-  const cemB = args[1];
 
-  if (!cemA || !cemB) {
+  if (args.length < 2) {
     process.stderr.write('Error: compare requires two CEM paths\n');
     process.exit(1);
   }
+  const cemA = args[0] as string;
+  const cemB = args[1] as string;
 
   const result = await compareLibraries({ cemPathA: cemA, cemPathB: cemB }, config);
 
@@ -419,12 +420,12 @@ async function cmdBenchmark(args: string[], opts: CliOptions): Promise<void> {
 
 async function cmdValidate(args: string[], opts: CliOptions): Promise<void> {
   const config = loadConfig();
-  const tag = args[0];
 
-  if (!tag) {
+  if (args.length < 1) {
     process.stderr.write('Error: validate requires a tag name\n');
     process.exit(1);
   }
+  const tag = args[0] as string;
   if (!opts.html) {
     process.stderr.write('Error: validate requires --html "<snippet>"\n');
     process.exit(1);
@@ -445,14 +446,13 @@ async function cmdValidate(args: string[], opts: CliOptions): Promise<void> {
 
 async function cmdCdn(args: string[], opts: CliOptions): Promise<void> {
   const config = loadConfig();
-  const pkg = args[0];
 
-  if (!pkg) {
+  if (args.length < 1) {
     process.stderr.write('Error: cdn requires a package name\n');
     process.exit(1);
   }
-
-  const version = args[1] ?? 'latest';
+  const pkg = args[0] as string;
+  const version = args.length >= 2 ? (args[1] as string) : 'latest';
   const result = await resolveCdnCem(pkg, version, opts.registry, config);
 
   if (opts.format === 'json') {
@@ -524,7 +524,7 @@ export async function runCli(): Promise<void> {
     values = result.values;
     positionals = result.positionals;
   } catch (err) {
-    process.stderr.write(`Error: ${String(err)}\n`);
+    process.stderr.write(`Error: ${handleToolError(err).message}\n`);
     process.exit(1);
   }
 
@@ -612,7 +612,7 @@ export async function runCli(): Promise<void> {
         process.exit(1);
     }
   } catch (err) {
-    process.stderr.write(`Error: ${String(err)}\n`);
+    process.stderr.write(`Error: ${handleToolError(err).message}\n`);
     process.exit(1);
   }
 }

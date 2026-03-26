@@ -32,7 +32,6 @@ const defaults: McpWcConfig = {
 };
 
 function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
-  // Primary config file name
   const primaryPath = resolve(projectRoot, 'helixir.mcp.json');
   if (existsSync(primaryPath)) {
     try {
@@ -40,21 +39,6 @@ function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
       return JSON.parse(raw) as Partial<McpWcConfig>;
     } catch {
       process.stderr.write(`[helixir] Warning: helixir.mcp.json is malformed. Using defaults.\n`);
-      return {};
-    }
-  }
-
-  // Backward-compatible fallback to legacy config file name
-  const legacyPath = resolve(projectRoot, 'mcpwc.config.json');
-  if (existsSync(legacyPath)) {
-    process.stderr.write(
-      `[helixir] Warning: mcpwc.config.json is deprecated. Rename to helixir.mcp.json.\n`,
-    );
-    try {
-      const raw = readFileSync(legacyPath, 'utf-8');
-      return JSON.parse(raw) as Partial<McpWcConfig>;
-    } catch {
-      process.stderr.write(`[helixir] Warning: mcpwc.config.json is malformed. Using defaults.\n`);
       return {};
     }
   }
@@ -92,36 +76,32 @@ export function loadConfig(): Readonly<McpWcConfig> {
   }
 
   // Apply env vars (highest priority)
-  if (process.env['MCP_WC_CEM_PATH'] !== undefined) {
-    config.cemPath = process.env['MCP_WC_CEM_PATH'];
+  // String keys map directly; nullable keys treat the literal string 'null' as null.
+  const ENV_MAP_STRING: Readonly<Record<string, keyof McpWcConfigMutable>> = {
+    MCP_WC_CEM_PATH: 'cemPath',
+    MCP_WC_PROJECT_ROOT: 'projectRoot',
+    MCP_WC_COMPONENT_PREFIX: 'componentPrefix',
+    MCP_WC_HEALTH_HISTORY_DIR: 'healthHistoryDir',
+    MCP_WC_TSCONFIG_PATH: 'tsconfigPath',
+  };
+  const ENV_MAP_NULLABLE: Readonly<Record<string, keyof McpWcConfigMutable>> = {
+    MCP_WC_TOKENS_PATH: 'tokensPath',
+    MCP_WC_CDN_BASE: 'cdnBase',
+    MCP_WC_CDN_AUTOLOADER: 'cdnAutoloader',
+    MCP_WC_CDN_STYLESHEET: 'cdnStylesheet',
+  };
+
+  for (const [envKey, configKey] of Object.entries(ENV_MAP_STRING)) {
+    const val = process.env[envKey];
+    if (val !== undefined) {
+      (config as Record<string, unknown>)[configKey] = val;
+    }
   }
-  if (process.env['MCP_WC_PROJECT_ROOT'] !== undefined) {
-    config.projectRoot = process.env['MCP_WC_PROJECT_ROOT'];
-  }
-  if (process.env['MCP_WC_COMPONENT_PREFIX'] !== undefined) {
-    config.componentPrefix = process.env['MCP_WC_COMPONENT_PREFIX'];
-  }
-  if (process.env['MCP_WC_HEALTH_HISTORY_DIR'] !== undefined) {
-    config.healthHistoryDir = process.env['MCP_WC_HEALTH_HISTORY_DIR'];
-  }
-  if (process.env['MCP_WC_TSCONFIG_PATH'] !== undefined) {
-    config.tsconfigPath = process.env['MCP_WC_TSCONFIG_PATH'];
-  }
-  if (process.env['MCP_WC_TOKENS_PATH'] !== undefined) {
-    const val = process.env['MCP_WC_TOKENS_PATH'];
-    config.tokensPath = val === 'null' ? null : val;
-  }
-  if (process.env['MCP_WC_CDN_BASE'] !== undefined) {
-    const val = process.env['MCP_WC_CDN_BASE'];
-    config.cdnBase = val === 'null' ? null : val;
-  }
-  if (process.env['MCP_WC_CDN_AUTOLOADER'] !== undefined) {
-    const val = process.env['MCP_WC_CDN_AUTOLOADER'];
-    config.cdnAutoloader = val === 'null' ? null : val;
-  }
-  if (process.env['MCP_WC_CDN_STYLESHEET'] !== undefined) {
-    const val = process.env['MCP_WC_CDN_STYLESHEET'];
-    config.cdnStylesheet = val === 'null' ? null : val;
+  for (const [envKey, configKey] of Object.entries(ENV_MAP_NULLABLE)) {
+    const val = process.env[envKey];
+    if (val !== undefined) {
+      (config as Record<string, unknown>)[configKey] = val === 'null' ? null : val;
+    }
   }
 
   // --watch CLI flag overrides config file value

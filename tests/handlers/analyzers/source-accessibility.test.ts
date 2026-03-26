@@ -111,8 +111,9 @@ class EmptyEl extends HTMLElement {}
 
 const TABINDEX_SOURCE = `
 class MyTabEl extends LitElement {
+  tabindex = 0;
   connectedCallback() {
-    this.setAttribute('tabindex', '0');
+    this.tabindex = 0;
   }
 }
 `;

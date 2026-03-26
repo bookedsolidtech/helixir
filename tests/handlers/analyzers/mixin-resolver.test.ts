@@ -298,12 +298,12 @@ describe('resolveInheritanceChain', () => {
   });
 
   describe('CEM-declared superclass with no module path', () => {
-    it('adds unresolved entry when superclass has no module path', async () => {
+    it('silently skips framework base classes like LitElement', async () => {
       const decl: CemDeclaration = {
         kind: 'class',
         name: 'MyButton',
         tagName: 'my-button',
-        superclass: { name: 'LitElement' }, // external, no module path
+        superclass: { name: 'LitElement' }, // framework base — skipped by getInheritanceChain
       };
       const chain = await resolveInheritanceChain(
         MINIMAL_SOURCE,
@@ -311,8 +311,27 @@ describe('resolveInheritanceChain', () => {
         decl,
         WORKTREE,
       );
-      // LitElement has no module path → goes to unresolved
-      expect(chain.unresolved).toContain('LitElement');
+      // LitElement is a framework base class — getInheritanceChain() skips it entirely.
+      // It does NOT appear in unresolved; the chain simply has no superclass entry.
+      expect(chain.unresolved).not.toContain('LitElement');
+      expect(chain.sources.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('adds unresolved entry when a non-framework superclass has no module path', async () => {
+      const decl: CemDeclaration = {
+        kind: 'class',
+        name: 'MyButton',
+        tagName: 'my-button',
+        superclass: { name: 'BaseButton' }, // custom base class, no module path
+      };
+      const chain = await resolveInheritanceChain(
+        MINIMAL_SOURCE,
+        resolve(WORKTREE, 'src/my-component.ts'),
+        decl,
+        WORKTREE,
+      );
+      // BaseButton has no module path → gets added to chain with modulePath=null → goes to unresolved
+      expect(chain.unresolved).toContain('BaseButton');
     });
   });
 

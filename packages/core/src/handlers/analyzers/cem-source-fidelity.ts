@@ -76,7 +76,9 @@ export function extractSourceEvents(source: string): string[] {
   const events = new Set<string>();
 
   // dispatchEvent(new CustomEvent('name')) or dispatchEvent(new Event('name'))
-  const dispatchRegex = /dispatchEvent\s*\(\s*new\s+(?:Custom)?Event\s*\(\s*['"`]([^'"`]+)['"`]/g;
+  // Handles TypeScript generics: new CustomEvent<Type>('name')
+  const dispatchRegex =
+    /dispatchEvent\s*\(\s*new\s+(?:Custom)?Event(?:<[^>]*>)?\s*\(\s*['"`]([^'"`]+)['"`]/g;
   let match;
   while ((match = dispatchRegex.exec(source)) !== null) {
     if (match[1]) events.add(match[1]);

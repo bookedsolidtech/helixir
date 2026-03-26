@@ -557,9 +557,9 @@ components to get detailed sub-metric breakdowns and remediation guidance.
 
 ### Scaffolding
 
-| Tool                 | Input                                                      | Returns                                                              |
-| -------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------- |
-| `scaffold_component` | `tagName`, `properties?`, `events?`, `slots?`, `cssParts?` | Lit source + Vitest stub + Storybook story                           |
+| Tool                 | Input                                                      | Returns                                                               |
+| -------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------- |
+| `scaffold_component` | `tagName`, `properties?`, `events?`, `slots?`, `cssParts?` | Lit source + Vitest stub + Storybook story                            |
 | `extend_component`   | `parentTagName`, `newTagName`, `newClassName?`             | TypeScript subclass with inheritance, exportparts, and style warnings |
 
 ### TypeScript
@@ -581,10 +581,10 @@ components to get detailed sub-metric breakdowns and remediation guidance.
 
 ### Theming
 
-| Tool                  | Input                       | Returns                                                       |
-| --------------------- | --------------------------- | ------------------------------------------------------------- |
-| `create_theme`        | `themeName?`, `prefix?`     | Complete CSS theme file (light + dark) from CEM token scan    |
-| `apply_theme_tokens`  | `themeTokens`, `tagNames?`  | Per-component CSS blocks wiring token values to CSS properties |
+| Tool                 | Input                      | Returns                                                        |
+| -------------------- | -------------------------- | -------------------------------------------------------------- |
+| `create_theme`       | `themeName?`, `prefix?`    | Complete CSS theme file (light + dark) from CEM token scan     |
+| `apply_theme_tokens` | `themeTokens`, `tagNames?` | Per-component CSS blocks wiring token values to CSS properties |
 
 ### Styling Validation
 

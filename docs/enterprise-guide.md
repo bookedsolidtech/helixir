@@ -457,6 +457,7 @@ create_theme({
 ```
 
 This analyzes the CEM to detect your token prefix and categories, then generates a complete CSS file with:
+
 - Light mode variables under `.brand-light`
 - Dark mode overrides under `.brand-dark` and `@media (prefers-color-scheme: dark)`
 - `color-scheme` declarations for each mode

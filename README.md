@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD041 -->
 <div align="center">
 
-<img src="assets/social-card.webp" alt="HELiXiR — MCP Server for Web Component Libraries" width="600">
+<img src="assets/social-card.png" alt="HELiXiR — MCP Server for Web Component Libraries" width="600">
 
 # HELiXiR
 
@@ -28,7 +28,7 @@ Stop AI hallucinations. Ground every component suggestion in your actual Custom 
 ## Why HELiXiR
 
 - **No more hallucinations** — AI reads your real component API from the Custom Elements Manifest, not from training data. Every attribute, event, slot, and CSS part is sourced directly from your library.
-- **30+ MCP tools out of the box** — Component discovery, health scoring, design token lookup, TypeScript diagnostics, breaking-change detection, and Storybook story generation — all callable by any MCP-compatible AI agent.
+- **87+ MCP tools out of the box** — Component discovery, health scoring, design token lookup, TypeScript diagnostics, breaking-change detection, and Storybook story generation — all callable by any MCP-compatible AI agent.
 - **Works with any web component framework** — Shoelace, Lit, Stencil, FAST, Spectrum, Vaadin, and any library that produces a `custom-elements.json` CEM file.
 - **Any AI editor, zero lock-in** — Claude Code, Claude Desktop, Cursor, VS Code (Cline/Continue), Zed — one config, any tool.
 

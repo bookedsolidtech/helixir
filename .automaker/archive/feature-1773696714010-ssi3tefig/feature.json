@@ -1,0 +1,105 @@
+{
+  "category": "bug-fix",
+  "description": "## Objective\n\nPerform a deep, antagonistic audit of the entire helixir codebase. The goal is to find bugs, architectural weaknesses, dead code, inconsistencies, and correctness issues — then FIX them. Not a report. Fixes.\n\n## Scope\n\nThe full system: `packages/core/src/` (52 source files — handlers, analyzers, tools, shared utilities, config) and `src/` (API, CLI, MCP entry points). Plus `tests/` (62 test files) for coverage gaps and false-positive tests.\n\n## What to Audit (ordered by severity)\n\n### 1. Correctness Bugs\n- Logic errors in handlers and analyzers (health scoring, accessibility scanner, CEM parsing, safety/diff, benchmark, bundle analysis)\n- Edge cases: empty CEMs, malformed manifests, missing fields, circular references\n- Off-by-one errors in scoring algorithms, threshold comparisons\n- Incorrect type narrowing or unsafe casts (`as any`, `as unknown`)\n- Promise handling: unhandled rejections, missing awaits, race conditions\n- Error paths that swallow errors or return misleading results\n\n### 2. Architectural Issues\n- Spec says \"NOT a monorepo\" but we have `packages/core/` with deep export maps — audit whether the layering is clean or leaking\n- `package.json` exports map: verify every export path actually resolves to a real file after build\n- Circular dependencies between handlers, shared utilities, and tools\n- Config system: verify env vars → config file → defaults cascade works correctly in all combinations\n- Are handlers stateless? Any hidden mutation or shared state that would break concurrent tool calls?\n\n### 3. API Contract Violations\n- MCP tool schemas (zod): verify input validation matches what handlers actually expect\n- Tool return types: ensure every tool returns well-structured content matching MCP spec\n- Breaking changes in public API surface (`./api`, `./mcp`, `./cli`, `./core` exports)\n\n### 4. Test Quality\n- Find tests that pass but don't actually test anything meaningful (tautological assertions)\n- Find untested code paths in handlers — especially error branches\n- Find tests that mock so heavily they'd pass even if the implementation was wrong\n- Verify test fixtures are realistic (not oversimplified CEMs that hide real-world issues)\n\n### 5. Dead Code & Inconsistencies  \n- Unused exports, unreachable branches, vestigial code from removed features\n- Inconsistent error handling patterns across handlers (some throw, some return errors, some swallow)\n- Naming inconsistencies between tool names, handler names, and file names\n\n### 6. Security Surface\n- Path traversal in file-ops (CEM path, tokens path, source file reads)\n- Validate that `shared/validation.ts` path containment checks are actually used everywhere files are read\n- Any eval, dynamic import, or shell exec that could be exploited via config values\n\n## Acceptance Criteria\n\n- All bugs found are FIXED, not just reported\n- All tests still pass after fixes (`pnpm test`)\n- Type-check passes (`pnpm run type-check`)\n- Lint passes (`pnpm run lint`)\n- No new dependencies added\n- Each fix has a clear commit-worthy explanation in code comments only where the fix is non-obvious\n\n## What NOT to Do\n\n- Do NOT refactor for style preferences — only fix actual bugs and architectural issues\n- Do NOT add new features\n- Do NOT touch the helix repo (separate project, separate team)\n- Do NOT modify .automaker/ config files\n- Do NOT add unnecessary abstractions or wrappers",
+  "title": "Deep antagonistic audit: full-system bug fix and architectural hardening sweep",
+  "status": "done",
+  "complexity": "architectural",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "3afffad8-321c-4087-b639-58b91488aa8e",
+  "id": "feature-1773696714010-ssi3tefig",
+  "branchName": "feature/deep-antagonistic-audit-full-system-bug",
+  "descriptionHistory": [
+    {
+      "description": "## Objective\n\nPerform a deep, antagonistic audit of the entire helixir codebase. The goal is to find bugs, architectural weaknesses, dead code, inconsistencies, and correctness issues — then FIX them. Not a report. Fixes.\n\n## Scope\n\nThe full system: `packages/core/src/` (52 source files — handlers, analyzers, tools, shared utilities, config) and `src/` (API, CLI, MCP entry points). Plus `tests/` (62 test files) for coverage gaps and false-positive tests.\n\n## What to Audit (ordered by severity)\n\n### 1. Correctness Bugs\n- Logic errors in handlers and analyzers (health scoring, accessibility scanner, CEM parsing, safety/diff, benchmark, bundle analysis)\n- Edge cases: empty CEMs, malformed manifests, missing fields, circular references\n- Off-by-one errors in scoring algorithms, threshold comparisons\n- Incorrect type narrowing or unsafe casts (`as any`, `as unknown`)\n- Promise handling: unhandled rejections, missing awaits, race conditions\n- Error paths that swallow errors or return misleading results\n\n### 2. Architectural Issues\n- Spec says \"NOT a monorepo\" but we have `packages/core/` with deep export maps — audit whether the layering is clean or leaking\n- `package.json` exports map: verify every export path actually resolves to a real file after build\n- Circular dependencies between handlers, shared utilities, and tools\n- Config system: verify env vars → config file → defaults cascade works correctly in all combinations\n- Are handlers stateless? Any hidden mutation or shared state that would break concurrent tool calls?\n\n### 3. API Contract Violations\n- MCP tool schemas (zod): verify input validation matches what handlers actually expect\n- Tool return types: ensure every tool returns well-structured content matching MCP spec\n- Breaking changes in public API surface (`./api`, `./mcp`, `./cli`, `./core` exports)\n\n### 4. Test Quality\n- Find tests that pass but don't actually test anything meaningful (tautological assertions)\n- Find untested code paths in handlers — especially error branches\n- Find tests that mock so heavily they'd pass even if the implementation was wrong\n- Verify test fixtures are realistic (not oversimplified CEMs that hide real-world issues)\n\n### 5. Dead Code & Inconsistencies  \n- Unused exports, unreachable branches, vestigial code from removed features\n- Inconsistent error handling patterns across handlers (some throw, some return errors, some swallow)\n- Naming inconsistencies between tool names, handler names, and file names\n\n### 6. Security Surface\n- Path traversal in file-ops (CEM path, tokens path, source file reads)\n- Validate that `shared/validation.ts` path containment checks are actually used everywhere files are read\n- Any eval, dynamic import, or shell exec that could be exploited via config values\n\n## Acceptance Criteria\n\n- All bugs found are FIXED, not just reported\n- All tests still pass after fixes (`pnpm test`)\n- Type-check passes (`pnpm run type-check`)\n- Lint passes (`pnpm run lint`)\n- No new dependencies added\n- Each fix has a clear commit-worthy explanation in code comments only where the fix is non-obvious\n\n## What NOT to Do\n\n- Do NOT refactor for style preferences — only fix actual bugs and architectural issues\n- Do NOT add new features\n- Do NOT touch the helix repo (separate project, separate team)\n- Do NOT modify .automaker/ config files\n- Do NOT add unnecessary abstractions or wrappers",
+      "timestamp": "2026-03-16T21:31:54.010Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-16T21:31:54.011Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-16T21:31:54.011Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-16T21:32:44.087Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-16T21:36:46.711Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-16T21:37:57.187Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-16T21:57:38.176Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in-progress",
+      "timestamp": "2026-03-16T22:06:39.765Z"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-16T22:08:58.183Z"
+    },
+    {
+      "from": "done",
+      "to": "blocked",
+      "timestamp": "2026-03-16T23:09:00.848Z",
+      "reason": "Max agent retries exceeded (3)"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-17T00:48:34.517Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-16T21:37:57.181Z",
+  "costUsd": 79.52965175,
+  "lastSessionId": "a4cdbdd6-bbef-4038-9430-e5607461655b",
+  "executionHistory": [
+    {
+      "id": "a6eceeef-cec3-4655-8c6b-a9f72c173698",
+      "startedAt": "2026-03-16T21:37:54.512Z",
+      "completedAt": "2026-03-16T22:07:50.427Z",
+      "durationMs": 1795917,
+      "costUsd": 79.52965175,
+      "model": "claude-opus-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/70",
+  "prNumber": 70,
+  "prMergedAt": "2026-03-16T22:08:58.169Z",
+  "completedAt": "2026-03-16T22:08:58.183Z",
+  "prLastPolledAt": "2026-03-17T00:47:52.521Z",
+  "statusChangeReason": "Max agent retries exceeded (3)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max agent retries exceeded (3)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-16T23:09:00.847Z"
+  }
+}

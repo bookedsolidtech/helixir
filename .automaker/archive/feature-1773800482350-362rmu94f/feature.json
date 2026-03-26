@@ -1,0 +1,63 @@
+{
+  "category": "infrastructure",
+  "description": "Consumer report from trip-planner project.\n\nProblem: The CEM is baked into the npm package at publish time. If component APIs change after publish but before the next release, consuming projects use stale API data. There is no CI gate that validates the published CEM matches the actual component source.\n\nThis has caused multiple issues in trip-planner where Helixir MCP tools returned outdated component info because they read the published CEM.\n\nProposed solution:\n1. CI step that regenerates CEM from source and diffs against the committed CEM\n2. Fails if there are uncommitted CEM changes\n3. Post-publish verification that the published CEM matches the source\n\nAcceptance criteria:\n- CI job runs CEM generation and compares to committed manifest\n- PR fails if CEM is stale\n- Documentation on how to update CEM before publishing",
+  "title": "feat: automated CEM sync CI gate to prevent stale published manifests",
+  "status": "done",
+  "complexity": "medium",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "48904ddc-14ae-4bf6-9144-98afcdf29dd0",
+  "id": "feature-1773800482350-362rmu94f",
+  "branchName": "feature/feat-automated-cem-sync-ci-gate-to",
+  "descriptionHistory": [
+    {
+      "description": "Consumer report from trip-planner project.\n\nProblem: The CEM is baked into the npm package at publish time. If component APIs change after publish but before the next release, consuming projects use stale API data. There is no CI gate that validates the published CEM matches the actual component source.\n\nThis has caused multiple issues in trip-planner where Helixir MCP tools returned outdated component info because they read the published CEM.\n\nProposed solution:\n1. CI step that regenerates CEM from source and diffs against the committed CEM\n2. Fails if there are uncommitted CEM changes\n3. Post-publish verification that the published CEM matches the source\n\nAcceptance criteria:\n- CI job runs CEM generation and compares to committed manifest\n- PR fails if CEM is stale\n- Documentation on how to update CEM before publishing",
+      "timestamp": "2026-03-18T02:21:22.350Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-18T02:21:22.351Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-18T02:21:22.351Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-18T02:32:14.756Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-18T02:33:36.964Z"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-18T02:39:50.464Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-18T03:12:12.668Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-18T02:32:19.668Z",
+  "costUsd": 1.7032826999999997,
+  "lastSessionId": "ad87f707-8f08-488a-8635-8e222d105c31",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/82",
+  "prNumber": 82,
+  "prCreatedAt": "2026-03-18T02:39:49.708Z",
+  "reviewStartedAt": "2026-03-18T02:39:50.464Z",
+  "prTrackedSince": "2026-03-18T02:39:50.466Z",
+  "prLastPolledAt": "2026-03-18T05:15:48.411Z",
+  "prMergedAt": "2026-03-18T03:11:42Z",
+  "completedAt": "2026-03-18T03:12:12.668Z"
+}

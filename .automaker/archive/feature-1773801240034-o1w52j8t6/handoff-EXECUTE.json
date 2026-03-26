@@ -1,0 +1,146 @@
+{
+  "phase": "EXECUTE",
+  "summary": "Agent completed execution. PR: #85",
+  "discoveries": [],
+  "modifiedFiles": [],
+  "outstandingQuestions": [],
+  "scopeLimits": [],
+  "testCoverage": "Tests mentioned in output",
+  "verdict": "APPROVE",
+  "createdAt": "2026-03-18T02:54:16.617Z",
+  "structuredPlan": {
+    "goal": "Create a CEM-Source Fidelity analyzer that detects discrepancies between CEM declarations and actual source code implementations, catching bugs like the hx-carousel event name mismatch.",
+    "acceptanceCriteria": [
+      {
+        "description": "Analyzer detects phantom events (declared in CEM but not dispatched in source), specifically the hx-carousel hx-slide-change case",
+        "verifyCommand": "npm run test -- cem-source-fidelity.test.ts --grep 'phantom.*event'"
+      },
+      {
+        "description": "Analyzer detects missing events (dispatched in source but not declared in CEM)",
+        "verifyCommand": "npm run test -- cem-source-fidelity.test.ts --grep 'missing.*event'"
+      },
+      {
+        "description": "Analyzer detects property default value mismatches between CEM and source",
+        "verifyCommand": "npm run test -- cem-source-fidelity.test.ts --grep 'property.*default'"
+      },
+      {
+        "description": "Analyzer detects attribute reflection mismatches (observedAttributes vs CEM reflects)",
+        "verifyCommand": "npm run test -- cem-source-fidelity.test.ts --grep 'attribute.*reflect'"
+      },
+      {
+        "description": "Analyzer is registered as dimension 12 with weight 10 and tier critical",
+        "verifyCommand": "grep -E 'dimension.*12|id.*12' packages/core/src/handlers/dimensions.ts | grep -q cemSourceFidelity"
+      },
+      {
+        "description": "Analyzer is wired into scoreComponentMultiDimensional() and uses mixin-resolver for inheritance chains",
+        "verifyCommand": "grep -q 'cemSourceFidelity' packages/core/src/handlers/health.ts"
+      },
+      {
+        "description": "All tests pass against real helix hx-carousel and at least 3 wc-libraries components",
+        "verifyCommand": "npm run test -- cem-source-fidelity.test.ts --run"
+      }
+    ],
+    "tasks": [
+      {
+        "title": "Implement event fidelity extraction and comparison",
+        "description": "Create packages/core/src/handlers/analyzers/cem-source-fidelity.ts with event extraction logic. Scan source code for dispatchEvent(new CustomEvent('name')), this.dispatchEvent(new Event('name')), .emit('name'), Lit @event decorators, and FAST $emit() patterns. Compare against CEM declaration.events[] array. Assign -15 points per phantom event, -10 per missing event.",
+        "files": [
+          "packages/core/src/handlers/analyzers/cem-source-fidelity.ts"
+        ],
+        "verifyCommand": "grep -q 'dispatchEvent\\|CustomEvent\\|\\@event\\|\\$emit' packages/core/src/handlers/analyzers/cem-source-fidelity.ts"
+      },
+      {
+        "title": "Implement property fidelity extraction and comparison",
+        "description": "In cem-source-fidelity.ts, add property extraction logic. Scan for static properties = {}, @property() decorators, and static get properties(). Compare against CEM declaration.members[] where kind=field. Check default values (CEM default vs source initializer) and reflect attribute (CEM reflects: true vs source reflect: true / attributeChangedCallback).",
+        "files": [
+          "packages/core/src/handlers/analyzers/cem-source-fidelity.ts"
+        ],
+        "verifyCommand": "grep -q '@property\\|static properties\\|attributeChangedCallback' packages/core/src/handlers/analyzers/cem-source-fidelity.ts"
+      },
+      {
+        "title": "Implement attribute reflection fidelity extraction",
+        "description": "In cem-source-fidelity.ts, add logic to extract static observedAttributes and framework equivalents. Compare against CEM declaration.attributes[] array.",
+        "files": [
+          "packages/core/src/handlers/analyzers/cem-source-fidelity.ts"
+        ],
+        "verifyCommand": "grep -q 'observedAttributes\\|attributes' packages/core/src/handlers/analyzers/cem-source-fidelity.ts"
+      },
+      {
+        "title": "Implement proportional scoring model",
+        "description": "In cem-source-fidelity.ts, implement 100-point scoring: 40 points for event fidelity (matched/total with phantom/missing penalties), 35 points for property fidelity (proportional match), 25 points for attribute reflection (proportional match). Return null if no source code available.",
+        "files": [
+          "packages/core/src/handlers/analyzers/cem-source-fidelity.ts"
+        ],
+        "verifyCommand": "grep -q 'return null\\|score.*40\\|score.*35\\|score.*25' packages/core/src/handlers/analyzers/cem-source-fidelity.ts"
+      },
+      {
+        "title": "Register analyzer as dimension 12 in dimensions.ts",
+        "description": "Modify packages/core/src/handlers/dimensions.ts to add CEM-Source Fidelity analyzer as dimension 12. Set weight: 10, tier: 'critical', confidence: 'heuristic'. Export analyzer function for use in health.ts.",
+        "files": [
+          "packages/core/src/handlers/dimensions.ts"
+        ],
+        "verifyCommand": "grep -q 'cemSourceFidelity\\|dimension.*12' packages/core/src/handlers/dimensions.ts"
+      },
+      {
+        "title": "Wire analyzer into health.ts scoring pipeline",
+        "description": "Modify packages/core/src/handlers/health.ts scoreComponentMultiDimensional() function to invoke cemSourceFidelity analyzer. Ensure it leverages mixin-resolver for deep inheritance chain scanning via deep mode.",
+        "files": [
+          "packages/core/src/handlers/health.ts"
+        ],
+        "verifyCommand": "grep -q 'cemSourceFidelity' packages/core/src/handlers/health.ts"
+      },
+      {
+        "title": "Create unit tests for event fidelity",
+        "description": "Create tests/handlers/cem-source-fidelity.test.ts with test cases for: phantom events (CEM event not in source), missing events (source dispatch not in CEM), using real helix hx-carousel case where CEM declares 'hx-slide-change' but source dispatches 'hx-slide'.",
+        "files": [
+          "tests/handlers/cem-source-fidelity.test.ts"
+        ],
+        "verifyCommand": "grep -q 'hx-slide-change\\|hx-slide\\|phantom' tests/handlers/cem-source-fidelity.test.ts"
+      },
+      {
+        "title": "Create unit tests for property and attribute fidelity",
+        "description": "In tests/handlers/cem-source-fidelity.test.ts, add test cases for property default mismatches, attribute reflection mismatches, and null return when source unavailable.",
+        "files": [
+          "tests/handlers/cem-source-fidelity.test.ts"
+        ],
+        "verifyCommand": "grep -q 'property.*default\\|reflection\\|null' tests/handlers/cem-source-fidelity.test.ts"
+      },
+      {
+        "title": "Test against real helix and wc-libraries components",
+        "description": "Add integration tests to cem-source-fidelity.test.ts that load real component sources from /Volumes/Development/booked/helix/packages/hx-library/ and at least 3 libraries from /Volumes/Development/booked/wc-libraries/. Verify analyzer produces correct scores and correctly identifies discrepancies.",
+        "files": [
+          "tests/handlers/cem-source-fidelity.test.ts"
+        ],
+        "verifyCommand": "npm run test -- cem-source-fidelity.test.ts --run"
+      },
+      {
+        "title": "Verify full test suite passes",
+        "description": "Run complete test suite to ensure new analyzer integrates cleanly with existing code and all tests pass.",
+        "files": [],
+        "verifyCommand": "npm run test -- --run"
+      }
+    ],
+    "deviationRules": [
+      {
+        "condition": "Source code is unavailable for a component",
+        "action": "Return null from analyzer to indicate verification is impossible, rather than assigning a default score"
+      },
+      {
+        "condition": "Component uses minified or transpiled source that defeats regex extraction",
+        "action": "Return null to avoid false positives from unreadable source"
+      },
+      {
+        "condition": "Deep inheritance chains exceed practical scanning depth",
+        "action": "Use mixin-resolver's maximum traversal depth limit to prevent performance degradation"
+      },
+      {
+        "condition": "Framework-specific patterns not explicitly implemented",
+        "action": "Document in comments for future enhancement; fall back to generic dispatchEvent/emit regex patterns"
+      },
+      {
+        "condition": "Event or property names match with case sensitivity differences",
+        "action": "Apply case-insensitive comparison and note in score metadata"
+      }
+    ]
+  }
+}

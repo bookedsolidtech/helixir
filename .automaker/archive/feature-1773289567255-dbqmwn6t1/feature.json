@@ -1,0 +1,72 @@
+{
+  "category": "Uncategorized",
+  "description": "**This bug is in protoMaker, NOT in helixir.** The auto-mode agent attempted to merge PR #32 using `gh pr merge 32 --squash` even though `prMergeStrategy` in settings is set to `\"merge\"`. The `bookedsolidtech/helixir` repo has squash merges disabled at the GitHub repository level. This feature should be moved to the protoMaker/system-improvements board — it cannot be fixed from within helixir's codebase.",
+  "title": "bug: system uses --squash merge despite prMergeStrategy set to merge",
+  "status": "done",
+  "complexity": "small",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "2735b50d-ad6c-44c8-8043-ad67e5ab9bbc",
+  "id": "feature-1773289567255-dbqmwn6t1",
+  "branchName": "feature/bug-system-uses-squash-merge-despite",
+  "descriptionHistory": [
+    {
+      "description": "The auto-mode agent attempted to merge PR #32 using `gh pr merge 32 --squash` even though `prMergeStrategy` in settings is set to `\"merge\"`. The `bookedsolidtech/helixir` repo has squash merges disabled at the GitHub repository level, so this caused a hard failure:\n\n```\nGraphQL: Squash merges are not allowed on this repository. (mergePullRequest)\n```\n\n**Root cause:** The agent is not reading or respecting the `prMergeStrategy` setting from `.automaker/settings.json` when constructing the `gh pr merge` command. It defaulted to `--squash` regardless of config.\n\n**Impact:** Any PR created by the system on this repo will fail to auto-merge until this is fixed. PR #32 had to be manually recovered by Ava.\n\n**Fix:** Ensure the PR merge step reads `gitWorkflow.prMergeStrategy` from project settings and passes the correct flag (`--merge`, `--squash`, or `--rebase`) to `gh pr merge`.\n\n**Acceptance criteria:**\n- When `prMergeStrategy: \"merge\"`, the system uses `gh pr merge --merge`\n- When `prMergeStrategy: \"squash\"`, the system uses `gh pr merge --squash`\n- When `prMergeStrategy: \"rebase\"`, the system uses `gh pr merge --rebase`\n- Existing tests cover the merge strategy routing",
+      "timestamp": "2026-03-12T04:26:07.255Z",
+      "source": "initial"
+    },
+    {
+      "description": "**This bug is in protoMaker, NOT in helixir.** The auto-mode agent attempted to merge PR #32 using `gh pr merge 32 --squash` even though `prMergeStrategy` in settings is set to `\"merge\"`. The `bookedsolidtech/helixir` repo has squash merges disabled at the GitHub repository level. This feature should be moved to the protoMaker/system-improvements board — it cannot be fixed from within helixir's codebase.",
+      "timestamp": "2026-03-12T05:34:30.394Z",
+      "source": "edit"
+    }
+  ],
+  "createdAt": "2026-03-12T04:26:07.255Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-12T04:26:07.255Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T05:28:01.898Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-12T05:32:00.772Z"
+    },
+    {
+      "from": "backlog",
+      "to": "blocked",
+      "timestamp": "2026-03-12T05:35:07.729Z",
+      "reason": "Max agent retries exceeded (3)"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-12T17:53:26.448Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-12T05:28:05.360Z",
+  "statusChangeReason": "Max agent retries exceeded (3)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max agent retries exceeded (3)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-12T05:35:07.734Z"
+  },
+  "completedAt": "2026-03-12T17:53:26.448Z"
+}

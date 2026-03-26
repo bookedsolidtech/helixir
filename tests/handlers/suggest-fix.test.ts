@@ -308,6 +308,59 @@ describe('suggestFix — layout', () => {
   });
 });
 
+// ─── Dark mode fixes ────────────────────────────────────────────────────────
+
+describe('suggestFix — dark mode', () => {
+  it('suggests custom property for theme-scoped standard property', () => {
+    const result = suggestFix({
+      type: 'dark-mode',
+      issue: 'theme-scope-standard-property',
+      original: '.dark sl-button { color: white; }',
+      tagName: 'sl-button',
+      property: 'color',
+    });
+    expect(result.suggestion).toContain('--sl-button-color');
+    expect(result.explanation).toContain('shadow DOM internals');
+    expect(result.severity).toBe('error');
+  });
+
+  it('uses tokenPrefix when provided for standard property fix', () => {
+    const result = suggestFix({
+      type: 'dark-mode',
+      issue: 'theme-scope-standard-property',
+      original: '.dark hx-button { background-color: #1a1a1a; }',
+      tagName: 'hx-button',
+      property: 'background-color',
+      tokenPrefix: '--hx-',
+    });
+    expect(result.suggestion).toContain('--hx-bg');
+    expect(result.suggestion).not.toContain('--hx-button-');
+  });
+
+  it('suggests ::part() or custom property for shadow piercing', () => {
+    const result = suggestFix({
+      type: 'dark-mode',
+      issue: 'theme-scope-shadow-piercing',
+      original: '.dark sl-button .inner { color: white; }',
+      tagName: 'sl-button',
+    });
+    expect(result.suggestion).toContain('::part(');
+    expect(result.suggestion).toContain('custom properties');
+    expect(result.severity).toBe('error');
+  });
+
+  it('returns generic guidance for unknown dark-mode issues', () => {
+    const result = suggestFix({
+      type: 'dark-mode',
+      issue: 'unknown-issue',
+      original: '.dark my-el { opacity: 0.5; }',
+      tagName: 'my-el',
+    });
+    expect(result.explanation).toContain('CSS custom properties');
+    expect(result.severity).toBe('info');
+  });
+});
+
 // ─── Library-agnostic token suggestions ─────────────────────────────────────
 
 describe('suggestFix — library-agnostic tokens', () => {
@@ -401,6 +454,46 @@ describe('suggestFix — library-agnostic tokens', () => {
     expect(result.suggestion).toContain('--hx-');
     // Should generate a radius-related token name
     expect(result.suggestion).toMatch(/--hx-.*radius/i);
+  });
+});
+
+// ─── :root scope token fixes ────────────────────────────────────────────────
+
+describe('suggestFix — :root scope token', () => {
+  it('suggests moving token from :root to host element', () => {
+    const result = suggestFix({
+      type: 'shadow-dom',
+      issue: 'root-scope-token',
+      original: ':root { --my-button-bg: blue; }',
+      tagName: 'my-button',
+    });
+    expect(result.suggestion).toContain('my-button');
+    expect(result.suggestion).toContain('--my-button-bg');
+    expect(result.suggestion).toContain('blue');
+    expect(result.suggestion).not.toContain(':root');
+    expect(result.severity).toBe('error');
+  });
+
+  it('preserves var() values in the fix', () => {
+    const result = suggestFix({
+      type: 'shadow-dom',
+      issue: 'root-scope-token',
+      original: ':root { --sl-button-color: var(--theme-text); }',
+      tagName: 'sl-button',
+    });
+    expect(result.suggestion).toContain('var(--theme-text)');
+    expect(result.suggestion).toContain('sl-button');
+  });
+
+  it('explains why :root tokens fail through Shadow DOM', () => {
+    const result = suggestFix({
+      type: 'shadow-dom',
+      issue: 'root-scope-token',
+      original: ':root { --my-card-bg: #fff; }',
+      tagName: 'my-card',
+    });
+    expect(result.explanation).toContain(':root');
+    expect(result.explanation).toContain('Shadow DOM');
   });
 });
 

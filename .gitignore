@@ -23,6 +23,7 @@ coverage/
 .automaker/ledger/
 .automaker/notifications.json
 .automaker/recovery/
+.automaker/memory/
 .automaker/self-review/
 .automaker/trajectory/
 .automaker/authority/
@@ -35,6 +36,7 @@ protoLabs.report.html
 # Env
 .env
 .env.local
+.env*.local
 MCP: Web Components/
 .automaker/settings.json.bak*
 .automaker-lock

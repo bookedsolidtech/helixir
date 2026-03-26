@@ -1,0 +1,141 @@
+{
+  "phase": "EXECUTE",
+  "summary": "Agent completed execution. PR: #88",
+  "discoveries": [],
+  "modifiedFiles": [],
+  "outstandingQuestions": [],
+  "scopeLimits": [],
+  "testCoverage": "Tests mentioned in output",
+  "verdict": "APPROVE",
+  "createdAt": "2026-03-18T04:01:15.196Z",
+  "structuredPlan": {
+    "goal": "Validate the 14-dimension web component scorer against 11 real libraries and helix, generating actionable scorecards and comparative reports.",
+    "acceptanceCriteria": [
+      {
+        "description": "All 11 wc-libraries (material, spectrum, vaadin, fluentui, carbon, ui5, calcite, porsche, ionic, wired, elix) parse and score successfully",
+        "verifyCommand": "test -f tests/benchmark/cross-library-scorer.test.ts && grep -q 'material.*spectrum.*vaadin' tests/benchmark/cross-library-scorer.test.ts"
+      },
+      {
+        "description": "Helix library scores successfully and generates component-by-component breakdown",
+        "verifyCommand": "grep -q 'hx-library' tests/benchmark/helix-report.test.ts"
+      },
+      {
+        "description": "All components score between 0-100 with valid grade distribution (A-F)",
+        "verifyCommand": "grep -q 'score.*0.*100\\|grade.*distribution' tests/benchmark/cross-library-scorer.test.ts"
+      },
+      {
+        "description": "Cross-library comparison table ranks libraries by average score and per-dimension",
+        "verifyCommand": "grep -q 'comparison.*table\\|ranked.*average' tests/benchmark/cross-library-scorer.test.ts"
+      },
+      {
+        "description": "CEM-Source Fidelity dimension identifies at least one real discrepancy in helix",
+        "verifyCommand": "grep -q 'CEM-Source Fidelity\\|carousel\\|discrepanc' tests/benchmark/helix-report.test.ts"
+      },
+      {
+        "description": "Helix scores competitively with Material Web on CEM-native dimensions",
+        "verifyCommand": "grep -q 'Material.*Carbon\\|gold.*standard' tests/benchmark/helix-report.test.ts"
+      },
+      {
+        "description": "Benchmark test completes in under 60 seconds",
+        "verifyCommand": "grep -q 'performance.*gate\\|60.*second' tests/benchmark/cross-library-scorer.test.ts"
+      },
+      {
+        "description": "No test regressions in existing test suite",
+        "verifyCommand": "npm test 2>&1 | tail -1 | grep -E 'passed|failed'"
+      }
+    ],
+    "tasks": [
+      {
+        "title": "Create benchmark test infrastructure and library loader",
+        "description": "Set up tests/benchmark/cross-library-scorer.test.ts with functions to load custom-elements.json from all 11 wc-libraries and helix library. Implement robust error handling for malformed or missing files.",
+        "files": [
+          "tests/benchmark/cross-library-scorer.test.ts",
+          "tests/benchmark/library-loader.ts"
+        ],
+        "verifyCommand": "test -f tests/benchmark/cross-library-scorer.test.ts && test -f tests/benchmark/library-loader.ts"
+      },
+      {
+        "title": "Implement component scoring across all libraries",
+        "description": "For each library, score ALL components using scoreComponentMultiDimensional() across all 14 dimensions. Collect results with timestamps and scorer version for tracking.",
+        "files": [
+          "tests/benchmark/cross-library-scorer.test.ts"
+        ],
+        "verifyCommand": "grep -q 'scoreComponentMultiDimensional\\|forEach.*component' tests/benchmark/cross-library-scorer.test.ts"
+      },
+      {
+        "title": "Generate per-library scorecards with dimension insights",
+        "description": "For each library, produce a scorecard containing: average score, grade distribution, dimension averages, top 5/bottom 5 components, dimension-level insights identifying which dimensions drag scores down, and confidence breakdown (verified/heuristic/untested).",
+        "files": [
+          "tests/benchmark/scorecard-generator.ts",
+          "tests/__fixtures__/benchmark-results/"
+        ],
+        "verifyCommand": "grep -q 'scorecard\\|dimension.*insight\\|confidence' tests/benchmark/scorecard-generator.ts"
+      },
+      {
+        "title": "Build cross-library comparison table",
+        "description": "Generate a comparison table ranking all 12 libraries (11 wc + helix) by average score, with per-dimension rankings. Identify which dimensions differentiate high vs low scoring libraries.",
+        "files": [
+          "tests/benchmark/comparison-table-generator.ts"
+        ],
+        "verifyCommand": "grep -q 'comparison\\|ranking\\|per-dimension' tests/benchmark/comparison-table-generator.ts"
+      },
+      {
+        "title": "Create helix-specific deep-dive report",
+        "description": "Generate tests/benchmark/helix-report.test.ts with full component-by-component breakdown, issues found per component (especially from CEM-Source Fidelity), comparison against Material Web and Carbon as gold standards, and actionable issue list for helix team.",
+        "files": [
+          "tests/benchmark/helix-report.test.ts",
+          "tests/benchmark/helix-issue-extractor.ts"
+        ],
+        "verifyCommand": "test -f tests/benchmark/helix-report.test.ts && grep -q 'Material.*Carbon\\|actionable.*issue' tests/benchmark/helix-report.test.ts"
+      },
+      {
+        "title": "Implement comprehensive test assertions",
+        "description": "Add assertions verifying: all libraries parse without errors, all components score 0-100, grade distribution is sensible, CEM-Source Fidelity catches real discrepancies, helix is competitive with Material Web on CEM-native dimensions.",
+        "files": [
+          "tests/benchmark/cross-library-scorer.test.ts",
+          "tests/benchmark/helix-report.test.ts"
+        ],
+        "verifyCommand": "grep -q 'expect\\|assert\\|test(' tests/benchmark/cross-library-scorer.test.ts"
+      },
+      {
+        "title": "Set up performance gate and output formatting",
+        "description": "Configure benchmark to complete in under 60 seconds with performance monitoring. Format output for both stdout (vitest) and optional JSON fixtures at tests/__fixtures__/benchmark-results/ for historical comparison.",
+        "files": [
+          "tests/benchmark/cross-library-scorer.test.ts",
+          "tests/benchmark/performance-monitor.ts"
+        ],
+        "verifyCommand": "grep -q '60.*second\\|performance\\|setTimeout\\|writeFileSync' tests/benchmark/cross-library-scorer.test.ts"
+      },
+      {
+        "title": "Document benchmark methodology and results interpretation",
+        "description": "Add README.md in tests/benchmark/ explaining how to run benchmarks, interpret results, understand dimension scores, and use helix report for actionable fixes.",
+        "files": [
+          "tests/benchmark/README.md"
+        ],
+        "verifyCommand": "test -f tests/benchmark/README.md && wc -l tests/benchmark/README.md | awk '{print $1}' | grep -E '^[0-9]+$'"
+      }
+    ],
+    "deviationRules": [
+      {
+        "condition": "A library's custom-elements.json is missing or malformed",
+        "action": "Log a clear error message, skip that library, but continue with remaining libraries. Report skipped libraries in test summary."
+      },
+      {
+        "condition": "CEM-Source Fidelity analyzer (F1, F2, or F3) has not been merged yet",
+        "action": "Skip that dimension in scoring, mark it as 'awaiting merger' in reports, and continue with other 13 dimensions."
+      },
+      {
+        "condition": "Benchmark execution exceeds 60 seconds",
+        "action": "Implement CEM parsing cache with in-memory storage, skip full re-parsing on subsequent runs, and add benchmarking logs to identify bottleneck."
+      },
+      {
+        "condition": "Helix library path or custom-elements.json structure differs from expected",
+        "action": "Add fallback path detection and log exact path being loaded. Fail the helix-specific test with clear error rather than silently missing helix validation."
+      },
+      {
+        "condition": "A component's score is outside 0-100 range",
+        "action": "Throw an assertion error with component name, library, dimension values, and scorer version. Do not silently clamp or round values."
+      }
+    ]
+  }
+}

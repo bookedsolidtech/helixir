@@ -1,0 +1,57 @@
+{
+  "category": "Uncategorized",
+  "description": "`.js.map` source map files are currently included in the npm tarball, adding ~200KB of unnecessary size.\n\n**Fix:** Exclude source maps from the published package via `.npmignore` or by updating `tsconfig.json` to not emit source maps, or by adding `!build/**/*.map` to the `files` array in `package.json` (check which approach is cleanest given the current tsconfig setup).\n\n**Note:** Source maps may be useful during development — verify the fix doesn't break the dev workflow before committing.\n\n**Acceptance criteria:**\n- `npm pack --dry-run` output shows no `.js.map` files\n- Package size is reduced by ~200KB\n- Build and test still work correctly",
+  "title": "chore: strip source maps from npm package",
+  "status": "done",
+  "complexity": "small",
+  "priority": 4,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "1624083a-7169-4883-8272-087ae0bd22ad",
+  "id": "feature-1772670364556-hun60j8tm",
+  "branchName": "feature/chore-strip-source-maps-from-npm-package",
+  "descriptionHistory": [
+    {
+      "description": "`.js.map` source map files are currently included in the npm tarball, adding ~200KB of unnecessary size.\n\n**Fix:** Exclude source maps from the published package via `.npmignore` or by updating `tsconfig.json` to not emit source maps, or by adding `!build/**/*.map` to the `files` array in `package.json` (check which approach is cleanest given the current tsconfig setup).\n\n**Note:** Source maps may be useful during development — verify the fix doesn't break the dev workflow before committing.\n\n**Acceptance criteria:**\n- `npm pack --dry-run` output shows no `.js.map` files\n- Package size is reduced by ~200KB\n- Build and test still work correctly",
+      "timestamp": "2026-03-05T00:26:04.556Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-05T00:26:04.556Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-05T00:26:04.556Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T05:49:43.151Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T05:51:34.704Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-12T06:13:56.331Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-12T05:49:48.771Z",
+  "costUsd": 0.40071549999999995,
+  "lastSessionId": "0b183e63-d346-4b3f-9eb0-acf41254b275",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/38",
+  "prNumber": 38,
+  "prCreatedAt": "2026-03-12T05:51:33.749Z",
+  "reviewStartedAt": "2026-03-12T05:51:34.704Z",
+  "prTrackedSince": "2026-03-12T05:51:34.706Z",
+  "prLastPolledAt": "2026-03-12T06:13:14.456Z",
+  "completedAt": "2026-03-12T06:13:56.331Z"
+}

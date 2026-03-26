@@ -1,0 +1,40 @@
+{
+  "category": "bug",
+  "description": "## Escalation Signal\n\nThis bug was automatically created by the escalation system.\n\n### Signal Details\n\n| Field | Value |\n|-------|-------|\n| **Type** | `pr_warning_feedback` |\n| **Severity** | high |\n| **Source** | pr_feedback |\n| **Timestamp** | 2026-03-21T03:17:43.491Z |\n\n### Context\n\n- **Feature ID**: `feature-1774061894190-ciwt20ovd`\n- **Feature Title**: New scoring sub-dimension: Shadow DOM theming quality in CSS Architecture\n- **Branch**: `feature/new-scoring-sub-dimension-shadow-dom`\n- **PR**: #102\n- **PR Number**: #102\n\n### Additional Context\n\n```json\n{\n  \"prUrl\": \"https://github.com/bookedsolidtech/helixir/pull/102\",\n  \"projectPath\": \"/Volumes/Development/booked/helixir\",\n  \"warningCount\": 2,\n  \"warningThreads\": [\n    {\n      \"threadId\": \"PRRT_kwDORa2Z08512jBm\",\n      \"message\": \"_⚠️ Potential issue_ | _🟠 Major_\",\n      \"location\": {\n        \"path\": \"packages/core/src/handlers/analyzers/css-architecture.ts\",\n        \"line\": 18\n      },\n      \"isBot\": true\n    },\n    {\n      \"threadId\": \"PRRT_kwDORa2Z08512jBv\",\n      \"message\": \"_⚠️ Potential issue_ | _🟠 Major_\",\n      \"location\": {\n        \"path\": \"packages/core/src/handlers/analyzers/css-architecture.ts\",\n        \"line\": 119\n      },\n      \"isBot\": true\n    }\n  ],\n  \"iterationCount\": 1\n}\n```\n",
+  "title": "[Escalation] pr_warning_feedback - feature-1774061894190-ciwt20ovd (PR #102)",
+  "projectSlug": "bugs",
+  "complexity": "medium",
+  "status": "done",
+  "id": "feature-1774063063492-ozwtpw01a",
+  "branchName": "feature/escalation-prwarningfeedback-feature",
+  "descriptionHistory": [
+    {
+      "description": "## Escalation Signal\n\nThis bug was automatically created by the escalation system.\n\n### Signal Details\n\n| Field | Value |\n|-------|-------|\n| **Type** | `pr_warning_feedback` |\n| **Severity** | high |\n| **Source** | pr_feedback |\n| **Timestamp** | 2026-03-21T03:17:43.491Z |\n\n### Context\n\n- **Feature ID**: `feature-1774061894190-ciwt20ovd`\n- **Feature Title**: New scoring sub-dimension: Shadow DOM theming quality in CSS Architecture\n- **Branch**: `feature/new-scoring-sub-dimension-shadow-dom`\n- **PR**: #102\n- **PR Number**: #102\n\n### Additional Context\n\n```json\n{\n  \"prUrl\": \"https://github.com/bookedsolidtech/helixir/pull/102\",\n  \"projectPath\": \"/Volumes/Development/booked/helixir\",\n  \"warningCount\": 2,\n  \"warningThreads\": [\n    {\n      \"threadId\": \"PRRT_kwDORa2Z08512jBm\",\n      \"message\": \"_⚠️ Potential issue_ | _🟠 Major_\",\n      \"location\": {\n        \"path\": \"packages/core/src/handlers/analyzers/css-architecture.ts\",\n        \"line\": 18\n      },\n      \"isBot\": true\n    },\n    {\n      \"threadId\": \"PRRT_kwDORa2Z08512jBv\",\n      \"message\": \"_⚠️ Potential issue_ | _🟠 Major_\",\n      \"location\": {\n        \"path\": \"packages/core/src/handlers/analyzers/css-architecture.ts\",\n        \"line\": 119\n      },\n      \"isBot\": true\n    }\n  ],\n  \"iterationCount\": 1\n}\n```\n",
+      "timestamp": "2026-03-21T03:17:43.495Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-21T03:17:43.495Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-21T03:17:43.495Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-21T04:19:19.988Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-25T03:53:24.663Z"
+    }
+  ],
+  "featureType": "code",
+  "prNumber": 112,
+  "reviewStartedAt": "2026-03-21T04:19:19.988Z",
+  "completedAt": "2026-03-25T03:53:24.663Z"
+}

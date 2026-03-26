@@ -24,6 +24,7 @@ export interface SuggestFixInput {
     | 'shadow-dom'
     | 'token-fallback'
     | 'theme-compat'
+    | 'dark-mode'
     | 'method-call'
     | 'event-usage'
     | 'specificity'
@@ -152,6 +153,22 @@ function fixShadowDom(input: SuggestFixInput): FixSuggestion {
       original,
       suggestion: `${tag} { display: block; /* or inline-block */ }`,
       explanation: `display: contents removes the host element from the layout box tree, which destroys the Shadow DOM attachment point and breaks accessibility. Use display: block or display: inline-block instead.`,
+      severity: 'error',
+    };
+  }
+
+  if (input.issue === 'root-scope-token') {
+    const tag = tagName ?? 'the-element';
+    // Extract token name from the original CSS
+    const tokenMatch = original.match(/(--[\w-]+)\s*:/);
+    const token = tokenMatch?.[1] ?? '--component-token';
+    const valueMatch = original.match(/:\s*([^;]+)/);
+    const value = valueMatch?.[1]?.trim() ?? 'value';
+
+    return {
+      original,
+      suggestion: `${tag} { ${token}: ${value}; }`,
+      explanation: `Component tokens set on :root have no effect through Shadow DOM boundaries. The token "${token}" must be set on the component's host element (<${tag}>) for the shadow root to inherit it.`,
       severity: 'error',
     };
   }
@@ -527,6 +544,66 @@ function fixLayout(input: SuggestFixInput): FixSuggestion {
   };
 }
 
+// ─── Dark mode fixes ────────────────────────────────────────────────────────
+
+function fixDarkMode(input: SuggestFixInput): FixSuggestion {
+  const { original, tagName, property, tokenPrefix } = input;
+  const tag = tagName ?? 'the-element';
+
+  if (input.issue === 'theme-scope-standard-property') {
+    const prop = property ?? 'color';
+    const tokenName = tokenPrefix
+      ? `${tokenPrefix}${prop === 'background-color' ? 'bg' : prop}`
+      : `--${tag}-${prop === 'background-color' ? 'bg' : prop}`;
+
+    // Extract selector and value from original
+    const selectorMatch = original.match(/^([^{]+)\{/);
+    const valueMatch = original.match(new RegExp(`${prop}\\s*:\\s*([^;]+)`));
+    const selector = selectorMatch?.[1]?.trim() ?? `.dark ${tag}`;
+    const value = valueMatch?.[1]?.trim() ?? 'inherit';
+
+    return {
+      original,
+      suggestion: `${selector} { ${tokenName}: ${value}; }`,
+      explanation:
+        `Standard CSS property "${prop}" on <${tag}> host in a theme scope won't reach shadow DOM internals. ` +
+        `The component's internal styles control appearance. Use a CSS custom property instead — ` +
+        `the component's shadow DOM can read it via var(${tokenName}).`,
+      severity: 'error',
+    };
+  }
+
+  if (input.issue === 'theme-scope-shadow-piercing') {
+    // Extract the selector parts
+    const selectorMatch = original.match(/^([^{]+)\{/);
+    const selector = selectorMatch?.[1]?.trim() ?? `.dark ${tag} .inner`;
+    // Remove the descendant part after the tag name
+    const hostOnly = selector.replace(
+      new RegExp(`(${tag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})\\s+\\S+.*`),
+      '$1',
+    );
+
+    return {
+      original,
+      suggestion: `/* Option 1: Use CSS custom properties */\n${hostOnly} { --${tag}-your-token: value; }\n\n/* Option 2: Use ::part() if the component exposes parts */\n${hostOnly}::part(base) { /* your styles */ }`,
+      explanation:
+        `Theme selector "${selector}" uses descendant combinators to reach inside <${tag}>'s shadow DOM. ` +
+        `CSS selectors cannot cross shadow boundaries. Use CSS custom properties on the host ` +
+        `or ::part() to style exposed parts.`,
+      severity: 'error',
+    };
+  }
+
+  return {
+    original,
+    suggestion: original,
+    explanation:
+      'Use CSS custom properties to communicate theme changes through shadow boundaries. ' +
+      'Standard CSS properties on the host element cannot reach shadow DOM internals.',
+    severity: 'info',
+  };
+}
+
 // ─── Main Entry Point ───────────────────────────────────────────────────────
 
 export function suggestFix(input: SuggestFixInput): FixSuggestion {
@@ -537,6 +614,8 @@ export function suggestFix(input: SuggestFixInput): FixSuggestion {
       return fixTokenFallback(input);
     case 'theme-compat':
       return fixThemeCompat(input);
+    case 'dark-mode':
+      return fixDarkMode(input);
     case 'method-call':
       return fixMethodCall(input);
     case 'event-usage':

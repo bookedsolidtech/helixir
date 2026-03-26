@@ -1,0 +1,11 @@
+{
+  "phase": "PLAN",
+  "summary": "Feature: feat: CEM-Source Fidelity analyzer — cross-reference CEM declarations against actual source code\n\n## Context\n\nPR #79 exposed that CEM event names can diverge from actual source code. The hx-carousel CEM declared `hx-slide-change` but the component dispatches `hx-slide`. This analyzer detects such discrepancies.\n\n## Implementation\n\nCreate a new analyzer at `packages/core/src/handlers/analyzers/cem-source-fidelity.ts` that:\n\n### Event Fidelity\n1. **Extract dispatched events from source**:",
+  "discoveries": [],
+  "modifiedFiles": [],
+  "outstandingQuestions": [],
+  "scopeLimits": [],
+  "testCoverage": "N/A — plan phase",
+  "verdict": "APPROVE",
+  "createdAt": "2026-03-18T02:45:06.386Z"
+}

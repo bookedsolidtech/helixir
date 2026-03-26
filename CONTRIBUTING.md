@@ -19,6 +19,54 @@ pnpm run build
 
 `pnpm install` automatically installs the husky pre-commit hooks via the `prepare` lifecycle script.
 
+## Developer Certificate of Origin (DCO)
+
+HELiXiR requires all commits to carry a `Signed-off-by` trailer. This certifies that you wrote the contribution yourself, or have the right to submit it under the project's open-source license, per the [Developer Certificate of Origin](https://developercertificate.org/).
+
+### How to sign off a commit
+
+Add `-s` (or `--signoff`) to your commit command:
+
+```bash
+git commit -s -m "feat: add new MCP tool"
+```
+
+Git appends the following trailer automatically, using your configured `user.name` and `user.email`:
+
+```
+Signed-off-by: Your Name <your@email.com>
+```
+
+### Configuring your Git identity
+
+If you haven't set your Git identity globally:
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "your@email.com"
+```
+
+### Signing off retroactively
+
+If your PR has unsigned commits, rebase to add sign-offs:
+
+```bash
+# Sign off all commits in your branch against main
+git rebase --signoff main
+```
+
+Or for a single commit:
+
+```bash
+git commit --amend --signoff
+```
+
+### Why DCO and not a CLA?
+
+DCO is a lightweight, developer-friendly alternative to Contributor License Agreements. There's no separate legal document to sign — the `Signed-off-by` trailer in each commit is the entire agreement. Enterprise contributors can participate without routing paperwork through their legal team.
+
+---
+
 ## Project Structure
 
 ```
@@ -236,6 +284,7 @@ Fixtures in `tests/__fixtures__/` must:
 
 Before opening a PR, verify:
 
+- [ ] All commits are signed off (`git commit -s`) — required by DCO
 - [ ] Tests added for new functionality
 - [ ] `pnpm run type-check` passes (zero TypeScript errors)
 - [ ] `pnpm run lint` passes

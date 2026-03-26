@@ -1,1 +1,21 @@
+# Secret scanning gate — must run BEFORE any other hooks
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks protect --staged --config .gitleaks.toml --redact
+  if [ $? -ne 0 ]; then
+    echo ""
+    echo "gitleaks: Potential secret detected in staged files. Commit blocked."
+    echo "Review the output above, remove the secret, and try again."
+    echo "To install gitleaks: brew install gitleaks"
+    exit 1
+  fi
+else
+  # Fallback: block commits that include .env* files if gitleaks is not installed
+  if git diff --cached --name-only | grep -qE '(^|/)\.env'; then
+    echo ""
+    echo "ERROR: Attempting to commit .env files. Install gitleaks to enable full secret scanning."
+    echo "To install: brew install gitleaks"
+    exit 1
+  fi
+fi
+
 pnpm exec lint-staged

@@ -1,0 +1,64 @@
+{
+  "category": "tooling",
+  "description": "Create a new MCP tool `check_shadow_dom_usage` that analyzes consumer CSS/HTML to detect Shadow DOM styling anti-patterns.\n\n**What it checks:**\n1. CSS selectors that try to pierce Shadow DOM (descendant selectors targeting known internal class names)\n2. `!important` usage that won't work across shadow boundaries\n3. Missing or incorrect CSS custom property names (fuzzy match against component's documented properties)\n4. Incorrect `::part()` usage (parts that don't exist, chained parts, descendant selectors after ::part)\n5. JavaScript shadow root penetration (`shadowRoot.querySelector` style manipulation)\n6. `::slotted()` misuse in consumer code (::slotted is only valid inside Shadow DOM)\n\n**Implementation:**\n- New handler: `src/handlers/shadow-dom-checker.ts`\n- New test: `tests/handlers/shadow-dom-checker.test.ts` (TDD)\n- New tool registration in a new `src/tools/styling.ts` tool group\n- Takes: CSS content string or file path + component library CEM context\n- Returns: Array of diagnostics with severity (error/warning/info), line numbers, suggested fixes\n\n**Acceptance criteria:**\n- Detects at least the 6 anti-patterns listed above\n- Each diagnostic includes: type, severity, message, suggestion (correct approach)\n- Tests cover each anti-pattern type with real-world examples from wc-libraries analysis\n- Must pass lint, format, type-check",
+  "title": "New MCP tool: check_shadow_dom_usage — anti-pattern detector for consumer code",
+  "status": "verified",
+  "complexity": "large",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "27625a7f-f308-4546-abfe-8424595a719f",
+  "id": "feature-1774061872384-1bqxjj22g",
+  "branchName": "feature/new-mcp-tool-checkshadowdomusage-anti",
+  "descriptionHistory": [
+    {
+      "description": "Create a new MCP tool `check_shadow_dom_usage` that analyzes consumer CSS/HTML to detect Shadow DOM styling anti-patterns.\n\n**What it checks:**\n1. CSS selectors that try to pierce Shadow DOM (descendant selectors targeting known internal class names)\n2. `!important` usage that won't work across shadow boundaries\n3. Missing or incorrect CSS custom property names (fuzzy match against component's documented properties)\n4. Incorrect `::part()` usage (parts that don't exist, chained parts, descendant selectors after ::part)\n5. JavaScript shadow root penetration (`shadowRoot.querySelector` style manipulation)\n6. `::slotted()` misuse in consumer code (::slotted is only valid inside Shadow DOM)\n\n**Implementation:**\n- New handler: `src/handlers/shadow-dom-checker.ts`\n- New test: `tests/handlers/shadow-dom-checker.test.ts` (TDD)\n- New tool registration in a new `src/tools/styling.ts` tool group\n- Takes: CSS content string or file path + component library CEM context\n- Returns: Array of diagnostics with severity (error/warning/info), line numbers, suggested fixes\n\n**Acceptance criteria:**\n- Detects at least the 6 anti-patterns listed above\n- Each diagnostic includes: type, severity, message, suggestion (correct approach)\n- Tests cover each anti-pattern type with real-world examples from wc-libraries analysis\n- Must pass lint, format, type-check",
+      "timestamp": "2026-03-21T02:57:52.384Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-21T02:57:52.386Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-21T02:57:52.386Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-21T03:01:03.671Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-21T03:03:58.982Z",
+      "reason": "Max agent retries exceeded (3)"
+    },
+    {
+      "from": "blocked",
+      "to": "verified",
+      "timestamp": "2026-03-21T03:05:07.221Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-21T03:05:07.221Z",
+  "statusChangeReason": "Max agent retries exceeded (3)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max agent retries exceeded (3)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-21T03:03:58.981Z"
+  },
+  "costUsd": 1.0305397499999998,
+  "lastSessionId": "12f1aebb-aef0-402b-aa59-4bbe08cd250d",
+  "completedAt": "2026-03-21T03:05:07.221Z"
+}

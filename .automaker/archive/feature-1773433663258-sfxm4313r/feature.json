@@ -1,0 +1,37 @@
+{
+  "category": "core",
+  "description": "## Problem\n\nThe current accessibility dimension in multi-dimensional health scoring relies entirely on CEM metadata, which captures ~20% of actual accessibility implementation. Cross-library validation against 9 major WC libraries (Shoelace, FAST, Ionic, Vaadin, Carbon, Material Web, PatternFly, Fluent, Lion) shows 0% pass rate on 4 of 8 checks (hasAriaRole, hasAriaAttributes, hasFormAssociation, hasKeyboardEvents) because the CEM standard doesn't require this data.\n\nMeanwhile, real components have rich accessibility — ARIA template bindings, keyboard handlers, focus management, form internals, live regions — all in source code that helixir can read.\n\n## Solution\n\nBuild a source-code accessibility scanner that reads component files via CEM module `path` field and detects real patterns:\n\n### Detection Categories\n\n1. **Template ARIA Bindings** — Parse render()/template for `aria-*` attributes, `role=` assignments, `aria-live`, `aria-modal`\n2. **Keyboard Support** — `@keydown`/`addEventListener('keydown')`, key switch statements (Space, Enter, Escape, Arrow)\n3. **Focus Management** — `focus()` calls, focus trapping patterns, `aria-activedescendant`, roving tabindex\n4. **Form Internals** — `attachInternals()`, `static formAssociated`, validation callbacks\n5. **Screen Reader Support** — `aria-hidden`, `.sr-only`/`.visually-hidden`, label/description ID chains\n6. **Live Regions** — `aria-live`, `role=\"alert\"`, `role=\"status\"`, `aria-atomic`\n7. **Semantic HTML** — Native element usage vs custom elements needing explicit ARIA\n\n### Architecture\n\n- New analyzer: `packages/core/src/handlers/analyzers/source-accessibility.ts`\n- Uses TypeScript compiler API (already available) or regex-based scanning for template patterns\n- Maps CEM module `path` → source file → parse for patterns\n- Returns standard `AnalyzerResult` with sub-metrics per category\n- Replaces CEM-only heuristics as the primary accessibility dimension\n- Must work with ANY web component framework: Lit, FAST, Stencil, vanilla, Haunted, etc.\n\n### Framework Detection Patterns\n\n- **Lit**: `html\\`...\\`` tagged templates, `@keydown=`, `.aria-label=`\n- **FAST**: `@attr`, template functions, `$observe`\n- **Stencil**: JSX-style `aria-label={...}`, `@Listen('keydown')`\n- **Vanilla**: `setAttribute('aria-*')`, `addEventListener('keydown')`\n\n### Acceptance Criteria\n\n- [ ] Scanner reads source files referenced by CEM module paths\n- [ ] Detects all 7 accessibility categories above\n- [ ] Works with Lit, FAST, Stencil, and vanilla WC patterns\n- [ ] Integrates with multi-dimensional health scoring as the Accessibility dimension\n- [ ] Helix library scores ≥70% on accessibility (reflecting real implementation)\n- [ ] Cross-library validation shows meaningful differentiation (not all F's)\n- [ ] Full test coverage for the new analyzer\n- [ ] Falls back gracefully when source files aren't accessible",
+  "title": "feat: source-level accessibility scanner for universal web component a11y scoring",
+  "status": "done",
+  "complexity": "architectural",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "6f8ace3c-77ae-4584-9dd7-fecef3cd4f19",
+  "id": "feature-1773433663258-sfxm4313r",
+  "branchName": "feature/feat-source-level-accessibility-scanner",
+  "descriptionHistory": [
+    {
+      "description": "## Problem\n\nThe current accessibility dimension in multi-dimensional health scoring relies entirely on CEM metadata, which captures ~20% of actual accessibility implementation. Cross-library validation against 9 major WC libraries (Shoelace, FAST, Ionic, Vaadin, Carbon, Material Web, PatternFly, Fluent, Lion) shows 0% pass rate on 4 of 8 checks (hasAriaRole, hasAriaAttributes, hasFormAssociation, hasKeyboardEvents) because the CEM standard doesn't require this data.\n\nMeanwhile, real components have rich accessibility — ARIA template bindings, keyboard handlers, focus management, form internals, live regions — all in source code that helixir can read.\n\n## Solution\n\nBuild a source-code accessibility scanner that reads component files via CEM module `path` field and detects real patterns:\n\n### Detection Categories\n\n1. **Template ARIA Bindings** — Parse render()/template for `aria-*` attributes, `role=` assignments, `aria-live`, `aria-modal`\n2. **Keyboard Support** — `@keydown`/`addEventListener('keydown')`, key switch statements (Space, Enter, Escape, Arrow)\n3. **Focus Management** — `focus()` calls, focus trapping patterns, `aria-activedescendant`, roving tabindex\n4. **Form Internals** — `attachInternals()`, `static formAssociated`, validation callbacks\n5. **Screen Reader Support** — `aria-hidden`, `.sr-only`/`.visually-hidden`, label/description ID chains\n6. **Live Regions** — `aria-live`, `role=\"alert\"`, `role=\"status\"`, `aria-atomic`\n7. **Semantic HTML** — Native element usage vs custom elements needing explicit ARIA\n\n### Architecture\n\n- New analyzer: `packages/core/src/handlers/analyzers/source-accessibility.ts`\n- Uses TypeScript compiler API (already available) or regex-based scanning for template patterns\n- Maps CEM module `path` → source file → parse for patterns\n- Returns standard `AnalyzerResult` with sub-metrics per category\n- Replaces CEM-only heuristics as the primary accessibility dimension\n- Must work with ANY web component framework: Lit, FAST, Stencil, vanilla, Haunted, etc.\n\n### Framework Detection Patterns\n\n- **Lit**: `html\\`...\\`` tagged templates, `@keydown=`, `.aria-label=`\n- **FAST**: `@attr`, template functions, `$observe`\n- **Stencil**: JSX-style `aria-label={...}`, `@Listen('keydown')`\n- **Vanilla**: `setAttribute('aria-*')`, `addEventListener('keydown')`\n\n### Acceptance Criteria\n\n- [ ] Scanner reads source files referenced by CEM module paths\n- [ ] Detects all 7 accessibility categories above\n- [ ] Works with Lit, FAST, Stencil, and vanilla WC patterns\n- [ ] Integrates with multi-dimensional health scoring as the Accessibility dimension\n- [ ] Helix library scores ≥70% on accessibility (reflecting real implementation)\n- [ ] Cross-library validation shows meaningful differentiation (not all F's)\n- [ ] Full test coverage for the new analyzer\n- [ ] Falls back gracefully when source files aren't accessible",
+      "timestamp": "2026-03-13T20:27:43.258Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-13T20:27:43.258Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-13T20:27:43.258Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-14T15:26:30.433Z"
+    }
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-14T15:26:30.433Z"
+}

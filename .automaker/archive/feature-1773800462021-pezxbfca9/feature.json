@@ -1,0 +1,58 @@
+{
+  "category": "bug-fix",
+  "description": "Consumer report from trip-planner project. CRITICAL.\n\nProblem: The TypeScript type definitions for hx-tabs are wrong. helix.d.ts declares:\n- active?: string\n- placement?: string  \n- size?: string\n\nBut the actual CEM shows:\n- orientation (not placement)\n- activation (not active)\n- label\n\nThe event detail type is also wrong: declares { active: string } but actual is { tabId: string, index: number }.\n\nThis causes type errors in consumer projects and misleading autocomplete suggestions.\n\nFix: Regenerate helix.d.ts from the current CEM, or add a CI gate that validates type definitions against CEM on every release.\n\nAcceptance criteria:\n- HxTabsAttributes matches actual CEM properties exactly\n- Tab change event detail type matches actual payload\n- All other component type defs verified against CEM",
+  "title": "fix: helix.d.ts HxTabsAttributes properties drift from CEM",
+  "status": "done",
+  "complexity": "medium",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "88817128-43f2-4c40-93fb-43022adb4df8",
+  "id": "feature-1773800462021-pezxbfca9",
+  "branchName": "feature/fix-helixdts-hxtabsattributes",
+  "descriptionHistory": [
+    {
+      "description": "Consumer report from trip-planner project. CRITICAL.\n\nProblem: The TypeScript type definitions for hx-tabs are wrong. helix.d.ts declares:\n- active?: string\n- placement?: string  \n- size?: string\n\nBut the actual CEM shows:\n- orientation (not placement)\n- activation (not active)\n- label\n\nThe event detail type is also wrong: declares { active: string } but actual is { tabId: string, index: number }.\n\nThis causes type errors in consumer projects and misleading autocomplete suggestions.\n\nFix: Regenerate helix.d.ts from the current CEM, or add a CI gate that validates type definitions against CEM on every release.\n\nAcceptance criteria:\n- HxTabsAttributes matches actual CEM properties exactly\n- Tab change event detail type matches actual payload\n- All other component type defs verified against CEM",
+      "timestamp": "2026-03-18T02:21:02.025Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-18T02:21:02.033Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-18T02:21:02.033Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-18T02:22:15.818Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-18T02:32:11.211Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-18T02:59:21.964Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-18T02:22:18.864Z",
+  "costUsd": 2.9079411000000004,
+  "lastSessionId": "5b4f7729-0da6-4909-a74e-91d833f89ba0",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/81",
+  "prNumber": 81,
+  "prCreatedAt": "2026-03-18T02:32:10.301Z",
+  "reviewStartedAt": "2026-03-18T02:32:11.211Z",
+  "prTrackedSince": "2026-03-18T02:32:11.213Z",
+  "prLastPolledAt": "2026-03-18T05:05:47.496Z",
+  "prMergedAt": "2026-03-18T02:58:56Z",
+  "completedAt": "2026-03-18T02:59:21.964Z"
+}

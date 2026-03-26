@@ -1,0 +1,58 @@
+{
+  "category": "bug-fix",
+  "description": "Consumer report from trip-planner project. HIGH.\n\nProblem: Multiple component type definitions have drifted from actual CEM:\n\n1. HxSkeletonAttributes (helix.d.ts lines 318-324):\n   - Types define: shape?, effect?\n   - Actual CEM: variant, width, height, animated, loaded\n\n2. HxSpinnerAttributes (helix.d.ts line 906):\n   - Types allow HxVariant (success, warning, etc.)\n   - Actual CEM only accepts: default, primary, inverted\n\n3. 20+ event handlers declared in types but not in CEM, and vice versa:\n   - Missing from types: onhx-after-close, onhx-copy, onhx-load, onhx-page-change, onhx-tree-item-select\n   - Dead in types: onhx-search (no component emits this)\n\nFix: Full audit of helix.d.ts against current CEM. Ideally automate generation.\n\nAcceptance criteria:\n- All component attribute types match CEM exactly\n- All event handler types match CEM events\n- No dead/phantom type definitions\n- CI check validates types vs CEM on release",
+  "title": "fix: helix.d.ts HxSkeletonAttributes and HxSpinnerAttributes property drift",
+  "status": "done",
+  "complexity": "medium",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "d08da519-9257-479c-9c2a-dc3215794573",
+  "id": "feature-1773800469009-8fv2tksuq",
+  "branchName": "feature/fix-helixdts-hxskeletonattributes-and",
+  "descriptionHistory": [
+    {
+      "description": "Consumer report from trip-planner project. HIGH.\n\nProblem: Multiple component type definitions have drifted from actual CEM:\n\n1. HxSkeletonAttributes (helix.d.ts lines 318-324):\n   - Types define: shape?, effect?\n   - Actual CEM: variant, width, height, animated, loaded\n\n2. HxSpinnerAttributes (helix.d.ts line 906):\n   - Types allow HxVariant (success, warning, etc.)\n   - Actual CEM only accepts: default, primary, inverted\n\n3. 20+ event handlers declared in types but not in CEM, and vice versa:\n   - Missing from types: onhx-after-close, onhx-copy, onhx-load, onhx-page-change, onhx-tree-item-select\n   - Dead in types: onhx-search (no component emits this)\n\nFix: Full audit of helix.d.ts against current CEM. Ideally automate generation.\n\nAcceptance criteria:\n- All component attribute types match CEM exactly\n- All event handler types match CEM events\n- No dead/phantom type definitions\n- CI check validates types vs CEM on release",
+      "timestamp": "2026-03-18T02:21:09.009Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-18T02:21:09.011Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-18T02:21:09.011Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-18T02:22:18.762Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-18T02:31:01.975Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-18T02:59:21.967Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-18T02:22:21.705Z",
+  "costUsd": 3.043146750000001,
+  "lastSessionId": "0c27e57b-7530-40e8-92fa-080364249e36",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/80",
+  "prNumber": 80,
+  "prCreatedAt": "2026-03-18T02:31:01.247Z",
+  "reviewStartedAt": "2026-03-18T02:31:01.975Z",
+  "prTrackedSince": "2026-03-18T02:31:01.978Z",
+  "prLastPolledAt": "2026-03-18T05:05:47.028Z",
+  "prMergedAt": "2026-03-18T02:58:53Z",
+  "completedAt": "2026-03-18T02:59:21.967Z"
+}

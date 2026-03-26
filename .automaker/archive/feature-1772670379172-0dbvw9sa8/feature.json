@@ -1,0 +1,76 @@
+{
+  "category": "Uncategorized",
+  "description": "Branch coverage is below threshold in several handlers:\n- `packages/core/src/handlers/compare.ts` at ~58.82% branch coverage\n- `packages/core/src/handlers/benchmark.ts` at ~73.17% branch coverage\n\n**Fix:** Add error-path and edge-case tests in the corresponding test files:\n- `tests/handlers/compare.test.ts` — missing component in base branch, empty component list\n- `tests/handlers/benchmark.ts` — CDN fetch failure, package not found\n- `tests/handlers/suggest.ts` — component with no members, no description\n\n**Acceptance criteria:**\n- `compare.ts` branch coverage ≥ 75%\n- `benchmark.ts` branch coverage ≥ 75%\n- `pnpm test:coverage` shows green across all thresholds\n- All new tests pass",
+  "title": "fix: add edge case tests for suggest, benchmark, and compare handlers",
+  "status": "done",
+  "complexity": "small",
+  "priority": 4,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "c9a9f331-2c06-461c-8352-a533d00ef8aa",
+  "id": "feature-1772670379172-0dbvw9sa8",
+  "branchName": "feature/fix-add-edge-case-tests-for-suggest",
+  "descriptionHistory": [
+    {
+      "description": "Branch coverage is below threshold in several handlers:\n- `packages/core/src/handlers/compare.ts` at ~58.82% branch coverage\n- `packages/core/src/handlers/benchmark.ts` at ~73.17% branch coverage\n\n**Fix:** Add error-path and edge-case tests in the corresponding test files:\n- `tests/handlers/compare.test.ts` — missing component in base branch, empty component list\n- `tests/handlers/benchmark.ts` — CDN fetch failure, package not found\n- `tests/handlers/suggest.ts` — component with no members, no description\n\n**Acceptance criteria:**\n- `compare.ts` branch coverage ≥ 75%\n- `benchmark.ts` branch coverage ≥ 75%\n- `pnpm test:coverage` shows green across all thresholds\n- All new tests pass",
+      "timestamp": "2026-03-05T00:26:19.172Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-05T00:26:19.172Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-05T00:26:19.172Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T06:16:48.959Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T06:18:25.254Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-12T07:08:31.383Z",
+      "reason": "Max same-state transitions exceeded in REVIEW (100 loops)"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-12T16:40:33.020Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-12T06:16:54.087Z",
+  "costUsd": 0.6531345,
+  "lastSessionId": "5c495658-fb66-495a-a7a4-153c15ef5ce3",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/40",
+  "prNumber": 40,
+  "prCreatedAt": "2026-03-12T06:18:24.426Z",
+  "reviewStartedAt": "2026-03-12T06:18:25.254Z",
+  "prTrackedSince": "2026-03-12T06:18:25.255Z",
+  "prLastPolledAt": "2026-03-12T18:44:25.818Z",
+  "statusChangeReason": "Max same-state transitions exceeded in REVIEW (100 loops)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max same-state transitions exceeded in REVIEW (100 loops)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-12T07:08:31.385Z"
+  },
+  "prMergedAt": "2026-03-12T16:40:22Z",
+  "completedAt": "2026-03-12T16:40:33.020Z"
+}

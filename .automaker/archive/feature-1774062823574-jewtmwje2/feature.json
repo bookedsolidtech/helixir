@@ -1,0 +1,122 @@
+{
+  "category": "bug",
+  "description": "## Escalation Signal\n\nThis bug was automatically created by the escalation system.\n\n### Signal Details\n\n| Field | Value |\n|-------|-------|\n| **Type** | `pr_warning_feedback` |\n| **Severity** | high |\n| **Source** | pr_feedback |\n| **Timestamp** | 2026-03-21T03:13:43.571Z |\n\n### Context\n\n- **Feature ID**: `feature-1774061879988-x3cs4jzhp`\n- **Feature Title**: Enhance suggest_usage to include styling guidance section\n- **Branch**: `feature/enhance-suggestusage-to-include-styling`\n- **PR**: #101\n- **PR Number**: #101\n\n### Additional Context\n\n```json\n{\n  \"prUrl\": \"https://github.com/bookedsolidtech/helixir/pull/101\",\n  \"projectPath\": \"/Volumes/Development/booked/helixir\",\n  \"warningCount\": 1,\n  \"warningThreads\": [\n    {\n      \"threadId\": \"PRRT_kwDORa2Z08512gWx\",\n      \"message\": \"_⚠️ Potential issue_ | _🟡 Minor_\",\n      \"location\": {\n        \"path\": \"packages/core/src/handlers/suggest.ts\",\n        \"line\": 180\n      },\n      \"isBot\": true\n    }\n  ],\n  \"iterationCount\": 1\n}\n```\n",
+  "title": "[Escalation] pr_warning_feedback - feature-1774061879988-x3cs4jzhp (PR #101)",
+  "projectSlug": "bugs",
+  "complexity": "medium",
+  "status": "done",
+  "id": "feature-1774062823574-jewtmwje2",
+  "branchName": "feature/escalation-prwarningfeedback-feature",
+  "descriptionHistory": [
+    {
+      "description": "## Escalation Signal\n\nThis bug was automatically created by the escalation system.\n\n### Signal Details\n\n| Field | Value |\n|-------|-------|\n| **Type** | `pr_warning_feedback` |\n| **Severity** | high |\n| **Source** | pr_feedback |\n| **Timestamp** | 2026-03-21T03:13:43.571Z |\n\n### Context\n\n- **Feature ID**: `feature-1774061879988-x3cs4jzhp`\n- **Feature Title**: Enhance suggest_usage to include styling guidance section\n- **Branch**: `feature/enhance-suggestusage-to-include-styling`\n- **PR**: #101\n- **PR Number**: #101\n\n### Additional Context\n\n```json\n{\n  \"prUrl\": \"https://github.com/bookedsolidtech/helixir/pull/101\",\n  \"projectPath\": \"/Volumes/Development/booked/helixir\",\n  \"warningCount\": 1,\n  \"warningThreads\": [\n    {\n      \"threadId\": \"PRRT_kwDORa2Z08512gWx\",\n      \"message\": \"_⚠️ Potential issue_ | _🟡 Minor_\",\n      \"location\": {\n        \"path\": \"packages/core/src/handlers/suggest.ts\",\n        \"line\": 180\n      },\n      \"isBot\": true\n    }\n  ],\n  \"iterationCount\": 1\n}\n```\n",
+      "timestamp": "2026-03-21T03:13:43.578Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-21T03:13:43.578Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-21T03:13:43.578Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-21T03:16:04.679Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-21T03:20:31.794Z"
+    },
+    {
+      "from": "review",
+      "to": "in_progress",
+      "timestamp": "2026-03-21T03:46:13.457Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-21T03:47:26.564Z"
+    },
+    {
+      "from": "review",
+      "to": "in_progress",
+      "timestamp": "2026-03-21T04:16:16.964Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "verified",
+      "timestamp": "2026-03-21T04:19:16.119Z"
+    },
+    {
+      "from": "done",
+      "to": "blocked",
+      "timestamp": "2026-03-21T04:19:16.192Z",
+      "reason": "Runtime cap exceeded: 63.2 min >= cap 60 min"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-21T11:49:19.172Z"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-21T11:49:57.971Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-25T03:53:24.344Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-21T04:19:16.119Z",
+  "costUsd": 2.904649,
+  "lastSessionId": "e40dc603-02b9-491a-bdcd-eaa8a141fdfd",
+  "executionHistory": [
+    {
+      "id": "2b57462f-74c4-4209-951c-e9ab24788cec",
+      "startedAt": "2026-03-21T03:16:09.500Z",
+      "completedAt": "2026-03-21T03:20:11.066Z",
+      "durationMs": 241566,
+      "costUsd": 1.239179,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    },
+    {
+      "id": "72feac48-5762-486a-bc60-5ca6561b8efd",
+      "startedAt": "2026-03-21T03:46:12.801Z",
+      "completedAt": "2026-03-21T03:47:09.115Z",
+      "durationMs": 56314,
+      "costUsd": 0.45196349999999996,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    },
+    {
+      "id": "dbf812b9-731e-4186-a66f-a282f17af040",
+      "startedAt": "2026-03-21T04:16:16.200Z",
+      "completedAt": "2026-03-21T04:18:49.981Z",
+      "durationMs": 153781,
+      "costUsd": 1.2135065,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Escalation Signal — PR #101 Shadow DOM Warning Deduplication (Retry #2)\n\n### Changes Implemented\n- Updated `packages/core/src/handlers/suggest.ts` to import and use `getShadowDomWarnings(tagName)` from `../shared/mcp-helpers.js` in the `buildStyling()` function\n- Removed the 3-line inline `warnings` array that duplicated the same Shadow DOM constraint text (with slightly different wording) as the shared helper\n\n### Files Modified\n- `packages/core/src/handlers/suggest.ts` — 1 file, 2 insertions, 4 deletions\n\n### Risks/Blockers Encountered\n- Prior agents (attempts #0 and #1) both claimed the fix was complete but the actual code in `main` showed `suggest.ts` still had the inline warnings array. The helper existed in `mcp-helpers.ts` but was never wired into `suggest.ts`. This retry completed the actual fix.\n\n### Learnings\n- Prior agent summaries can overstate what was accomplished — always verify the actual file contents in the worktree rather than trusting the summary narrative\n- The `getShadowDomWarnings` helper was added to `mcp-helpers.ts` in a prior commit (`7523ab6`) but `suggest.ts` was never updated to use it — the two changes needed to go together\n- Inline text in `suggest.ts` (`.label` example) differed from the helper (`.inner` example), confirming the files were never actually synchronized\n\n### Verification Status\n- Build passes: `pnpm run build` — exit code 0, TypeScript compiled cleanly\n- `git diff --stat`: only `suggest.ts` modified (1 file, 2 insertions, 4 deletions)\n- PR #112 created and auto-merge enabled\n- No Playwright verification applicable — this is a pure TypeScript refactor with no UI/behavior change; the Shadow DOM warning text content is semantically identical, only the source is centralized",
+  "reviewStartedAt": "2026-03-21T03:20:31.794Z",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/112",
+  "prNumber": 112,
+  "prTrackedSince": "2026-03-21T04:19:16.093Z",
+  "prLastPolledAt": "2026-03-22T03:08:52.427Z",
+  "completedAt": "2026-03-21T04:19:16.119Z",
+  "statusChangeReason": "Runtime cap exceeded: 63.2 min >= cap 60 min"
+}

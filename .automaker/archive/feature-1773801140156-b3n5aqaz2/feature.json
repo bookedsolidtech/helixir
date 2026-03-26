@@ -1,0 +1,38 @@
+{
+  "category": "infrastructure",
+  "description": "## Overview\n\nPR #79 exposed a fundamental gap: helixir trusts CEM data as source of truth, but CEM declarations can diverge from actual source code. The carousel component fired `hx-slide` but the CEM documented `hx-slide-change`. Our 11-dimension scorer had no way to catch this.\n\nThis epic adds 3 new scoring dimensions and a cross-library benchmark suite that validates the scorer against 1,100+ real components from 11 production libraries.\n\n## Child Features\n\n### F1: CEM-Source Fidelity Analyzer (FOUNDATION — must land first)\n### F2: Slot Architecture Analyzer  \n### F3: Naming Convention Consistency Analyzer\n### F4: Cross-Library Benchmark Suite + Helix Report\n\nSee child features for details.",
+  "title": "epic: Enhanced Health Dimensions — CEM-Source Fidelity + Cross-Library Validation Suite",
+  "status": "done",
+  "isEpic": true,
+  "complexity": "architectural",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "a80c8557-f0b1-4071-afe6-bdfc53459802",
+  "id": "feature-1773801140156-b3n5aqaz2",
+  "branchName": "feature/epic-enhanced-health-dimensions-cem",
+  "descriptionHistory": [
+    {
+      "description": "## Overview\n\nPR #79 exposed a fundamental gap: helixir trusts CEM data as source of truth, but CEM declarations can diverge from actual source code. The carousel component fired `hx-slide` but the CEM documented `hx-slide-change`. Our 11-dimension scorer had no way to catch this.\n\nThis epic adds 3 new scoring dimensions and a cross-library benchmark suite that validates the scorer against 1,100+ real components from 11 production libraries.\n\n## Child Features\n\n### F1: CEM-Source Fidelity Analyzer (FOUNDATION — must land first)\n### F2: Slot Architecture Analyzer  \n### F3: Naming Convention Consistency Analyzer\n### F4: Cross-Library Benchmark Suite + Helix Report\n\nSee child features for details.",
+      "timestamp": "2026-03-18T02:32:20.156Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-18T02:32:20.157Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-18T02:32:20.157Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-18T04:51:28.436Z"
+    }
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-18T04:51:28.436Z"
+}

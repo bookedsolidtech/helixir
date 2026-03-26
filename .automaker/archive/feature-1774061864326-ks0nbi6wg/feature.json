@@ -1,0 +1,64 @@
+{
+  "category": "tooling",
+  "description": "Create a new MCP tool `diagnose_styling` that takes a component tagName and returns a comprehensive styling guide:\n\n**What it returns:**\n1. Available CSS custom properties with descriptions, default values, and example usage\n2. Available CSS parts with descriptions and example `::part()` selectors\n3. Theming approach detection (token-based, class-based, data-attribute)\n4. Light/dark mode support status\n5. Common styling anti-patterns specific to this component\n6. A ready-to-use CSS snippet showing how to customize this component\n\n**Implementation:**\n- New handler: `src/handlers/styling-diagnostics.ts`\n- New test: `tests/handlers/styling-diagnostics.test.ts` (TDD — write tests first)\n- New tool registration in `src/tools/component.ts` (or new `src/tools/styling.ts`)\n- Uses CEM data (cssProperties, cssParts) + source analysis for :host patterns\n- Detects token naming convention (--sl-*, --md-*, --hx-*) to suggest correct property names\n\n**Acceptance criteria:**\n- Tool returns structured JSON with all 6 sections above\n- For components with 0 CSS props/parts, returns guidance on alternative styling approaches\n- Includes framework-specific styling examples (React inline styles vs CSS modules)\n- Tests cover: component with parts+props, component with only props, component with neither\n- Must pass lint, format, type-check",
+  "title": "New MCP tool: diagnose_styling — Shadow DOM styling guide per component",
+  "status": "verified",
+  "complexity": "large",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "34be9fe3-c3b4-4fe6-8911-08de67fd7e46",
+  "id": "feature-1774061864326-ks0nbi6wg",
+  "branchName": "feature/new-mcp-tool-diagnosestyling-shadow-dom",
+  "descriptionHistory": [
+    {
+      "description": "Create a new MCP tool `diagnose_styling` that takes a component tagName and returns a comprehensive styling guide:\n\n**What it returns:**\n1. Available CSS custom properties with descriptions, default values, and example usage\n2. Available CSS parts with descriptions and example `::part()` selectors\n3. Theming approach detection (token-based, class-based, data-attribute)\n4. Light/dark mode support status\n5. Common styling anti-patterns specific to this component\n6. A ready-to-use CSS snippet showing how to customize this component\n\n**Implementation:**\n- New handler: `src/handlers/styling-diagnostics.ts`\n- New test: `tests/handlers/styling-diagnostics.test.ts` (TDD — write tests first)\n- New tool registration in `src/tools/component.ts` (or new `src/tools/styling.ts`)\n- Uses CEM data (cssProperties, cssParts) + source analysis for :host patterns\n- Detects token naming convention (--sl-*, --md-*, --hx-*) to suggest correct property names\n\n**Acceptance criteria:**\n- Tool returns structured JSON with all 6 sections above\n- For components with 0 CSS props/parts, returns guidance on alternative styling approaches\n- Includes framework-specific styling examples (React inline styles vs CSS modules)\n- Tests cover: component with parts+props, component with only props, component with neither\n- Must pass lint, format, type-check",
+      "timestamp": "2026-03-21T02:57:44.327Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-21T02:57:44.329Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-21T02:57:44.329Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-21T03:00:48.661Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-21T03:03:37.139Z",
+      "reason": "Max agent retries exceeded (3)"
+    },
+    {
+      "from": "blocked",
+      "to": "verified",
+      "timestamp": "2026-03-21T03:06:01.087Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-21T03:06:01.087Z",
+  "statusChangeReason": "Max agent retries exceeded (3)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max agent retries exceeded (3)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-21T03:03:37.139Z"
+  },
+  "costUsd": 1.725274,
+  "lastSessionId": "ba18eb06-552a-4b21-8422-b38be0d344b6",
+  "completedAt": "2026-03-21T03:06:01.087Z"
+}

@@ -1,0 +1,80 @@
+{
+  "category": "developer-experience",
+  "description": "## Goal\n\nAdd a `/update-helixir` slash command (Claude Code skill) that lets users update their helixir MCP server to the latest version from npm in one step — mirroring the `update-plugin` command in protoLabs Studio.\n\n## Background\n\nhelixir is installed globally via npm (e.g., `npm install -g helixir` or `npx helixir`). When a new version ships, users currently have no easy way to update inside a Claude Code session. This command closes that gap.\n\n## Implementation\n\nCreate a new skill file at `src/skills/update-helixir.md` (or wherever helixir's skills/commands live — research the project structure first).\n\nThe skill should:\n\n1. **Detect install method** — Check how helixir is currently installed:\n   - `npm list -g helixir` — global npm install\n   - `which helixir` — check if it's on PATH\n   - Read current version from the installed package\n\n2. **Check latest version on npm**:\n   ```bash\n   npm view helixir version\n   ```\n\n3. **Compare versions** — If already on latest, tell the user and exit cleanly.\n\n4. **Run the update**:\n   ```bash\n   npm install -g helixir@latest\n   ```\n\n5. **Verify** — Re-check installed version after update to confirm it changed.\n\n6. **Tell the user to restart Claude Code** — The MCP server won't reload until Claude Code restarts. Print a clear message:\n   > \"helixir updated to vX.Y.Z. Please restart Claude Code for the new version to take effect.\"\n\n## Reference\n\nSee how `update-plugin` is structured in protoLabs Studio:\n`/Volumes/Development/protoMaker/packages/mcp-server/plugins/automaker/commands/update-plugin.md`\n\nThe helixir version is much simpler — no `.env` migration, no plugin registry, no hooks. Just: check → update → verify → tell user to restart.\n\n## Acceptance Criteria\n\n- [ ] `/update-helixir` skill exists and is registered\n- [ ] Detects current installed version\n- [ ] Checks latest version from npm registry\n- [ ] Skips update if already on latest (with confirmation message)\n- [ ] Runs `npm install -g helixir@latest` when update needed\n- [ ] Verifies version after install\n- [ ] Clearly instructs user to restart Claude Code\n- [ ] Works whether helixir is installed globally or via npx\n\n## Notes\n\n- This feature should be implemented AFTER the current dev→staging→main promotion completes (it will be part of the next release cycle)\n- Keep it simple — this is a skill file (markdown), not a code change to the MCP server itself",
+  "title": "feat: add /update-helixir slash command to self-update from npm",
+  "status": "done",
+  "complexity": "small",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "cc3a1208-f502-494d-bb46-28dcfcef8134",
+  "id": "feature-1773362508747-tofsvptsd",
+  "branchName": "feature/feat-add-update-helixir-slash-command",
+  "descriptionHistory": [
+    {
+      "description": "## Goal\n\nAdd a `/update-helixir` slash command (Claude Code skill) that lets users update their helixir MCP server to the latest version from npm in one step — mirroring the `update-plugin` command in protoLabs Studio.\n\n## Background\n\nhelixir is installed globally via npm (e.g., `npm install -g helixir` or `npx helixir`). When a new version ships, users currently have no easy way to update inside a Claude Code session. This command closes that gap.\n\n## Implementation\n\nCreate a new skill file at `src/skills/update-helixir.md` (or wherever helixir's skills/commands live — research the project structure first).\n\nThe skill should:\n\n1. **Detect install method** — Check how helixir is currently installed:\n   - `npm list -g helixir` — global npm install\n   - `which helixir` — check if it's on PATH\n   - Read current version from the installed package\n\n2. **Check latest version on npm**:\n   ```bash\n   npm view helixir version\n   ```\n\n3. **Compare versions** — If already on latest, tell the user and exit cleanly.\n\n4. **Run the update**:\n   ```bash\n   npm install -g helixir@latest\n   ```\n\n5. **Verify** — Re-check installed version after update to confirm it changed.\n\n6. **Tell the user to restart Claude Code** — The MCP server won't reload until Claude Code restarts. Print a clear message:\n   > \"helixir updated to vX.Y.Z. Please restart Claude Code for the new version to take effect.\"\n\n## Reference\n\nSee how `update-plugin` is structured in protoLabs Studio:\n`/Volumes/Development/protoMaker/packages/mcp-server/plugins/automaker/commands/update-plugin.md`\n\nThe helixir version is much simpler — no `.env` migration, no plugin registry, no hooks. Just: check → update → verify → tell user to restart.\n\n## Acceptance Criteria\n\n- [ ] `/update-helixir` skill exists and is registered\n- [ ] Detects current installed version\n- [ ] Checks latest version from npm registry\n- [ ] Skips update if already on latest (with confirmation message)\n- [ ] Runs `npm install -g helixir@latest` when update needed\n- [ ] Verifies version after install\n- [ ] Clearly instructs user to restart Claude Code\n- [ ] Works whether helixir is installed globally or via npx\n\n## Notes\n\n- This feature should be implemented AFTER the current dev→staging→main promotion completes (it will be part of the next release cycle)\n- Keep it simple — this is a skill file (markdown), not a code change to the MCP server itself",
+      "timestamp": "2026-03-13T00:41:48.747Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-13T00:41:48.747Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-13T00:41:48.747Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-13T01:57:06.871Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-13T01:59:09.180Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-13T02:23:45.306Z",
+      "reason": "Max remediation cycles exceeded (4)"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-13T02:27:37.153Z"
+    }
+  ],
+  "featureType": "code",
+  "startedAt": "2026-03-13T01:57:06.783Z",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-13T01:57:09.025Z",
+  "costUsd": 0.6544190000000001,
+  "lastSessionId": "03b02394-fdd7-4d07-834d-7a25a3af7764",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/60",
+  "prNumber": 60,
+  "prCreatedAt": "2026-03-13T01:59:08.285Z",
+  "reviewStartedAt": "2026-03-13T01:59:09.180Z",
+  "prTrackedSince": "2026-03-13T01:59:09.183Z",
+  "prLastPolledAt": "2026-03-13T04:29:38.630Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 1**\n\n> [!CAUTION]\n> Some comments are outside the diff and can’t be posted inline due to platform limitations.\n> \n> \n> \n> <details>\n> <summary>⚠️ Outside diff range comments (1)</summary><blockquote>\n> \n> <details>\n> <summary>.coderabbit.yaml (1)</summary><blockquote>\n> \n> `24-25`: _⚠️ Potential issue_ | _🟠 Major_\n> \n> **Move `path_filters` to the correct schema location.**\n> \n> `path_filters` must be defined directly under `reviews`, not under `reviews.auto_review`. The current placement violates the CodeRabbit schema and may cause the filter to be ignored.\n> \n> <details>\n> <summary>🔧 Proposed fix</summary>\n> \n> ```diff\n>  reviews:\n>    profile: 'assertive'\n>    request_changes_workflow: true\n>    high_level_summary: true\n>    poem: false\n>    review_status: true\n>    collapse_walkthrough: false\n> +  path_filters:\n> +    - '!**/AUDIT.md'\n>    auto_review:\n>      enabled: true\n>      drafts: false\n>      base_branches:\n>        - main\n>        - dev\n>        - staging\n>      ignore_title_keywords:\n>        - 'AUDIT'\n>        - 'audit'\n>        - 'Deep Audit'\n>        - 'deep-audit'\n> -    path_filters:\n> -      - '!**/AUDIT.md'\n> ```\n> </details>\n> \n> <details>\n> <summary>🤖 Prompt for AI Agents</summary>\n> \n> ```\n> Verify each finding against the current code and only fix it if needed.\n> \n> In @.coderabbit.yaml around lines 24 - 25, Move the path_filters key out of the\n> nested reviews.auto_review block and place it directly under the top-level\n> reviews mapping; specifically locate the path_filters entry and the\n> reviews.auto_review block (symbols: path_filters, reviews, auto_review) and\n> relocate the path_filters array so it is a direct child of reviews, preserving\n> its values and YAML indentation so it conforms to the CodeRabbit schema.\n> ```\n> \n> </details>\n> \n> </blockquote></details>\n> \n> </blockquote></details>\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each find",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1,
+  "statusChangeReason": "Max remediation cycles exceeded (4)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max remediation cycles exceeded (4)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-13T02:23:45.310Z"
+  },
+  "prMergedAt": "2026-03-13T02:27:27Z",
+  "completedAt": "2026-03-13T02:27:37.153Z"
+}

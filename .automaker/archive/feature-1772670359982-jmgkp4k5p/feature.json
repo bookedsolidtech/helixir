@@ -1,0 +1,75 @@
+{
+  "category": "Uncategorized",
+  "description": "The CI badge in `README.md` around line 9 references a `your-org` placeholder instead of the actual GitHub org/repo path.\n\n**Fix:** Update the CI badge URL to use the actual GitHub repository path (`bookedsolidtech/helixir`).\n\n**Acceptance criteria:**\n- CI badge URL points to `https://github.com/bookedsolidtech/helixir/actions/workflows/ci.yml`\n- Badge renders correctly on GitHub",
+  "title": "fix: update placeholder CI badge URL in README",
+  "status": "done",
+  "complexity": "small",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "374b6e06-7fcf-46ac-8af0-85ebbbc2c395",
+  "id": "feature-1772670359982-jmgkp4k5p",
+  "branchName": "feature/fix-update-placeholder-ci-badge-url-in",
+  "descriptionHistory": [
+    {
+      "description": "The CI badge in `README.md` around line 9 references a `your-org` placeholder instead of the actual GitHub org/repo path.\n\n**Fix:** Update the CI badge URL to use the actual GitHub repository path (`bookedsolidtech/wc-tools`).\n\n**Acceptance criteria:**\n- CI badge URL points to `https://github.com/bookedsolidtech/wc-tools/actions/workflows/ci.yml`\n- Badge renders correctly on GitHub",
+      "timestamp": "2026-03-05T00:25:59.982Z",
+      "source": "initial"
+    },
+    {
+      "description": "The CI badge in `README.md` around line 9 references a `your-org` placeholder instead of the actual GitHub org/repo path.\n\n**Fix:** Update the CI badge URL to use the actual GitHub repository path (`bookedsolidtech/helixir`).\n\n**Acceptance criteria:**\n- CI badge URL points to `https://github.com/bookedsolidtech/helixir/actions/workflows/ci.yml`\n- Badge renders correctly on GitHub",
+      "timestamp": "2026-03-12T04:11:27.266Z",
+      "source": "edit"
+    }
+  ],
+  "createdAt": "2026-03-05T00:25:59.982Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-05T00:25:59.982Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-12T03:46:25.118Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-12T03:47:29.686Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-12T05:21:26.580Z"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-12T05:21:42.844Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-12T03:47:29.686Z",
+  "costUsd": 0.20934624999999998,
+  "lastSessionId": "251c33b8-6d76-41d3-a407-bc4eab33b282",
+  "executionHistory": [
+    {
+      "id": "a909cade-311d-4e9e-b3b8-618c4a6a14e6",
+      "startedAt": "2026-03-12T03:46:26.243Z",
+      "completedAt": "2026-03-12T03:47:09.135Z",
+      "durationMs": 42892,
+      "costUsd": 0.20934624999999998,
+      "model": "claude-opus-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Fix/Update placeholder CI badge URL in README\n\n### Changes Implemented\n- None required. The CI badge URLs in README.md (lines 9-10) already reference the correct GitHub org/repo path (`bookedsolidtech/helixir`). The `your-org` placeholder was previously fixed in commit `1708102` (\"fix: update all repository URLs from wc-tools to helixir\").\n\n### Files Modified\n- None\n\n### Risks/Blockers Encountered\n- **Already resolved:** The feature describes fixing a `your-org` placeholder, but this was already corrected in a prior commit. The audit documents (`DX_REVIEW.md`, `AUDIT_SUMMARY.md`, `principal-review-2026-03-01.md`) still reference the old state but the code itself is correct.\n- **Repo name mismatch:** The feature description references `bookedsolidtech/wc-tools` but the actual repo is `bookedsolidtech/helixir`. The prior fix correctly updated to `helixir`.\n\n### Verification Status\n- No Playwright test needed — no code changes were made. Verified by reading README.md and confirming badges are correct, and by grep-searching the entire repo for `your-org` (only found in historical audit/review docs, not in any functional files).\n\n### Learnings\n- The feature was auto-generated from an audit that captured a point-in-time snapshot. The underlying issue had already been resolved.\n\n### Notes for Developer\n- The `your-org` references in `docs/DX_REVIEW.md`, `docs/AUDIT_SUMMARY.md`, and `.automaker/reviews/` are in historical audit documents describing the old state — these are not actionable bugs.",
+  "reviewStartedAt": "2026-03-12T03:47:29.686Z",
+  "completedAt": "2026-03-12T05:21:42.844Z"
+}

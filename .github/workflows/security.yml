@@ -7,7 +7,32 @@ on:
     branches: [main, dev, staging]
 
 jobs:
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install gitleaks
+        run: |
+          GITLEAKS_VERSION="8.18.4"
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz -C /usr/local/bin gitleaks
+
+      - name: Scan for secrets (PR)
+        if: github.event_name == 'pull_request'
+        run: gitleaks detect --config .gitleaks.toml --log-opts="${{ github.event.pull_request.base.sha }}..${{ github.sha }}" --verbose --redact
+
+      - name: Scan for secrets (Push)
+        if: github.event_name == 'push'
+        run: gitleaks detect --config .gitleaks.toml --log-opts="HEAD~1..HEAD" --verbose --redact
+
   audit:
+    needs: secret-scan
     runs-on: ubuntu-latest
     timeout-minutes: 10
 

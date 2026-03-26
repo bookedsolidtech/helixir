@@ -187,6 +187,74 @@ describe('runStylingPreflight — bare component', () => {
   });
 });
 
+// ─── Token Fallback Validation ───────────────────────────────────────────────
+
+describe('runStylingPreflight — token fallback validation', () => {
+  it('catches var() without fallback on custom property declarations', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button { --hx-button-bg: var(--undefined-token); }',
+      meta: buttonMeta,
+    });
+    expect(result.issues.some((i) => i.category === 'tokenFallbacks')).toBe(true);
+  });
+
+  it('allows known component tokens without fallback', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button { color: var(--hx-button-color); }',
+      meta: buttonMeta,
+    });
+    expect(result.issues.filter((i) => i.category === 'tokenFallbacks')).toHaveLength(0);
+  });
+});
+
+// ─── Scope Validation ────────────────────────────────────────────────────────
+
+describe('runStylingPreflight — scope validation', () => {
+  it('catches component tokens on :root', () => {
+    const result = runStylingPreflight({
+      css: ':root { --hx-button-bg: blue; }',
+      meta: buttonMeta,
+    });
+    expect(result.issues.some((i) => i.category === 'scope')).toBe(true);
+  });
+});
+
+// ─── Shorthand Validation ────────────────────────────────────────────────────
+
+describe('runStylingPreflight — shorthand validation', () => {
+  it('catches risky shorthand + var() combinations', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button { border: 1px solid var(--hx-button-color); }',
+      meta: buttonMeta,
+    });
+    expect(result.issues.some((i) => i.category === 'shorthand')).toBe(true);
+  });
+});
+
+// ─── Color Contrast Validation ───────────────────────────────────────────────
+
+describe('runStylingPreflight — color contrast validation', () => {
+  it('catches low-contrast color pairs', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button { color: #eeeeee; background: #ffffff; }',
+      meta: buttonMeta,
+    });
+    expect(result.issues.some((i) => i.category === 'colorContrast')).toBe(true);
+  });
+});
+
+// ─── Specificity Validation ──────────────────────────────────────────────────
+
+describe('runStylingPreflight — specificity validation', () => {
+  it('catches !important usage', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button { color: red !important; }',
+      meta: buttonMeta,
+    });
+    expect(result.issues.some((i) => i.category === 'specificity')).toBe(true);
+  });
+});
+
 // ─── Overall Verdict ─────────────────────────────────────────────────────────
 
 describe('runStylingPreflight — verdict', () => {
@@ -201,7 +269,7 @@ describe('runStylingPreflight — verdict', () => {
 
   it('reports pass verdict for clean CSS', () => {
     const result = runStylingPreflight({
-      css: 'hx-button { --hx-button-bg: blue; }',
+      css: 'hx-button { --hx-button-bg: var(--theme-primary, blue); }',
       meta: buttonMeta,
     });
     expect(result.verdict).toContain('pass');
@@ -213,5 +281,88 @@ describe('runStylingPreflight — verdict', () => {
       meta: buttonMeta,
     });
     expect(result.verdict.toLowerCase()).toMatch(/fail|issue|error/);
+  });
+});
+
+// ─── Anti-Patterns in Preflight ─────────────────────────────────────────────
+
+describe('runStylingPreflight — antiPatterns', () => {
+  it('includes antiPatterns array in result', () => {
+    const result = runStylingPreflight({
+      css: '',
+      meta: buttonMeta,
+    });
+    expect(Array.isArray(result.antiPatterns)).toBe(true);
+    expect(result.antiPatterns.length).toBeGreaterThan(0);
+  });
+
+  it('includes shadow DOM warning with component tag name', () => {
+    const result = runStylingPreflight({
+      css: '',
+      meta: buttonMeta,
+    });
+    expect(result.antiPatterns.some((p) => p.includes('hx-button'))).toBe(true);
+    expect(result.antiPatterns.some((p) => p.includes('shadow') || p.includes('Shadow'))).toBe(
+      true,
+    );
+  });
+
+  it('includes :root scope warning for components with tokens', () => {
+    const result = runStylingPreflight({
+      css: '',
+      meta: buttonMeta,
+    });
+    expect(result.antiPatterns.some((p) => p.includes(':root'))).toBe(true);
+  });
+
+  it('includes no-style-api warning for bare components', () => {
+    const result = runStylingPreflight({
+      css: '',
+      meta: bareMeta,
+    });
+    expect(result.antiPatterns.some((p) => p.includes('no CSS') || p.includes('no style'))).toBe(
+      true,
+    );
+  });
+});
+
+// ─── Inline Fix Suggestions ─────────────────────────────────────────────────
+
+describe('runStylingPreflight — inline fixes', () => {
+  it('shadow DOM issue has fix with ::part() suggestion', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button .inner { color: red; }',
+      meta: buttonMeta,
+    });
+    const shadowIssue = result.issues.find((i) => i.category === 'shadowDom');
+    expect(shadowIssue?.fix).toBeDefined();
+    expect(shadowIssue?.fix?.suggestion).toContain('::part(');
+  });
+
+  it('!important issue has fix removing !important', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button { color: red !important; }',
+      meta: buttonMeta,
+    });
+    const specIssue = result.issues.find((i) => i.category === 'specificity');
+    expect(specIssue?.fix).toBeDefined();
+    expect(specIssue?.fix?.suggestion).not.toContain('!important');
+  });
+
+  it('clean CSS has no issues and no fixes', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button::part(base) { --hx-button-bg: var(--theme, blue); }',
+      meta: buttonMeta,
+    });
+    expect(result.issues).toHaveLength(0);
+  });
+
+  it('fix includes explanation', () => {
+    const result = runStylingPreflight({
+      css: 'hx-button .inner { color: red; }',
+      meta: buttonMeta,
+    });
+    const shadowIssue = result.issues.find((i) => i.category === 'shadowDom');
+    expect(shadowIssue?.fix?.explanation).toBeTruthy();
   });
 });

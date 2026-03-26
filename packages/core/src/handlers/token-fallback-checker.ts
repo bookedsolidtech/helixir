@@ -171,14 +171,14 @@ function parseCssDeclarations(css: string): CssPropertyDecl[] {
 
 // ─── Main Entry Point ───────────────────────────────────────────────────────
 
-export function checkTokenFallbacks(
+/**
+ * Core implementation accepting a pre-built set of known tokens.
+ * Used by both the CEM-based entry point and the preflight (which already has metadata).
+ */
+export function checkTokenFallbacksFromMeta(
   cssText: string,
-  tagName: string,
-  cem: Cem,
+  knownTokens: Set<string>,
 ): TokenFallbackResult {
-  const meta = parseCem(tagName, cem);
-  const knownTokens = new Set(meta.cssProperties.map((p) => p.name));
-
   const declarations = parseCssDeclarations(cssText);
   const issues: TokenFallbackIssue[] = [];
   let totalVarCalls = 0;
@@ -227,4 +227,18 @@ export function checkTokenFallbacks(
     totalVarCalls,
     clean: issues.length === 0,
   };
+}
+
+/**
+ * CEM-based entry point — parses the CEM to extract known tokens,
+ * then delegates to the core implementation.
+ */
+export function checkTokenFallbacks(
+  cssText: string,
+  tagName: string,
+  cem: Cem,
+): TokenFallbackResult {
+  const meta = parseCem(tagName, cem);
+  const knownTokens = new Set(meta.cssProperties.map((p) => p.name));
+  return checkTokenFallbacksFromMeta(cssText, knownTokens);
 }

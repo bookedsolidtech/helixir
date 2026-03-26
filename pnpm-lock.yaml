@@ -99,6 +99,28 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  packages/mcp:
+    dependencies:
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.26.0
+        version: 1.27.1(zod@3.25.76)
+      zod:
+        specifier: ^3.22.0
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.13
+      helixir:
+        specifier: workspace:*
+        version: link:../..
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@22.19.13)(jiti@2.6.1)(yaml@2.8.2)
+
 packages:
 
   '@actions/core@1.11.1':

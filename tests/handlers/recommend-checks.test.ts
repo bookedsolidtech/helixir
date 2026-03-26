@@ -50,6 +50,35 @@ describe('recommendChecks — CSS code', () => {
     const result = recommendChecks(code);
     expect(result.recommended).toContain('check_token_fallbacks');
   });
+
+  it('recommends styling_preflight as first CSS-specific check', () => {
+    const code = `sl-button { --sl-button-color: red; }`;
+    const result = recommendChecks(code);
+    const cssIdx = result.recommended.indexOf('styling_preflight');
+    const shadowIdx = result.recommended.indexOf('check_shadow_dom_usage');
+    expect(cssIdx).toBeGreaterThan(-1);
+    expect(cssIdx).toBeLessThan(shadowIdx);
+  });
+
+  it('recommends check_dark_mode_patterns for dark mode CSS', () => {
+    const code = `.dark sl-button { --sl-button-color: red; }`;
+    const result = recommendChecks(code);
+    expect(result.recommended).toContain('check_dark_mode_patterns');
+  });
+
+  it('recommends check_dark_mode_patterns for prefers-color-scheme CSS', () => {
+    const code = `@media (prefers-color-scheme: dark) {
+  sl-button { --sl-button-color: red; }
+}`;
+    const result = recommendChecks(code);
+    expect(result.recommended).toContain('check_dark_mode_patterns');
+  });
+
+  it('does not recommend check_dark_mode_patterns for non-theme CSS', () => {
+    const code = `sl-button { --sl-button-color: red; }`;
+    const result = recommendChecks(code);
+    expect(result.recommended).not.toContain('check_dark_mode_patterns');
+  });
 });
 
 // ─── JavaScript code ────────────────────────────────────────────────────────

@@ -84,9 +84,16 @@ function parseCssBlocks(css: string): CssBlock[] {
 
 // ─── Main Entry Point ───────────────────────────────────────────────────────
 
-export function checkCssScope(css: string, tagName: string, cem: Cem): ScopeCheckResult {
-  const meta = parseCem(tagName, cem);
-  const knownTokens = new Set(meta.cssProperties.map((p) => p.name));
+/**
+ * Core implementation accepting a pre-built set of known tokens.
+ * Used by both the CEM-based entry point and the preflight (which already has metadata).
+ */
+export function checkCssScopeFromMeta(
+  css: string,
+  tagName: string,
+  cssProperties: Array<{ name: string }>,
+): ScopeCheckResult {
+  const knownTokens = new Set(cssProperties.map((p) => p.name));
 
   const blocks = parseCssBlocks(css);
   const issues: ScopeIssue[] = [];
@@ -113,4 +120,13 @@ export function checkCssScope(css: string, tagName: string, cem: Cem): ScopeChec
     issues,
     clean: issues.length === 0,
   };
+}
+
+/**
+ * CEM-based entry point — parses the CEM to extract known tokens,
+ * then delegates to the core implementation.
+ */
+export function checkCssScope(css: string, tagName: string, cem: Cem): ScopeCheckResult {
+  const meta = parseCem(tagName, cem);
+  return checkCssScopeFromMeta(css, tagName, meta.cssProperties);
 }

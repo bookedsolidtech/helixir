@@ -1,0 +1,140 @@
+{
+  "category": "tooling",
+  "description": "Enhance the CSS Architecture analyzer (src/handlers/analyzers/css-architecture.ts) to include Shadow DOM theming quality as new sub-metrics.\n\n**Current state:** The analyzer only checks:\n- CSS property descriptions (35 pts)\n- Design token naming patterns (30 pts)  \n- CSS parts documentation (35 pts)\n\n**New sub-metrics to add (rebalance weights):**\n1. **CSS Parts coverage ratio** (new) — ratio of CSS parts to total internal DOM elements (heuristic from slot count + member count)\n2. **Token namespace consistency** (new) — all CSS properties share a common prefix pattern (e.g., all start with --sl-)\n3. **Theming completeness** (new) — components that declare CSS properties also declare them for common categories (color, spacing, typography, border-radius)\n\n**Rebalanced weights (still sum to 100 within this dimension):**\n- CSS property descriptions: 25 pts (was 35)\n- Design token naming: 20 pts (was 30)\n- CSS parts documentation: 25 pts (was 35)\n- Token namespace consistency: 15 pts (new)\n- Theming completeness: 15 pts (new)\n\n**Acceptance criteria:**\n- Existing tests still pass (no regression on current scores)\n- New sub-metrics are exposed in the score_component output\n- New fixture data covers components with good/bad theming patterns\n- Must pass lint, format, type-check",
+  "title": "New scoring sub-dimension: Shadow DOM theming quality in CSS Architecture",
+  "status": "done",
+  "complexity": "medium",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "11eb4c5b-d3ec-4ffc-bf28-3aeb6e618f78",
+  "id": "feature-1774061894190-ciwt20ovd",
+  "branchName": "feature/new-scoring-sub-dimension-shadow-dom",
+  "descriptionHistory": [
+    {
+      "description": "Enhance the CSS Architecture analyzer (src/handlers/analyzers/css-architecture.ts) to include Shadow DOM theming quality as new sub-metrics.\n\n**Current state:** The analyzer only checks:\n- CSS property descriptions (35 pts)\n- Design token naming patterns (30 pts)  \n- CSS parts documentation (35 pts)\n\n**New sub-metrics to add (rebalance weights):**\n1. **CSS Parts coverage ratio** (new) — ratio of CSS parts to total internal DOM elements (heuristic from slot count + member count)\n2. **Token namespace consistency** (new) — all CSS properties share a common prefix pattern (e.g., all start with --sl-)\n3. **Theming completeness** (new) — components that declare CSS properties also declare them for common categories (color, spacing, typography, border-radius)\n\n**Rebalanced weights (still sum to 100 within this dimension):**\n- CSS property descriptions: 25 pts (was 35)\n- Design token naming: 20 pts (was 30)\n- CSS parts documentation: 25 pts (was 35)\n- Token namespace consistency: 15 pts (new)\n- Theming completeness: 15 pts (new)\n\n**Acceptance criteria:**\n- Existing tests still pass (no regression on current scores)\n- New sub-metrics are exposed in the score_component output\n- New fixture data covers components with good/bad theming patterns\n- Must pass lint, format, type-check",
+      "timestamp": "2026-03-21T02:58:14.190Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-21T02:58:14.191Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-21T02:58:14.191Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-21T03:06:05.098Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-21T03:11:58.512Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-21T03:17:43.495Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-21T03:17:44.272Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "verified",
+      "timestamp": "2026-03-21T03:21:09.743Z"
+    },
+    {
+      "from": "done",
+      "to": "backlog",
+      "timestamp": "2026-03-21T03:21:44.694Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-21T03:21:45.784Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "done",
+      "timestamp": "2026-03-21T03:22:21.605Z"
+    },
+    {
+      "from": "done",
+      "to": "blocked",
+      "timestamp": "2026-03-21T03:22:44.600Z"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-21T04:19:19.968Z",
+      "reason": "prMergedAt set — reconciled from non-done status"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [
+    "feature-1774061864326-ks0nbi6wg"
+  ],
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-21T03:21:45.784Z",
+  "costUsd": 3.2283715,
+  "lastSessionId": "5ed8599d-b95d-4c6e-89dd-224a8b195a39",
+  "prUrl": "https://github.com/bookedsolidtech/helixir/pull/102",
+  "prNumber": 102,
+  "prCreatedAt": "2026-03-21T03:11:57.442Z",
+  "reviewStartedAt": "2026-03-21T03:11:58.512Z",
+  "prTrackedSince": "2026-03-21T03:21:09.695Z",
+  "prLastPolledAt": "2026-03-21T03:22:44.569Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 4**\n\n> [!CAUTION]\n> Some comments are outside the diff and can’t be posted inline due to platform limitations.\n> \n> \n> \n> <details>\n> <summary>⚠️ Outside diff range comments (1)</summary><blockquote>\n> \n> <details>\n> <summary>tests/__fixtures__/benchmark-results/latest-benchmark.json (1)</summary><blockquote>\n> \n> `1-3353`: _⚠️ Potential issue_ | _🟡 Minor_\n> \n> **Formatting check is failing for this fixture file.**\n> \n> Pipeline reports a Prettier warning for this file; please reformat it so `pnpm run format:check` passes cleanly before merge.\n> \n> <details>\n> <summary>🤖 Prompt for AI Agents</summary>\n> \n> ```\n> Verify each finding against the current code and only fix it if needed.\n> \n> In `@tests/__fixtures__/benchmark-results/latest-benchmark.json` around lines 1 -\n> 3353, The JSON fixture latest-benchmark.json is not formatted according to\n> Prettier; run the repository formatter (e.g. pnpm run format or Prettier\n> --write) on this fixture and save the normalized JSON so keys like \"timestamp\",\n> \"scorecards\", \"comparisonTable\" and \"performance\" follow the project's Prettier\n> rules (consistent spacing, indentation, trailing commas/line breaks). After\n> reformatting, re-run pnpm run format:check to confirm the Prettier warning is\n> resolved and commit the updated file.\n> ```\n> \n> </details>\n> \n> </blockquote></details>\n> \n> </blockquote></details>\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@packages/core/src/handlers/analyzers/css-architecture.ts`:\n- Line 18: The spacing pattern set in the css architecture analyzer currently\nincludes a generic /size/ which matches tokens like `--*-font-size` and causes\ntypography tokens to be counted as spacing; update the spacing entry in the\npatterns array (the { name: 'spacing', patterns: [...] } object) to remove the\ngeneric /size/ and use a more s",
+  "prIterationCount": 1,
+  "reviewRemediationCount": 2,
+  "remediationCycleCount": 2,
+  "workItemState": "blocked",
+  "executionHistory": [
+    {
+      "id": "b43e4b38-601a-4fe0-9905-9202747b9165",
+      "startedAt": "2026-03-21T03:17:43.525Z",
+      "completedAt": "2026-03-21T03:20:29.255Z",
+      "durationMs": 165735,
+      "costUsd": 0.76167125,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "retry"
+    },
+    {
+      "id": "1e885dbd-a00d-4c6e-8823-f61e6f83110c",
+      "startedAt": "2026-03-21T03:21:44.711Z",
+      "completedAt": "2026-03-21T03:22:12.666Z",
+      "durationMs": 27959,
+      "costUsd": 0.28437825000000005,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "retry"
+    }
+  ],
+  "completedAt": "2026-03-21T03:21:09.743Z",
+  "threadFeedback": [
+    {
+      "threadId": "PRRT_kwDORa2Z08512jBm",
+      "status": "accepted",
+      "agentReasoning": "Real correctness bug: `/size/` matches `font-size`, causing typography tokens like `--sdr-font-size` to double-count as spacing. This skews theming completeness scoring. The fix is to remove `/size/` from spacing patterns — the remaining patterns (`/spacing/`, `/padding/`, `/margin/`, `/gap/`) are specific enough. CodeRabbit's suggested regex `/(^|-)size$/i` is actually also wrong (still matches `font-size`), so I'll implement the simpler correct fix of removing the ambiguous pattern.",
+      "resolvedAt": "2026-03-21T03:21:09.807Z"
+    },
+    {
+      "threadId": "PRRT_kwDORa2Z08512jB1",
+      "status": "accepted",
+      "agentReasoning": "The `propertyNames` array is computed twice via `cssProperties.map(p => p.name.toLowerCase())` — once inside the `if (cssProperties.length > 0)` block and again for `coveredCategoryNames`. Deduplicating is a correct, low-risk cleanup with no behavioral change.",
+      "resolvedAt": "2026-03-21T03:21:09.807Z"
+    }
+  ],
+  "prMergedAt": "2026-03-21T03:22:21.601Z",
+  "error": "Review remediation budget exhausted: 2/2 review cycles used.",
+  "statusChangeReason": "prMergedAt set — reconciled from non-done status"
+}

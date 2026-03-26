@@ -3,6 +3,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { loadConfig } from '../../packages/core/src/config.js';
+import { handleToolError } from '../../packages/core/src/shared/error-handling.js';
 import { CemSchema } from '../../packages/core/src/handlers/cem.js';
 import type { Cem, CemDeclaration } from '../../packages/core/src/handlers/cem.js';
 import { parseCem, diffCem, listAllComponents } from '../../packages/core/src/handlers/cem.js';
@@ -524,7 +525,7 @@ export async function runCli(): Promise<void> {
     values = result.values;
     positionals = result.positionals;
   } catch (err) {
-    process.stderr.write(`Error: ${String(err)}\n`);
+    process.stderr.write(`Error: ${handleToolError(err).message}\n`);
     process.exit(1);
   }
 
@@ -612,7 +613,7 @@ export async function runCli(): Promise<void> {
         process.exit(1);
     }
   } catch (err) {
-    process.stderr.write(`Error: ${String(err)}\n`);
+    process.stderr.write(`Error: ${handleToolError(err).message}\n`);
     process.exit(1);
   }
 }

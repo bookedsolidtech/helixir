@@ -1,4 +1,5 @@
 import type { Cem, CemDeclaration } from './cem.js';
+import { MCPError, ErrorCategory } from '../shared/error-handling.js';
 
 // --- Helpers ---
 
@@ -66,7 +67,7 @@ export function extendComponent(
 ): ExtendComponentResult {
   const parentDecl = findDeclaration(cem, parentTagName);
   if (!parentDecl) {
-    throw new Error(`Component "${parentTagName}" not found in CEM.`);
+    throw new MCPError(`Component "${parentTagName}" not found in CEM.`, ErrorCategory.NOT_FOUND);
   }
 
   const parentClassName = tagNameToClassName(parentTagName);

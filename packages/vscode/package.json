@@ -35,6 +35,11 @@
         "command": "helixir.runHealthCheck",
         "title": "Helixir: Run Health Check",
         "category": "Helixir"
+      },
+      {
+        "command": "helixir.configureCursorWindsurf",
+        "title": "Helixir: Configure for Cursor/Windsurf",
+        "category": "Helixir"
       }
     ],
     "configuration": {

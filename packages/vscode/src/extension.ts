@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { registerConfigureCursorWindsurfCommand } from './commands/configureCursorWindsurf.js';
 import { registerMcpProvider } from './mcpProvider.js';
 
 /**
@@ -8,6 +9,7 @@ import { registerMcpProvider } from './mcpProvider.js';
  */
 export function activate(context: vscode.ExtensionContext): void {
   registerMcpProvider(context);
+  registerConfigureCursorWindsurfCommand(context);
 
   const healthCheckCommand = vscode.commands.registerCommand(
     'helixir.runHealthCheck',

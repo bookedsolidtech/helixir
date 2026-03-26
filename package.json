@@ -36,6 +36,7 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "type-check": "tsc --noEmit",
+    "typecheck": "pnpm run type-check",
     "lint": "eslint src packages/core/src",
     "lint:fix": "eslint src packages/core/src --fix",
     "format": "prettier --write .",
@@ -107,7 +108,8 @@
       "@hono/node-server": ">=1.19.10",
       "express-rate-limit": ">=8.2.2",
       "undici": ">=7.24.0",
-      "flatted": ">=3.4.0"
+      "flatted": ">=3.4.2",
+      "picomatch": ">=4.0.4"
     }
   },
   "engines": {

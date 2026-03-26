@@ -725,7 +725,10 @@ export function findComponentsByToken(
   cem: Cem,
 ): FindComponentsByTokenResult {
   if (!token.startsWith('--')) {
-    throw new Error(`CSS custom property name must start with "--": "${token}"`);
+    throw new MCPError(
+      `CSS custom property name must start with "--": "${token}"`,
+      ErrorCategory.VALIDATION,
+    );
   }
 
   const components: TokenComponentMatch[] = [];

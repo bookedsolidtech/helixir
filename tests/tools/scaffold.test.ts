@@ -4,10 +4,7 @@
  * and response formatting.
  */
 import { describe, it, expect, vi } from 'vitest';
-import {
-  isScaffoldTool,
-  handleScaffoldCall,
-} from '../../packages/core/src/tools/scaffold.js';
+import { isScaffoldTool, handleScaffoldCall } from '../../packages/core/src/tools/scaffold.js';
 import type { McpWcConfig } from '../../packages/core/src/config.js';
 import type { Cem } from '../../packages/core/src/handlers/cem.js';
 

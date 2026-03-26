@@ -1,0 +1,67 @@
+{
+  "name": "helixir-vscode",
+  "displayName": "Helixir",
+  "description": "AI-powered web component intelligence for VS Code — powered by helixir MCP",
+  "version": "0.1.0",
+  "publisher": "bookedsolidtech",
+  "private": true,
+  "engines": {
+    "vscode": "^1.99.0"
+  },
+  "categories": [
+    "Other",
+    "AI"
+  ],
+  "keywords": [
+    "mcp",
+    "web components",
+    "helixir",
+    "ai",
+    "custom elements"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "mcpServerDefinitionProviders": [
+      {
+        "id": "helixir",
+        "label": "Helixir"
+      }
+    ],
+    "commands": [
+      {
+        "command": "helixir.runHealthCheck",
+        "title": "Helixir: Run Health Check",
+        "category": "Helixir"
+      }
+    ],
+    "configuration": {
+      "title": "Helixir",
+      "properties": {
+        "helixir.configPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to mcpwc.config.json (relative to workspace root or absolute). Leave empty to use workspace root defaults."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "node esbuild.config.mjs --production",
+    "build": "node esbuild.config.mjs",
+    "watch": "node esbuild.config.mjs --watch",
+    "package": "vsce package --no-dependencies",
+    "publish": "vsce publish --no-dependencies"
+  },
+  "dependencies": {
+    "helixir": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.99.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.25.0",
+    "ovsx": "^0.9.0"
+  }
+}

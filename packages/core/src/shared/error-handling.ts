@@ -37,12 +37,21 @@ export function sanitizeErrorMessage(message: string, projectRoot: string): stri
     // Match the projectRoot prefix (possibly followed by more path characters)
     const escapedRoot = normalizedRoot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const projectRootRegex = new RegExp(escapedRoot + '(/[^\\s]*)?', 'g');
-    sanitized = sanitized.replace(projectRootRegex, (match, rest) => {
+    sanitized = sanitized.replace(projectRootRegex, (match) => {
       // Compute the path relative to projectRoot
       const relativePath = relative(normalizedRoot, match);
       return relativePath || '.';
     });
   }
+
+  // Strip regex pattern details from Zod validation messages.
+  // Patterns like: /someRegex/, "Invalid regex: /pattern/"
+  // Must run BEFORE path redaction so regex delimiters aren't mistaken for paths.
+  sanitized = sanitized.replace(/Invalid regex:[^;,\n]*/gi, 'Invalid regex: [pattern redacted]');
+  sanitized = sanitized.replace(
+    /\/(?=[^/\s]*[\\^$[\](){}+*?|])([^/\s]{2,})\/[gimsuy]*/g,
+    '[pattern redacted]',
+  );
 
   // Replace any remaining Unix absolute paths (starting with /)
   // Matches paths like /foo/bar/baz (no whitespace)
@@ -50,11 +59,6 @@ export function sanitizeErrorMessage(message: string, projectRoot: string): stri
 
   // Replace Windows absolute paths (e.g. C:\foo\bar)
   sanitized = sanitized.replace(/[A-Za-z]:\\[^\s]*/g, '[path redacted]');
-
-  // Strip regex pattern details from Zod validation messages.
-  // Patterns like: /someRegex/, "Invalid regex: /pattern/"
-  sanitized = sanitized.replace(/Invalid regex:[^;,\n]*/gi, 'Invalid regex: [pattern redacted]');
-  sanitized = sanitized.replace(/\/[^/\s]{2,}\/[gimsuy]*/g, '[pattern redacted]');
 
   return sanitized;
 }

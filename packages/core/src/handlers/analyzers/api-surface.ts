@@ -39,11 +39,9 @@ export function analyzeApiSurface(decl: CemDeclaration): ApiSurfaceResult | null
   });
 
   // 2. Attribute reflection declared (25 points)
-  const fieldsWithAttribute = fields.filter(
-    (m) => typeof m.attribute === 'string' && m.attribute.length > 0,
-  );
-  const fieldsReflecting = fields.filter((m) => m.reflects === true);
-  const reflectedCount = Math.max(fieldsWithAttribute.length, fieldsReflecting.length);
+  const reflectedCount = fields.filter(
+    (m) => (typeof m.attribute === 'string' && m.attribute.length > 0) || m.reflects === true,
+  ).length;
   const attrScore = fields.length === 0 ? 0 : Math.round((reflectedCount / fields.length) * 25);
   subMetrics.push({
     name: 'Attribute reflection',

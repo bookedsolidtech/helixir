@@ -150,7 +150,7 @@ describe('handleValidateCall — valid inputs', () => {
   });
 
   it('accepts html up to 50000 characters', () => {
-    const longHtml = '<hx-button>' + 'x'.repeat(49_980) + '</hx-button>';
+    const longHtml = '<hx-button>' + 'x'.repeat(49_977) + '</hx-button>';
     const result = handleValidateCall(
       'validate_usage',
       { tagName: 'hx-button', html: longHtml },

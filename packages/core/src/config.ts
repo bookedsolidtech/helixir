@@ -121,6 +121,21 @@ function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
     }
   }
 
+  // Fallback to legacy mcpwc.config.json with deprecation warning
+  const legacyPath = resolve(projectRoot, 'mcpwc.config.json');
+  if (existsSync(legacyPath)) {
+    process.stderr.write(
+      `[helixir] Warning: mcpwc.config.json is deprecated. Rename to helixir.mcp.json.\n`,
+    );
+    try {
+      const raw = readFileSync(legacyPath, 'utf-8');
+      return JSON.parse(raw) as Partial<McpWcConfig>;
+    } catch {
+      process.stderr.write(`[helixir] Warning: mcpwc.config.json is malformed. Using defaults.\n`);
+      return {};
+    }
+  }
+
   return {};
 }
 

@@ -1,0 +1,34 @@
+name: helixir-audit
+description: Read-only code quality audit for HELiXiR
+phases:
+  - state: INTAKE
+    enabled: true
+  - state: PLAN
+    enabled: false
+  - state: EXECUTE
+    enabled: true
+  - state: REVIEW
+    enabled: false
+  - state: MERGE
+    enabled: false
+  - state: DEPLOY
+    enabled: false
+agent:
+  role: principal-engineer
+  model: sonnet
+  tools:
+    - Read
+    - Grep
+    - Glob
+    - Bash
+execution:
+  useWorktrees: false
+  gitWorkflow:
+    autoCommit: false
+    autoPush: false
+    autoCreatePR: false
+  outputDir: .automaker/audits
+  terminalStatus: done
+match:
+  categories: [audit, quality-audit]
+  keywords: [audit, sweep, analyze, quality]

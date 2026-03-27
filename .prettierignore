@@ -6,3 +6,4 @@ coverage/
 .claude/
 pnpm-lock.yaml
 tests/__fixtures__/health-history/corrupted-tag/
+.pnpm-store/

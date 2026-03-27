@@ -48,3 +48,7 @@ MCP: Web Components/
 helixir/
 PUBLISHING.md
 .turbo/
+
+# act (local CI)
+.act-secrets
+.act-results.json

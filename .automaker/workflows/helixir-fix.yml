@@ -1,0 +1,30 @@
+name: helixir-fix
+description: Bug fixes for HELiXiR
+phases:
+  - state: INTAKE
+    enabled: true
+  - state: PLAN
+    enabled: false
+  - state: EXECUTE
+    enabled: true
+  - state: REVIEW
+    enabled: true
+  - state: MERGE
+    enabled: true
+  - state: DEPLOY
+    enabled: false
+agent:
+  role: principal-engineer
+  model: sonnet
+execution:
+  useWorktrees: true
+  gitWorkflow:
+    autoCommit: true
+    autoPush: true
+    autoCreatePR: true
+    autoMergePR: true
+    prBaseBranch: dev
+  terminalStatus: review
+match:
+  categories: [fix, bug-fix]
+  keywords: [fix, bug, patch]

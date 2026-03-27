@@ -39,19 +39,17 @@ that don't work in local Docker.
 **Apple Silicon:** Always use `--native` to avoid Rosetta emulation overhead and
 Docker RWLayer corruption bugs with amd64 containers.
 
-## Relationship to Pre-Push Hook
+## Relationship to Preflight
 
-The pre-push git hook runs `pnpm run preflight` automatically on every push.
-This is the **primary** quality gate — it runs natively without Docker.
+act-ci is **Gate 6** inside `pnpm run preflight` (`scripts/preflight.sh`).
+It runs automatically if `act` is installed and Docker is running.
 
-act-ci is the **secondary** gate — it runs the same checks inside Docker
-containers matching the GitHub Actions environment. Use act-ci for:
-- Extra confidence before pushing critical changes
-- Debugging CI-specific failures (environment differences)
-- Verifying the Docker-based pipeline still works
+- Docker + act available → Gate 6 runs, hard fail if it fails
+- Docker not running → Gate 6 skips with warning
+- `SKIP_ACT=1` → Gate 6 skips explicitly
 
-For most pushes, the pre-push hook is sufficient. act-ci adds ~15s but
-guarantees exact GitHub Actions parity.
+This means any caller of `pnpm run preflight` gets the Docker CI gate
+automatically — git hooks, agents, humans, CI. One command, all gates.
 
 ## Requirements
 
@@ -61,7 +59,8 @@ guarantees exact GitHub Actions parity.
 
 ## For Agents
 
-Before every `git push`, run `./scripts/act-ci.sh --native`. If it fails, fix the
-issue and re-run. Do NOT push code that fails the local Docker CI gate.
+Do NOT call `./scripts/act-ci.sh` separately. It runs automatically as Gate 6
+inside `pnpm run preflight`, which the pre-push hook calls. Just `git push` —
+if Docker is available, the act-ci gate runs. If it fails, fix and retry.
 
-This is not a suggestion. This is a hard gate. See `agent-push-protocol.md`.
+See `agent-push-protocol.md`.

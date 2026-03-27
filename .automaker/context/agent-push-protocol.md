@@ -37,6 +37,7 @@ The pre-push hook runs `pnpm run preflight` automatically. This executes:
 3. Type check (TypeScript strict)
 4. Build (tsc compilation)
 5. Test (Vitest)
+6. Docker CI (act-ci, if Docker is available)
 
 If ANY gate fails, the push is blocked. Fix the errors and push again.
 
@@ -65,13 +66,11 @@ gh pr merge $PR_NUMBER --auto --merge --repo bookedsolidtech/helixir
 |-------|------|-------------|
 | pre-commit | gitleaks + lint-staged | Only with `--no-verify` |
 | commit-msg | commitlint | Only with `--no-verify` |
-| **pre-push** | **Full preflight (lint+format+typecheck+build+test)** | **Only with `--no-verify`** |
-| act-ci | Docker CI (optional additional layer) | Manual invocation |
+| **pre-push** | **`pnpm run preflight` (6 gates including Docker CI)** | **Only with `--no-verify`** |
 
-The pre-push hook is the **hard gate**. If it fails, the push does not happen.
-The act-ci Docker gate (`./scripts/act-ci.sh --native`) is an additional layer
-for extra confidence — it runs the same gates inside a Docker container matching
-the GitHub Actions environment.
+The pre-push hook calls `pnpm run preflight` which runs all 6 gates.
+Gate 6 (Docker CI) is the act-ci gate — runs if Docker is available, hard fail if it fails.
+Skip Docker only: `SKIP_ACT=1 git push`
 
 ---
 

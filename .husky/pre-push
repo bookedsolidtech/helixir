@@ -1,57 +1,19 @@
 #!/bin/sh
 
 # ── Quality Gate: pre-push ──────────────────────────────────────────────
-# Two-layer gate before code reaches GitHub:
-#   1. preflight — native Node checks (lint, format, type-check, build, test)
-#   2. act-ci   — Docker CI gate (same checks in GitHub Actions container)
+# Runs pnpm run preflight which executes all 6 gates:
+#   1. Lint  2. Format  3. Type-check  4. Build  5. Test  6. Docker CI
 #
-# Layer 1 always runs. Layer 2 runs if Docker is available.
-# Both must pass for the push to succeed.
-#
-# To skip (EMERGENCY ONLY): git push --no-verify
+# Gate 6 (Docker CI) runs if act + Docker are available.
+# Skip with: SKIP_ACT=1 git push
+# Emergency bypass: git push --no-verify
 # ─────────────────────────────────────────────────────────────────────────
-
-echo "=== Pre-push quality gate ==="
-echo ""
-
-# ── Layer 1: Native preflight ──────────────────────────────────────────
-echo "Layer 1: Running native preflight (lint, format, type-check, build, test)..."
-echo ""
 
 pnpm run preflight
 
 if [ $? -ne 0 ]; then
   echo ""
-  echo "=== PUSH BLOCKED (preflight failed) ==="
-  echo "Fix the errors above and try again."
+  echo "=== PUSH BLOCKED ==="
+  echo "Preflight failed. Fix errors and retry."
   exit 1
 fi
-
-echo ""
-echo "Layer 1: preflight passed"
-
-# ── Layer 2: Docker CI gate ────────────────────────────────────────────
-if docker info >/dev/null 2>&1; then
-  echo ""
-  echo "Layer 2: Docker detected — running act-ci gate..."
-  echo ""
-
-  ./scripts/act-ci.sh --native
-
-  if [ $? -ne 0 ]; then
-    echo ""
-    echo "=== PUSH BLOCKED (act-ci failed) ==="
-    echo "Docker CI gate failed. Fix the errors and try again."
-    exit 1
-  fi
-
-  echo ""
-  echo "Layer 2: act-ci passed"
-else
-  echo ""
-  echo "Layer 2: Docker not running — skipping act-ci gate"
-  echo "  (preflight passed, push allowed without Docker verification)"
-fi
-
-echo ""
-echo "=== All quality gates passed — pushing ==="

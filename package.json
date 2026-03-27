@@ -40,7 +40,7 @@
     "lint:fix": "eslint src packages/core/src --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "preflight": "pnpm run lint && pnpm run format:check && pnpm run type-check && pnpm run build && pnpm run test",
+    "preflight": "bash scripts/preflight.sh",
     "cem:generate": "cem analyze && node scripts/normalize-cem.mjs",
     "cem:check": "pnpm run cem:generate && git diff --exit-code custom-elements.json",
     "changeset": "changeset",

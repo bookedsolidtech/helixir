@@ -38,15 +38,15 @@ The path can be relative to the workspace root or absolute.
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
+| Command                     | Description                                            |
+| --------------------------- | ------------------------------------------------------ |
 | `Helixir: Run Health Check` | Guides you to run a health check via your AI assistant |
 
 ## Extension Settings
 
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| `helixir.configPath` | `string` | `""` | Path to `mcpwc.config.json`. Empty = workspace root. |
+| Setting              | Type     | Default | Description                                          |
+| -------------------- | -------- | ------- | ---------------------------------------------------- |
+| `helixir.configPath` | `string` | `""`    | Path to `mcpwc.config.json`. Empty = workspace root. |
 
 ## How It Works
 
@@ -58,24 +58,27 @@ The server reads your `custom-elements.json` and exposes 30+ tools that AI model
 
 The helixir server is configured via environment variables passed by the extension:
 
-| Variable | Description |
-|----------|-------------|
-| `MCP_WC_PROJECT_ROOT` | Set to your workspace folder automatically |
-| `MCP_WC_CONFIG_PATH` | Set when `helixir.configPath` is configured |
+| Variable              | Description                                 |
+| --------------------- | ------------------------------------------- |
+| `MCP_WC_PROJECT_ROOT` | Set to your workspace folder automatically  |
+| `MCP_WC_CONFIG_PATH`  | Set when `helixir.configPath` is configured |
 
 Additional configuration (token path, component prefix, health history dir) belongs in `mcpwc.config.json`. See the [helixir documentation](https://github.com/bookedsolidtech/helixir) for the full config reference.
 
 ## Troubleshooting
 
 **MCP server not appearing in AI assistant tools**
+
 - Verify VS Code ≥ 1.99.0 is installed
 - Confirm your workspace contains a `custom-elements.json`
 - Check the Output panel → Helixir for error messages
 
 **"No workspace folder" error from Run Health Check**
+
 - Open a folder (not just a file) in VS Code — the extension uses the workspace folder as the project root
 
 **Server starts but returns no components**
+
 - Ensure `custom-elements.json` exists at the workspace root or configure `helixir.configPath`
 - Regenerate the manifest: `npm run analyze:cem` (or your CEM generation script)
 

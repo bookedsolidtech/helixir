@@ -16,16 +16,13 @@
 
 import { describe, it, expect } from 'vitest';
 import { resolve } from 'node:path';
-import {
-  resolveInheritanceChain,
-  type ResolvedSource,
-  type InheritanceChainResult,
-} from '../../../packages/core/src/handlers/analyzers/mixin-resolver.js';
+import { resolveInheritanceChain } from '../../../packages/core/src/handlers/analyzers/mixin-resolver.js';
 import type { CemDeclaration } from '../../../packages/core/src/handlers/cem.js';
 
 // ─── Fixtures ──────────────────────────────────────────────────────────────────
 
-const WORKTREE = '/Volumes/Development/booked/helixir/.worktrees/feature-test-add-test-suites-for-8-untested';
+const WORKTREE =
+  '/Volumes/Development/booked/helixir/.worktrees/feature-test-add-test-suites-for-8-untested';
 
 // A minimal component source with no a11y patterns
 const MINIMAL_SOURCE = `
@@ -69,7 +66,7 @@ class MyInput extends LitElement {
 `;
 
 // A component that imports an a11y-relevant mixin
-const MIXIN_IMPORT_SOURCE = `
+const _MIXIN_IMPORT_SOURCE = `
 import { FocusMixin } from './focus-mixin.js';
 import { KeyboardMixin } from './keyboard-mixin.js';
 
@@ -180,9 +177,7 @@ describe('resolveInheritanceChain', () => {
         SIMPLE_DECL,
         WORKTREE,
       );
-      expect(['inline', 'mixin-heavy', 'controller-based', 'hybrid']).toContain(
-        chain.architecture,
-      );
+      expect(['inline', 'mixin-heavy', 'controller-based', 'hybrid']).toContain(chain.architecture);
     });
   });
 

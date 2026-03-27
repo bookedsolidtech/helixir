@@ -16,18 +16,11 @@ import * as vscode from 'vscode';
 export function registerMcpProvider(context: vscode.ExtensionContext): void {
   const provider = {
     provideMcpServerDefinitions() {
-      const serverScriptPath = path.join(
-        context.extensionPath,
-        'dist',
-        'mcp-server.js'
-      );
+      const serverScriptPath = path.join(context.extensionPath, 'dist', 'mcp-server.js');
 
-      const workspaceFolder =
-        vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? process.cwd();
+      const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? process.cwd();
 
-      const configPath = vscode.workspace
-        .getConfiguration('helixir')
-        .get<string>('configPath', '');
+      const configPath = vscode.workspace.getConfiguration('helixir').get<string>('configPath', '');
 
       const env: Record<string, string> = {
         MCP_WC_PROJECT_ROOT: workspaceFolder,
@@ -57,12 +50,12 @@ export function registerMcpProvider(context: vscode.ExtensionContext): void {
   const lm = vscode.lm as any;
   if (typeof lm?.registerMcpServerDefinitionProvider === 'function') {
     context.subscriptions.push(
-      lm.registerMcpServerDefinitionProvider('helixir', provider) as vscode.Disposable
+      lm.registerMcpServerDefinitionProvider('helixir', provider) as vscode.Disposable,
     );
   } else {
     console.warn(
       '[helixir-vscode] vscode.lm.registerMcpServerDefinitionProvider is not available. ' +
-        'Upgrade to VS Code ≥ 1.99.0 to enable MCP server support.'
+        'Upgrade to VS Code ≥ 1.99.0 to enable MCP server support.',
     );
   }
 }

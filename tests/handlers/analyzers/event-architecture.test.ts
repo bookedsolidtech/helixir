@@ -227,11 +227,7 @@ describe('analyzeEventArchitecture', () => {
         kind: 'class',
         name: 'MultiSegment',
         tagName: 'multi-segment',
-        events: [
-          { name: 'value-change' },
-          { name: 'menu-item-click' },
-          { name: 'form-submit' },
-        ],
+        events: [{ name: 'value-change' }, { name: 'menu-item-click' }, { name: 'form-submit' }],
       };
       const result = analyzeEventArchitecture(decl);
       const namingMetric = result!.subMetrics.find((m) => m.name === 'Kebab-case naming');

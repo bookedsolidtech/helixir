@@ -4,10 +4,7 @@
  * and response formatting with CEM-based inputs.
  */
 import { describe, it, expect, vi } from 'vitest';
-import {
-  isThemeTool,
-  handleThemeCall,
-} from '../../packages/core/src/tools/theme.js';
+import { isThemeTool, handleThemeCall } from '../../packages/core/src/tools/theme.js';
 import type { Cem } from '../../packages/core/src/handlers/cem.js';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
@@ -21,11 +18,7 @@ vi.mock('../../packages/core/src/handlers/theme.js', () => ({
     fullThemeCSS: `.${opts?.themeName ?? 'theme'}-light { --hx-color-primary: #0066cc; }`,
   })),
   applyThemeTokens: vi.fn(
-    (
-      _cem: unknown,
-      themeTokens: Record<string, string>,
-      _tagNames?: string[],
-    ) => ({
+    (_cem: unknown, themeTokens: Record<string, string>, _tagNames?: string[]) => ({
       globalBlock: `:root {\n${Object.entries(themeTokens)
         .map(([k, v]) => `  ${k}: ${v};`)
         .join('\n')}\n}`,
@@ -163,11 +156,7 @@ describe('handleThemeCall — apply_theme_tokens', () => {
       '--hx-spacing-md': '1rem',
       '--hx-font-family': 'sans-serif',
     };
-    const result = await handleThemeCall(
-      'apply_theme_tokens',
-      { themeTokens: tokens },
-      RICH_CEM,
-    );
+    const result = await handleThemeCall('apply_theme_tokens', { themeTokens: tokens }, RICH_CEM);
     expect(result.isError).toBeFalsy();
     const parsed = JSON.parse(result.content[0].text);
     expect(parsed.matchedTokenCount).toBe(3);

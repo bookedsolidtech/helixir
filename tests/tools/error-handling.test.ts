@@ -98,16 +98,16 @@ describe('sanitizeErrorMessage', () => {
     });
 
     it('replaces all absolute paths when projectRoot is empty string', () => {
-      const result = sanitizeErrorMessage(
-        "Cannot read /Users/alice/myapp/tokens.json",
-        '',
-      );
+      const result = sanitizeErrorMessage('Cannot read /Users/alice/myapp/tokens.json', '');
       expect(result).toContain('[path redacted]');
       expect(result).not.toContain('/Users/alice');
     });
 
     it('leaves messages without absolute paths unchanged', () => {
-      const result = sanitizeErrorMessage('Token not found: --sl-color-primary', '/home/jake/project');
+      const result = sanitizeErrorMessage(
+        'Token not found: --sl-color-primary',
+        '/home/jake/project',
+      );
       expect(result).toBe('Token not found: --sl-color-primary');
     });
   });
@@ -115,7 +115,7 @@ describe('sanitizeErrorMessage', () => {
   describe('VALIDATION / Zod pattern sanitization', () => {
     it('strips regex pattern details from validation messages', () => {
       const result = sanitizeErrorMessage(
-        "String must match pattern /^[a-z]+$/",
+        'String must match pattern /^[a-z]+$/',
         '/home/jake/project',
       );
       expect(result).not.toContain('/^[a-z]+$/');
@@ -124,7 +124,7 @@ describe('sanitizeErrorMessage', () => {
 
     it('strips "Invalid regex:" detail from messages', () => {
       const result = sanitizeErrorMessage(
-        "Invalid regex: /(?<=foo)bar/ is not valid in this engine",
+        'Invalid regex: /(?<=foo)bar/ is not valid in this engine',
         '/home/jake/project',
       );
       expect(result).not.toContain('/(?<=foo)bar/');
@@ -144,7 +144,9 @@ describe('sanitizeErrorMessage', () => {
   describe('handleToolError with projectRoot', () => {
     it('sanitizes absolute path in FILESYSTEM errors when projectRoot is provided', () => {
       const err = Object.assign(
-        new Error("ENOENT: no such file or directory, open '/Users/jake/project/custom-elements.json'"),
+        new Error(
+          "ENOENT: no such file or directory, open '/Users/jake/project/custom-elements.json'",
+        ),
         { code: 'ENOENT' },
       );
       const result = handleToolError(err, '/Users/jake/project');
@@ -154,7 +156,7 @@ describe('sanitizeErrorMessage', () => {
     });
 
     it('sanitizes absolute paths in VALIDATION errors when projectRoot is provided', () => {
-      const err = new SyntaxError("Unexpected token at /Users/jake/project/src/index.ts:10");
+      const err = new SyntaxError('Unexpected token at /Users/jake/project/src/index.ts:10');
       const result = handleToolError(err, '/Users/jake/project');
       expect(result.category).toBe(ErrorCategory.VALIDATION);
       expect(result.message).not.toContain('/Users/jake/project');

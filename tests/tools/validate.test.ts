@@ -14,16 +14,14 @@ import type { Cem } from '../../packages/core/src/handlers/cem.js';
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
 vi.mock('../../packages/core/src/handlers/validate.js', () => ({
-  validateUsage: vi.fn(
-    (tagName: string, html: string, _cem: unknown) => ({
-      tagName,
-      html,
-      valid: true,
-      issues: [],
-      issueCount: 0,
-      formatted: `## Validation: ${tagName}\n\n**Result:** PASS\n\nNo issues found.`,
-    }),
-  ),
+  validateUsage: vi.fn((tagName: string, html: string, _cem: unknown) => ({
+    tagName,
+    html,
+    valid: true,
+    issues: [],
+    issueCount: 0,
+    formatted: `## Validation: ${tagName}\n\n**Result:** PASS\n\nNo issues found.`,
+  })),
 }));
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
@@ -187,11 +185,7 @@ describe('handleValidateCall — error cases', () => {
   });
 
   it('returns error when html is missing', () => {
-    const result = handleValidateCall(
-      'validate_usage',
-      { tagName: 'hx-button' },
-      BUTTON_CEM,
-    );
+    const result = handleValidateCall('validate_usage', { tagName: 'hx-button' }, BUTTON_CEM);
     expect(result.isError).toBe(true);
   });
 

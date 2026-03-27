@@ -188,11 +188,7 @@ describe('handleStoryCall — error cases', () => {
   });
 
   it('returns error with (none) when CEM has no components', async () => {
-    const result = await handleStoryCall(
-      'generate_story',
-      { tagName: 'hx-button' },
-      EMPTY_CEM,
-    );
+    const result = await handleStoryCall('generate_story', { tagName: 'hx-button' }, EMPTY_CEM);
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain('(none)');
   });

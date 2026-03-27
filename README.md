@@ -676,6 +676,12 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) and [`LOCAL.md`](./LOCAL.md) for full
 
 ---
 
+## Compliance
+
+HELiXiR generates a [CycloneDX](https://cyclonedx.org/) Software Bill of Materials (SBOM) as part of every release. The `sbom.json` artifact is attached to each GitHub Release and lists all runtime and development dependencies with their versions, licenses, and package identifiers — suitable for enterprise security audits and supply-chain compliance reviews.
+
+---
+
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.

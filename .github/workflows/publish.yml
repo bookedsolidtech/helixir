@@ -63,6 +63,16 @@ jobs:
       - name: Scan build artifacts for secrets
         run: gitleaks detect --config .gitleaks.toml --source ./build --no-git --verbose --redact
 
+      - name: Generate SBOM
+        run: npx @cyclonedx/cyclonedx-npm --output-file sbom.json --output-format json
+
+      - name: Upload SBOM as release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.json
+          if-no-files-found: error
+
       - name: Version and Publish
         uses: changesets/action@v1
         with:

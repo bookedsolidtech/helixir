@@ -2,6 +2,51 @@ import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 import { discoverCemPath, FRIENDLY_CEM_ERROR } from './shared/discovery.js';
 
+/**
+ * Weight multipliers for each health scoring dimension.
+ * Each key maps to a dimension in the DIMENSION_REGISTRY.
+ * Values are positive multipliers (1.0 = base weight, 2.0 = double, 0.5 = half).
+ */
+export interface ScoringWeights {
+  /** CEM Completeness dimension */
+  readonly documentation?: number;
+  /** Accessibility dimension */
+  readonly accessibility?: number;
+  /** Type Coverage dimension */
+  readonly typeCoverage?: number;
+  /** API Surface Quality dimension */
+  readonly apiConsistency?: number;
+  /** CSS Architecture dimension */
+  readonly cssArchitecture?: number;
+  /** Event Architecture dimension */
+  readonly eventArchitecture?: number;
+  /** Test Coverage dimension */
+  readonly testCoverage?: number;
+  /** Bundle Size dimension */
+  readonly bundleSize?: number;
+  /** Story Coverage dimension */
+  readonly storyCoverage?: number;
+  /** Performance dimension */
+  readonly performance?: number;
+  /** Drupal Readiness dimension */
+  readonly drupalReadiness?: number;
+  /** CEM-Source Fidelity dimension */
+  readonly cemSourceFidelity?: number;
+  /** Slot Architecture dimension */
+  readonly slotArchitecture?: number;
+  /** Naming Consistency dimension */
+  readonly naming?: number;
+}
+
+/**
+ * Enterprise scoring configuration.
+ * Allows teams to adjust dimension weights to match their priorities.
+ */
+export interface ScoringConfig {
+  /** Per-dimension weight multipliers. Missing keys default to 1.0. */
+  readonly weights?: ScoringWeights;
+}
+
 export interface McpWcConfig {
   readonly cemPath: string;
   readonly projectRoot: string;
@@ -13,10 +58,43 @@ export interface McpWcConfig {
   readonly cdnAutoloader?: string | null;
   readonly cdnStylesheet?: string | null;
   readonly watch: boolean;
+  /** Optional scoring configuration for customizing health dimension weights. */
+  readonly scoring?: ScoringConfig;
 }
 
 /** Mutable version used internally during config construction. */
 type McpWcConfigMutable = { -readonly [K in keyof McpWcConfig]: McpWcConfig[K] };
+
+/**
+ * Validates and sanitizes the scoring.weights section from config file.
+ * Invalid values (non-positive numbers, non-numbers) are discarded with a warning.
+ */
+function validateScoringWeights(raw: unknown): ScoringWeights | undefined {
+  if (typeof raw !== 'object' || raw === null) return undefined;
+  const result: Record<string, number> = {};
+  for (const [key, val] of Object.entries(raw as Record<string, unknown>)) {
+    if (typeof val === 'number' && val > 0) {
+      result[key] = val;
+    } else if (val !== undefined) {
+      process.stderr.write(
+        `[helixir] Warning: scoring.weights.${key} must be a positive number. Ignoring.\n`,
+      );
+    }
+  }
+  return Object.keys(result).length > 0 ? (result as ScoringWeights) : undefined;
+}
+
+/**
+ * Parses the scoring section from the config file.
+ * Always returns a ScoringConfig object (never undefined) when called.
+ */
+function parseScoringConfig(raw: unknown): ScoringConfig {
+  if (typeof raw !== 'object' || raw === null) return {};
+  const scoringRaw = raw as Record<string, unknown>;
+  if (scoringRaw['weights'] === undefined) return {};
+  const weights = validateScoringWeights(scoringRaw['weights']);
+  return weights !== undefined ? { weights } : {};
+}
 
 const defaults: McpWcConfig = {
   cemPath: 'custom-elements.json',
@@ -61,7 +139,15 @@ export function loadConfig(): Readonly<McpWcConfig> {
   // Prevent config file from overriding projectRoot (circular dependency).
   const safeFileConfig: Omit<Partial<McpWcConfig>, 'projectRoot'> = { ...fileConfig };
   delete (safeFileConfig as Record<string, unknown>)['projectRoot'];
+  // scoring needs special validation — extract before mass-assign and apply separately
+  const rawScoringFromFile = (safeFileConfig as Record<string, unknown>)['scoring'];
+  delete (safeFileConfig as Record<string, unknown>)['scoring'];
   Object.assign(config, safeFileConfig);
+
+  // Apply validated scoring config (weights must be positive numbers)
+  if (rawScoringFromFile !== undefined) {
+    config.scoring = parseScoringConfig(rawScoringFromFile);
+  }
 
   // Auto-discover cemPath if not explicitly configured via env var or config file
   const cemPathExplicit = process.env['MCP_WC_CEM_PATH'] !== undefined || fileCemPath !== undefined;

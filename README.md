@@ -455,6 +455,7 @@ Place this file at the root of your component library project (or wherever `MCP_
 | `tokensPath`       | `string \| null` | `null`                   | Path to a design tokens JSON file. Set to `null` to disable token tools.                                                                                                                                                                                              |
 | `cdnBase`          | `string \| null` | `null`                   | Base URL prepended to component paths when generating CDN `<script>` and `<link>` tags in `suggest_usage` output (e.g. `"https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2/cdn"`). Does not affect `resolve_cdn_cem`. Set to `null` to disable CDN suggestions. |
 | `watch`            | `boolean`        | `false`                  | When `true`, HELiXiR automatically reloads the CEM on file changes.                                                                                                                                                                                                   |
+| `scoring`          | `object`         | `undefined`              | Optional scoring configuration for customizing health dimension weights. See [Configurable Health Scoring Weights](#configurable-health-scoring-weights).                                                                                                              |
 
 **Full example:**
 
@@ -467,6 +468,72 @@ Place this file at the root of your component library project (or wherever `MCP_
   "tsconfigPath": "tsconfig.build.json",
   "tokensPath": "dist/tokens/tokens.json",
   "cdnBase": "https://cdn.jsdelivr.net/npm"
+}
+```
+
+### Configurable Health Scoring Weights
+
+Enterprise teams have different priorities. A design system team may weight accessibility at 3× while a rapid-prototyping team may treat it as lower priority. The `scoring.weights` config section lets you adjust per-dimension weight multipliers:
+
+```json
+{
+  "scoring": {
+    "weights": {
+      "documentation": 1.0,
+      "accessibility": 1.5,
+      "naming": 1.0,
+      "apiConsistency": 1.0,
+      "cssArchitecture": 1.0,
+      "cemSourceFidelity": 0.5
+    }
+  }
+}
+```
+
+Each value is a **positive multiplier** applied to that dimension's base weight (e.g. `1.5` = 50% more influence; `0.5` = half influence). Omitted keys default to `1.0` (unchanged). Setting a key to `0` or a negative number is rejected with a warning.
+
+**Supported keys and their dimensions:**
+
+| Config Key          | Health Dimension         | Default Weight |
+| ------------------- | ------------------------ | -------------- |
+| `documentation`     | CEM Completeness         | 15             |
+| `accessibility`     | Accessibility            | 10             |
+| `typeCoverage`      | Type Coverage            | 10             |
+| `apiConsistency`    | API Surface Quality      | 10             |
+| `cemSourceFidelity` | CEM-Source Fidelity      | 10             |
+| `testCoverage`      | Test Coverage            | 10             |
+| `cssArchitecture`   | CSS Architecture         | 5              |
+| `eventArchitecture` | Event Architecture       | 5              |
+| `slotArchitecture`  | Slot Architecture        | 5              |
+| `bundleSize`        | Bundle Size              | 5              |
+| `storyCoverage`     | Story Coverage           | 5              |
+| `naming`            | Naming Consistency       | 5              |
+| `performance`       | Performance              | 5              |
+| `drupalReadiness`   | Drupal Readiness         | 5              |
+
+**Accessibility-first team example:**
+```json
+{
+  "scoring": {
+    "weights": {
+      "accessibility": 3.0,
+      "testCoverage": 2.0,
+      "cemSourceFidelity": 0.5
+    }
+  }
+}
+```
+
+**Rapid-prototyping team example:**
+```json
+{
+  "scoring": {
+    "weights": {
+      "documentation": 0.5,
+      "testCoverage": 0.5,
+      "accessibility": 0.5
+    }
+  }
 }
 ```
 

@@ -21,12 +21,14 @@ import {
 } from './analyzers/naming-consistency.js';
 import {
   DIMENSION_REGISTRY,
+  DIMENSION_WEIGHT_KEYS,
   calculateGrade,
   computeWeightedScore,
   type ConfidenceLevel,
   type DimensionResult,
   type SubMetric,
 } from './dimensions.js';
+import type { ScoringWeights } from '../config.js';
 
 // ─── Return types ────────────────────────────────────────────────────────────
 
@@ -741,6 +743,31 @@ function scoreCemCompleteness(decl: CemDeclaration): { score: number; subMetrics
 }
 
 /**
+ * Returns the effective weight for a dimension, applying any multiplier
+ * from the config's `scoring.weights` section.
+ *
+ * @param baseWeight - The base weight from DIMENSION_REGISTRY
+ * @param dimensionName - The dimension name (e.g. 'CEM Completeness')
+ * @param weights - Optional scoring weights from config
+ * @returns The base weight multiplied by the configured multiplier (defaults to 1.0)
+ */
+function getEffectiveWeight(
+  baseWeight: number,
+  dimensionName: string,
+  weights: ScoringWeights | undefined,
+): number {
+  if (!weights) return baseWeight;
+  // Find the config key that maps to this dimension name
+  for (const [key, name] of Object.entries(DIMENSION_WEIGHT_KEYS)) {
+    if (name === dimensionName) {
+      const multiplier = (weights as Record<string, number | undefined>)[key];
+      return multiplier !== undefined ? baseWeight * multiplier : baseWeight;
+    }
+  }
+  return baseWeight;
+}
+
+/**
  * Scores a component across all 11 dimensions using the enterprise grade algorithm.
  * CEM-native dimensions are computed from the declaration.
  * External dimensions are checked via history files (reported as untested if unavailable).
@@ -768,7 +795,11 @@ export async function scoreComponentMultiDimensional(
     // No history available — external dimensions will be untested
   }
 
+  const scoringWeights = config.scoring?.weights;
+
   for (const def of DIMENSION_REGISTRY) {
+    const effectiveWeight = getEffectiveWeight(def.weight, def.name, scoringWeights);
+
     if (def.source === 'cem-native') {
       const result = await scoreCemNativeDimension(
         def.name,
@@ -782,7 +813,7 @@ export async function scoreComponentMultiDimensional(
       dimensions.push({
         name: def.name,
         score: result.score,
-        weight: def.weight,
+        weight: effectiveWeight,
         tier: def.tier,
         confidence: result.confidence,
         measured: !notApplicable,
@@ -795,7 +826,7 @@ export async function scoreComponentMultiDimensional(
         dimensions.push({
           name: def.name,
           score: historyEntry.score,
-          weight: def.weight,
+          weight: effectiveWeight,
           tier: def.tier,
           confidence: (historyEntry.confidence as 'verified' | 'heuristic') ?? 'verified',
           measured: true,
@@ -804,7 +835,7 @@ export async function scoreComponentMultiDimensional(
         dimensions.push({
           name: def.name,
           score: 0,
-          weight: def.weight,
+          weight: effectiveWeight,
           tier: def.tier,
           confidence: 'untested',
           measured: false,

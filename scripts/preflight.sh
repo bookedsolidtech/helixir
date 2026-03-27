@@ -1,53 +1,146 @@
 #!/usr/bin/env bash
-# scripts/preflight.sh — All quality gates in one command
-# Usage: pnpm run preflight
-#        SKIP_ACT=1 pnpm run preflight  (skip Docker gate)
+# ==============================================================================
+# Preflight — Local CI equivalent. Run before every push.
+# ==============================================================================
+# Mirrors the CI pipeline exactly so all failures are caught locally.
+# Fails fast on first error.
+#
+# Gates (in order):
+#   1. Lint (ESLint)
+#   2. Format check (Prettier)
+#   3. Type check (TypeScript strict)
+#   4. Build (tsc)
+#   5. Test (Vitest, Node mode)
+#   6. Changeset check (if source changed)
+#   7. Docker CI (act — full CI pipeline in Docker containers)
+#
+# Usage:
+#   pnpm run preflight
+#   SKIP_CHANGESET=1 pnpm run preflight   # bypass changeset gate (infra-only changes)
+#   SKIP_ACT=1 pnpm run preflight         # bypass Docker CI gate
+# ==============================================================================
+
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
-echo "=== Preflight quality gates ==="
+echo "════════════════════════════════════════════════"
+echo "  HELiXiR Preflight — local CI equivalent"
+echo "════════════════════════════════════════════════"
 echo ""
 
-# ── Gate 1: Lint ─────────────────────────────────────────────────────────
-echo "Gate 1/6: Lint"
-pnpm run lint
-echo ""
+# ── Resolve base branch and common ancestor ──────────────────────────────────
 
-# ── Gate 2: Format ───────────────────────────────────────────────────────
-echo "Gate 2/6: Format"
-pnpm run format:check
-echo ""
+BASE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null \
+  | sed 's|refs/remotes/origin/||' \
+  || git rev-parse --abbrev-ref origin/HEAD 2>/dev/null \
+  | sed 's|origin/||' \
+  || echo "dev")
 
-# ── Gate 3: Type check ──────────────────────────────────────────────────
-echo "Gate 3/6: Type check"
-pnpm run type-check
-echo ""
+COMMON_ANCESTOR=$(git merge-base HEAD "origin/${BASE_BRANCH}" 2>/dev/null || echo "")
 
-# ── Gate 4: Build ────────────────────────────────────────────────────────
-echo "Gate 4/6: Build"
-pnpm run build
-echo ""
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
 
-# ── Gate 5: Test ─────────────────────────────────────────────────────────
-echo "Gate 5/6: Test"
-pnpm run test
-echo ""
-
-# ── Gate 6: Docker CI (act) ─────────────────────────────────────────────
-if [ "${SKIP_ACT:-}" = "1" ]; then
-  echo "Gate 6/6: Docker CI — SKIPPED (SKIP_ACT=1)"
-elif ! command -v act &>/dev/null; then
-  echo "Gate 6/6: Docker CI — SKIPPED (act not installed)"
-  echo "  Install: brew install act"
-elif ! docker info &>/dev/null 2>&1; then
-  echo "Gate 6/6: Docker CI — SKIPPED (Docker not running)"
-  echo "  Start Docker Desktop to enable this gate"
-else
-  echo "Gate 6/6: Docker CI (act)"
-  ./scripts/act-ci.sh --native
+# Detect changed source files (src/ or packages/core/src/)
+CHANGED_SOURCES=""
+if [ -n "$COMMON_ANCESTOR" ]; then
+  CHANGED_SOURCES=$(git diff --name-only "$COMMON_ANCESTOR"...HEAD \
+    | grep -E '^(src/|packages/core/src/)' \
+    | grep -v '\.test\.ts$' \
+    || true)
 fi
 
+# ── Gate 1: Lint ─────────────────────────────────────────────────────────────
+
+echo "▶ [1/7] Lint"
+pnpm run lint
+echo "  ✓ Lint passed"
 echo ""
-echo "=== All preflight gates passed ==="
+
+# ── Gate 2: Format check ─────────────────────────────────────────────────────
+
+echo "▶ [2/7] Format check"
+pnpm run format:check
+echo "  ✓ Format passed"
+echo ""
+
+# ── Gate 3: Type check ───────────────────────────────────────────────────────
+
+echo "▶ [3/7] Type check"
+pnpm run type-check
+echo "  ✓ Type check passed"
+echo ""
+
+# ── Gate 4: Build ────────────────────────────────────────────────────────────
+
+echo "▶ [4/7] Build"
+pnpm run build
+echo "  ✓ Build passed"
+echo ""
+
+# ── Gate 5: Test ─────────────────────────────────────────────────────────────
+
+echo "▶ [5/7] Test"
+pnpm run test
+echo "  ✓ Tests passed"
+echo ""
+
+# ── Gate 6: Changeset ────────────────────────────────────────────────────────
+
+echo "▶ [6/7] Changeset"
+
+if [ "${SKIP_CHANGESET:-0}" = "1" ]; then
+  echo "  ✓ SKIP_CHANGESET=1 — bypassed"
+elif [[ "$CURRENT_BRANCH" == "main" || "$CURRENT_BRANCH" == "staging" || "$CURRENT_BRANCH" == "dev" ]] \
+  || [[ "$CURRENT_BRANCH" == *"audit/"* ]]; then
+  echo "  ✓ Changeset check skipped (branch: $CURRENT_BRANCH)"
+elif [ -n "$COMMON_ANCESTOR" ] && [ -n "$CHANGED_SOURCES" ]; then
+  CHANGESET_ADDED=$(git diff --name-only "$COMMON_ANCESTOR"...HEAD \
+    | grep '^\.changeset/.*\.md$' | grep -v 'README\.md' || true)
+
+  if [ -z "$CHANGESET_ADDED" ]; then
+    echo ""
+    echo "  ✗ CHANGESET REQUIRED — source was modified but no changeset found."
+    echo ""
+    echo "    Run: pnpm exec changeset"
+    echo "    Select the package, bump type, and write a description."
+    echo "    Commit the .changeset/*.md file with your changes."
+    echo ""
+    echo "    To bypass for infra-only work: SKIP_CHANGESET=1 pnpm run preflight"
+    echo ""
+    exit 1
+  fi
+  echo "  ✓ Changeset found: $CHANGESET_ADDED"
+else
+  echo "  ✓ No source changes — changeset not required"
+fi
+echo ""
+
+# ── Gate 7: Docker CI (act) ──────────────────────────────────────────────────
+
+echo "▶ [7/7] Docker CI (act)"
+
+if [ "${SKIP_ACT:-0}" = "1" ]; then
+  echo "  ⚠ SKIP_ACT=1 — Docker CI gate bypassed"
+elif ! command -v act &>/dev/null || ! docker info &>/dev/null 2>&1; then
+  echo "  ⚠ WARNING: Docker CI gate skipped — Docker not running or act not installed"
+  echo "    CI may fail on push. Install: brew install act && open -a Docker"
+else
+  echo "  Running full CI in Docker..."
+  if ./scripts/act-ci.sh --native; then
+    echo "  ✓ Docker CI passed"
+  else
+    echo ""
+    echo "  ✗ DOCKER CI FAILED — do NOT push."
+    echo "    Fix the errors above and re-run: pnpm run preflight"
+    exit 1
+  fi
+fi
+echo ""
+
+# ── All gates passed ──────────────────────────────────────────────────────────
+
+echo "════════════════════════════════════════════════"
+echo "  ✓ All preflight gates passed — safe to push!"
+echo "════════════════════════════════════════════════"

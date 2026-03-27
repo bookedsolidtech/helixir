@@ -18,7 +18,7 @@ pnpm lint                # eslint src tests
 
 ## Pre-Push Quality Gate
 
-Every `git push` runs `pnpm run preflight` via the pre-push hook. This executes 6 gates sequentially — any failure blocks the push.
+Every `git push` runs `pnpm run preflight` via the pre-push hook. This executes 7 gates sequentially — any failure blocks the push.
 
 | Gate | Check | Command |
 |------|-------|---------|
@@ -27,12 +27,12 @@ Every `git push` runs `pnpm run preflight` via the pre-push hook. This executes 
 | 3 | Type check | `pnpm run type-check` |
 | 4 | Build | `pnpm run build` |
 | 5 | Test | `pnpm run test` |
-| 6 | Docker CI | `./scripts/act-ci.sh --native` |
+| 6 | Changeset | Requires `.changeset/*.md` if `src/` or `packages/core/src/` changed |
+| 7 | Docker CI | `./scripts/act-ci.sh --native` (if Docker available) |
 
-Gate 6 runs if `act` and Docker are available. If not, it skips with a warning.
-
-**Bypass Docker gate:** `SKIP_ACT=1 git push` (explicit opt-out, not silent skip)
-**Emergency bypass:** `git push --no-verify` (skips all hooks)
+**Bypass changeset:** `SKIP_CHANGESET=1 pnpm run preflight` (infra-only changes)
+**Bypass Docker:** `SKIP_ACT=1 pnpm run preflight`
+**Emergency bypass all:** `git push --no-verify`
 **Do NOT use `HUSKY=0`.**
 
 ## Architecture: Critical Rules

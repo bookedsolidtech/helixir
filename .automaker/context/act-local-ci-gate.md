@@ -41,12 +41,12 @@ Docker RWLayer corruption bugs with amd64 containers.
 
 ## Relationship to Preflight
 
-act-ci is **Gate 6** inside `pnpm run preflight` (`scripts/preflight.sh`).
+act-ci is **Gate 7** inside `pnpm run preflight` (`scripts/preflight.sh`).
 It runs automatically if `act` is installed and Docker is running.
 
-- Docker + act available → Gate 6 runs, hard fail if it fails
-- Docker not running → Gate 6 skips with warning
-- `SKIP_ACT=1` → Gate 6 skips explicitly
+- Docker + act available → Gate 7 runs, hard fail if it fails
+- Docker not running → Gate 7 skips with warning
+- `SKIP_ACT=1` → Gate 7 skips explicitly
 
 This means any caller of `pnpm run preflight` gets the Docker CI gate
 automatically — git hooks, agents, humans, CI. One command, all gates.
@@ -59,7 +59,7 @@ automatically — git hooks, agents, humans, CI. One command, all gates.
 
 ## For Agents
 
-Do NOT call `./scripts/act-ci.sh` separately. It runs automatically as Gate 6
+Do NOT call `./scripts/act-ci.sh` separately. It runs automatically as Gate 7
 inside `pnpm run preflight`, which the pre-push hook calls. Just `git push` —
 if Docker is available, the act-ci gate runs. If it fails, fix and retry.
 

@@ -346,7 +346,11 @@ describe('handleStylingCall — check_shadow_dom_usage', () => {
 
     expect(result.isError).toBeFalsy();
     // meta should be undefined when parseCem throws
-    expect(vi.mocked(checkShadowDomUsage)).toHaveBeenCalledWith('x-button .foo {}', 'x-button', undefined);
+    expect(vi.mocked(checkShadowDomUsage)).toHaveBeenCalledWith(
+      'x-button .foo {}',
+      'x-button',
+      undefined,
+    );
   });
 
   it('returns error when cssText is missing', () => {
@@ -448,11 +452,7 @@ describe('handleStylingCall — get_component_quick_ref', () => {
     vi.mocked(parseCem).mockReturnValue(FAKE_META);
     vi.mocked(getComponentQuickRef).mockReturnValue({ attributes: [], parts: [] });
 
-    const result = handleStylingCall(
-      'get_component_quick_ref',
-      { tagName: 'my-button' },
-      FAKE_CEM,
-    );
+    const result = handleStylingCall('get_component_quick_ref', { tagName: 'my-button' }, FAKE_CEM);
 
     expect(result.isError).toBeFalsy();
     expect(vi.mocked(getComponentQuickRef)).toHaveBeenCalledWith(FAKE_META);
@@ -818,7 +818,9 @@ describe('handleStylingCall — check_css_specificity', () => {
       FAKE_CEM,
     );
 
-    expect(vi.mocked(checkCssSpecificity)).toHaveBeenCalledWith(expect.any(String), { mode: 'html' });
+    expect(vi.mocked(checkCssSpecificity)).toHaveBeenCalledWith(expect.any(String), {
+      mode: 'html',
+    });
   });
 
   it('returns error when code is missing', () => {
@@ -1041,7 +1043,11 @@ describe('handleStylingCall — validate_component_code', () => {
 
     expect(result.isError).toBeFalsy();
     expect(vi.mocked(validateComponentCode)).toHaveBeenCalledWith(
-      expect.objectContaining({ html: '<my-button></my-button>', tagName: 'my-button', cem: FAKE_CEM }),
+      expect.objectContaining({
+        html: '<my-button></my-button>',
+        tagName: 'my-button',
+        cem: FAKE_CEM,
+      }),
     );
     const parsed = JSON.parse(result.content[0].text);
     expect(parsed.passed).toBe(true);
@@ -1217,7 +1223,9 @@ describe('handleStylingCall — check_dark_mode_patterns', () => {
     );
 
     expect(result.isError).toBeFalsy();
-    expect(vi.mocked(checkDarkModePatterns)).toHaveBeenCalledWith('.dark my-button { color: white; }');
+    expect(vi.mocked(checkDarkModePatterns)).toHaveBeenCalledWith(
+      '.dark my-button { color: white; }',
+    );
     const parsed = JSON.parse(result.content[0].text);
     expect(parsed.issues).toEqual([]);
   });

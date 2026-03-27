@@ -4,28 +4,28 @@
  * and response formatting.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-  isBundleTool,
-  handleBundleCall,
-} from '../../packages/core/src/tools/bundle.js';
+import { isBundleTool, handleBundleCall } from '../../packages/core/src/tools/bundle.js';
 import type { McpWcConfig } from '../../packages/core/src/config.js';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
 vi.mock('../../packages/core/src/handlers/bundle.js', () => ({
-  estimateBundleSize: vi.fn(async (tagName: string, _config: unknown, _pkg?: string, version = 'latest') => ({
-    component: tagName,
-    package: _pkg ?? '@shoelace-style/shoelace',
-    version,
-    estimates: {
-      component_only: null,
-      full_package: { minified: 48000, gzipped: 14000 },
-      shared_dependencies: 'Actual component size depends on tree-shaking and bundler configuration.',
-    },
-    source: 'bundlephobia',
-    cached: false,
-    note: 'Sizes are estimates. Actual bundle size depends on your bundler and tree-shaking config.',
-  })),
+  estimateBundleSize: vi.fn(
+    async (tagName: string, _config: unknown, _pkg?: string, version = 'latest') => ({
+      component: tagName,
+      package: _pkg ?? '@shoelace-style/shoelace',
+      version,
+      estimates: {
+        component_only: null,
+        full_package: { minified: 48000, gzipped: 14000 },
+        shared_dependencies:
+          'Actual component size depends on tree-shaking and bundler configuration.',
+      },
+      source: 'bundlephobia',
+      cached: false,
+      note: 'Sizes are estimates. Actual bundle size depends on your bundler and tree-shaking config.',
+    }),
+  ),
 }));
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────

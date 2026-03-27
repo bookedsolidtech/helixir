@@ -1,5 +1,5 @@
-node_modules/
-build/
+node_modules
+build
 dist/
 coverage/
 
@@ -28,6 +28,9 @@ coverage/
 .automaker/trajectory/
 .automaker/authority/
 .automaker/settings.json
+
+# SBOM (generated artifact)
+sbom.json
 
 # Reports (generated artifacts)
 protoLabs.report.html

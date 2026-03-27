@@ -184,11 +184,7 @@ describe('handleCompositionCall — error cases', () => {
   });
 
   it('returns error when tagNames is empty array', () => {
-    const result = handleCompositionCall(
-      'get_composition_example',
-      { tagNames: [] },
-      FAKE_CEM,
-    );
+    const result = handleCompositionCall('get_composition_example', { tagNames: [] }, FAKE_CEM);
     expect(result.isError).toBe(true);
   });
 
@@ -219,7 +215,8 @@ describe('handleCompositionCall — handler error propagation', () => {
   });
 
   it('returns error when getCompositionExample handler throws', async () => {
-    const { getCompositionExample } = await import('../../packages/core/src/handlers/composition.js');
+    const { getCompositionExample } =
+      await import('../../packages/core/src/handlers/composition.js');
     vi.mocked(getCompositionExample).mockImplementationOnce(() => {
       throw new Error('Component not found in CEM');
     });

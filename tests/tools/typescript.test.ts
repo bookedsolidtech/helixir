@@ -230,7 +230,8 @@ describe('handleTypeScriptCall — handler error propagation', () => {
   });
 
   it('returns error when getProjectDiagnostics handler throws', async () => {
-    const { getProjectDiagnostics } = await import('../../packages/core/src/handlers/typescript.js');
+    const { getProjectDiagnostics } =
+      await import('../../packages/core/src/handlers/typescript.js');
     vi.mocked(getProjectDiagnostics).mockImplementationOnce(() => {
       throw new Error('Project root does not exist');
     });

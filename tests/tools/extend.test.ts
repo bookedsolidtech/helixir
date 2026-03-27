@@ -4,35 +4,34 @@
  * and response formatting with CEM-based component inputs.
  */
 import { describe, it, expect, vi } from 'vitest';
-import {
-  isExtendTool,
-  handleExtendCall,
-} from '../../packages/core/src/tools/extend.js';
+import { isExtendTool, handleExtendCall } from '../../packages/core/src/tools/extend.js';
 import type { Cem } from '../../packages/core/src/handlers/cem.js';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
 vi.mock('../../packages/core/src/handlers/extend.js', () => ({
-  extendComponent: vi.fn((parentTagName: string, newTagName: string, _cem: unknown, newClassName?: string) => {
-    const parentClass = parentTagName.replace(/-([a-z])/g, (_, l: string) => l.toUpperCase());
-    const defaultNewClass = newTagName.replace(/-([a-z])/g, (_, l: string) => l.toUpperCase());
-    const newClass = newClassName ?? defaultNewClass;
-    return {
-      parentTagName,
-      newTagName,
-      parentClassName: parentClass.charAt(0).toUpperCase() + parentClass.slice(1),
-      newClassName: newClass.charAt(0).toUpperCase() + newClass.slice(1),
-      source: `import { ${parentClass.charAt(0).toUpperCase() + parentClass.slice(1)} } from './${parentTagName}.js'\nexport class ${newClass.charAt(0).toUpperCase() + newClass.slice(1)} extends ${parentClass.charAt(0).toUpperCase() + parentClass.slice(1)} {}\n@customElement('${newTagName}')`,
-      inheritedCssParts: ['base', 'label'],
-      inheritedSlots: ['(default)', 'prefix'],
-      warnings: [
-        'shadow DOM style encapsulation',
-        'exportparts must be declared',
-        'render() override replaces parent template',
-        'shadowRoot.querySelector() is not recommended',
-      ],
-    };
-  }),
+  extendComponent: vi.fn(
+    (parentTagName: string, newTagName: string, _cem: unknown, newClassName?: string) => {
+      const parentClass = parentTagName.replace(/-([a-z])/g, (_, l: string) => l.toUpperCase());
+      const defaultNewClass = newTagName.replace(/-([a-z])/g, (_, l: string) => l.toUpperCase());
+      const newClass = newClassName ?? defaultNewClass;
+      return {
+        parentTagName,
+        newTagName,
+        parentClassName: parentClass.charAt(0).toUpperCase() + parentClass.slice(1),
+        newClassName: newClass.charAt(0).toUpperCase() + newClass.slice(1),
+        source: `import { ${parentClass.charAt(0).toUpperCase() + parentClass.slice(1)} } from './${parentTagName}.js'\nexport class ${newClass.charAt(0).toUpperCase() + newClass.slice(1)} extends ${parentClass.charAt(0).toUpperCase() + parentClass.slice(1)} {}\n@customElement('${newTagName}')`,
+        inheritedCssParts: ['base', 'label'],
+        inheritedSlots: ['(default)', 'prefix'],
+        warnings: [
+          'shadow DOM style encapsulation',
+          'exportparts must be declared',
+          'render() override replaces parent template',
+          'shadowRoot.querySelector() is not recommended',
+        ],
+      };
+    },
+  ),
 }));
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
@@ -199,20 +198,12 @@ describe('handleExtendCall — error cases', () => {
   });
 
   it('returns error when parentTagName is missing', () => {
-    const result = handleExtendCall(
-      'extend_component',
-      { newTagName: 'my-button' },
-      PARENT_CEM,
-    );
+    const result = handleExtendCall('extend_component', { newTagName: 'my-button' }, PARENT_CEM);
     expect(result.isError).toBe(true);
   });
 
   it('returns error when newTagName is missing', () => {
-    const result = handleExtendCall(
-      'extend_component',
-      { parentTagName: 'hx-button' },
-      PARENT_CEM,
-    );
+    const result = handleExtendCall('extend_component', { parentTagName: 'hx-button' }, PARENT_CEM);
     expect(result.isError).toBe(true);
   });
 

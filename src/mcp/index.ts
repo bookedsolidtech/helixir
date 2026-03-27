@@ -184,7 +184,9 @@ export async function main(): Promise<void> {
     loadCem(cemAbsPath);
   } catch (err) {
     const relPath = relative(resolvedProjectRoot, cemAbsPath);
-    process.stderr.write(`Fatal: CEM file at ${relPath} is invalid: ${handleToolError(err).message}\n`);
+    process.stderr.write(
+      `Fatal: CEM file at ${relPath} is invalid: ${handleToolError(err).message}\n`,
+    );
     process.exit(1);
   }
 

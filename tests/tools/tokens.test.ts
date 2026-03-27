@@ -24,9 +24,9 @@ vi.mock('../../packages/core/src/handlers/tokens.js', () => ({
     categories: ['color', 'spacing'],
   })),
   findToken: vi.fn(async (_config: unknown, query: string) => ({
-    tokens: [
-      { name: '--color-primary', value: '#0066cc', category: 'color' },
-    ].filter((t) => t.name.includes(query) || t.value.includes(query)),
+    tokens: [{ name: '--color-primary', value: '#0066cc', category: 'color' }].filter(
+      (t) => t.name.includes(query) || t.value.includes(query),
+    ),
     count: 1,
     query,
   })),
@@ -111,11 +111,7 @@ describe('handleTokenCall — get_design_tokens', () => {
   });
 
   it('accepts optional category filter', async () => {
-    const result = await handleTokenCall(
-      'get_design_tokens',
-      { category: 'color' },
-      FAKE_CONFIG,
-    );
+    const result = await handleTokenCall('get_design_tokens', { category: 'color' }, FAKE_CONFIG);
     expect(result.isError).toBeFalsy();
   });
 

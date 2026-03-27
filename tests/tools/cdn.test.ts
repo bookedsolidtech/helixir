@@ -4,7 +4,11 @@
  * and response formatting.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { isCdnTool, handleCdnCall, CDN_TOOL_DEFINITIONS } from '../../packages/core/src/tools/cdn.js';
+import {
+  isCdnTool,
+  handleCdnCall,
+  CDN_TOOL_DEFINITIONS,
+} from '../../packages/core/src/tools/cdn.js';
 import type { McpWcConfig } from '../../packages/core/src/config.js';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
@@ -129,11 +133,7 @@ describe('handleCdnCall — valid inputs', () => {
   it('defaults version to latest when omitted', async () => {
     const { resolveCdnCem } = await import('../../packages/core/src/handlers/cdn.js');
     vi.mocked(resolveCdnCem).mockClear();
-    await handleCdnCall(
-      'resolve_cdn_cem',
-      { package: '@shoelace-style/shoelace' },
-      FAKE_CONFIG,
-    );
+    await handleCdnCall('resolve_cdn_cem', { package: '@shoelace-style/shoelace' }, FAKE_CONFIG);
     expect(vi.mocked(resolveCdnCem)).toHaveBeenCalledWith(
       '@shoelace-style/shoelace',
       'latest',
@@ -147,11 +147,7 @@ describe('handleCdnCall — valid inputs', () => {
   it('defaults registry to jsdelivr when omitted', async () => {
     const { resolveCdnCem } = await import('../../packages/core/src/handlers/cdn.js');
     vi.mocked(resolveCdnCem).mockClear();
-    await handleCdnCall(
-      'resolve_cdn_cem',
-      { package: '@shoelace-style/shoelace' },
-      FAKE_CONFIG,
-    );
+    await handleCdnCall('resolve_cdn_cem', { package: '@shoelace-style/shoelace' }, FAKE_CONFIG);
     const [, , registry] = vi.mocked(resolveCdnCem).mock.calls[0];
     expect(registry).toBe('jsdelivr');
   });

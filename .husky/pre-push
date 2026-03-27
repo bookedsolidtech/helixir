@@ -1,7 +1,28 @@
 #!/bin/sh
 
-# Gate: Format check — fails push if code is unformatted.
-# Auto-formatting runs in the pre-commit hook (lint-staged).
-# This hook is enforcement: if you bypassed pre-commit, your push fails here.
-# CI format check is the final un-bypassable backstop.
-pnpm run format:check
+# ── Quality Gate: pre-push ──────────────────────────────────────────────
+# ALL quality gates must pass before code leaves this machine.
+# This is the hard gate — no bypass, no shortcuts.
+#
+# Gates: lint → format → type-check → build → test
+# Time: ~15-30s natively (no Docker required)
+#
+# To skip (EMERGENCY ONLY): git push --no-verify
+# ─────────────────────────────────────────────────────────────────────────
+
+echo "=== Pre-push quality gate ==="
+echo "Running all quality checks before push..."
+echo ""
+
+pnpm run preflight
+
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "=== PUSH BLOCKED ==="
+  echo "Quality gates failed. Fix the errors above and try again."
+  echo "Do NOT use --no-verify to bypass this gate."
+  exit 1
+fi
+
+echo ""
+echo "=== All quality gates passed — pushing ==="

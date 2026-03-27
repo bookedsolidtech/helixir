@@ -39,6 +39,20 @@ that don't work in local Docker.
 **Apple Silicon:** Always use `--native` to avoid Rosetta emulation overhead and
 Docker RWLayer corruption bugs with amd64 containers.
 
+## Relationship to Pre-Push Hook
+
+The pre-push git hook runs `pnpm run preflight` automatically on every push.
+This is the **primary** quality gate — it runs natively without Docker.
+
+act-ci is the **secondary** gate — it runs the same checks inside Docker
+containers matching the GitHub Actions environment. Use act-ci for:
+- Extra confidence before pushing critical changes
+- Debugging CI-specific failures (environment differences)
+- Verifying the Docker-based pipeline still works
+
+For most pushes, the pre-push hook is sufficient. act-ci adds ~15s but
+guarantees exact GitHub Actions parity.
+
 ## Requirements
 
 - Docker must be running (`docker info`)

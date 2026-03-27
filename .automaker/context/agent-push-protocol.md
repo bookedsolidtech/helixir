@@ -3,7 +3,7 @@
 Every agent push MUST follow this exact sequence. No shortcuts. No exceptions.
 Pushing code that fails CI is a wasted cycle and an unacceptable failure.
 
-**CODE DOES NOT LEAVE THIS MACHINE UNTIL IT PASSES THE LOCAL DOCKER CI GATE.**
+**CODE DOES NOT LEAVE THIS MACHINE UNTIL IT PASSES ALL QUALITY GATES.**
 
 ---
 
@@ -16,48 +16,34 @@ pnpm run format
 git add -u
 ```
 
-### Step 2: Local Checks (fast)
+### Step 2: Commit
 
 ```bash
-pnpm run lint
-pnpm run format:check
-pnpm run type-check
-pnpm run build
-pnpm run test
+git commit -m "type(scope): lowercase message"
 ```
 
-If any step fails: **FIX THE ERRORS.** Do not proceed.
+Do NOT use `HUSKY=0`. The pre-commit hook runs gitleaks (secret scanning)
+and lint-staged. These are safety checks, not obstacles.
 
-### Step 3: Docker CI Gate (MANDATORY)
+### Step 3: Push
 
 ```bash
-./scripts/act-ci.sh
+git push origin <branch>
 ```
 
-This runs the FULL quality gates inside Docker containers — the exact same
-environment as GitHub Actions CI. If it passes here, it WILL pass on GitHub.
+The pre-push hook runs `pnpm run preflight` automatically. This executes:
+1. Lint (ESLint)
+2. Format check (Prettier)
+3. Type check (TypeScript strict)
+4. Build (tsc compilation)
+5. Test (Vitest)
 
-**If act fails: FIX THE ERRORS. Do not push. Do not skip. This is non-negotiable.**
+If ANY gate fails, the push is blocked. Fix the errors and push again.
 
-If Docker is not running, start it. If `act` is not installed, stop — you cannot push.
+**Do NOT use `--no-verify` to bypass the pre-push hook.**
+**Do NOT use `HUSKY=0` to skip hooks.**
 
-### Step 4: Commit
-
-```bash
-HUSKY=0 git commit -m "type(scope): lowercase message"
-```
-
-Subject must be ALL LOWERCASE. Max 120 chars.
-
-### Step 5: Push ONCE
-
-```bash
-HUSKY=0 git push origin <branch>
-```
-
-ONE push. ONE CodeRabbit review cycle. Never push twice.
-
-### Step 6: Create PR + Auto-Merge
+### Step 4: Create PR + Auto-Merge
 
 ```bash
 PR_URL=$(gh pr create \
@@ -73,11 +59,30 @@ gh pr merge $PR_NUMBER --auto --merge --repo bookedsolidtech/helixir
 
 ---
 
+## Enforcement Layers
+
+| Layer | What | Bypassable? |
+|-------|------|-------------|
+| pre-commit | gitleaks + lint-staged | Only with `--no-verify` |
+| commit-msg | commitlint | Only with `--no-verify` |
+| **pre-push** | **Full preflight (lint+format+typecheck+build+test)** | **Only with `--no-verify`** |
+| act-ci | Docker CI (optional additional layer) | Manual invocation |
+
+The pre-push hook is the **hard gate**. If it fails, the push does not happen.
+The act-ci Docker gate (`./scripts/act-ci.sh --native`) is an additional layer
+for extra confidence — it runs the same gates inside a Docker container matching
+the GitHub Actions environment.
+
+---
+
 ## What Happens If You Skip Steps
 
-- **Skip format** — CI format check fails — wasted cycle
-- **Skip local checks** — CI lint/type-check/build/tests fail — wasted cycle
-- **Push twice** — CodeRabbit reviews twice — stale CHANGES_REQUESTED blocks merge
+- **Skip format** → pre-push format check fails → push blocked
+- **Skip lint** → pre-push lint fails → push blocked
+- **Type errors** → pre-push type-check fails → push blocked
+- **Build broken** → pre-push build fails → push blocked
+- **Tests fail** → pre-push test fails → push blocked
+- **Use --no-verify** → EMERGENCY ONLY — document why in the commit message
 
 ---
 
@@ -96,5 +101,5 @@ Commit the `.changeset/*.md` file WITH your code changes (same commit).
 
 ## The One Rule
 
-If `./scripts/act-ci.sh` fails, you do NOT push. Period.
+If `git push` fails due to the pre-push hook, you do NOT bypass it. Period.
 Fix the errors first. Then push. This is non-negotiable.

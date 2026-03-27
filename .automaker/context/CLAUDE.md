@@ -16,6 +16,28 @@ pnpm format:check        # prettier --check .
 pnpm lint                # eslint src tests
 ```
 
+## Pre-Push Quality Gate
+
+Every `git push` triggers a two-layer quality gate via the pre-push hook. This is **code enforcement**, not a suggestion — the push will not complete unless both layers pass.
+
+**Layer 1: Native preflight** (always runs, ~15-30s)
+```bash
+pnpm run preflight
+# Runs: lint → format:check → type-check → build → test
+```
+
+**Layer 2: Docker CI gate** (runs if Docker is available, ~15s)
+```bash
+./scripts/act-ci.sh --native
+# Runs the same gates inside a Docker container matching GitHub Actions
+```
+
+If Docker is not running, Layer 2 is skipped with a warning — Layer 1 is sufficient for most cases. If Docker IS running, both layers must pass.
+
+**Emergency bypass:** `git push --no-verify` — document why in the commit message.
+
+**Do NOT use `HUSKY=0` to skip hooks.** The hooks are the enforcement layer.
+
 ## Architecture: Critical Rules
 
 **Single dispatcher** — ONE `ListToolsRequestSchema` handler, ONE `CallToolRequestSchema` handler in `src/index.ts`. Each `src/tools/*.ts` exports `getTools()` and `handleCall()`. Never register multiple handlers for the same schema type.

@@ -29,6 +29,9 @@ coverage/
 .automaker/authority/
 .automaker/settings.json
 
+# SBOM (generated artifact)
+sbom.json
+
 # Reports (generated artifacts)
 protoLabs.report.html
 *.report.html

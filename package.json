@@ -24,7 +24,6 @@
   "files": [
     "build",
     "!build/**/*.map",
-    "packages/core/src",
     "src/skills",
     "README.md",
     "CHANGELOG.md"

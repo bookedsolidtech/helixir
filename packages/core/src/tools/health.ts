@@ -368,7 +368,7 @@ export async function handleHealthCall(
 
     return createErrorResponse(`Unknown health tool: ${name}`);
   } catch (err) {
-    const mcpErr = handleToolError(err);
+    const mcpErr = handleToolError(err, config.projectRoot);
     return createErrorResponse(`[${mcpErr.category}] ${mcpErr.message}`);
   }
 }

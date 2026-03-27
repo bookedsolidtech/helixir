@@ -3,6 +3,7 @@ import {
   MCPError,
   ErrorCategory,
   handleToolError,
+  sanitizeErrorMessage,
 } from '../../packages/core/src/shared/error-handling.js';
 
 // Mock the handler modules before importing the tool dispatch functions
@@ -71,6 +72,121 @@ describe('handleToolError', () => {
     const err = new Error('some unknown problem');
     const result = handleToolError(err);
     expect(result.category).toBe(ErrorCategory.UNKNOWN);
+  });
+});
+
+// ─── sanitizeErrorMessage ─────────────────────────────────────────────────────
+
+describe('sanitizeErrorMessage', () => {
+  describe('filesystem path sanitization', () => {
+    it('replaces absolute path under projectRoot with relative path', () => {
+      const result = sanitizeErrorMessage(
+        "ENOENT: no such file or directory, open '/home/jake/project/custom-elements.json'",
+        '/home/jake/project',
+      );
+      expect(result).toContain('custom-elements.json');
+      expect(result).not.toContain('/home/jake/project');
+    });
+
+    it('replaces absolute paths not under projectRoot with [path redacted]', () => {
+      const result = sanitizeErrorMessage(
+        "ENOENT: no such file or directory, open '/etc/passwd'",
+        '/home/jake/project',
+      );
+      expect(result).toContain('[path redacted]');
+      expect(result).not.toContain('/etc/passwd');
+    });
+
+    it('replaces all absolute paths when projectRoot is empty string', () => {
+      const result = sanitizeErrorMessage(
+        "Cannot read /Users/alice/myapp/tokens.json",
+        '',
+      );
+      expect(result).toContain('[path redacted]');
+      expect(result).not.toContain('/Users/alice');
+    });
+
+    it('leaves messages without absolute paths unchanged', () => {
+      const result = sanitizeErrorMessage('Token not found: --sl-color-primary', '/home/jake/project');
+      expect(result).toBe('Token not found: --sl-color-primary');
+    });
+  });
+
+  describe('VALIDATION / Zod pattern sanitization', () => {
+    it('strips regex pattern details from validation messages', () => {
+      const result = sanitizeErrorMessage(
+        "String must match pattern /^[a-z]+$/",
+        '/home/jake/project',
+      );
+      expect(result).not.toContain('/^[a-z]+$/');
+      expect(result).toContain('[pattern redacted]');
+    });
+
+    it('strips "Invalid regex:" detail from messages', () => {
+      const result = sanitizeErrorMessage(
+        "Invalid regex: /(?<=foo)bar/ is not valid in this engine",
+        '/home/jake/project',
+      );
+      expect(result).not.toContain('/(?<=foo)bar/');
+      expect(result).toContain('[pattern redacted]');
+    });
+
+    it('preserves field name context while removing regex detail', () => {
+      const result = sanitizeErrorMessage(
+        "Field 'tagName': String must match /^[a-z][a-z0-9-]*$/",
+        '/home/jake/project',
+      );
+      expect(result).toContain("Field 'tagName'");
+      expect(result).not.toContain('/^[a-z][a-z0-9-]*$/');
+    });
+  });
+
+  describe('handleToolError with projectRoot', () => {
+    it('sanitizes absolute path in FILESYSTEM errors when projectRoot is provided', () => {
+      const err = Object.assign(
+        new Error("ENOENT: no such file or directory, open '/Users/jake/project/custom-elements.json'"),
+        { code: 'ENOENT' },
+      );
+      const result = handleToolError(err, '/Users/jake/project');
+      expect(result.category).toBe(ErrorCategory.FILESYSTEM);
+      expect(result.message).not.toContain('/Users/jake/project');
+      expect(result.message).toContain('custom-elements.json');
+    });
+
+    it('sanitizes absolute paths in VALIDATION errors when projectRoot is provided', () => {
+      const err = new SyntaxError("Unexpected token at /Users/jake/project/src/index.ts:10");
+      const result = handleToolError(err, '/Users/jake/project');
+      expect(result.category).toBe(ErrorCategory.VALIDATION);
+      expect(result.message).not.toContain('/Users/jake/project');
+    });
+
+    it('redacts non-project absolute paths with [path redacted]', () => {
+      const err = Object.assign(
+        new Error("ENOENT: no such file or directory, open '/tmp/scratch.txt'"),
+        { code: 'ENOENT' },
+      );
+      const result = handleToolError(err, '/Users/jake/project');
+      expect(result.category).toBe(ErrorCategory.FILESYSTEM);
+      expect(result.message).toContain('[path redacted]');
+      expect(result.message).not.toContain('/tmp/scratch.txt');
+    });
+
+    it('does not sanitize messages from already-constructed MCPError', () => {
+      // MCPError is passed through directly without re-sanitizing
+      const err = new MCPError('/some/absolute/path leaked', ErrorCategory.FILESYSTEM);
+      const result = handleToolError(err, '/Users/jake/project');
+      expect(result.message).toBe('/some/absolute/path leaked');
+    });
+
+    it('does not include stack traces in the returned error message', () => {
+      const err = Object.assign(
+        new Error("ENOENT: no such file or directory, open '/Users/jake/project/file.json'"),
+        { code: 'ENOENT' },
+      );
+      const result = handleToolError(err, '/Users/jake/project');
+      expect(result.message).not.toContain('at ');
+      expect(result.message).not.toContain('.test.ts');
+    });
   });
 });
 

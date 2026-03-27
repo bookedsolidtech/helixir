@@ -15,9 +15,7 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import type { McpWcConfig } from '../../packages/core/src/config.js';
 import { loadConfig } from '../../packages/core/src/config.js';
-import {
-  scoreComponentMultiDimensional,
-} from '../../packages/core/src/handlers/health.js';
+import { scoreComponentMultiDimensional } from '../../packages/core/src/handlers/health.js';
 import {
   DIMENSION_REGISTRY,
   DIMENSION_WEIGHT_KEYS,
@@ -66,9 +64,7 @@ const LOW_A11Y_DECL: CemDeclaration = {
   name: 'LowA11y',
   tagName: 'low-a11y',
   description: 'A component with poor accessibility.',
-  members: [
-    { kind: 'field', name: 'value', type: { text: 'string' }, description: 'Some value.' },
-  ],
+  members: [{ kind: 'field', name: 'value', type: { text: 'string' }, description: 'Some value.' }],
 };
 
 // ─── DIMENSION_WEIGHT_KEYS mapping ───────────────────────────────────────────
@@ -269,6 +265,7 @@ describe('scoreComponentMultiDimensional — custom weights', () => {
     const lowDocResult = await scoreComponentMultiDimensional(lowDocConfig, LOW_A11Y_DECL);
 
     // The two scores should differ
+    expect(baseResult.score).not.toBeNaN();
     expect(lowDocResult.score).not.toBeNaN();
     expect(lowDocResult.score).toBeGreaterThanOrEqual(0);
     expect(lowDocResult.score).toBeLessThanOrEqual(100);
@@ -483,10 +480,7 @@ describe('loadConfig — scoring.weights', () => {
   });
 
   it('scoring.weights absent from config leaves scoring undefined', () => {
-    writeFileSync(
-      join(tmpDir, 'helixir.mcp.json'),
-      JSON.stringify({ scoring: {} }),
-    );
+    writeFileSync(join(tmpDir, 'helixir.mcp.json'), JSON.stringify({ scoring: {} }));
     vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
 
     const config = loadConfig();

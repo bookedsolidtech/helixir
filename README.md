@@ -455,7 +455,7 @@ Place this file at the root of your component library project (or wherever `MCP_
 | `tokensPath`       | `string \| null` | `null`                   | Path to a design tokens JSON file. Set to `null` to disable token tools.                                                                                                                                                                                              |
 | `cdnBase`          | `string \| null` | `null`                   | Base URL prepended to component paths when generating CDN `<script>` and `<link>` tags in `suggest_usage` output (e.g. `"https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2/cdn"`). Does not affect `resolve_cdn_cem`. Set to `null` to disable CDN suggestions. |
 | `watch`            | `boolean`        | `false`                  | When `true`, HELiXiR automatically reloads the CEM on file changes.                                                                                                                                                                                                   |
-| `scoring`          | `object`         | `undefined`              | Optional scoring configuration for customizing health dimension weights. See [Configurable Health Scoring Weights](#configurable-health-scoring-weights).                                                                                                              |
+| `scoring`          | `object`         | `undefined`              | Optional scoring configuration for customizing health dimension weights. See [Configurable Health Scoring Weights](#configurable-health-scoring-weights).                                                                                                             |
 
 **Full example:**
 
@@ -494,24 +494,25 @@ Each value is a **positive multiplier** applied to that dimension's base weight 
 
 **Supported keys and their dimensions:**
 
-| Config Key          | Health Dimension         | Default Weight |
-| ------------------- | ------------------------ | -------------- |
-| `documentation`     | CEM Completeness         | 15             |
-| `accessibility`     | Accessibility            | 10             |
-| `typeCoverage`      | Type Coverage            | 10             |
-| `apiConsistency`    | API Surface Quality      | 10             |
-| `cemSourceFidelity` | CEM-Source Fidelity      | 10             |
-| `testCoverage`      | Test Coverage            | 10             |
-| `cssArchitecture`   | CSS Architecture         | 5              |
-| `eventArchitecture` | Event Architecture       | 5              |
-| `slotArchitecture`  | Slot Architecture        | 5              |
-| `bundleSize`        | Bundle Size              | 5              |
-| `storyCoverage`     | Story Coverage           | 5              |
-| `naming`            | Naming Consistency       | 5              |
-| `performance`       | Performance              | 5              |
-| `drupalReadiness`   | Drupal Readiness         | 5              |
+| Config Key          | Health Dimension    | Default Weight |
+| ------------------- | ------------------- | -------------- |
+| `documentation`     | CEM Completeness    | 15             |
+| `accessibility`     | Accessibility       | 10             |
+| `typeCoverage`      | Type Coverage       | 10             |
+| `apiConsistency`    | API Surface Quality | 10             |
+| `cemSourceFidelity` | CEM-Source Fidelity | 10             |
+| `testCoverage`      | Test Coverage       | 10             |
+| `cssArchitecture`   | CSS Architecture    | 5              |
+| `eventArchitecture` | Event Architecture  | 5              |
+| `slotArchitecture`  | Slot Architecture   | 5              |
+| `bundleSize`        | Bundle Size         | 5              |
+| `storyCoverage`     | Story Coverage      | 5              |
+| `naming`            | Naming Consistency  | 5              |
+| `performance`       | Performance         | 5              |
+| `drupalReadiness`   | Drupal Readiness    | 5              |
 
 **Accessibility-first team example:**
+
 ```json
 {
   "scoring": {
@@ -525,6 +526,7 @@ Each value is a **positive multiplier** applied to that dimension's base weight 
 ```
 
 **Rapid-prototyping team example:**
+
 ```json
 {
   "scoring": {

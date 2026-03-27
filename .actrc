@@ -1,6 +1,5 @@
 -P ubuntu-latest=catthehacker/ubuntu:act-latest
 --bind
---reuse
 --rm
 --pull=false
 --no-cache-server

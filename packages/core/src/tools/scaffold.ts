@@ -216,7 +216,7 @@ export function handleScaffoldCall(
 
     return createErrorResponse(`Unknown scaffold tool: ${name}`);
   } catch (err) {
-    const mcpErr = handleToolError(err, config.projectRoot);
+    const mcpErr = handleToolError(err, _config.projectRoot);
     return createErrorResponse(`[${mcpErr.category}] ${mcpErr.message}`);
   }
 }

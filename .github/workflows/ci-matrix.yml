@@ -1,0 +1,106 @@
+# ============================================================================
+# Matrix CI Pipeline — HELiXiR MCP Server
+# ============================================================================
+# Tests across Node.js 20, 22, and 24 to ensure forward-compatibility
+# and catch version-specific ESM / native module regressions.
+# ============================================================================
+
+name: CI Matrix
+
+on:
+  push:
+    branches: [main, dev, staging, 'changeset-release/**']
+    paths-ignore:
+      - '**/*.md'
+      - '.automaker/**'
+      - '.claude/**'
+      - 'LICENSE'
+      - '.editorconfig'
+  pull_request:
+    branches: [main, dev]
+    paths-ignore:
+      - '**/*.md'
+      - '.automaker/**'
+      - '.claude/**'
+      - 'LICENSE'
+      - '.editorconfig'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  matrix-test:
+    name: Test (Node ${{ matrix.node-version }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22, 24]
+        os: [ubuntu-latest]
+
+    steps:
+      # ---- Setup ----
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # ---- Quality Checks ----
+
+      - name: Type check
+        run: pnpm run type-check
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Format check
+        run: pnpm run format:check
+
+      # ---- Build ----
+
+      - name: Build
+        run: pnpm run build
+
+      # ---- Tests ----
+
+      - name: Test
+        run: |
+          # Promotion PRs (staging→main): tests already verified on staging — skip
+          if [[ "${{ github.head_ref }}" == "staging" && "${{ github.base_ref }}" == "main" ]]; then
+            echo "Promotion PR (staging → main) — skipping matrix tests"
+            exit 0
+          fi
+          pnpm run test
+
+  matrix-summary:
+    name: Matrix Test Summary
+    runs-on: ubuntu-latest
+    needs: matrix-test
+    if: always()
+
+    steps:
+      - name: Check matrix results
+        run: |
+          if [ "${{ needs.matrix-test.result }}" == "failure" ]; then
+            echo "❌ Matrix tests failed"
+            exit 1
+          else
+            echo "✅ All matrix tests passed"
+          fi

@@ -74,7 +74,7 @@ export async function handleTokenCall(
 
     return createErrorResponse(`Unknown token tool: ${name}`);
   } catch (err) {
-    const mcpErr = handleToolError(err);
+    const mcpErr = handleToolError(err, config.projectRoot);
     return createErrorResponse(`[${mcpErr.category}] ${mcpErr.message}`);
   }
 }

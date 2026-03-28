@@ -32,7 +32,7 @@ export async function handleFrameworkCall(
     }
     return createErrorResponse(`Unknown framework tool: ${name}`);
   } catch (err) {
-    const mcpErr = handleToolError(err);
+    const mcpErr = handleToolError(err, config.projectRoot);
     return createErrorResponse(`[${mcpErr.category}] ${mcpErr.message}`);
   }
 }

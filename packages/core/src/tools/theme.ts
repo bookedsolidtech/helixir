@@ -8,10 +8,12 @@ import { handleToolError } from '../shared/error-handling.js';
 
 // ─── Input Schemas ─────────────────────────────────────────────────────────────
 
-const CreateThemeArgsSchema = z.object({
-  themeName: z.string().optional(),
-  prefix: z.string().optional(),
-});
+const CreateThemeArgsSchema = z
+  .object({
+    themeName: z.string().optional(),
+    prefix: z.string().optional(),
+  })
+  .strict();
 
 const ApplyThemeTokensArgsSchema = z.object({
   themeTokens: z.record(z.string(), z.string()),

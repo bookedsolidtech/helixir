@@ -158,6 +158,29 @@ export const DIMENSION_CLASSIFICATION = {
 
 export const TOTAL_WEIGHT = DIMENSION_REGISTRY.reduce((sum, d) => sum + d.weight, 0);
 
+/**
+ * Maps scoring config keys (from helixir.mcp.json `scoring.weights`)
+ * to their corresponding dimension names in the DIMENSION_REGISTRY.
+ *
+ * Used to apply per-enterprise weight multipliers to health scoring.
+ */
+export const DIMENSION_WEIGHT_KEYS: Readonly<Record<string, string>> = {
+  documentation: 'CEM Completeness',
+  accessibility: 'Accessibility',
+  typeCoverage: 'Type Coverage',
+  apiConsistency: 'API Surface Quality',
+  cssArchitecture: 'CSS Architecture',
+  eventArchitecture: 'Event Architecture',
+  testCoverage: 'Test Coverage',
+  bundleSize: 'Bundle Size',
+  storyCoverage: 'Story Coverage',
+  performance: 'Performance',
+  drupalReadiness: 'Drupal Readiness',
+  cemSourceFidelity: 'CEM-Source Fidelity',
+  slotArchitecture: 'Slot Architecture',
+  naming: 'Naming Consistency',
+} as const;
+
 // ─── Grade Thresholds ────────────────────────────────────────────────────────
 
 interface GradeThreshold {

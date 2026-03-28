@@ -24,7 +24,6 @@
   "files": [
     "build",
     "!build/**/*.map",
-    "packages/core/src",
     "src/skills",
     "README.md",
     "CHANGELOG.md"
@@ -36,6 +35,7 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "type-check": "tsc --noEmit",
+    "typecheck": "pnpm run type-check",
     "lint": "eslint src packages/core/src",
     "lint:fix": "eslint src packages/core/src --fix",
     "format": "prettier --write .",
@@ -111,7 +111,7 @@
     }
   },
   "engines": {
-    "node": ">=20.0.0",
+    "node": "^20.0.0 || ^22.0.0 || ^24.0.0",
     "pnpm": ">=9"
   },
   "lint-staged": {

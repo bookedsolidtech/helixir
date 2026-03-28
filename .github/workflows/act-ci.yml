@@ -1,0 +1,132 @@
+# ============================================================================
+# Local CI — Quality gates for nektos/act
+# ============================================================================
+# Mirrors the core quality gates from ci.yml but avoids GitHub-specific actions
+# (pnpm/action-setup, actions/setup-node) that break in act due to PATH issues
+# and missing API context.
+#
+# Single-job design: helixir is a single-package Node project. Running all
+# gates in one job avoids bind-mount contention (parallel jobs sharing
+# node_modules via --bind corrupt each other's pnpm install).
+#
+# Usage: ./scripts/act-ci.sh [--job <job-name>] [--list] [--full] [--matrix]
+# Jobs: quality-gates (default), test-full (activated by --full or --matrix)
+# ============================================================================
+
+name: Local CI
+
+on:
+  pull_request:
+
+jobs:
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+          pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm run lint
+      - name: Format check
+        run: pnpm run format:check
+      - name: Type check
+        run: pnpm run type-check
+      - name: Build
+        run: pnpm run build
+      - name: Test
+        run: pnpm run test
+
+  # ── Full suite test with Node version matrix (mirrors ci-matrix.yml) ───
+  test-full:
+    name: Test Full (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: ${{ env.ACT_MATRIX_TESTS == 'true' || env.ACT_FULL_TESTS == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node ${{ matrix.node-version }} via nvm
+        run: |
+          if [ "${{ matrix.node-version }}" != "" ]; then
+            export NVM_DIR="$HOME/.nvm"
+            if [ ! -d "$NVM_DIR" ]; then
+              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+            fi
+            . "$NVM_DIR/nvm.sh"
+            nvm install ${{ matrix.node-version }}
+            nvm use ${{ matrix.node-version }}
+            echo "Node version: $(node --version)"
+          fi
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+          pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm run build
+      - name: Run full test suite with hang watchdog
+        run: |
+          # Vitest hang watchdog — kills stale processes after 15s of no output
+          LOGFILE=$(mktemp /tmp/helixir-test-full.XXXXXX)
+          STALE_TIMEOUT=15
+          POLL_INTERVAL=3
+          START_TIME=$(date +%s)
+
+          pnpm exec vitest run --reporter=verbose > "$LOGFILE" 2>&1 &
+          VITEST_PID=$!
+
+          echo "[test-full] vitest PID=$VITEST_PID, Node ${{ matrix.node-version }}"
+
+          LAST_SIZE=0
+          STALE_SECONDS=0
+          FORCE_KILLED=false
+
+          while kill -0 "$VITEST_PID" 2>/dev/null; do
+            sleep "$POLL_INTERVAL"
+            CURRENT_SIZE=$(stat -c "%s" "$LOGFILE" 2>/dev/null || stat -f "%z" "$LOGFILE" 2>/dev/null || echo 0)
+            ELAPSED=$(( $(date +%s) - START_TIME ))
+
+            if [ "$CURRENT_SIZE" -eq "$LAST_SIZE" ] && [ "$CURRENT_SIZE" -gt 0 ]; then
+              STALE_SECONDS=$((STALE_SECONDS + POLL_INTERVAL))
+              if [ "$STALE_SECONDS" -ge "$STALE_TIMEOUT" ] && [ "$ELAPSED" -ge 30 ]; then
+                echo "[test-full] Output stale for ${STALE_SECONDS}s at ${ELAPSED}s — force killing vitest"
+                kill "$VITEST_PID" 2>/dev/null || true
+                sleep 1
+                kill -9 "$VITEST_PID" 2>/dev/null || true
+                FORCE_KILLED=true
+                break
+              fi
+            else
+              STALE_SECONDS=0
+            fi
+            LAST_SIZE=$CURRENT_SIZE
+          done
+
+          wait "$VITEST_PID" 2>/dev/null || true
+
+          # Determine pass/fail from output
+          FAILED_TESTS=$(grep -c "^[[:space:]]*[×x]" "$LOGFILE" 2>/dev/null || echo 0)
+          PASSED_TESTS=$(grep -c "^[[:space:]]*[✓✔]" "$LOGFILE" 2>/dev/null || echo 0)
+
+          echo ""
+          cat "$LOGFILE" | tail -30
+          echo ""
+          echo "[test-full] Node ${{ matrix.node-version }}: ${PASSED_TESTS} passed, ${FAILED_TESTS} failed"
+
+          if [ "$FORCE_KILLED" = true ]; then
+            echo "[test-full] vitest was force-killed after teardown hang"
+          fi
+
+          rm -f "$LOGFILE"
+
+          if [ "$FAILED_TESTS" -gt 0 ]; then
+            exit 1
+          fi

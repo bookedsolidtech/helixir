@@ -1,21 +1,31 @@
 #!/usr/bin/env bash
 # scripts/act-ci.sh — Run CI locally via nektos/act
-# Usage: ./scripts/act-ci.sh [--job <job-name>] [--list] [--native] [--clean]
+# Usage: ./scripts/act-ci.sh [--job <job-name>] [--list] [--native] [--full] [--matrix] [--clean] [--help]
 #
 # Runs .github/workflows/act-ci.yml — a lightweight mirror of ci.yml that
 # avoids GitHub-specific actions (pnpm/action-setup, actions/setup-node)
 # which break in act due to PATH issues and missing API context.
 #
-# Available jobs: lint, format, type-check, build, test, quality-gates
+# Available jobs: quality-gates, test-full
 # Flags:
 #   --job <name>  Run a specific job only
 #   --list        List available jobs
+#   --help        Show this help message
 #   --clean       Remove all stale act containers before running
 #   --native      Use linux/arm64 native architecture (no Rosetta emulation)
+#   --full        Run full test suite on current Node (triggers test-full job)
+#   --matrix      Run full test suite on Node 20/22/24 matrix (CI Matrix parity)
 #
 # Performance notes:
 #   .actrc configures --bind (zero-copy mount), --reuse (keep containers),
 #   --pull=false (skip image check), --no-cache-server, --action-offline-mode.
+#
+# Docker OOM on Apple Silicon:
+#   Default mode runs linux/amd64 via Rosetta 2, which uses 2-3x more memory.
+#   Use --native for linux/arm64 containers (no emulation overhead).
+#   Use --full to run the complete test suite (default is quality gates only).
+#   Use --matrix for full CI Matrix parity (Node 20/22/24).
+#   Best combo: ./scripts/act-ci.sh --native --matrix
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -49,9 +59,25 @@ WORKFLOW=".github/workflows/act-ci.yml"
 JOB_ARGS=""
 DO_CLEAN=false
 USE_NATIVE=false
+USE_FULL=false
+USE_MATRIX=false
+
+show_help() {
+  sed -n '3,27p' "${BASH_SOURCE[0]}" | sed 's/^# //' | sed 's/^#//'
+  echo ""
+  echo "Examples:"
+  echo "  ./scripts/act-ci.sh                    # Quality gates only"
+  echo "  ./scripts/act-ci.sh --full             # Full test suite, current Node"
+  echo "  ./scripts/act-ci.sh --matrix           # Full test suite, Node 20/22/24"
+  echo "  ./scripts/act-ci.sh --native --matrix  # Matrix tests, ARM64 (no Rosetta)"
+  exit 0
+}
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --help|-h)
+      show_help
+      ;;
     --list)
       act -W "$WORKFLOW" --list
       exit 0
@@ -68,6 +94,15 @@ while [[ $# -gt 0 ]]; do
       USE_NATIVE=true
       shift
       ;;
+    --full)
+      USE_FULL=true
+      shift
+      ;;
+    --matrix)
+      USE_MATRIX=true
+      USE_FULL=true
+      shift
+      ;;
     *)
       break
       ;;
@@ -82,7 +117,7 @@ else
   cleanup_stale_containers
 fi
 
-# ── Build architecture flags ─────────────────────────────────────────────────
+# ── Build architecture and env flags ──────────────────────────────────────────
 ARCH_ARGS=""
 ENV_ARGS="--env CI=true"
 
@@ -94,10 +129,22 @@ else
   ARCH_MODE="amd64 (Rosetta)"
 fi
 
+# ── Test mode selection ──────────────────────────────────────────────────────
+if [[ "$USE_MATRIX" == true ]]; then
+  ENV_ARGS="$ENV_ARGS --env ACT_MATRIX_TESTS=true --env ACT_FULL_TESTS=true"
+  TEST_MODE="full suite + Node 20/22/24 matrix (CI Matrix parity)"
+elif [[ "$USE_FULL" == true ]]; then
+  ENV_ARGS="$ENV_ARGS --env ACT_FULL_TESTS=true"
+  TEST_MODE="full suite (current Node)"
+else
+  TEST_MODE="quality gates only"
+fi
+
 echo "=== Running CI locally via act ==="
 echo "Workflow: $WORKFLOW"
 echo "Job: ${JOB_ARGS:-all}"
 echo "Mode: $ARCH_MODE"
+echo "Tests: $TEST_MODE"
 echo ""
 
 START_TIME=$(date +%s)
@@ -122,6 +169,7 @@ cat > .act-results.json << EOF
   "status": "$STATUS",
   "workflow": "act-ci.yml",
   "job": "${JOB_ARGS:-all}",
+  "test_mode": "$TEST_MODE",
   "duration_seconds": $DURATION,
   "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 }

@@ -12,12 +12,13 @@
 #   4. Build (tsc)
 #   5. Test (Vitest, Node mode)
 #   6. Changeset check (if source changed)
-#   7. Docker CI (act — full CI pipeline in Docker containers)
+#   7. Docker CI (act — full CI pipeline in Docker containers, with Node matrix)
 #
 # Usage:
 #   pnpm run preflight
 #   SKIP_CHANGESET=1 pnpm run preflight   # bypass changeset gate (infra-only changes)
 #   SKIP_ACT=1 pnpm run preflight         # bypass Docker CI gate
+#   SKIP_MATRIX=1 pnpm run preflight      # downgrade Docker CI to basic (no Node matrix)
 # ==============================================================================
 
 set -euo pipefail
@@ -117,7 +118,7 @@ else
 fi
 echo ""
 
-# ── Gate 7: Docker CI (act) ──────────────────────────────────────────────────
+# ── Gate 7: Docker CI (act) with Node matrix ────────────────────────────────
 
 echo "▶ [7/7] Docker CI (act)"
 
@@ -127,8 +128,14 @@ elif ! command -v act &>/dev/null || ! docker info &>/dev/null 2>&1; then
   echo "  ⚠ WARNING: Docker CI gate skipped — Docker not running or act not installed"
   echo "    CI may fail on push. Install: brew install act && open -a Docker"
 else
-  echo "  Running full CI in Docker..."
-  if ./scripts/act-ci.sh --native; then
+  if [ "${SKIP_MATRIX:-0}" = "1" ]; then
+    echo "  Running CI in Docker (basic — matrix skipped via SKIP_MATRIX=1)..."
+    ACT_CMD="./scripts/act-ci.sh --native"
+  else
+    echo "  Running CI in Docker with Node 20/22/24 matrix..."
+    ACT_CMD="./scripts/act-ci.sh --matrix --native"
+  fi
+  if $ACT_CMD; then
     echo "  ✓ Docker CI passed"
   else
     echo ""

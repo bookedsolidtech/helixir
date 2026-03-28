@@ -38,7 +38,7 @@ The pre-push hook runs `pnpm run preflight` automatically. This executes:
 4. Build (tsc compilation)
 5. Test (Vitest)
 6. Changeset check (if source changed)
-7. Docker CI (act-ci, if Docker is available)
+7. Docker CI with Node matrix (act-ci --matrix --native, if Docker is available)
 
 If ANY gate fails, the push is blocked. Fix the errors and push again.
 
@@ -71,7 +71,9 @@ gh pr merge $PR_NUMBER --auto --merge --repo bookedsolidtech/helixir
 
 The pre-push hook calls `pnpm run preflight` which runs all 7 gates.
 Gate 7 (Docker CI) is the act-ci gate — runs if Docker is available, hard fail if it fails.
+Gate 7 now includes Node 20/22/24 matrix testing by default (CI Matrix parity).
 Skip Docker only: `SKIP_ACT=1 git push`
+Skip matrix only (basic Docker CI): `SKIP_MATRIX=1 git push`
 
 ---
 
@@ -103,3 +105,19 @@ Commit the `.changeset/*.md` file WITH your code changes (same commit).
 
 If `git push` fails due to the pre-push hook, you do NOT bypass it. Period.
 Fix the errors first. Then push. This is non-negotiable.
+
+---
+
+## CI Matrix Parity Requirement
+
+Code must pass on Node 20, 22, AND 24 before merging. This is enforced at two levels:
+
+| Layer | What | How |
+|-------|------|-----|
+| **Local** | `preflight` Gate 7 | `act-ci.sh --matrix --native` runs test-full job on Node 20/22/24 |
+| **GitHub** | `ci-matrix.yml` | Matrix workflow tests on `[20, 22, 24]` x `[ubuntu-latest]` |
+
+The `package.json` engines field declares `"node": "^20.0.0 || ^22.0.0 || ^24.0.0"`.
+
+To run matrix tests manually: `./scripts/act-ci.sh --matrix --native`
+To skip matrix in preflight: `SKIP_MATRIX=1 pnpm run preflight`

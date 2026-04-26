@@ -56,6 +56,10 @@ export interface DetectedConventions {
   prefix: string;
   /** Most common base class found in the CEM (e.g. "LitElement"). */
   baseClass: string;
+  /** Module path the base class is exported from, when the CEM records it. */
+  baseClassModule: string | null;
+  /** Package name the base class is exported from, when the CEM records it. */
+  baseClassPackage: string | null;
   /** Package name detected from inherited members, or null if not found. */
   packageName: string | null;
 }
@@ -113,11 +117,22 @@ export function detectConventions(cem: Cem, configPrefix?: string): DetectedConv
 
   // --- Base class ---
   let baseClass = 'LitElement';
+  let baseClassModule: string | null = null;
+  let baseClassPackage: string | null = null;
   const superclassCounts = new Map<string, number>();
+  // Track first-seen import origin (module/package) for each candidate base
+  // class so the eventual winner can be imported correctly in scaffolded code.
+  const superclassOrigins = new Map<string, { module: string | null; package: string | null }>();
   for (const decl of declarations) {
     if (decl.superclass?.name) {
       const sc = decl.superclass.name;
       superclassCounts.set(sc, (superclassCounts.get(sc) ?? 0) + 1);
+      if (!superclassOrigins.has(sc)) {
+        superclassOrigins.set(sc, {
+          module: decl.superclass.module ?? null,
+          package: decl.superclass.package ?? null,
+        });
+      }
     }
   }
   let maxSc = 0;
@@ -125,6 +140,13 @@ export function detectConventions(cem: Cem, configPrefix?: string): DetectedConv
     if (n > maxSc) {
       maxSc = n;
       baseClass = sc;
+    }
+  }
+  if (baseClass !== 'LitElement') {
+    const origin = superclassOrigins.get(baseClass);
+    if (origin) {
+      baseClassModule = origin.module;
+      baseClassPackage = origin.package;
     }
   }
 
@@ -139,7 +161,7 @@ export function detectConventions(cem: Cem, configPrefix?: string): DetectedConv
     }
   }
 
-  return { prefix, baseClass, packageName };
+  return { prefix, baseClass, baseClassModule, baseClassPackage, packageName };
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -178,9 +200,27 @@ function generateComponentSource(
   const baseClass = options.baseClass ?? conventions.baseClass;
   const lines: string[] = [];
 
-  // Imports
+  // Imports — lit exports html/css always; LitElement only when it is the base
+  // class. Non-Lit base classes need a separate import resolved from the CEM's
+  // recorded origin (package preferred, module fallback) so the generated file
+  // does not reference an undefined symbol.
   lines.push(`import { ${baseClass === 'LitElement' ? 'LitElement, ' : ''}html, css } from 'lit';`);
   lines.push(`import { customElement, property } from 'lit/decorators.js';`);
+  if (baseClass !== 'LitElement') {
+    const baseSpecifier =
+      conventions.baseClassPackage ??
+      conventions.baseClassModule ??
+      conventions.packageName ??
+      null;
+    if (baseSpecifier) {
+      lines.push(`import { ${baseClass} } from '${baseSpecifier}';`);
+    } else {
+      // Origin unknown — leave a TODO so the generated file still compiles
+      // after the consumer wires up the import manually rather than silently
+      // shipping a reference to an undefined symbol.
+      lines.push(`// TODO: import { ${baseClass} } from '<package>';`);
+    }
+  }
   lines.push('');
 
   // JSDoc block with CEM annotations (@slot, @csspart, @fires)

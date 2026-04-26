@@ -300,4 +300,75 @@ describe('scaffoldComponent — custom baseClass option', () => {
   it('uses the provided baseClass', () => {
     expect(result.component).toContain('extends FormAssociatedMixin');
   });
+
+  it('emits a TODO import when the base class origin is unknown', () => {
+    // EMPTY_CEM has no superclass metadata, so we cannot resolve where to
+    // import FormAssociatedMixin from. The generator should leave a TODO
+    // import marker rather than silently shipping uncompilable output that
+    // references an undefined symbol.
+    expect(result.component).toContain('// TODO: import { FormAssociatedMixin }');
+  });
+});
+
+// ─── scaffoldComponent — non-Lit base class import (codex bug fix) ───────────
+
+describe('scaffoldComponent — non-Lit base class import', () => {
+  // CEM whose components extend a custom base class the generator must import.
+  const CUSTOM_BASE_CEM: Cem = {
+    schemaVersion: '1.0.0',
+    modules: [
+      {
+        kind: 'javascript-module',
+        path: './hx-button.js',
+        declarations: [
+          {
+            kind: 'class',
+            name: 'HxButton',
+            tagName: 'hx-button',
+            customElement: true,
+            superclass: {
+              name: 'BookedSolidElement',
+              package: '@bookedsolid/elements',
+            },
+          },
+        ],
+      },
+    ],
+  };
+
+  it('imports the detected non-Lit base class from its package', () => {
+    const result = scaffoldComponent({ tagName: 'hx-card' }, CUSTOM_BASE_CEM);
+    expect(result.component).toContain('extends BookedSolidElement');
+    expect(result.component).toContain(
+      "import { BookedSolidElement } from '@bookedsolid/elements';",
+    );
+    // LitElement should NOT be imported when it is not the base class
+    expect(result.component).not.toContain('LitElement,');
+  });
+
+  it('falls back to the module path when no package is recorded', () => {
+    const MODULE_ONLY_CEM: Cem = {
+      schemaVersion: '1.0.0',
+      modules: [
+        {
+          kind: 'javascript-module',
+          path: './hx-button.js',
+          declarations: [
+            {
+              kind: 'class',
+              name: 'HxButton',
+              tagName: 'hx-button',
+              customElement: true,
+              superclass: {
+                name: 'CustomBase',
+                module: './custom-base.js',
+              },
+            },
+          ],
+        },
+      ],
+    };
+    const result = scaffoldComponent({ tagName: 'hx-card' }, MODULE_ONLY_CEM);
+    expect(result.component).toContain("import { CustomBase } from './custom-base.js';");
+  });
 });

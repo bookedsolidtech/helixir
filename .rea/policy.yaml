@@ -1,0 +1,26 @@
+# .rea/policy.yaml — managed by rea v0.4.0
+# Edit carefully: tightening takes effect on next load; loosening requires human approval.
+version: '1'
+profile: 'bst-internal'
+installed_by: 'himerus'
+installed_at: '2026-04-19T16:42:10.100Z'
+autonomy_level: L3
+max_autonomy_level: L3
+promotion_requires_human_approval: true
+block_ai_attribution: true
+blocked_paths:
+  - '.env'
+  - '.env.*'
+  - '.reagent/HALT'
+notification_channel: ''
+injection:
+  suspicious_blocks_writes: true
+context_protection:
+  delegate_to_subagent:
+    - 'pnpm run preflight'
+    - 'pnpm run test'
+    - 'pnpm run build'
+  max_bash_output_lines: 100
+review:
+  concerns_blocks: true
+  codex_required: true

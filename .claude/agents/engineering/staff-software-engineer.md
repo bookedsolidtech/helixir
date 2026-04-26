@@ -1,1 +1,0 @@
-/Volumes/Development/booked/booked-solid-tech/.claude/agents/engineering/staff-software-engineer.md

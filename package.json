@@ -46,7 +46,7 @@
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
-    "prepublishOnly": "pnpm run build",
+    "prepublishOnly": "node scripts/block-local-publish.mjs && pnpm run build",
     "prepare": "husky"
   },
   "keywords": [
@@ -86,6 +86,7 @@
     }
   },
   "devDependencies": {
+    "@bookedsolid/rea": "0.11.0",
     "@changesets/cli": "^2.29.4",
     "@commitlint/cli": "^20.4.3",
     "@commitlint/config-conventional": "^20.4.3",

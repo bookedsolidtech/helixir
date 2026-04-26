@@ -52,3 +52,29 @@ PUBLISHING.md
 # act (local CI)
 .act-secrets
 .act-results.json
+
+# reagent — AI tooling (stays on developer machine, not committed)
+.claude/hooks/
+.claude/settings.json
+RESTART.md
+
+# reagent task store (local state)
+.reagent/tasks.jsonl
+.reagent/tasks.lock
+
+# === rea managed — do not edit between markers ===
+.rea/audit.jsonl
+.rea/audit-*.jsonl
+.rea/HALT
+.rea/metrics.jsonl
+.rea/serve.pid
+.rea/serve.state.json
+.rea/fingerprints.json
+.rea/last-review.json
+.rea/*.tmp
+.rea/*.tmp.*
+.rea/install-manifest.json.bak
+.rea/install-manifest.json.tmp
+.gitignore.rea-tmp-*
+.rea.lock
+# === end rea managed ===

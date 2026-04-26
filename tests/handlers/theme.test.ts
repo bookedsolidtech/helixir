@@ -170,16 +170,17 @@ describe('createTheme', () => {
     expect(result.darkModeCSS).toContain('#1a1a1a');
   });
 
-  it('produces a var() fallback for tokens with unknown categories', () => {
+  it('emits `inherit` (not a self-referential var()) for tokens with unknown categories', () => {
     // --my-custom-widget does not match any known category pattern,
     // so it lands in "other" and hits the default case in lightPlaceholder.
+    // A `var(--my-custom-widget)` value here would be self-referential and
+    // invalid at computed-value time — `inherit` lets the cascade resolve it.
     const cem = makeCem([
       { tagName: 'my-widget', cssProperties: [{ name: '--my-custom-widget' }] },
     ]);
     const result = createTheme(cem);
-    // The generated CSS should contain var(--my-custom-widget) instead of a TODO comment
-    expect(result.lightModeCSS).toContain('var(--my-custom-widget)');
-    expect(result.lightModeCSS).not.toContain('TODO');
+    expect(result.lightModeCSS).toContain('--my-custom-widget: inherit');
+    expect(result.lightModeCSS).not.toContain('var(--my-custom-widget)');
   });
 });
 

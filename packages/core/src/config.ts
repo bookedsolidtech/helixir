@@ -110,6 +110,31 @@ const defaults: McpWcConfig = {
 };
 
 function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
+  // Highest priority: explicit MCP_WC_CONFIG_PATH (e.g. set by the VS Code
+  // extension's helixir.configPath setting). When present, this absolute or
+  // project-relative path is read directly and the in-root discovery below is
+  // skipped — workspaces whose config lives outside the project root depend on
+  // this override.
+  const explicitConfigPath = process.env['MCP_WC_CONFIG_PATH'];
+  if (explicitConfigPath !== undefined && explicitConfigPath !== '') {
+    const resolvedExplicit = resolve(projectRoot, explicitConfigPath);
+    if (existsSync(resolvedExplicit)) {
+      try {
+        const raw = readFileSync(resolvedExplicit, 'utf-8');
+        return JSON.parse(raw) as Partial<McpWcConfig>;
+      } catch {
+        process.stderr.write(
+          `[helixir] Warning: MCP_WC_CONFIG_PATH=${explicitConfigPath} is malformed. Using defaults.\n`,
+        );
+        return {};
+      }
+    }
+    process.stderr.write(
+      `[helixir] Warning: MCP_WC_CONFIG_PATH=${explicitConfigPath} not found. Using defaults.\n`,
+    );
+    return {};
+  }
+
   const primaryPath = resolve(projectRoot, 'helixir.mcp.json');
   if (existsSync(primaryPath)) {
     try {

@@ -145,7 +145,10 @@ function lightPlaceholder(tokenName: string, category: string): string {
       return '200ms';
 
     default:
-      return `var(${tokenName})`;
+      // Uncategorized token — emit `inherit` so the cascade resolves it from
+      // a parent scope or the document root. A `var(${tokenName})` reference
+      // here would be self-referential and invalid at computed-value time.
+      return 'inherit';
   }
 }
 

@@ -8,12 +8,13 @@ import { handleToolError } from '../shared/error-handling.js';
 
 // ─── Input Schemas ─────────────────────────────────────────────────────────────
 
-const CreateThemeArgsSchema = z
-  .object({
-    themeName: z.string().optional(),
-    prefix: z.string().optional(),
-  })
-  .strict();
+// Not `.strict()` — multi-library callers route through src/mcp/index.ts which
+// extracts libraryId from raw args and forwards the original object. Strict
+// validation would reject that legitimate forwarded field.
+const CreateThemeArgsSchema = z.object({
+  themeName: z.string().optional(),
+  prefix: z.string().optional(),
+});
 
 const ApplyThemeTokensArgsSchema = z.object({
   themeTokens: z.record(z.string(), z.string()),

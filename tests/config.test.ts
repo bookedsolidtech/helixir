@@ -140,6 +140,36 @@ describe('loadConfig', () => {
       expect(() => loadConfig()).not.toThrow();
     });
 
+    it('honors MCP_WC_CONFIG_PATH for an absolute config path outside projectRoot', () => {
+      // The VS Code extension's helixir.configPath setting flows here as
+      // MCP_WC_CONFIG_PATH. It must be readable from anywhere on disk, not
+      // just under projectRoot.
+      const externalDir = mkdtempSync(join(tmpdir(), 'helixir-external-'));
+      const externalConfig = join(externalDir, 'helixir.mcp.json');
+      try {
+        writeFileSync(externalConfig, JSON.stringify({ cemPath: 'external-cem.json' }));
+        vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+        vi.stubEnv('MCP_WC_CONFIG_PATH', externalConfig);
+
+        const config = loadConfig();
+        expect(config.cemPath).toBe('external-cem.json');
+      } finally {
+        rmSync(externalDir, { recursive: true, force: true });
+      }
+    });
+
+    it('resolves MCP_WC_CONFIG_PATH relative to projectRoot when not absolute', () => {
+      writeFileSync(
+        join(tmpDir, 'custom-config.json'),
+        JSON.stringify({ cemPath: 'relative-cem.json' }),
+      );
+      vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+      vi.stubEnv('MCP_WC_CONFIG_PATH', 'custom-config.json');
+
+      const config = loadConfig();
+      expect(config.cemPath).toBe('relative-cem.json');
+    });
+
     it('writes a warning to stderr for malformed config file but does not throw', () => {
       writeFileSync(join(tmpDir, 'mcpwc.config.json'), 'not-valid-json{{{');
       vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);

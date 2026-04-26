@@ -110,6 +110,17 @@ describe('sanitizeErrorMessage', () => {
       );
       expect(result).toBe('Token not found: --sl-color-primary');
     });
+
+    it('does not partial-match a sibling directory that shares a prefix with projectRoot', () => {
+      // Regression: with projectRoot=/repo/app and path=/repo/application/secrets.txt,
+      // the projectRoot regex must NOT consume "/repo/app" alone, then leave
+      // "lication/secrets.txt" attached to a relative-path replacement.
+      // The unrelated absolute path must hit the [path redacted] branch instead.
+      const result = sanitizeErrorMessage('Cannot read /repo/application/secrets.txt', '/repo/app');
+      expect(result).toContain('[path redacted]');
+      expect(result).not.toContain('lication');
+      expect(result).not.toContain('secrets');
+    });
   });
 
   describe('VALIDATION / Zod pattern sanitization', () => {

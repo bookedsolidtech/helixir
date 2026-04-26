@@ -34,9 +34,13 @@ export function sanitizeErrorMessage(message: string, projectRoot: string): stri
   if (projectRoot) {
     // Normalize projectRoot to ensure no trailing slash
     const normalizedRoot = projectRoot.replace(/\/+$/, '');
-    // Match the projectRoot prefix (possibly followed by more path characters)
+    // Match the projectRoot prefix only when it is NOT followed by another word
+    // character — so `/repo/app` does not partial-match `/repo/application` and
+    // leak the rest of an unrelated absolute path. The `(?!\w)` boundary still
+    // accepts paths followed by `:` (line numbers), `'` / `"` (quoting), end-of-
+    // string, and whitespace — all common in error messages.
     const escapedRoot = normalizedRoot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const projectRootRegex = new RegExp(escapedRoot + '(/[^\\s]*)?', 'g');
+    const projectRootRegex = new RegExp(escapedRoot + '(?:/[^\\s]*)?(?!\\w)', 'g');
     sanitized = sanitized.replace(projectRootRegex, (match) => {
       // Compute the path relative to projectRoot
       const relativePath = relative(normalizedRoot, match);

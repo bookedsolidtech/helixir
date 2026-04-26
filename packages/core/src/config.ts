@@ -1,5 +1,5 @@
 import { readFileSync, existsSync } from 'fs';
-import { resolve } from 'path';
+import { dirname, isAbsolute, resolve } from 'path';
 import { discoverCemPath, FRIENDLY_CEM_ERROR } from './shared/discovery.js';
 
 /**
@@ -109,6 +109,22 @@ const defaults: McpWcConfig = {
   watch: false,
 };
 
+// Path-bearing fields that should resolve relative to the config file's
+// directory when MCP_WC_CONFIG_PATH points outside projectRoot. URL fields
+// (cdnBase, cdnAutoloader, cdnStylesheet) are deliberately excluded.
+const CONFIG_PATH_FIELDS = ['cemPath', 'tsconfigPath', 'tokensPath', 'healthHistoryDir'] as const;
+
+function rebaseRelativePaths(config: Partial<McpWcConfig>, baseDir: string): Partial<McpWcConfig> {
+  const rebased: Record<string, unknown> = { ...config };
+  for (const field of CONFIG_PATH_FIELDS) {
+    const value = rebased[field];
+    if (typeof value === 'string' && value !== '' && !isAbsolute(value)) {
+      rebased[field] = resolve(baseDir, value);
+    }
+  }
+  return rebased as Partial<McpWcConfig>;
+}
+
 function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
   // Highest priority: explicit MCP_WC_CONFIG_PATH (e.g. set by the VS Code
   // extension's helixir.configPath setting). When present, this absolute or
@@ -121,7 +137,13 @@ function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
     if (existsSync(resolvedExplicit)) {
       try {
         const raw = readFileSync(resolvedExplicit, 'utf-8');
-        return JSON.parse(raw) as Partial<McpWcConfig>;
+        const parsed = JSON.parse(raw) as Partial<McpWcConfig>;
+        // When the config file lives outside projectRoot (e.g. a colocated
+        // packages/ds/helixir.mcp.json), its relative path fields refer to the
+        // config's own directory, not the workspace root. Rebase them to
+        // absolute paths so downstream resolution against projectRoot does not
+        // chase the wrong tree.
+        return rebaseRelativePaths(parsed, dirname(resolvedExplicit));
       } catch {
         process.stderr.write(
           `[helixir] Warning: MCP_WC_CONFIG_PATH=${explicitConfigPath} is malformed. Using defaults.\n`,

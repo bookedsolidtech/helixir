@@ -78,11 +78,20 @@ export function registerConfigureCursorWindsurfCommand(context: vscode.Extension
       }
     }
 
-    // Upsert the helixir entry.
+    // Upsert the helixir entry. Populating MCP_WC_PROJECT_ROOT matters most for
+    // the global `~/.cursor/mcp.json` / `~/.windsurf/mcp.json` case, where the
+    // editor spawns the MCP process from its own cwd (often $HOME) rather than
+    // the workspace root. Without it, helixir cannot locate the target
+    // component library's CEM, tsconfig, or tokens.
+    const env: Record<string, string> = {};
+    const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    if (workspaceRoot) {
+      env['MCP_WC_PROJECT_ROOT'] = workspaceRoot;
+    }
     existing.mcpServers['helixir'] = {
       command: 'node',
       args: [serverScriptPath],
-      env: {},
+      env,
     };
 
     // Ensure the config directory exists.

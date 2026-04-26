@@ -152,7 +152,56 @@ describe('loadConfig', () => {
         vi.stubEnv('MCP_WC_CONFIG_PATH', externalConfig);
 
         const config = loadConfig();
-        expect(config.cemPath).toBe('external-cem.json');
+        // Relative cemPath is rebased to the config file's directory so
+        // downstream resolution against projectRoot does not chase the wrong
+        // tree (would otherwise look for <tmpDir>/external-cem.json).
+        expect(config.cemPath).toBe(join(externalDir, 'external-cem.json'));
+      } finally {
+        rmSync(externalDir, { recursive: true, force: true });
+      }
+    });
+
+    it('rebases all relative path fields in an external config to the config directory', () => {
+      const externalDir = mkdtempSync(join(tmpdir(), 'helixir-external-'));
+      const externalConfig = join(externalDir, 'helixir.mcp.json');
+      try {
+        writeFileSync(
+          externalConfig,
+          JSON.stringify({
+            cemPath: 'dist/custom-elements.json',
+            tsconfigPath: 'tsconfig.build.json',
+            tokensPath: 'tokens/generated.json',
+            healthHistoryDir: '.health',
+          }),
+        );
+        vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+        vi.stubEnv('MCP_WC_CONFIG_PATH', externalConfig);
+
+        const config = loadConfig();
+        expect(config.cemPath).toBe(join(externalDir, 'dist/custom-elements.json'));
+        expect(config.tsconfigPath).toBe(join(externalDir, 'tsconfig.build.json'));
+        expect(config.tokensPath).toBe(join(externalDir, 'tokens/generated.json'));
+        expect(config.healthHistoryDir).toBe(join(externalDir, '.health'));
+      } finally {
+        rmSync(externalDir, { recursive: true, force: true });
+      }
+    });
+
+    it('leaves absolute path fields in an external config unchanged', () => {
+      const externalDir = mkdtempSync(join(tmpdir(), 'helixir-external-'));
+      const externalConfig = join(externalDir, 'helixir.mcp.json');
+      try {
+        writeFileSync(
+          externalConfig,
+          JSON.stringify({
+            cemPath: '/abs/path/custom-elements.json',
+          }),
+        );
+        vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+        vi.stubEnv('MCP_WC_CONFIG_PATH', externalConfig);
+
+        const config = loadConfig();
+        expect(config.cemPath).toBe('/abs/path/custom-elements.json');
       } finally {
         rmSync(externalDir, { recursive: true, force: true });
       }

@@ -49,7 +49,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [20, 22, 24]
+        node-version: [22, 24]
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node ${{ matrix.node-version }} via nvm
@@ -109,7 +109,14 @@ jobs:
             LAST_SIZE=$CURRENT_SIZE
           done
 
-          wait "$VITEST_PID" 2>/dev/null || true
+          # Capture vitest's actual exit status so we can detect crashes that
+          # happen before the reporter ever emits ×/✓ markers (config errors,
+          # module-load failures, OOM, etc.). Without this, grep counts stay 0
+          # and the matrix run reports green for a crashed suite.
+          set +e
+          wait "$VITEST_PID" 2>/dev/null
+          VITEST_EXIT=$?
+          set -e
 
           # Determine pass/fail from output
           FAILED_TESTS=$(grep -c "^[[:space:]]*[×x]" "$LOGFILE" 2>/dev/null || echo 0)
@@ -118,7 +125,7 @@ jobs:
           echo ""
           cat "$LOGFILE" | tail -30
           echo ""
-          echo "[test-full] Node ${{ matrix.node-version }}: ${PASSED_TESTS} passed, ${FAILED_TESTS} failed"
+          echo "[test-full] Node ${{ matrix.node-version }}: ${PASSED_TESTS} passed, ${FAILED_TESTS} failed (vitest exit=${VITEST_EXIT})"
 
           if [ "$FORCE_KILLED" = true ]; then
             echo "[test-full] vitest was force-killed after teardown hang"
@@ -127,5 +134,13 @@ jobs:
           rm -f "$LOGFILE"
 
           if [ "$FAILED_TESTS" -gt 0 ]; then
+            exit 1
+          fi
+
+          # Vitest exited non-zero but no individual test was marked failed —
+          # the suite itself crashed before reporting. Treat as failure unless
+          # we force-killed it (already reported above).
+          if [ "$FORCE_KILLED" != true ] && [ "$VITEST_EXIT" -ne 0 ]; then
+            echo "[test-full] vitest exited with code ${VITEST_EXIT} but no test markers found — treating as failure"
             exit 1
           fi

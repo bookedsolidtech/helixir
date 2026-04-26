@@ -372,6 +372,91 @@ describe('scaffoldComponent — non-Lit base class import', () => {
     expect(result.component).toContain("import { CustomBase } from './custom-base.js';");
   });
 
+  it('emits a TODO import when options.baseClass overrides the detected base class', () => {
+    // CEM detects BookedSolidElement from package @bookedsolid/elements, but
+    // the caller passes baseClass: FormAssociatedMixin. Importing
+    // FormAssociatedMixin from @bookedsolid/elements would be wrong — the
+    // generator must not reuse the detected metadata for the override.
+    const DETECTED_BASE_CEM: Cem = {
+      schemaVersion: '1.0.0',
+      modules: [
+        {
+          kind: 'javascript-module',
+          path: './hx-button.js',
+          declarations: [
+            {
+              kind: 'class',
+              name: 'HxButton',
+              tagName: 'hx-button',
+              customElement: true,
+              superclass: {
+                name: 'BookedSolidElement',
+                package: '@bookedsolid/elements',
+              },
+            },
+          ],
+        },
+      ],
+    };
+    const result = scaffoldComponent(
+      { tagName: 'hx-form-field', baseClass: 'FormAssociatedMixin' },
+      DETECTED_BASE_CEM,
+    );
+    expect(result.component).toContain('extends FormAssociatedMixin');
+    expect(result.component).toContain('// TODO: import { FormAssociatedMixin }');
+    // Critical: must NOT emit FormAssociatedMixin from the detected base's package
+    expect(result.component).not.toContain(
+      "import { FormAssociatedMixin } from '@bookedsolid/elements';",
+    );
+  });
+
+  it('merges superclass origin metadata across declarations (non-null wins)', () => {
+    // CEM where the first declaration of a shared superclass omits its
+    // package, but a later declaration of the same class includes it.
+    // Convention detection must keep the non-null metadata so scaffolds
+    // generate a real import, not a TODO.
+    const MIXED_QUALITY_CEM: Cem = {
+      schemaVersion: '1.0.0',
+      modules: [
+        {
+          kind: 'javascript-module',
+          path: './hx-button.js',
+          declarations: [
+            {
+              kind: 'class',
+              name: 'HxButton',
+              tagName: 'hx-button',
+              customElement: true,
+              superclass: { name: 'BookedSolidElement' }, // no package/module
+            },
+          ],
+        },
+        {
+          kind: 'javascript-module',
+          path: './hx-card.js',
+          declarations: [
+            {
+              kind: 'class',
+              name: 'HxCard',
+              tagName: 'hx-card',
+              customElement: true,
+              superclass: {
+                name: 'BookedSolidElement',
+                package: '@bookedsolid/elements',
+              },
+            },
+          ],
+        },
+      ],
+    };
+    const result = scaffoldComponent({ tagName: 'hx-input' }, MIXED_QUALITY_CEM);
+    expect(result.component).toContain('extends BookedSolidElement');
+    expect(result.component).toContain(
+      "import { BookedSolidElement } from '@bookedsolid/elements';",
+    );
+    expect(result.component).not.toContain('// TODO');
+  });
+
   it('does NOT guess the base-class import from an unrelated inherited member package', () => {
     // CEM where superclass has no module/package metadata, but an inherited
     // member records a package. That inheritedFrom.package is unrelated to

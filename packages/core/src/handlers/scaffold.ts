@@ -127,12 +127,16 @@ export function detectConventions(cem: Cem, configPrefix?: string): DetectedConv
     if (decl.superclass?.name) {
       const sc = decl.superclass.name;
       superclassCounts.set(sc, (superclassCounts.get(sc) ?? 0) + 1);
-      if (!superclassOrigins.has(sc)) {
-        superclassOrigins.set(sc, {
-          module: decl.superclass.module ?? null,
-          package: decl.superclass.package ?? null,
-        });
-      }
+      // Merge origin metadata across declarations — once a non-null module or
+      // package is recorded for a candidate base class, it sticks. Mixed-
+      // quality CEMs (first decl omits superclass.module, a later one
+      // includes it) would otherwise leave the entry permanently empty and
+      // force the generator to emit a TODO instead of a real import.
+      const existing = superclassOrigins.get(sc) ?? { module: null, package: null };
+      superclassOrigins.set(sc, {
+        module: existing.module ?? decl.superclass.module ?? null,
+        package: existing.package ?? decl.superclass.package ?? null,
+      });
     }
   }
   let maxSc = 0;
@@ -207,18 +211,25 @@ function generateComponentSource(
   lines.push(`import { ${baseClass === 'LitElement' ? 'LitElement, ' : ''}html, css } from 'lit';`);
   lines.push(`import { customElement, property } from 'lit/decorators.js';`);
   if (baseClass !== 'LitElement') {
-    // Only trust origin metadata that belongs to the SELECTED base class.
-    // `conventions.packageName` is the package of any inherited member found
-    // anywhere in the CEM and may have nothing to do with where this base
-    // class is exported — using it as a fallback would emit a confidently
-    // wrong import that fails to compile. Better to leave a TODO and let
-    // the consumer wire it up than ship a broken reference.
-    const baseSpecifier = conventions.baseClassPackage ?? conventions.baseClassModule ?? null;
+    // Only trust origin metadata that belongs to THIS specific base class.
+    // When options.baseClass overrides the detected one (e.g. caller forces
+    // FormAssociatedMixin while the library's detected base is
+    // BookedSolidElement), conventions.baseClassPackage/module describes the
+    // detected class, not the override — using it would import the override
+    // from the wrong package. Use the detected origin only when the names
+    // match; otherwise fall through to the TODO marker.
+    // `conventions.packageName` is also unsafe (it is the package of any
+    // inherited member, not necessarily the base class).
+    const baseSpecifier =
+      baseClass === conventions.baseClass
+        ? (conventions.baseClassPackage ?? conventions.baseClassModule ?? null)
+        : null;
     if (baseSpecifier) {
       lines.push(`import { ${baseClass} } from '${baseSpecifier}';`);
     } else {
-      // Origin unknown — emit a TODO so the generated file flags the missing
-      // import explicitly rather than silently referencing an undefined symbol.
+      // Origin unknown (or override with no available metadata) — emit a TODO
+      // so the generated file flags the missing import explicitly rather than
+      // silently referencing an undefined or wrong symbol.
       lines.push(`// TODO: import { ${baseClass} } from '<package>';`);
     }
   }

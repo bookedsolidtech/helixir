@@ -203,6 +203,47 @@ describe('loadConfig', () => {
       }
     });
 
+    it('falls back to in-repo discovery when MCP_WC_CONFIG_PATH points at a missing file', () => {
+      // A stale or mistyped editor setting should not silently discard a
+      // working workspace config. Warn, then continue into the standard
+      // in-root discovery path.
+      writeFileSync(
+        join(tmpDir, 'helixir.mcp.json'),
+        JSON.stringify({ componentPrefix: 'wc-', cemPath: 'in-repo-cem.json' }),
+      );
+      vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+      vi.stubEnv('MCP_WC_CONFIG_PATH', join(tmpDir, 'does-not-exist.json'));
+
+      const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+      try {
+        const config = loadConfig();
+        expect(config.componentPrefix).toBe('wc-');
+        expect(config.cemPath).toBe('in-repo-cem.json');
+        const warnings = stderrSpy.mock.calls.flat().join(' ');
+        expect(warnings).toContain('MCP_WC_CONFIG_PATH');
+        expect(warnings).toContain('not found');
+      } finally {
+        stderrSpy.mockRestore();
+      }
+    });
+
+    it('falls back to in-repo discovery when MCP_WC_CONFIG_PATH JSON is malformed', () => {
+      writeFileSync(join(tmpDir, 'helixir.mcp.json'), JSON.stringify({ componentPrefix: 'wc-' }));
+      writeFileSync(join(tmpDir, 'broken.json'), '{not valid json');
+      vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+      vi.stubEnv('MCP_WC_CONFIG_PATH', join(tmpDir, 'broken.json'));
+
+      const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+      try {
+        const config = loadConfig();
+        expect(config.componentPrefix).toBe('wc-');
+        const warnings = stderrSpy.mock.calls.flat().join(' ');
+        expect(warnings).toContain('malformed');
+      } finally {
+        stderrSpy.mockRestore();
+      }
+    });
+
     it('drops fields that would resolve outside projectRoot, with a warning', () => {
       // A relative cemPath inside an external config rebases to a path that
       // escapes projectRoot. mcp/index.ts has a hard containment check that

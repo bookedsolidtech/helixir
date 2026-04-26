@@ -173,16 +173,19 @@ function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
         // checks, git-backed paths) that require repo-relative inputs.
         return rebaseRelativePaths(parsed, dirname(resolvedExplicit), projectRoot);
       } catch {
+        // Bad explicit-path JSON — warn and FALL THROUGH to the in-root
+        // discovery below. A stale or malformed editor setting should not
+        // silently drop an otherwise valid workspace config.
         process.stderr.write(
-          `[helixir] Warning: MCP_WC_CONFIG_PATH=${explicitConfigPath} is malformed. Using defaults.\n`,
+          `[helixir] Warning: MCP_WC_CONFIG_PATH=${explicitConfigPath} is malformed. Falling back to in-repo config.\n`,
         );
-        return {};
       }
+    } else {
+      process.stderr.write(
+        `[helixir] Warning: MCP_WC_CONFIG_PATH=${explicitConfigPath} not found. Falling back to in-repo config.\n`,
+      );
     }
-    process.stderr.write(
-      `[helixir] Warning: MCP_WC_CONFIG_PATH=${explicitConfigPath} not found. Using defaults.\n`,
-    );
-    return {};
+    // Fall through to standard in-root discovery rather than returning {}.
   }
 
   const primaryPath = resolve(projectRoot, 'helixir.mcp.json');

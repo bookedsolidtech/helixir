@@ -207,17 +207,18 @@ function generateComponentSource(
   lines.push(`import { ${baseClass === 'LitElement' ? 'LitElement, ' : ''}html, css } from 'lit';`);
   lines.push(`import { customElement, property } from 'lit/decorators.js';`);
   if (baseClass !== 'LitElement') {
-    const baseSpecifier =
-      conventions.baseClassPackage ??
-      conventions.baseClassModule ??
-      conventions.packageName ??
-      null;
+    // Only trust origin metadata that belongs to the SELECTED base class.
+    // `conventions.packageName` is the package of any inherited member found
+    // anywhere in the CEM and may have nothing to do with where this base
+    // class is exported — using it as a fallback would emit a confidently
+    // wrong import that fails to compile. Better to leave a TODO and let
+    // the consumer wire it up than ship a broken reference.
+    const baseSpecifier = conventions.baseClassPackage ?? conventions.baseClassModule ?? null;
     if (baseSpecifier) {
       lines.push(`import { ${baseClass} } from '${baseSpecifier}';`);
     } else {
-      // Origin unknown — leave a TODO so the generated file still compiles
-      // after the consumer wires up the import manually rather than silently
-      // shipping a reference to an undefined symbol.
+      // Origin unknown — emit a TODO so the generated file flags the missing
+      // import explicitly rather than silently referencing an undefined symbol.
       lines.push(`// TODO: import { ${baseClass} } from '<package>';`);
     }
   }

@@ -371,4 +371,45 @@ describe('scaffoldComponent — non-Lit base class import', () => {
     const result = scaffoldComponent({ tagName: 'hx-card' }, MODULE_ONLY_CEM);
     expect(result.component).toContain("import { CustomBase } from './custom-base.js';");
   });
+
+  it('does NOT guess the base-class import from an unrelated inherited member package', () => {
+    // CEM where superclass has no module/package metadata, but an inherited
+    // member records a package. That inheritedFrom.package is unrelated to
+    // where the base class lives — emitting an import from it would compile
+    // to a "not exported from" error. The generator must leave a TODO.
+    const UNRELATED_PACKAGE_CEM: Cem = {
+      schemaVersion: '1.0.0',
+      modules: [
+        {
+          kind: 'javascript-module',
+          path: './hx-button.js',
+          declarations: [
+            {
+              kind: 'class',
+              name: 'HxButton',
+              tagName: 'hx-button',
+              customElement: true,
+              superclass: {
+                name: 'LocalBase',
+                // No module or package — locally defined, origin unknown
+              },
+              members: [
+                {
+                  kind: 'field',
+                  name: 'someInheritedField',
+                  inheritedFrom: {
+                    name: 'AnotherClass',
+                    package: '@unrelated/library',
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const result = scaffoldComponent({ tagName: 'hx-card' }, UNRELATED_PACKAGE_CEM);
+    expect(result.component).toContain('// TODO: import { LocalBase }');
+    expect(result.component).not.toContain('@unrelated/library');
+  });
 });

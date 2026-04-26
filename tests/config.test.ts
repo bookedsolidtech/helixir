@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { mkdtempSync, writeFileSync, rmSync } from 'fs';
+import { mkdirSync, mkdtempSync, writeFileSync, rmSync } from 'fs';
 import { tmpdir } from 'os';
-import { join } from 'path';
+import { join, relative } from 'path';
 import { loadConfig } from '../packages/core/src/config.js';
 
 describe('loadConfig', () => {
@@ -140,28 +140,24 @@ describe('loadConfig', () => {
       expect(() => loadConfig()).not.toThrow();
     });
 
-    it('honors MCP_WC_CONFIG_PATH for an absolute config path outside projectRoot', () => {
-      // The VS Code extension's helixir.configPath setting flows here as
-      // MCP_WC_CONFIG_PATH. It must be readable from anywhere on disk, not
-      // just under projectRoot.
-      const externalDir = mkdtempSync(join(tmpdir(), 'helixir-external-'));
-      const externalConfig = join(externalDir, 'helixir.mcp.json');
-      try {
-        writeFileSync(externalConfig, JSON.stringify({ cemPath: 'external-cem.json' }));
-        vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
-        vi.stubEnv('MCP_WC_CONFIG_PATH', externalConfig);
+    it('honors MCP_WC_CONFIG_PATH for a config path nested inside the workspace', () => {
+      // Common case: a colocated packages/ds/helixir.mcp.json with relative
+      // path fields. The result must be PROJECT-RELATIVE (not absolute) so
+      // downstream consumers (mcp/index.ts containment check, git-backed
+      // paths in handlers/cem.ts and handlers/health.ts) keep working.
+      const nestedDir = join(tmpDir, 'packages', 'ds');
+      mkdirSync(nestedDir, { recursive: true });
+      const nestedConfig = join(nestedDir, 'helixir.mcp.json');
+      writeFileSync(nestedConfig, JSON.stringify({ cemPath: 'dist/custom-elements.json' }));
+      vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+      vi.stubEnv('MCP_WC_CONFIG_PATH', nestedConfig);
 
-        const config = loadConfig();
-        // Relative cemPath is rebased to the config file's directory so
-        // downstream resolution against projectRoot does not chase the wrong
-        // tree (would otherwise look for <tmpDir>/external-cem.json).
-        expect(config.cemPath).toBe(join(externalDir, 'external-cem.json'));
-      } finally {
-        rmSync(externalDir, { recursive: true, force: true });
-      }
+      const config = loadConfig();
+      // Project-relative path; joins to <tmpDir>/packages/ds/dist/custom-elements.json
+      expect(config.cemPath).toBe(join('packages', 'ds', 'dist', 'custom-elements.json'));
     });
 
-    it('rebases all relative path fields in an external config to the config directory', () => {
+    it('rebases all relative path fields in an external config to repo-relative', () => {
       const externalDir = mkdtempSync(join(tmpdir(), 'helixir-external-'));
       const externalConfig = join(externalDir, 'helixir.mcp.json');
       try {
@@ -178,10 +174,18 @@ describe('loadConfig', () => {
         vi.stubEnv('MCP_WC_CONFIG_PATH', externalConfig);
 
         const config = loadConfig();
-        expect(config.cemPath).toBe(join(externalDir, 'dist/custom-elements.json'));
-        expect(config.tsconfigPath).toBe(join(externalDir, 'tsconfig.build.json'));
-        expect(config.tokensPath).toBe(join(externalDir, 'tokens/generated.json'));
-        expect(config.healthHistoryDir).toBe(join(externalDir, '.health'));
+        // External config: paths walk up from projectRoot (relative starts
+        // with ../) but they are still RELATIVE strings, never absolute.
+        expect(config.cemPath).toBe(
+          relative(tmpDir, join(externalDir, 'dist/custom-elements.json')),
+        );
+        expect(config.tsconfigPath).toBe(
+          relative(tmpDir, join(externalDir, 'tsconfig.build.json')),
+        );
+        expect(config.tokensPath).toBe(
+          relative(tmpDir, join(externalDir, 'tokens/generated.json')),
+        );
+        expect(config.healthHistoryDir).toBe(relative(tmpDir, join(externalDir, '.health')));
       } finally {
         rmSync(externalDir, { recursive: true, force: true });
       }

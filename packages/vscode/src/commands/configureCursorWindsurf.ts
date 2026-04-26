@@ -83,10 +83,23 @@ export function registerConfigureCursorWindsurfCommand(context: vscode.Extension
     // editor spawns the MCP process from its own cwd (often $HOME) rather than
     // the workspace root. Without it, helixir cannot locate the target
     // component library's CEM, tsconfig, or tokens.
+    //
+    // Also forward helixir.configPath so workspaces with a non-root config
+    // (mirroring mcpProvider.ts behavior) work in Cursor/Windsurf too —
+    // otherwise this command silently writes a config that points at the
+    // workspace defaults even when the user has selected a different one.
     const env: Record<string, string> = {};
     const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (workspaceRoot) {
       env['MCP_WC_PROJECT_ROOT'] = workspaceRoot;
+    }
+    const configPath = vscode.workspace.getConfiguration('helixir').get<string>('configPath', '');
+    if (configPath && configPath.trim() !== '') {
+      env['MCP_WC_CONFIG_PATH'] = path.isAbsolute(configPath)
+        ? configPath
+        : workspaceRoot
+          ? path.join(workspaceRoot, configPath)
+          : configPath;
     }
     existing.mcpServers['helixir'] = {
       command: 'node',

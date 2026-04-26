@@ -1,5 +1,5 @@
 import { readFileSync, existsSync } from 'fs';
-import { dirname, isAbsolute, resolve } from 'path';
+import { dirname, isAbsolute, relative, resolve } from 'path';
 import { discoverCemPath, FRIENDLY_CEM_ERROR } from './shared/discovery.js';
 
 /**
@@ -114,12 +114,22 @@ const defaults: McpWcConfig = {
 // (cdnBase, cdnAutoloader, cdnStylesheet) are deliberately excluded.
 const CONFIG_PATH_FIELDS = ['cemPath', 'tsconfigPath', 'tokensPath', 'healthHistoryDir'] as const;
 
-function rebaseRelativePaths(config: Partial<McpWcConfig>, baseDir: string): Partial<McpWcConfig> {
+function rebaseRelativePaths(
+  config: Partial<McpWcConfig>,
+  configDir: string,
+  projectRoot: string,
+): Partial<McpWcConfig> {
   const rebased: Record<string, unknown> = { ...config };
   for (const field of CONFIG_PATH_FIELDS) {
     const value = rebased[field];
     if (typeof value === 'string' && value !== '' && !isAbsolute(value)) {
-      rebased[field] = resolve(baseDir, value);
+      // Resolve the field relative to the config file's directory, then make
+      // it RELATIVE TO projectRoot — not absolute. Several downstream consumers
+      // (src/mcp/index.ts containment check; git-backed comparisons in
+      // handlers/cem.ts and handlers/health.ts that pipe paths to `git show`)
+      // require repo-relative paths and break on absolute ones.
+      const absolute = resolve(configDir, value);
+      rebased[field] = relative(projectRoot, absolute);
     }
   }
   return rebased as Partial<McpWcConfig>;
@@ -140,10 +150,11 @@ function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
         const parsed = JSON.parse(raw) as Partial<McpWcConfig>;
         // When the config file lives outside projectRoot (e.g. a colocated
         // packages/ds/helixir.mcp.json), its relative path fields refer to the
-        // config's own directory, not the workspace root. Rebase them to
-        // absolute paths so downstream resolution against projectRoot does not
-        // chase the wrong tree.
-        return rebaseRelativePaths(parsed, dirname(resolvedExplicit));
+        // config's own directory, not the workspace root. Rebase them to be
+        // relative to projectRoot so downstream resolution against projectRoot
+        // points at the right tree without breaking consumers (containment
+        // checks, git-backed paths) that require repo-relative inputs.
+        return rebaseRelativePaths(parsed, dirname(resolvedExplicit), projectRoot);
       } catch {
         process.stderr.write(
           `[helixir] Warning: MCP_WC_CONFIG_PATH=${explicitConfigPath} is malformed. Using defaults.\n`,

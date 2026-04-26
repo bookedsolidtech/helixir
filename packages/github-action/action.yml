@@ -32,9 +32,9 @@ inputs:
     required: false
     default: ''
   node-version:
-    description: 'Node.js version to use'
+    description: 'Node.js version to use (must be ≥22; helixir engines.node is ^22 || ^24)'
     required: false
-    default: '20'
+    default: '22'
   helixir-version:
     description: 'Version of helixir to install (default: latest)'
     required: false

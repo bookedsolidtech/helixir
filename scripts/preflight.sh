@@ -43,11 +43,14 @@ COMMON_ANCESTOR=$(git merge-base HEAD "origin/${BASE_BRANCH}" 2>/dev/null || ech
 
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
 
-# Detect changed source files (src/ or packages/core/src/)
+# Detect changed source files across every publishable workspace.
+# Catching only src/ + packages/core/src/ would silently let releasable
+# changes under packages/mcp/src or packages/github-action/src merge without
+# a changeset and ship without a version bump or release note.
 CHANGED_SOURCES=""
 if [ -n "$COMMON_ANCESTOR" ]; then
   CHANGED_SOURCES=$(git diff --name-only "$COMMON_ANCESTOR"...HEAD \
-    | grep -E '^(src/|packages/core/src/)' \
+    | grep -E '^(src/|packages/[^/]+/src/)' \
     | grep -v '\.test\.ts$' \
     || true)
 fi

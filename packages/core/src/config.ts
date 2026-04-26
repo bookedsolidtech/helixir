@@ -246,9 +246,32 @@ export function loadConfig(): Readonly<McpWcConfig> {
   const cemPathExplicit = process.env['MCP_WC_CEM_PATH'] !== undefined || fileCemPath !== undefined;
 
   if (!cemPathExplicit) {
-    const discovered = discoverCemPath(effectiveRoot);
+    // When the user selected a non-root config via MCP_WC_CONFIG_PATH, run
+    // CEM discovery starting from THAT file's directory rather than the
+    // workspace root — otherwise a monorepo with both a root manifest and a
+    // package-level manifest will load the root CEM even though the user
+    // explicitly pointed at the nested config.
+    const explicitConfigPath = process.env['MCP_WC_CONFIG_PATH'];
+    let discoveryRoot = effectiveRoot;
+    if (explicitConfigPath !== undefined && explicitConfigPath !== '') {
+      const resolvedExplicit = resolve(effectiveRoot, explicitConfigPath);
+      if (existsSync(resolvedExplicit)) {
+        discoveryRoot = dirname(resolvedExplicit);
+      }
+    }
+    const discovered = discoverCemPath(discoveryRoot);
     if (discovered !== null) {
-      config.cemPath = discovered;
+      // discoverCemPath returns a path absolute to discoveryRoot; rebase to
+      // projectRoot so the containment check + git-backed consumers stay happy.
+      const absolute = resolve(discoveryRoot, discovered);
+      const normalizedRoot = resolve(effectiveRoot);
+      if (absolute === normalizedRoot || absolute.startsWith(normalizedRoot + sep)) {
+        config.cemPath = relative(normalizedRoot, absolute) || discovered;
+      } else {
+        // Discovered CEM is outside projectRoot — would fail downstream.
+        // Fall back to the friendly-error path rather than handing it on.
+        process.stderr.write(FRIENDLY_CEM_ERROR);
+      }
     } else {
       process.stderr.write(FRIENDLY_CEM_ERROR);
     }

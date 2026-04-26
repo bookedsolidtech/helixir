@@ -1,5 +1,5 @@
 import { readFileSync, existsSync } from 'fs';
-import { dirname, isAbsolute, relative, resolve } from 'path';
+import { dirname, isAbsolute, relative, resolve, sep } from 'path';
 import { discoverCemPath, FRIENDLY_CEM_ERROR } from './shared/discovery.js';
 
 /**
@@ -120,19 +120,36 @@ function rebaseRelativePaths(
   projectRoot: string,
 ): Partial<McpWcConfig> {
   const rebased: Record<string, unknown> = { ...config };
+  const normalizedRoot = resolve(projectRoot);
+  const dropped = new Set<string>();
   for (const field of CONFIG_PATH_FIELDS) {
     const value = rebased[field];
     if (typeof value === 'string' && value !== '' && !isAbsolute(value)) {
       // Resolve the field relative to the config file's directory, then make
-      // it RELATIVE TO projectRoot — not absolute. Several downstream consumers
+      // it RELATIVE TO projectRoot — not absolute. Downstream consumers
       // (src/mcp/index.ts containment check; git-backed comparisons in
       // handlers/cem.ts and handlers/health.ts that pipe paths to `git show`)
       // require repo-relative paths and break on absolute ones.
       const absolute = resolve(configDir, value);
-      rebased[field] = relative(projectRoot, absolute);
+      // If the rebased path escapes projectRoot, the containment check in
+      // src/mcp/index.ts would later abort startup with a fatal error. Drop
+      // the field with a warning so defaults take over rather than letting
+      // the server crash on what looks like a successfully-loaded config.
+      if (absolute !== normalizedRoot && !absolute.startsWith(normalizedRoot + sep)) {
+        process.stderr.write(
+          `[helixir] Warning: ${field} in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Using default.\n`,
+        );
+        dropped.add(field);
+        continue;
+      }
+      rebased[field] = relative(normalizedRoot, absolute);
     }
   }
-  return rebased as Partial<McpWcConfig>;
+  // Build the result without the dropped fields rather than mutating with
+  // `delete` (lint rule @typescript-eslint/no-dynamic-delete).
+  return Object.fromEntries(
+    Object.entries(rebased).filter(([k]) => !dropped.has(k)),
+  ) as Partial<McpWcConfig>;
 }
 
 function readConfigFile(projectRoot: string): Partial<McpWcConfig> {

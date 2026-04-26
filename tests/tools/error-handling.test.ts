@@ -121,6 +121,22 @@ describe('sanitizeErrorMessage', () => {
       expect(result).not.toContain('lication');
       expect(result).not.toContain('secrets');
     });
+
+    it('does not partial-match a sibling directory separated by - or .', () => {
+      // The boundary must reject pathname-continuation characters beyond just
+      // \w — `/repo/app-prod/...` and `/repo/app.config/...` are siblings of
+      // `/repo/app`, not children, and must be redacted in full rather than
+      // having `/repo/app` consumed and the rest leaked as a bare fragment.
+      const dashCase = sanitizeErrorMessage('Cannot read /repo/app-prod/secrets.txt', '/repo/app');
+      expect(dashCase).toContain('[path redacted]');
+      expect(dashCase).not.toContain('-prod');
+      expect(dashCase).not.toContain('secrets');
+
+      const dotCase = sanitizeErrorMessage('Cannot read /repo/app.config/token.json', '/repo/app');
+      expect(dotCase).toContain('[path redacted]');
+      expect(dotCase).not.toContain('.config');
+      expect(dotCase).not.toContain('token');
+    });
   });
 
   describe('VALIDATION / Zod pattern sanitization', () => {

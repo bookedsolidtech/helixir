@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdirSync, mkdtempSync, writeFileSync, rmSync } from 'fs';
 import { tmpdir } from 'os';
-import { join, relative } from 'path';
+import { join } from 'path';
 import { loadConfig } from '../packages/core/src/config.js';
 
 describe('loadConfig', () => {
@@ -157,38 +157,30 @@ describe('loadConfig', () => {
       expect(config.cemPath).toBe(join('packages', 'ds', 'dist', 'custom-elements.json'));
     });
 
-    it('rebases all relative path fields in an external config to repo-relative', () => {
-      const externalDir = mkdtempSync(join(tmpdir(), 'helixir-external-'));
-      const externalConfig = join(externalDir, 'helixir.mcp.json');
-      try {
-        writeFileSync(
-          externalConfig,
-          JSON.stringify({
-            cemPath: 'dist/custom-elements.json',
-            tsconfigPath: 'tsconfig.build.json',
-            tokensPath: 'tokens/generated.json',
-            healthHistoryDir: '.health',
-          }),
-        );
-        vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
-        vi.stubEnv('MCP_WC_CONFIG_PATH', externalConfig);
+    it('rebases all relative path fields in a nested config to repo-relative', () => {
+      // Inside-projectRoot variant of the rebase: paths land under
+      // packages/ds/* and stay relative to the workspace root, ready for
+      // git-backed handlers and the mcp/index.ts containment check.
+      const nestedDir = join(tmpDir, 'packages', 'ds');
+      mkdirSync(nestedDir, { recursive: true });
+      const nestedConfig = join(nestedDir, 'helixir.mcp.json');
+      writeFileSync(
+        nestedConfig,
+        JSON.stringify({
+          cemPath: 'dist/custom-elements.json',
+          tsconfigPath: 'tsconfig.build.json',
+          tokensPath: 'tokens/generated.json',
+          healthHistoryDir: '.health',
+        }),
+      );
+      vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+      vi.stubEnv('MCP_WC_CONFIG_PATH', nestedConfig);
 
-        const config = loadConfig();
-        // External config: paths walk up from projectRoot (relative starts
-        // with ../) but they are still RELATIVE strings, never absolute.
-        expect(config.cemPath).toBe(
-          relative(tmpDir, join(externalDir, 'dist/custom-elements.json')),
-        );
-        expect(config.tsconfigPath).toBe(
-          relative(tmpDir, join(externalDir, 'tsconfig.build.json')),
-        );
-        expect(config.tokensPath).toBe(
-          relative(tmpDir, join(externalDir, 'tokens/generated.json')),
-        );
-        expect(config.healthHistoryDir).toBe(relative(tmpDir, join(externalDir, '.health')));
-      } finally {
-        rmSync(externalDir, { recursive: true, force: true });
-      }
+      const config = loadConfig();
+      expect(config.cemPath).toBe(join('packages', 'ds', 'dist', 'custom-elements.json'));
+      expect(config.tsconfigPath).toBe(join('packages', 'ds', 'tsconfig.build.json'));
+      expect(config.tokensPath).toBe(join('packages', 'ds', 'tokens', 'generated.json'));
+      expect(config.healthHistoryDir).toBe(join('packages', 'ds', '.health'));
     });
 
     it('leaves absolute path fields in an external config unchanged', () => {
@@ -206,6 +198,35 @@ describe('loadConfig', () => {
 
         const config = loadConfig();
         expect(config.cemPath).toBe('/abs/path/custom-elements.json');
+      } finally {
+        rmSync(externalDir, { recursive: true, force: true });
+      }
+    });
+
+    it('drops fields that would resolve outside projectRoot, with a warning', () => {
+      // A relative cemPath inside an external config rebases to a path that
+      // escapes projectRoot. mcp/index.ts has a hard containment check that
+      // would crash startup; rather than handing it a path it will reject,
+      // we drop the field so defaults take over and emit a warning.
+      const externalDir = mkdtempSync(join(tmpdir(), 'helixir-external-'));
+      const externalConfig = join(externalDir, 'helixir.mcp.json');
+      try {
+        writeFileSync(externalConfig, JSON.stringify({ cemPath: 'dist/cem.json' }));
+        vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
+        vi.stubEnv('MCP_WC_CONFIG_PATH', externalConfig);
+
+        const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+        try {
+          const config = loadConfig();
+          // Field dropped → falls back to default
+          expect(config.cemPath).toBe('custom-elements.json');
+          // Warning emitted
+          const warnings = stderrSpy.mock.calls.flat().join(' ');
+          expect(warnings).toContain('cemPath');
+          expect(warnings).toContain('outside projectRoot');
+        } finally {
+          stderrSpy.mockRestore();
+        }
       } finally {
         rmSync(externalDir, { recursive: true, force: true });
       }

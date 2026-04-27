@@ -165,12 +165,18 @@ export async function main(): Promise<void> {
   const resolvedProjectRoot = resolve(config.projectRoot);
   const cemAbsPath = resolve(resolvedProjectRoot, config.cemPath);
 
-  // Containment check on cemPath. loadConfig already drops out-of-tree
-  // cemPath from external configs (with a warning), and git-backed
-  // handlers (diffCem, getHealthDiff via gitShow) require repo-relative
-  // paths anyway. This check stays as defense-in-depth against env-var
-  // path traversal that bypasses loadConfig.
-  if (!cemAbsPath.startsWith(resolvedProjectRoot + sep) && cemAbsPath !== resolvedProjectRoot) {
+  // Containment check on cemPath. Skip when the user has explicitly
+  // pointed at an out-of-tree manifest via MCP_WC_CEM_PATH (env override —
+  // shared/monorepo CEMs in central locations are a documented use case
+  // and the operator has explicitly opted in). Otherwise the check stays
+  // fail-closed against accidental path traversal via config files.
+  const cemEnvOverride = process.env['MCP_WC_CEM_PATH'];
+  const envOptIn = cemEnvOverride !== undefined && cemEnvOverride !== '';
+  if (
+    !envOptIn &&
+    !cemAbsPath.startsWith(resolvedProjectRoot + sep) &&
+    cemAbsPath !== resolvedProjectRoot
+  ) {
     process.stderr.write(`Fatal: cemPath resolves outside of projectRoot. Refusing to load.\n`);
     process.exit(1);
   }

@@ -221,14 +221,13 @@ function generateComponentSource(
     // `conventions.packageName` is also unsafe (it is the package of any
     // inherited member, not necessarily the base class).
     //
-    // Prefer package (portable to any destination), fall back to module
-    // (relative to the sampled declaration; works when scaffolded files
-    // share the source layout, fails otherwise — but the CEM's module
-    // path is still better than emitting a `// TODO` for libraries that
-    // only record local base-class modules).
+    // Prefer module (CEM's canonical pointer to where the class lives —
+    // most accurate for local base classes that aren't exported from a
+    // package root). Fall back to package for libraries that only record
+    // their npm package. TODO when neither is available.
     const baseSpecifier =
       baseClass === conventions.baseClass
-        ? (conventions.baseClassPackage ?? conventions.baseClassModule ?? null)
+        ? (conventions.baseClassModule ?? conventions.baseClassPackage ?? null)
         : null;
     if (baseSpecifier) {
       lines.push(`import { ${baseClass} } from '${baseSpecifier}';`);

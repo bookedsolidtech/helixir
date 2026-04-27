@@ -114,13 +114,13 @@ const defaults: McpWcConfig = {
 // (cdnBase, cdnAutoloader, cdnStylesheet) are deliberately excluded.
 const CONFIG_PATH_FIELDS = ['cemPath', 'tsconfigPath', 'tokensPath', 'healthHistoryDir'] as const;
 
-// Subset whose downstream consumers (mcp/index.ts containment check; git-
-// backed handlers/cem.ts, handlers/health.ts) require a path inside
-// projectRoot. tsconfigPath and tokensPath are intentionally NOT in this set
-// because handlers/typescript.ts and handlers/tokens.ts handle absolute paths
-// safely — dropping a valid shared `../tsconfig.base.json` from an external
-// config would break diagnostics in monorepos opened from a package subfolder.
-const STRICT_CONTAINMENT_FIELDS = new Set<string>(['cemPath', 'healthHistoryDir']);
+// Only cemPath needs strict containment — git-backed handlers (diffCem,
+// getHealthDiff via GitOperations.gitShow) reject absolute paths and silently
+// fall back to "component not found". healthHistoryDir, tsconfigPath, and
+// tokensPath all use plain `resolve(projectRoot, value)` and accept absolute
+// paths, so dropping them from external configs would silently lose valid
+// shared values (e.g. `../shared/tsconfig.base.json`).
+const STRICT_CONTAINMENT_FIELDS = new Set<string>(['cemPath']);
 
 function rebaseRelativePaths(
   config: Partial<McpWcConfig>,
@@ -141,21 +141,21 @@ function rebaseRelativePaths(
     const escapesRoot = absolute !== normalizedRoot && !absolute.startsWith(normalizedRoot + sep);
     if (escapesRoot) {
       if (STRICT_CONTAINMENT_FIELDS.has(field)) {
-        // cemPath / healthHistoryDir MUST be project-relative — git-backed
-        // tools (diffCem, getHealthDiff via GitOperations.gitShow) reject
-        // absolute paths and silently fall back to "component not found"
-        // for every component. Drop with a warning so defaults take over
-        // rather than letting those tools silently degrade. Affects both
-        // relative paths that escape root and absolute paths outside root.
+        // cemPath MUST be project-relative — git-backed tools (diffCem,
+        // getHealthDiff via GitOperations.gitShow) reject absolute paths
+        // and silently fall back to "component not found" for every
+        // component. Drop with a warning so defaults take over rather than
+        // letting those tools silently degrade.
         process.stderr.write(
           `[helixir] Warning: ${field} in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Git-backed tools (diff/health) require repo-relative paths. Using default.\n`,
         );
         dropped.add(field);
         continue;
       }
-      // tsconfigPath / tokensPath: handlers tolerate absolute paths, so
-      // keep the rebased absolute path rather than discarding a valid
-      // shared file (e.g. ../tsconfig.base.json) from an external config.
+      // healthHistoryDir / tsconfigPath / tokensPath: handlers tolerate
+      // absolute paths via plain `resolve(projectRoot, value)` so keep the
+      // rebased absolute path rather than discarding a valid shared file
+      // (e.g. ../shared/tsconfig.base.json) from an external config.
       rebased[field] = absolute;
       continue;
     }

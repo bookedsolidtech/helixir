@@ -18,6 +18,15 @@ if [ -f "${REA_ROOT}/.rea/HALT" ]; then
   exit 1
 fi
 
+
+# Project-local format gate. Codex push-gate does not enforce
+# `pnpm run format:check`, so a dev who bypasses pre-commit can still
+# push code that fails CI's format job. Run format:check first; only
+# hand off to rea when it passes. Skipped when pnpm is unavailable.
+if command -v pnpm >/dev/null 2>&1 && [ -f "${REA_ROOT}/package.json" ]; then
+  ( cd "${REA_ROOT}" && pnpm run format:check ) || exit 1
+fi
+
 # Each branch exec's directly with proper quoting so paths containing
 # spaces survive (the prior `REA_BIN="node ..."; exec $REA_BIN ...`
 # pattern word-split on the resolved path and produced "not found" for

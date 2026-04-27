@@ -90,7 +90,14 @@ export function registerConfigureCursorWindsurfCommand(context: vscode.Extension
     // workspace defaults even when the user has selected a different one.
     const env: Record<string, string> = {};
     const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    if (workspaceRoot) {
+    // Only persist MCP_WC_PROJECT_ROOT for the GLOBAL ~/.cursor or
+    // ~/.windsurf config (where the editor spawns from $HOME). For
+    // workspace-local .cursor/mcp.json or .windsurf/mcp.json (configDir
+    // under workspaceRoot), omit it — Cursor/Windsurf already spawn from
+    // the workspace and the absolute path would make the committed file
+    // non-portable across machines.
+    const isWorkspaceLocal = workspaceRoot && configDir.startsWith(workspaceRoot);
+    if (workspaceRoot && !isWorkspaceLocal) {
       env['MCP_WC_PROJECT_ROOT'] = workspaceRoot;
     }
     const configPath = vscode.workspace.getConfiguration('helixir').get<string>('configPath', '');

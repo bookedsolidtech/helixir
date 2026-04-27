@@ -47,7 +47,8 @@
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
     "prepublishOnly": "node scripts/block-local-publish.mjs && pnpm run build",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "node scripts/install-gitleaks-shim.mjs"
   },
   "keywords": [
     "mcp",

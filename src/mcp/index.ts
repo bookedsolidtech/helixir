@@ -165,8 +165,18 @@ export async function main(): Promise<void> {
   const resolvedProjectRoot = resolve(config.projectRoot);
   const cemAbsPath = resolve(resolvedProjectRoot, config.cemPath);
 
-  // Verify the resolved cemPath is contained within projectRoot (prevent absolute cemPath escaping).
-  if (!cemAbsPath.startsWith(resolvedProjectRoot + sep) && cemAbsPath !== resolvedProjectRoot) {
+  // Containment check on cemPath. Skip when MCP_WC_CONFIG_PATH is set —
+  // the user has explicitly opted into an external config and may legitimately
+  // point at a shared CEM outside the workspace (e.g. monorepo with a
+  // workspace-level manifest). Without that opt-in, paths that escape
+  // projectRoot are likely a misconfig (or hostile env) and we refuse.
+  const explicitConfigPath = process.env['MCP_WC_CONFIG_PATH'];
+  const externalConfigOptIn = explicitConfigPath !== undefined && explicitConfigPath !== '';
+  if (
+    !externalConfigOptIn &&
+    !cemAbsPath.startsWith(resolvedProjectRoot + sep) &&
+    cemAbsPath !== resolvedProjectRoot
+  ) {
     process.stderr.write(`Fatal: cemPath resolves outside of projectRoot. Refusing to load.\n`);
     process.exit(1);
   }

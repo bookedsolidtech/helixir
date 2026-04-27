@@ -282,25 +282,35 @@ export function loadConfig(): Readonly<McpWcConfig> {
   const cemPathExplicit = process.env['MCP_WC_CEM_PATH'] !== undefined || fileCemPath !== undefined;
 
   if (!cemPathExplicit) {
-    // CEM discovery base = the directory readConfigFile actually loaded the
-    // config from, when that directory is inside projectRoot. This lets a
-    // nested packages/ds/helixir.mcp.json drive discovery toward its own
-    // dist/custom-elements.json. When the loaded source is outside
-    // projectRoot OR when fall-through happened (missing/malformed explicit
-    // config — sourceDir is null in those cases), discovery stays in
-    // projectRoot so the workspace's own dist/custom-elements.json is found.
+    // Two-phase CEM discovery:
+    //   1. If the config was loaded from a directory inside projectRoot
+    //      (e.g. packages/ds/helixir.mcp.json), search there first so a
+    //      package-local dist/custom-elements.json wins.
+    //   2. If nothing is found there — or the config came from outside
+    //      projectRoot, or fall-through happened (missing/malformed
+    //      explicit config) — search projectRoot. This avoids missing a
+    //      workspace-root manifest in monorepos that use a nested config
+    //      only for tsconfigPath/tokensPath.
     const normalizedRoot = resolve(effectiveRoot);
     let discoveryRoot = effectiveRoot;
+    let discovered: string | null = null;
     if (configSourceDir !== null) {
       const normalizedSource = resolve(configSourceDir);
       if (
-        normalizedSource === normalizedRoot ||
-        normalizedSource.startsWith(normalizedRoot + sep)
+        (normalizedSource === normalizedRoot ||
+          normalizedSource.startsWith(normalizedRoot + sep)) &&
+        normalizedSource !== normalizedRoot
       ) {
-        discoveryRoot = normalizedSource;
+        discovered = discoverCemPath(normalizedSource);
+        if (discovered !== null) {
+          discoveryRoot = normalizedSource;
+        }
       }
     }
-    const discovered = discoverCemPath(discoveryRoot);
+    if (discovered === null) {
+      discovered = discoverCemPath(effectiveRoot);
+      discoveryRoot = effectiveRoot;
+    }
     if (discovered !== null) {
       // discoverCemPath returns a path relative to discoveryRoot; rebase to
       // projectRoot so the containment check + git-backed consumers stay

@@ -43,16 +43,40 @@ COMMON_ANCESTOR=$(git merge-base HEAD "origin/${BASE_BRANCH}" 2>/dev/null || ech
 
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
 
-# Detect changed source files across every publishable workspace.
+# Detect changed source files across every PUBLISHABLE workspace package.
 # Catching only src/ + packages/core/src/ would silently let releasable
-# changes under packages/mcp/src or packages/github-action/src merge without
-# a changeset and ship without a version bump or release note.
+# changes elsewhere (e.g. packages/mcp/src) merge without a changeset; but
+# private packages (vscode extension, github-action) are not published and
+# must NOT trip the gate or every internal-only feature branch hard-fails
+# with "CHANGESET REQUIRED".
+PRIVATE_PACKAGES=$(node -e "
+  const fs = require('fs');
+  const path = require('path');
+  const pkgsDir = path.resolve('packages');
+  if (!fs.existsSync(pkgsDir)) process.exit(0);
+  for (const name of fs.readdirSync(pkgsDir)) {
+    const pkgJson = path.join(pkgsDir, name, 'package.json');
+    if (!fs.existsSync(pkgJson)) continue;
+    try {
+      const data = JSON.parse(fs.readFileSync(pkgJson, 'utf-8'));
+      if (data.private === true) console.log(name);
+    } catch {}
+  }
+" 2>/dev/null || true)
+
 CHANGED_SOURCES=""
 if [ -n "$COMMON_ANCESTOR" ]; then
   CHANGED_SOURCES=$(git diff --name-only "$COMMON_ANCESTOR"...HEAD \
     | grep -E '^(src/|packages/[^/]+/src/)' \
     | grep -v '\.test\.ts$' \
     || true)
+  if [ -n "$PRIVATE_PACKAGES" ]; then
+    while IFS= read -r private_pkg; do
+      [ -z "$private_pkg" ] && continue
+      CHANGED_SOURCES=$(printf '%s\n' "$CHANGED_SOURCES" \
+        | grep -v "^packages/${private_pkg}/src/" || true)
+    done <<< "$PRIVATE_PACKAGES"
+  fi
 fi
 
 # ── Gate 1: Lint ─────────────────────────────────────────────────────────────

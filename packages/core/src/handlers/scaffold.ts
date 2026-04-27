@@ -220,9 +220,14 @@ function generateComponentSource(
     // match; otherwise fall through to the TODO marker.
     // `conventions.packageName` is also unsafe (it is the package of any
     // inherited member, not necessarily the base class).
+    //
+    // Prefer module over package: many internal base classes/mixins are only
+    // exported from a specific module path (e.g. './internal/base.js'), not
+    // from the package root. The rest of the codebase already treats module
+    // as the canonical source path for superclass references.
     const baseSpecifier =
       baseClass === conventions.baseClass
-        ? (conventions.baseClassPackage ?? conventions.baseClassModule ?? null)
+        ? (conventions.baseClassModule ?? conventions.baseClassPackage ?? null)
         : null;
     if (baseSpecifier) {
       lines.push(`import { ${baseClass} } from '${baseSpecifier}';`);

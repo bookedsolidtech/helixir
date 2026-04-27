@@ -165,47 +165,12 @@ export async function main(): Promise<void> {
   const resolvedProjectRoot = resolve(config.projectRoot);
   const cemAbsPath = resolve(resolvedProjectRoot, config.cemPath);
 
-  // Containment check on cemPath. Skip ONLY when cemPath actually came
-  // from a successfully-loaded external config (file at MCP_WC_CONFIG_PATH
-  // exists, parses as JSON, AND its `cemPath` field is set). Three layers
-  // of guarding:
-  //   1. MCP_WC_CEM_PATH env var takes priority over external-config
-  //      cemPath in loadConfig — when the operator overrides the manifest
-  //      separately, the bypass should NOT apply (otherwise a stray
-  //      external-config presence would let an env-supplied absolute path
-  //      escape).
-  //   2. Stale/malformed external configs (file missing or non-JSON)
-  //      don't bypass — those just fall through in loadConfig.
-  //   3. External config that doesn't set cemPath also doesn't bypass —
-  //      the manifest came from auto-discovery, not from the external
-  //      file.
-  let cemFromExternalConfig = false;
-  const explicitConfigPath = process.env['MCP_WC_CONFIG_PATH'];
-  const cemEnvOverride = process.env['MCP_WC_CEM_PATH'];
-  if (
-    explicitConfigPath !== undefined &&
-    explicitConfigPath !== '' &&
-    (cemEnvOverride === undefined || cemEnvOverride === '')
-  ) {
-    const resolvedExplicit = resolve(resolvedProjectRoot, explicitConfigPath);
-    if (existsSync(resolvedExplicit)) {
-      try {
-        const parsed = JSON.parse(readFileSync(resolvedExplicit, 'utf-8')) as {
-          cemPath?: unknown;
-        };
-        if (typeof parsed.cemPath === 'string' && parsed.cemPath !== '') {
-          cemFromExternalConfig = true;
-        }
-      } catch {
-        // Malformed JSON — fall through to fail-closed.
-      }
-    }
-  }
-  if (
-    !cemFromExternalConfig &&
-    !cemAbsPath.startsWith(resolvedProjectRoot + sep) &&
-    cemAbsPath !== resolvedProjectRoot
-  ) {
+  // Containment check on cemPath. loadConfig already drops out-of-tree
+  // cemPath from external configs (with a warning), and git-backed
+  // handlers (diffCem, getHealthDiff via gitShow) require repo-relative
+  // paths anyway. This check stays as defense-in-depth against env-var
+  // path traversal that bypasses loadConfig.
+  if (!cemAbsPath.startsWith(resolvedProjectRoot + sep) && cemAbsPath !== resolvedProjectRoot) {
     process.stderr.write(`Fatal: cemPath resolves outside of projectRoot. Refusing to load.\n`);
     process.exit(1);
   }

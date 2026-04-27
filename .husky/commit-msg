@@ -38,16 +38,11 @@ fi
 
 # ── Check if attribution blocking is enabled ───────────────────────────────────
 # Look for block_ai_attribution: true in .rea/policy.yaml
-# If not found or not true, exit 0 (normal commit behavior)
-
-POLICY_FILE=".rea/policy.yaml"
-if [ ! -f "$POLICY_FILE" ]; then
-  exit 0
-fi
-
-# Simple grep — no YAML parser dependency needed for a boolean flag
-if ! grep -qE '^block_ai_attribution:[[:space:]]*true' "$POLICY_FILE" 2>/dev/null; then
-  exit 0
+# When unset/false, the attribution patterns are skipped, but commitlint still
+# runs at the end of this hook so the conventional-commit contract holds.
+ATTRIBUTION_ACTIVE=0
+if [ -f ".rea/policy.yaml" ] && grep -qE '^block_ai_attribution:[[:space:]]*true' ".rea/policy.yaml" 2>/dev/null; then
+  ATTRIBUTION_ACTIVE=1
 fi
 
 # ── Attribution blocking is enabled — check patterns ───────────────────────────
@@ -55,6 +50,7 @@ fi
 BLOCKED=0
 MATCHES=""
 
+if [ "$ATTRIBUTION_ACTIVE" -eq 1 ]; then
 # Pattern 1: Co-Authored-By with noreply@ email
 if grep -qiE 'Co-Authored-By:.*noreply@' "$COMMIT_MSG_FILE" 2>/dev/null; then
   BLOCKED=1
@@ -88,6 +84,7 @@ if grep -qE '🤖.*[Gg]enerated' "$COMMIT_MSG_FILE" 2>/dev/null; then
   BLOCKED=1
   MATCHES="${MATCHES}$(grep -nE '🤖.*[Gg]enerated' "$COMMIT_MSG_FILE" 2>/dev/null)
 "
+fi
 fi
 
 # ── Block or allow ─────────────────────────────────────────────────────────────

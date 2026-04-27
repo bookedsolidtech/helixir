@@ -48,7 +48,7 @@
     "changeset:publish": "changeset publish",
     "prepublishOnly": "node scripts/block-local-publish.mjs && pnpm run build",
     "prepare": "husky",
-    "postinstall": "node scripts/install-gitleaks-shim.mjs"
+    "postinstall": "node -e \"try{require('fs').statSync('scripts/install-gitleaks-shim.mjs')}catch{process.exit(0)};require('child_process').spawnSync(process.execPath,['scripts/install-gitleaks-shim.mjs'],{stdio:'inherit'})\""
   },
   "keywords": [
     "mcp",

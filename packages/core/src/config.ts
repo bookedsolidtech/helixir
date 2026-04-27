@@ -114,16 +114,6 @@ const defaults: McpWcConfig = {
 // (cdnBase, cdnAutoloader, cdnStylesheet) are deliberately excluded.
 const CONFIG_PATH_FIELDS = ['cemPath', 'tsconfigPath', 'tokensPath', 'healthHistoryDir'] as const;
 
-// Fields whose downstream consumers do plain file I/O (read tokens, read
-// tsconfig, write health snapshots). External configs that point these
-// outside projectRoot would let arbitrary host files be read or written —
-// drop them with a warning so the workspace remains the security boundary.
-// `cemPath` is intentionally NOT in this set: the CLI legitimately accepts
-// absolute manifests for `helixir analyze`-style flows on workspace-level
-// CEMs, and the MCP server gates its own absolute-cemPath check via the
-// external-config opt-in (see src/mcp/index.ts).
-const FS_BOUNDARY_FIELDS = new Set<string>(['tsconfigPath', 'tokensPath', 'healthHistoryDir']);
-
 function rebaseRelativePaths(
   config: Partial<McpWcConfig>,
   configDir: string,
@@ -142,21 +132,21 @@ function rebaseRelativePaths(
     const absolute = isAbsolute(value) ? value : resolve(configDir, value);
     const escapesRoot = absolute !== normalizedRoot && !absolute.startsWith(normalizedRoot + sep);
     if (escapesRoot) {
-      if (FS_BOUNDARY_FIELDS.has(field)) {
-        // Drop tokensPath/tsconfigPath/healthHistoryDir when they escape
-        // projectRoot — handlers feed them straight into file I/O and an
-        // out-of-tree path lets a nested config read/write arbitrary host
-        // files. Default (workspace-relative) takes over.
-        process.stderr.write(
-          `[helixir] Warning: ${field} in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Using default to keep host filesystem in the workspace boundary.\n`,
-        );
-        dropped.add(field);
-        continue;
-      }
-      // cemPath is preserved as absolute — CLI consumers accept it and the
-      // MCP server gates its own containment via the external-config
-      // opt-in.
-      rebased[field] = absolute;
+      // Two reasons to drop fields whose resolved path escapes projectRoot:
+      //   1. tsconfigPath/tokensPath/healthHistoryDir feed straight into
+      //      file I/O — out-of-tree paths could read or write arbitrary
+      //      host files.
+      //   2. cemPath is also unsafe for git-backed handlers: diffCem and
+      //      getHealthDiff pass `config.cemPath` to GitOperations.gitShow,
+      //      whose allowlist only accepts repo-relative paths. An absolute
+      //      out-of-tree cemPath silently fails those tools as
+      //      "component not found".
+      // Drop with a warning so defaults take over rather than handing the
+      // path to a downstream consumer that will reject it.
+      process.stderr.write(
+        `[helixir] Warning: ${field} in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Using default to keep within the workspace boundary.\n`,
+      );
+      dropped.add(field);
       continue;
     }
     // Inside projectRoot: always emit project-relative so consumers requiring

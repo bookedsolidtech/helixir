@@ -144,22 +144,13 @@ function rebaseRelativePaths(
     const absolute = isAbsolute(value) ? value : resolve(configDir, value);
     const inRoot = absolute === normalizedRoot || absolute.startsWith(normalizedRoot + sep);
     if (!inRoot) {
-      // Out-of-tree paths from external configs:
-      //   - tsconfigPath/tokensPath/healthHistoryDir: preserve absolute
-      //     (their handlers accept absolute paths via plain resolve()).
-      //   - cemPath: drop with warning. Preserving would brick the MCP
-      //     server (containment check fatals at startup); dropping lets
-      //     loadConfig fall through to in-repo/default discovery so the
-      //     server still starts. Trade-off: a stale external config no
-      //     longer surfaces a fatal — operators must check warnings.
-      if (field === 'cemPath') {
-        process.stderr.write(
-          `[helixir] Warning: cemPath in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Using default. (For out-of-tree CEMs set MCP_WC_CEM_PATH directly.)\n`,
-        );
-        dropped.add(field);
-      } else {
-        rebased[field] = absolute;
-      }
+      // All out-of-tree paths from external configs are preserved as-is.
+      // The MCP server's startup containment check (src/mcp/index.ts) is
+      // the right place to surface invalid cemPath — fail-fast at startup
+      // is safer than silently dropping the user's chosen manifest and
+      // analyzing some other discovered CEM. tsconfig/tokens/health
+      // handlers accept absolute paths anyway.
+      rebased[field] = absolute;
       continue;
     }
     // Inside projectRoot: emit project-relative POSIX path so git-backed

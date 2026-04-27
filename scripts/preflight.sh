@@ -178,12 +178,20 @@ elif ! command -v act &>/dev/null || ! docker info &>/dev/null 2>&1; then
   echo ""
   exit 1
 else
+  # Pass --native only when running on ARM64 (the flag forces linux/arm64
+  # containers; on x86_64 hosts that would force emulation and is the
+  # opposite of the intent). Operators on either arch can opt-in via
+  # ACT_NATIVE=1.
+  ACT_NATIVE_FLAG=""
+  if [ -n "${ACT_NATIVE:-}" ] || [ "$(uname -m 2>/dev/null)" = "arm64" ]; then
+    ACT_NATIVE_FLAG="--native"
+  fi
   if [ "${SKIP_MATRIX:-0}" = "1" ]; then
     echo "  Running CI in Docker (basic — matrix skipped via SKIP_MATRIX=1)..."
-    ACT_CMD="./scripts/act-ci.sh --native"
+    ACT_CMD="./scripts/act-ci.sh $ACT_NATIVE_FLAG"
   else
-    echo "  Running CI in Docker with Node 20/22/24 matrix..."
-    ACT_CMD="./scripts/act-ci.sh --matrix --native"
+    echo "  Running CI in Docker with Node 22/24 matrix..."
+    ACT_CMD="./scripts/act-ci.sh --matrix $ACT_NATIVE_FLAG"
   fi
   if $ACT_CMD; then
     echo "  ✓ Docker CI passed"

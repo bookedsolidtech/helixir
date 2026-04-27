@@ -135,6 +135,9 @@ if [ -x "node_modules/.bin/commitlint" ]; then
   node_modules/.bin/commitlint --edit "$COMMIT_MSG_FILE"
 elif command -v pnpm > /dev/null 2>&1; then
   pnpm exec commitlint --edit "$COMMIT_MSG_FILE"
+else
+  printf 'commit-msg: commitlint not available — install dependencies (pnpm install) before committing.\n' >&2
+  exit 1
 fi
 
 exit 0

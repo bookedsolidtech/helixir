@@ -116,39 +116,45 @@ const CONFIG_PATH_FIELDS = ['cemPath', 'tsconfigPath', 'tokensPath', 'healthHist
 
 function rebaseRelativePaths(
   config: Partial<McpWcConfig>,
-  _configDir: string,
+  configDir: string,
   projectRoot: string,
 ): Partial<McpWcConfig> {
-  // Path fields in helixir configs are documented as projectRoot-relative,
-  // not config-file-dir-relative. Even when the config is loaded from
-  // outside projectRoot, a value like `packages/ds/dist/custom-elements.json`
-  // is meant to be resolved against projectRoot — rebasing against the
-  // config dir would double-include the path segment for already-valid
-  // configs that were simply moved.
+  // Path resolution semantics for external configs (MCP_WC_CONFIG_PATH):
   //
-  // Only one transformation needed: drop ABSOLUTE values that escape
-  // projectRoot. The MCP server's containment check would fatal on them
-  // anyway, and silently letting them through means analyzing the wrong
-  // workspace.
+  //   - Relative values are resolved against the CONFIG FILE'S directory
+  //     (`packages/ds/helixir.mcp.json` with `cemPath: "dist/cem.json"`
+  //     means `packages/ds/dist/cem.json`). After rebasing, results inside
+  //     projectRoot are relativized to projectRoot for git-backed
+  //     consumers; results outside projectRoot are dropped with warning
+  //     (the rebase math gave us something the user didn't sanction).
+  //
+  //   - Absolute values are taken as-is. Inside projectRoot they're
+  //     relativized; outside they're dropped (mcp/index.ts containment
+  //     check would fatal anyway, and silently letting them through means
+  //     analyzing the wrong workspace).
+  //
+  // Out-of-tree CEMs that genuinely belong on a shared host path should be
+  // pointed at via MCP_WC_CEM_PATH directly — env vars bypass this rebase.
   const rebased: Record<string, unknown> = { ...config };
   const normalizedRoot = resolve(projectRoot);
   const dropped = new Set<string>();
   for (const field of CONFIG_PATH_FIELDS) {
     const value = rebased[field];
     if (typeof value !== 'string' || value === '') continue;
-    if (!isAbsolute(value)) continue;
-    if (value === normalizedRoot || value.startsWith(normalizedRoot + sep)) {
-      // Absolute path inside projectRoot — relativize for git-backed
-      // consumers (gitShow rejects absolute, needs POSIX-separated
-      // repo-relative).
-      rebased[field] = relative(normalizedRoot, value).split(sep).join('/');
+    const absolute = isAbsolute(value) ? value : resolve(configDir, value);
+    const inRoot = absolute === normalizedRoot || absolute.startsWith(normalizedRoot + sep);
+    if (!inRoot) {
+      process.stderr.write(
+        `[helixir] Warning: ${field} in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Using default. (For out-of-tree CEMs set MCP_WC_CEM_PATH directly.)\n`,
+      );
+      dropped.add(field);
       continue;
     }
-    // Absolute path OUTSIDE projectRoot — drop with a warning.
-    process.stderr.write(
-      `[helixir] Warning: ${field} in MCP_WC_CONFIG_PATH points at ${value}, which is outside projectRoot (${normalizedRoot}). Using default. (For out-of-tree CEMs set MCP_WC_CEM_PATH directly.)\n`,
-    );
-    dropped.add(field);
+    // Inside projectRoot: emit project-relative POSIX path so git-backed
+    // consumers (gitShow's repo-relative allowlist) work, and so the path
+    // doesn't accidentally double-segment when later resolved against
+    // projectRoot.
+    rebased[field] = relative(normalizedRoot, absolute).split(sep).join('/');
   }
   return Object.fromEntries(
     Object.entries(rebased).filter(([k]) => !dropped.has(k)),

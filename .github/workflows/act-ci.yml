@@ -128,7 +128,7 @@ jobs:
           echo "[test-full] Node ${{ matrix.node-version }}: ${PASSED_TESTS} passed, ${FAILED_TESTS} failed (vitest exit=${VITEST_EXIT})"
 
           if [ "$FORCE_KILLED" = true ]; then
-            echo "[test-full] vitest was force-killed after teardown hang"
+            echo "[test-full] vitest was force-killed after teardown hang — treating as failure"
           fi
 
           rm -f "$LOGFILE"
@@ -137,10 +137,16 @@ jobs:
             exit 1
           fi
 
+          # A force-kill means the watchdog gave up waiting for the suite to
+          # report; the run did not complete cleanly and must NOT be reported
+          # as green even when no test markers landed before the kill.
+          if [ "$FORCE_KILLED" = true ]; then
+            exit 1
+          fi
+
           # Vitest exited non-zero but no individual test was marked failed —
-          # the suite itself crashed before reporting. Treat as failure unless
-          # we force-killed it (already reported above).
-          if [ "$FORCE_KILLED" != true ] && [ "$VITEST_EXIT" -ne 0 ]; then
+          # the suite itself crashed before reporting. Treat as failure.
+          if [ "$VITEST_EXIT" -ne 0 ]; then
             echo "[test-full] vitest exited with code ${VITEST_EXIT} but no test markers found — treating as failure"
             exit 1
           fi

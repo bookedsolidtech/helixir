@@ -173,7 +173,17 @@ function rebaseRelativePaths(
   ) as Partial<McpWcConfig>;
 }
 
-function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
+/**
+ * Result of readConfigFile — includes the partial config plus the directory
+ * the config was actually loaded FROM. CEM auto-discovery uses sourceDir
+ * to scope its search; null means "no config was loaded, use projectRoot".
+ */
+interface ConfigReadResult {
+  partial: Partial<McpWcConfig>;
+  sourceDir: string | null;
+}
+
+function readConfigFile(projectRoot: string): ConfigReadResult {
   // Highest priority: explicit MCP_WC_CONFIG_PATH (e.g. set by the VS Code
   // extension's helixir.configPath setting). When present, this absolute or
   // project-relative path is read directly and the in-root discovery below is
@@ -192,7 +202,10 @@ function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
         // relative to projectRoot so downstream resolution against projectRoot
         // points at the right tree without breaking consumers (containment
         // checks, git-backed paths) that require repo-relative inputs.
-        return rebaseRelativePaths(parsed, dirname(resolvedExplicit), projectRoot);
+        return {
+          partial: rebaseRelativePaths(parsed, dirname(resolvedExplicit), projectRoot),
+          sourceDir: dirname(resolvedExplicit),
+        };
       } catch {
         // Bad explicit-path JSON — warn and FALL THROUGH to the in-root
         // discovery below. A stale or malformed editor setting should not
@@ -213,10 +226,10 @@ function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
   if (existsSync(primaryPath)) {
     try {
       const raw = readFileSync(primaryPath, 'utf-8');
-      return JSON.parse(raw) as Partial<McpWcConfig>;
+      return { partial: JSON.parse(raw) as Partial<McpWcConfig>, sourceDir: projectRoot };
     } catch {
       process.stderr.write(`[helixir] Warning: helixir.mcp.json is malformed. Using defaults.\n`);
-      return {};
+      return { partial: {}, sourceDir: null };
     }
   }
 
@@ -228,14 +241,14 @@ function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
     );
     try {
       const raw = readFileSync(legacyPath, 'utf-8');
-      return JSON.parse(raw) as Partial<McpWcConfig>;
+      return { partial: JSON.parse(raw) as Partial<McpWcConfig>, sourceDir: projectRoot };
     } catch {
       process.stderr.write(`[helixir] Warning: mcpwc.config.json is malformed. Using defaults.\n`);
-      return {};
+      return { partial: {}, sourceDir: null };
     }
   }
 
-  return {};
+  return { partial: {}, sourceDir: null };
 }
 
 export function loadConfig(): Readonly<McpWcConfig> {
@@ -248,7 +261,9 @@ export function loadConfig(): Readonly<McpWcConfig> {
   // Merge config file values (override defaults, lower priority than env vars).
   // Exclude projectRoot from file config — it's already determined from env/cwd,
   // and the config file is located relative to it (circular dependency).
-  const fileConfig = readConfigFile(effectiveRoot);
+  const fileConfigResult = readConfigFile(effectiveRoot);
+  const fileConfig = fileConfigResult.partial;
+  const configSourceDir = fileConfigResult.sourceDir;
   const fileCemPath = fileConfig.cemPath;
   // Prevent config file from overriding projectRoot (circular dependency).
   const safeFileConfig: Omit<Partial<McpWcConfig>, 'projectRoot'> = { ...fileConfig };
@@ -267,23 +282,22 @@ export function loadConfig(): Readonly<McpWcConfig> {
   const cemPathExplicit = process.env['MCP_WC_CEM_PATH'] !== undefined || fileCemPath !== undefined;
 
   if (!cemPathExplicit) {
-    // When the user selected a non-root config via MCP_WC_CONFIG_PATH that
-    // lives INSIDE projectRoot (e.g. packages/ds/helixir.mcp.json), run CEM
-    // discovery from that file's directory so package-local CEMs win over
-    // a workspace-root manifest. For external configs (outside projectRoot)
-    // and for fallthrough cases (missing/malformed explicit config),
-    // discovery stays in projectRoot — moving it outside would cause the
-    // server to ignore the workspace's own dist/custom-elements.json.
-    const explicitConfigPath = process.env['MCP_WC_CONFIG_PATH'];
+    // CEM discovery base = the directory readConfigFile actually loaded the
+    // config from, when that directory is inside projectRoot. This lets a
+    // nested packages/ds/helixir.mcp.json drive discovery toward its own
+    // dist/custom-elements.json. When the loaded source is outside
+    // projectRoot OR when fall-through happened (missing/malformed explicit
+    // config — sourceDir is null in those cases), discovery stays in
+    // projectRoot so the workspace's own dist/custom-elements.json is found.
     const normalizedRoot = resolve(effectiveRoot);
     let discoveryRoot = effectiveRoot;
-    if (explicitConfigPath !== undefined && explicitConfigPath !== '') {
-      const resolvedExplicit = resolve(effectiveRoot, explicitConfigPath);
-      if (existsSync(resolvedExplicit)) {
-        const explicitDir = dirname(resolvedExplicit);
-        if (explicitDir === normalizedRoot || explicitDir.startsWith(normalizedRoot + sep)) {
-          discoveryRoot = explicitDir;
-        }
+    if (configSourceDir !== null) {
+      const normalizedSource = resolve(configSourceDir);
+      if (
+        normalizedSource === normalizedRoot ||
+        normalizedSource.startsWith(normalizedRoot + sep)
+      ) {
+        discoveryRoot = normalizedSource;
       }
     }
     const discovered = discoverCemPath(discoveryRoot);

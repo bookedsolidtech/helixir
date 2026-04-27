@@ -57,9 +57,9 @@ export interface DetectedConventions {
   /** Most common base class found in the CEM (e.g. "LitElement"). */
   baseClass: string;
   /** Module path the base class is exported from, when the CEM records it. */
-  baseClassModule: string | null;
+  baseClassModule?: string | null;
   /** Package name the base class is exported from, when the CEM records it. */
-  baseClassPackage: string | null;
+  baseClassPackage?: string | null;
   /** Package name detected from inherited members, or null if not found. */
   packageName: string | null;
 }

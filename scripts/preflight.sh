@@ -141,7 +141,19 @@ if [ "${SKIP_CHANGESET:-0}" = "1" ]; then
 elif [[ "$CURRENT_BRANCH" == "main" || "$CURRENT_BRANCH" == "staging" || "$CURRENT_BRANCH" == "dev" ]] \
   || [[ "$CURRENT_BRANCH" == *"audit/"* ]]; then
   echo "  ✓ Changeset check skipped (branch: $CURRENT_BRANCH)"
-elif [ -n "$COMMON_ANCESTOR" ] && [ -n "$CHANGED_SOURCES" ]; then
+elif [ -z "$COMMON_ANCESTOR" ]; then
+  # No merge-base means we cannot determine what changed since the target
+  # branch — fresh clone, shallow checkout, or pre-fetch state. Fail loudly
+  # rather than silently waving through changes that should have required
+  # a changeset.
+  echo ""
+  echo "  ✗ CANNOT DETERMINE CHANGESET REQUIREMENT — origin/${BASE_BRANCH} not available locally."
+  echo ""
+  echo "    Run: git fetch origin ${BASE_BRANCH}"
+  echo "    Or, if this is intentionally an infra/CI-only run: SKIP_CHANGESET=1 pnpm run preflight"
+  echo ""
+  exit 1
+elif [ -n "$CHANGED_SOURCES" ]; then
   CHANGESET_ADDED=$(git diff --name-only "$COMMON_ANCESTOR"...HEAD \
     | grep '^\.changeset/.*\.md$' | grep -v 'README\.md' || true)
 

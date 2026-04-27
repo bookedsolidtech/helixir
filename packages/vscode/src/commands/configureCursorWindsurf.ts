@@ -94,12 +94,17 @@ export function registerConfigureCursorWindsurfCommand(context: vscode.Extension
       env['MCP_WC_PROJECT_ROOT'] = workspaceRoot;
     }
     const configPath = vscode.workspace.getConfiguration('helixir').get<string>('configPath', '');
-    if (configPath && configPath.trim() !== '') {
+    // Only forward MCP_WC_CONFIG_PATH when we can pair it with a known
+    // MCP_WC_PROJECT_ROOT — without the pair, loadConfig() falls back to
+    // the editor host's cwd as projectRoot, which causes relative paths
+    // in the selected config to resolve against the wrong tree (and
+    // out-of-tree cemPath gets dropped). Skipping configPath entirely in
+    // the no-workspace case is safer than emitting a half-configured
+    // entry that will silently target the wrong library.
+    if (configPath && configPath.trim() !== '' && workspaceRoot) {
       env['MCP_WC_CONFIG_PATH'] = path.isAbsolute(configPath)
         ? configPath
-        : workspaceRoot
-          ? path.join(workspaceRoot, configPath)
-          : configPath;
+        : path.join(workspaceRoot, configPath);
     }
     existing.mcpServers['helixir'] = {
       command: 'node',

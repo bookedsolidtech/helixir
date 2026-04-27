@@ -170,19 +170,18 @@ describe('createTheme', () => {
     expect(result.darkModeCSS).toContain('#1a1a1a');
   });
 
-  it('emits uncategorized tokens with `unset` so the scaffold remains complete', () => {
-    // --my-custom-widget does not match any known category pattern, so it
-    // lands in "other" and hits the default case in lightPlaceholder.
-    // Codex preferred we keep all tokens in the scaffold (skipping makes
-    // it incomplete for libraries with non-standard tokens). `unset` is
-    // the least-bad placeholder: valid CSS keyword, behaves as inherit
-    // for inherited properties and initial for non-inherited.
+  it('emits uncategorized tokens with var() so consumer fallbacks survive', () => {
+    // --my-custom-widget lands in "other" and hits the default case. We
+    // emit `var(--my-custom-widget)` — technically self-referential and
+    // invalid at computed-value time, but it leaves consumers' fallback
+    // (`var(--token, fallback)`) intact rather than force-resetting the
+    // property the way `unset` / `initial` would. Imperfect, but the
+    // safest choice for tokens whose semantics we cannot infer.
     const cem = makeCem([
       { tagName: 'my-widget', cssProperties: [{ name: '--my-custom-widget' }] },
     ]);
     const result = createTheme(cem);
-    expect(result.lightModeCSS).toContain('--my-custom-widget: unset');
-    expect(result.lightModeCSS).not.toContain('var(--my-custom-widget)');
+    expect(result.lightModeCSS).toContain('--my-custom-widget: var(--my-custom-widget)');
     expect(result.tokenCount).toBe(1);
   });
 });

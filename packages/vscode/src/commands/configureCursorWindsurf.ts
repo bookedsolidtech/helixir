@@ -102,9 +102,11 @@ export function registerConfigureCursorWindsurfCommand(context: vscode.Extension
     // the no-workspace case is safer than emitting a half-configured
     // entry that will silently target the wrong library.
     if (configPath && configPath.trim() !== '' && workspaceRoot) {
-      env['MCP_WC_CONFIG_PATH'] = path.isAbsolute(configPath)
-        ? configPath
-        : path.join(workspaceRoot, configPath);
+      // Preserve relative paths verbatim so the generated mcp.json stays
+      // portable across machines and clones. loadConfig() resolves
+      // relative MCP_WC_CONFIG_PATH against MCP_WC_PROJECT_ROOT at
+      // runtime. Only absolute paths are written as-is.
+      env['MCP_WC_CONFIG_PATH'] = configPath;
     }
     existing.mcpServers['helixir'] = {
       command: 'node',

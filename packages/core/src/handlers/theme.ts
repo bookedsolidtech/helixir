@@ -145,17 +145,15 @@ function lightPlaceholder(tokenName: string, category: string): string {
       return '200ms';
 
     default:
-      // Uncategorized token — emit `unset`. Every option here is imperfect:
-      // `var(${tokenName})` is self-referential and invalid; `inherit`
-      // forces inheritance and overrides component fallbacks; explicit
-      // values guess at semantics we cannot infer; skipping the token
-      // entirely makes the scaffold incomplete for any library with
-      // uncategorized variables. `unset` is the least-bad choice — it
-      // resolves to `inherit` for inherited properties and `initial` for
-      // non-inherited ones, which is the closest behavior to "no value
-      // declared." The token still appears in the scaffold so consumers
-      // can override it; they just need to fill in a real value.
-      return 'unset';
+      // Uncategorized token — emit `var(${tokenName})`. This IS technically
+      // self-referential and invalid at computed-value time, BUT consumers
+      // typically write `var(--token, fallback)` and a self-referential
+      // var() leaves the consumer-side fallback intact rather than
+      // force-resetting the property (which `unset`/`initial` would do).
+      // Imperfect but the safest default for tokens whose semantics we
+      // cannot infer — the token still appears in the scaffold so users
+      // can override it with a real value.
+      return `var(${tokenName})`;
   }
 }
 

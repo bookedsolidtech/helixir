@@ -116,53 +116,40 @@ const CONFIG_PATH_FIELDS = ['cemPath', 'tsconfigPath', 'tokensPath', 'healthHist
 
 function rebaseRelativePaths(
   config: Partial<McpWcConfig>,
-  configDir: string,
+  _configDir: string,
   projectRoot: string,
 ): Partial<McpWcConfig> {
+  // Path fields in helixir configs are documented as projectRoot-relative,
+  // not config-file-dir-relative. Even when the config is loaded from
+  // outside projectRoot, a value like `packages/ds/dist/custom-elements.json`
+  // is meant to be resolved against projectRoot — rebasing against the
+  // config dir would double-include the path segment for already-valid
+  // configs that were simply moved.
+  //
+  // Only one transformation needed: drop ABSOLUTE values that escape
+  // projectRoot. The MCP server's containment check would fatal on them
+  // anyway, and silently letting them through means analyzing the wrong
+  // workspace.
   const rebased: Record<string, unknown> = { ...config };
   const normalizedRoot = resolve(projectRoot);
   const dropped = new Set<string>();
   for (const field of CONFIG_PATH_FIELDS) {
     const value = rebased[field];
     if (typeof value !== 'string' || value === '') continue;
-    // Resolve to absolute. Relative values rebase against the config file's
-    // directory; already-absolute values still need the containment check
-    // below — an absolute external cemPath would otherwise sneak past the
-    // rebase guard and crash mcp/index.ts at startup.
-    const absolute = isAbsolute(value) ? value : resolve(configDir, value);
-    const escapesRoot = absolute !== normalizedRoot && !absolute.startsWith(normalizedRoot + sep);
-    if (escapesRoot) {
-      // ABSOLUTE values: trust the user's explicit choice. Editor/shared-
-      //   config flows legitimately point at out-of-tree manifests
-      //   (cemPath), shared tsconfigs, or token files. mcp/index.ts
-      //   enforces server-side containment for cemPath; CLI flows accept
-      //   absolute paths.
-      // RELATIVE values that escape root: the rebase math gave us
-      //   something out-of-tree (e.g. `dist/cem.json` from a config in
-      //   /shared/ rebased to /shared/dist/cem.json). The user did NOT
-      //   explicitly choose this absolute path — it's a side effect of
-      //   relative resolution. Dropping is safer than handing a path the
-      //   downstream consumer didn't sanction.
-      if (isAbsolute(value)) {
-        rebased[field] = absolute;
-      } else {
-        process.stderr.write(
-          `[helixir] Warning: ${field} in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Using default. (Set ${field} to an absolute path in the external config to override.)\n`,
-        );
-        dropped.add(field);
-      }
+    if (!isAbsolute(value)) continue;
+    if (value === normalizedRoot || value.startsWith(normalizedRoot + sep)) {
+      // Absolute path inside projectRoot — relativize for git-backed
+      // consumers (gitShow rejects absolute, needs POSIX-separated
+      // repo-relative).
+      rebased[field] = relative(normalizedRoot, value).split(sep).join('/');
       continue;
     }
-    // Inside projectRoot: always emit project-relative so consumers requiring
-    // repo-relative inputs (containment check, `git show` paths) work,
-    // regardless of whether the original value was absolute or relative.
-    // Normalize to POSIX separators because git-backed handlers
-    // (GitOperations.gitShow) only accept forward slashes — node's
-    // path.relative() emits backslashes on Windows.
-    rebased[field] = relative(normalizedRoot, absolute).split(sep).join('/');
+    // Absolute path OUTSIDE projectRoot — drop with a warning.
+    process.stderr.write(
+      `[helixir] Warning: ${field} in MCP_WC_CONFIG_PATH points at ${value}, which is outside projectRoot (${normalizedRoot}). Using default. (For out-of-tree CEMs set MCP_WC_CEM_PATH directly.)\n`,
+    );
+    dropped.add(field);
   }
-  // Build the result without the dropped fields rather than mutating with
-  // `delete` (lint rule @typescript-eslint/no-dynamic-delete).
   return Object.fromEntries(
     Object.entries(rebased).filter(([k]) => !dropped.has(k)),
   ) as Partial<McpWcConfig>;

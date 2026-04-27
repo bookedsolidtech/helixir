@@ -132,23 +132,26 @@ function rebaseRelativePaths(
     const absolute = isAbsolute(value) ? value : resolve(configDir, value);
     const escapesRoot = absolute !== normalizedRoot && !absolute.startsWith(normalizedRoot + sep);
     if (escapesRoot) {
-      if (!isAbsolute(value)) {
-        // RELATIVE path that escapes projectRoot — the rebase math gave us
-        // something out-of-tree (e.g. `../shared/cem.json` from a config
-        // that lives outside the workspace). Likely a misconfig: drop with
-        // warning so defaults take over.
+      // FINAL DESIGN (after codex round-trip on this exact question):
+      //
+      // cemPath: drop when out-of-tree. mcp/index.ts's containment check
+      //   would fatal on it, and git-backed handlers (diffCem,
+      //   getHealthDiff via gitShow) reject absolute paths anyway.
+      //   CLI-only users with an external CEM should set MCP_WC_CEM_PATH
+      //   directly — env vars bypass this rebase logic entirely.
+      //
+      // tsconfigPath/tokensPath/healthHistoryDir: preserve. Their handlers
+      //   (handlers/typescript.ts, handlers/tokens.ts, handlers/health.ts)
+      //   accept absolute paths via plain `resolve()`. Dropping a valid
+      //   shared `../shared/tsconfig.base.json` from an editor config
+      //   silently regresses monorepo flows.
+      if (field === 'cemPath') {
         process.stderr.write(
-          `[helixir] Warning: ${field} in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Using default.\n`,
+          `[helixir] Warning: cemPath in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Using default. (Set MCP_WC_CEM_PATH directly for out-of-tree manifests.)\n`,
         );
         dropped.add(field);
         continue;
       }
-      // ABSOLUTE path the user explicitly chose — trust it. Editor/shared-
-      // config flows legitimately point at out-of-tree manifests
-      // (cemPath), shared tsconfigs, or token files. Trade-off: git-backed
-      // tools (diffCem, getHealthDiff) require repo-relative cemPath and
-      // will degrade to "component not found" for out-of-tree absolute
-      // CEMs — documented in CONTRIBUTING.md.
       rebased[field] = absolute;
       continue;
     }

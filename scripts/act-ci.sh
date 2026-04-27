@@ -140,8 +140,12 @@ if [[ "$USE_MATRIX" == true ]]; then
   ENV_ARGS="$ENV_ARGS --env ACT_MATRIX_TESTS=true --env ACT_FULL_TESTS=true"
   TEST_MODE="full suite + Node 20/22/24 matrix (CI Matrix parity)"
 elif [[ "$USE_FULL" == true ]]; then
-  ENV_ARGS="$ENV_ARGS --env ACT_FULL_TESTS=true"
-  TEST_MODE="full suite (current Node)"
+  # --full runs the full test suite on the current host's Node version only.
+  # Use --matrix for the multi-version Node 20/22/24 sweep. The workflow's
+  # test-full job filters its matrix to a single host-Node entry when
+  # ACT_FULL_TESTS=true but ACT_MATRIX_TESTS is unset.
+  ENV_ARGS="$ENV_ARGS --env ACT_FULL_TESTS=true --env ACT_HOST_NODE=$(node --version 2>/dev/null | tr -d 'v' | cut -d. -f1)"
+  TEST_MODE="full suite (current Node only)"
 else
   TEST_MODE="quality gates only"
 fi

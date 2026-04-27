@@ -84,15 +84,22 @@ EXCLUDED_PACKAGES=$(node -e "
 
 CHANGED_SOURCES=""
 if [ -n "$COMMON_ANCESTOR" ]; then
+  # Release-bearing changes include not just src/ but also publish-affecting
+  # metadata: root package.json, packages/*/package.json (engines, exports,
+  # deps), and the github-action's action.yml. Edits to these can ship a
+  # semver-relevant change without ever touching src/.
   CHANGED_SOURCES=$(git diff --name-only "$COMMON_ANCESTOR"...HEAD \
-    | grep -E '^(src/|packages/[^/]+/src/)' \
+    | grep -E '^(src/|packages/[^/]+/src/|package\.json$|packages/[^/]+/package\.json$|packages/[^/]+/action\.yml$)' \
     | grep -v '\.test\.ts$' \
     || true)
   if [ -n "$EXCLUDED_PACKAGES" ]; then
     while IFS= read -r excluded_pkg; do
       [ -z "$excluded_pkg" ] && continue
       CHANGED_SOURCES=$(printf '%s\n' "$CHANGED_SOURCES" \
-        | grep -v "^packages/${excluded_pkg}/src/" || true)
+        | grep -v "^packages/${excluded_pkg}/src/" \
+        | grep -v "^packages/${excluded_pkg}/package\.json$" \
+        | grep -v "^packages/${excluded_pkg}/action\.yml$" \
+        || true)
     done <<< "$EXCLUDED_PACKAGES"
   fi
 fi

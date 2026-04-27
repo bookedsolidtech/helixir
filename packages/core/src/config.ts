@@ -140,22 +140,22 @@ function rebaseRelativePaths(
     const absolute = isAbsolute(value) ? value : resolve(configDir, value);
     const escapesRoot = absolute !== normalizedRoot && !absolute.startsWith(normalizedRoot + sep);
     if (escapesRoot) {
-      // For external configs (MCP_WC_CONFIG_PATH-driven), preserve absolute
-      // paths even for strict-containment fields. The mcp/index.ts
-      // containment check has been relaxed for explicit-config absolute
-      // paths so shared/monorepo configs can direct the CLI at a CEM that
-      // legitimately lives outside the workspace root. Relative paths that
-      // resolve out-of-tree are still suspicious (likely a misconfig) and
-      // get dropped with a warning so defaults take over.
-      if (STRICT_CONTAINMENT_FIELDS.has(field) && !isAbsolute(value)) {
+      if (STRICT_CONTAINMENT_FIELDS.has(field)) {
+        // cemPath / healthHistoryDir MUST be project-relative — git-backed
+        // tools (diffCem, getHealthDiff via GitOperations.gitShow) reject
+        // absolute paths and silently fall back to "component not found"
+        // for every component. Drop with a warning so defaults take over
+        // rather than letting those tools silently degrade. Affects both
+        // relative paths that escape root and absolute paths outside root.
         process.stderr.write(
-          `[helixir] Warning: ${field} in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Using default.\n`,
+          `[helixir] Warning: ${field} in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Git-backed tools (diff/health) require repo-relative paths. Using default.\n`,
         );
         dropped.add(field);
         continue;
       }
-      // Either non-strict (handlers tolerate absolute) or an explicitly
-      // user-chosen absolute path — keep it as absolute.
+      // tsconfigPath / tokensPath: handlers tolerate absolute paths, so
+      // keep the rebased absolute path rather than discarding a valid
+      // shared file (e.g. ../tsconfig.base.json) from an external config.
       rebased[field] = absolute;
       continue;
     }

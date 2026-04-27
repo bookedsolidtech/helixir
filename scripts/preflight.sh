@@ -33,33 +33,51 @@ echo ""
 
 # ── Resolve base branch and common ancestor ──────────────────────────────────
 
-BASE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null \
-  | sed 's|refs/remotes/origin/||' \
-  || git rev-parse --abbrev-ref origin/HEAD 2>/dev/null \
-  | sed 's|origin/||' \
-  || echo "dev")
+# BASE_BRANCH = the branch this work targets, NOT origin/HEAD. The promotion
+# pipeline is feature/* → dev → staging → main, so a feature branch's diff
+# baseline is `dev`. Using origin/HEAD (which resolves to `main`) would pull
+# in everything already merged to dev, causing false-positive changeset
+# requirements on docs-only branches. Operators on dev/staging/main can
+# override via $BASE_BRANCH or the diff lands against the same branch (no-op).
+case "$(git rev-parse --abbrev-ref HEAD 2>/dev/null)" in
+  main) BASE_BRANCH="${BASE_BRANCH:-staging}" ;;
+  staging) BASE_BRANCH="${BASE_BRANCH:-dev}" ;;
+  dev) BASE_BRANCH="${BASE_BRANCH:-dev}" ;;
+  *) BASE_BRANCH="${BASE_BRANCH:-dev}" ;;
+esac
 
 COMMON_ANCESTOR=$(git merge-base HEAD "origin/${BASE_BRANCH}" 2>/dev/null || echo "")
 
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
 
-# Detect changed source files across every PUBLISHABLE workspace package.
-# Catching only src/ + packages/core/src/ would silently let releasable
-# changes elsewhere (e.g. packages/mcp/src) merge without a changeset; but
-# private packages (vscode extension, github-action) are not published and
-# must NOT trip the gate or every internal-only feature branch hard-fails
-# with "CHANGESET REQUIRED".
-PRIVATE_PACKAGES=$(node -e "
+# Detect changed source files across every release-bearing workspace package.
+# A package is excluded only if it is BOTH marked `"private": true` AND its
+# src is not re-exported by the root helixir package's `exports` map.
+# packages/core is private but root helixir exports `./core` and `./core/*`
+# from it, so its changes ship via the root npm release and MUST trigger the
+# changeset gate. packages/vscode and packages/github-action are private AND
+# not re-exported, so they're safe to skip.
+EXCLUDED_PACKAGES=$(node -e "
   const fs = require('fs');
   const path = require('path');
+  const rootPkgPath = path.resolve('package.json');
   const pkgsDir = path.resolve('packages');
   if (!fs.existsSync(pkgsDir)) process.exit(0);
+  let rootExports = {};
+  try {
+    rootExports = JSON.parse(fs.readFileSync(rootPkgPath, 'utf-8')).exports || {};
+  } catch {}
+  const exportTargets = JSON.stringify(rootExports);
   for (const name of fs.readdirSync(pkgsDir)) {
     const pkgJson = path.join(pkgsDir, name, 'package.json');
     if (!fs.existsSync(pkgJson)) continue;
     try {
       const data = JSON.parse(fs.readFileSync(pkgJson, 'utf-8'));
-      if (data.private === true) console.log(name);
+      if (data.private !== true) continue;
+      // Re-exported via root? Look for 'packages/<name>/' anywhere in the
+      // root exports map. If found, treat as publishable.
+      if (exportTargets.includes('packages/' + name + '/')) continue;
+      console.log(name);
     } catch {}
   }
 " 2>/dev/null || true)
@@ -70,12 +88,12 @@ if [ -n "$COMMON_ANCESTOR" ]; then
     | grep -E '^(src/|packages/[^/]+/src/)' \
     | grep -v '\.test\.ts$' \
     || true)
-  if [ -n "$PRIVATE_PACKAGES" ]; then
-    while IFS= read -r private_pkg; do
-      [ -z "$private_pkg" ] && continue
+  if [ -n "$EXCLUDED_PACKAGES" ]; then
+    while IFS= read -r excluded_pkg; do
+      [ -z "$excluded_pkg" ] && continue
       CHANGED_SOURCES=$(printf '%s\n' "$CHANGED_SOURCES" \
-        | grep -v "^packages/${private_pkg}/src/" || true)
-    done <<< "$PRIVATE_PACKAGES"
+        | grep -v "^packages/${excluded_pkg}/src/" || true)
+    done <<< "$EXCLUDED_PACKAGES"
   fi
 fi
 

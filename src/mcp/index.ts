@@ -165,30 +165,13 @@ export async function main(): Promise<void> {
   const resolvedProjectRoot = resolve(config.projectRoot);
   const cemAbsPath = resolve(resolvedProjectRoot, config.cemPath);
 
-  // Containment check on cemPath. Skip ONLY when MCP_WC_CONFIG_PATH was
-  // genuinely loaded — the file exists AND parses as JSON. A stale or
-  // malformed editor setting must NOT bypass the guard, otherwise a leftover
-  // helixir.configPath from a previous workspace would let `MCP_WC_CEM_PATH`
-  // or an in-repo cemPath silently load an out-of-tree manifest.
-  const explicitConfigPath = process.env['MCP_WC_CONFIG_PATH'];
-  let externalConfigUsed = false;
-  if (explicitConfigPath !== undefined && explicitConfigPath !== '') {
-    const resolvedExplicit = resolve(resolvedProjectRoot, explicitConfigPath);
-    if (existsSync(resolvedExplicit)) {
-      try {
-        JSON.parse(readFileSync(resolvedExplicit, 'utf-8'));
-        externalConfigUsed = true;
-      } catch {
-        // Malformed JSON — loadConfig already warned and fell back; do NOT
-        // grant the bypass.
-      }
-    }
-  }
-  if (
-    !externalConfigUsed &&
-    !cemAbsPath.startsWith(resolvedProjectRoot + sep) &&
-    cemAbsPath !== resolvedProjectRoot
-  ) {
+  // Containment check on cemPath. cemPath MUST resolve inside projectRoot
+  // because git-backed handlers (diffCem, getHealthDiff via
+  // GitOperations.gitShow) reject absolute paths. loadConfig drops out-of-
+  // tree cemPath fields from external configs with a warning, so by the
+  // time we get here the path should always be containable. The check
+  // remains as a defense-in-depth guard against env-var path traversal.
+  if (!cemAbsPath.startsWith(resolvedProjectRoot + sep) && cemAbsPath !== resolvedProjectRoot) {
     process.stderr.write(`Fatal: cemPath resolves outside of projectRoot. Refusing to load.\n`);
     process.exit(1);
   }

@@ -13,17 +13,11 @@
 version: '1'
 
 servers:
-  - name: studio
-    command: bash
-    args:
-      - /Volumes/Development/protoMaker/packages/mcp-server/plugins/automaker/hooks/start-mcp.sh
-    env:
-      AUTOMAKER_ROOT: /Volumes/Development/protoMaker
-      AUTOMAKER_API_URL: http://localhost:3008
-      AUTOMAKER_API_KEY: '${AUTOMAKER_API_KEY}'
-      ENABLE_TOOL_SEARCH: 'auto:10'
-    enabled: true
-
+  # Workstation-specific MCP servers (e.g. local protoMaker tooling) belong in
+  # a gitignored .rea/registry.yaml.local override that rea-serve merges on top
+  # of this committed catalog. The committed file ships only project-portable
+  # entries so a fresh clone does not point at paths that exist only on the
+  # original author's machine.
   - name: discord-ops
     command: npx
     args:

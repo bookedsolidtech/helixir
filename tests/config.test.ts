@@ -183,7 +183,11 @@ describe('loadConfig', () => {
       expect(config.healthHistoryDir).toBe(join('packages', 'ds', '.health'));
     });
 
-    it('leaves absolute path fields in an external config unchanged', () => {
+    it('drops out-of-tree absolute cemPath but preserves other absolute fields', () => {
+      // cemPath outside projectRoot is dropped (mcp/index.ts containment +
+      // gitShow's repo-relative requirement). tsconfigPath/tokensPath/
+      // healthHistoryDir are preserved as absolute because their handlers
+      // accept absolute paths via plain resolve().
       const externalDir = mkdtempSync(join(tmpdir(), 'helixir-external-'));
       const externalConfig = join(externalDir, 'helixir.mcp.json');
       try {
@@ -191,13 +195,29 @@ describe('loadConfig', () => {
           externalConfig,
           JSON.stringify({
             cemPath: '/abs/path/custom-elements.json',
+            tsconfigPath: '/shared/tsconfig.base.json',
+            tokensPath: '/shared/tokens.json',
+            healthHistoryDir: '/tmp/helixir-health',
           }),
         );
         vi.stubEnv('MCP_WC_PROJECT_ROOT', tmpDir);
         vi.stubEnv('MCP_WC_CONFIG_PATH', externalConfig);
 
-        const config = loadConfig();
-        expect(config.cemPath).toBe('/abs/path/custom-elements.json');
+        const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+        try {
+          const config = loadConfig();
+          // cemPath dropped → falls back to default
+          expect(config.cemPath).toBe('custom-elements.json');
+          // Non-CEM absolute paths preserved
+          expect(config.tsconfigPath).toBe('/shared/tsconfig.base.json');
+          expect(config.tokensPath).toBe('/shared/tokens.json');
+          expect(config.healthHistoryDir).toBe('/tmp/helixir-health');
+          // Drop warning is for cemPath only
+          const warnings = stderrSpy.mock.calls.flat().join(' ');
+          expect(warnings).toContain('cemPath');
+        } finally {
+          stderrSpy.mockRestore();
+        }
       } finally {
         rmSync(externalDir, { recursive: true, force: true });
       }

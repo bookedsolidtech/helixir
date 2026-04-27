@@ -170,8 +170,13 @@ echo "▶ [7/7] Docker CI (act)"
 if [ "${SKIP_ACT:-0}" = "1" ]; then
   echo "  ⚠ SKIP_ACT=1 — Docker CI gate bypassed"
 elif ! command -v act &>/dev/null || ! docker info &>/dev/null 2>&1; then
-  echo "  ⚠ WARNING: Docker CI gate skipped — Docker not running or act not installed"
-  echo "    CI may fail on push. Install: brew install act && open -a Docker"
+  echo ""
+  echo "  ✗ DOCKER CI GATE CANNOT RUN"
+  echo "    Either act is not installed or Docker is not running."
+  echo "    Install: brew install act && open -a Docker"
+  echo "    To bypass intentionally (e.g. infra-only changes): SKIP_ACT=1 pnpm run preflight"
+  echo ""
+  exit 1
 else
   if [ "${SKIP_MATRIX:-0}" = "1" ]; then
     echo "  Running CI in Docker (basic — matrix skipped via SKIP_MATRIX=1)..."

@@ -109,10 +109,16 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Always clean stale containers, or do a full clean if requested
+# Always clean stale containers, or do a full clean if requested.
+# BSD xargs (macOS) does not support `-r` — guard against the empty-input
+# case explicitly so the script works on both BSD and GNU userlands.
 if [[ "$DO_CLEAN" == true ]]; then
   echo "Cleaning ALL act containers..."
-  docker ps -aq --filter "name=act-" 2>/dev/null | xargs -r docker rm -f >/dev/null 2>&1 || true
+  ACT_CONTAINERS=$(docker ps -aq --filter "name=act-" 2>/dev/null || true)
+  if [[ -n "$ACT_CONTAINERS" ]]; then
+    # shellcheck disable=SC2086  # intentional word-splitting on container IDs
+    docker rm -f $ACT_CONTAINERS >/dev/null 2>&1 || true
+  fi
 else
   cleanup_stale_containers
 fi

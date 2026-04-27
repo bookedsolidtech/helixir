@@ -221,18 +221,15 @@ function generateComponentSource(
     // `conventions.packageName` is also unsafe (it is the package of any
     // inherited member, not necessarily the base class).
     //
-    // Prefer package over module for the import specifier: superclass.module
-    // identifies where the SAMPLED base class was declared, not where it can
-    // be imported FROM the new file. Reusing module verbatim only compiles
-    // when the generated component is saved with the same relative layout
-    // as the original declaration — nested component folders or
-    // project-relative CEM paths produce broken imports. The package root,
-    // when known, is portable to any destination. Module is kept as a
-    // best-effort fallback when no package is recorded.
+    // Use ONLY the package specifier (portable to any destination).
+    // superclass.module identifies where the SAMPLED base class was
+    // declared, NOT where it can be imported from the new file. Even
+    // module paths that look reasonable (e.g. `../base/component.js`)
+    // break as soon as the new component lives in a different directory
+    // than the source. When no package is available, emit a TODO marker
+    // — uncompilable-but-flagged is safer than uncompilable-and-silent.
     const baseSpecifier =
-      baseClass === conventions.baseClass
-        ? (conventions.baseClassPackage ?? conventions.baseClassModule ?? null)
-        : null;
+      baseClass === conventions.baseClass ? (conventions.baseClassPackage ?? null) : null;
     if (baseSpecifier) {
       lines.push(`import { ${baseClass} } from '${baseSpecifier}';`);
     } else {

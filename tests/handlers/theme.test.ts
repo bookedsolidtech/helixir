@@ -170,22 +170,20 @@ describe('createTheme', () => {
     expect(result.darkModeCSS).toContain('#1a1a1a');
   });
 
-  it('skips uncategorized tokens entirely so consumer fallbacks in var(--token, fallback) win', () => {
+  it('emits uncategorized tokens with `unset` so the scaffold remains complete', () => {
     // --my-custom-widget does not match any known category pattern, so it
-    // lands in "other" and hits the default case in lightPlaceholder. The
-    // generator must NOT emit a declaration for it — any value here
-    // (`var(--token)` self-referential; `inherit` clobbers component
-    // fallbacks; explicit values guess at semantics we cannot infer) is
-    // wrong. Consumers using `var(--my-custom-widget, fallback)` should
-    // resolve to their fallback, which only happens if the variable is
-    // undefined.
+    // lands in "other" and hits the default case in lightPlaceholder.
+    // Codex preferred we keep all tokens in the scaffold (skipping makes
+    // it incomplete for libraries with non-standard tokens). `unset` is
+    // the least-bad placeholder: valid CSS keyword, behaves as inherit
+    // for inherited properties and initial for non-inherited.
     const cem = makeCem([
       { tagName: 'my-widget', cssProperties: [{ name: '--my-custom-widget' }] },
     ]);
     const result = createTheme(cem);
-    expect(result.lightModeCSS).not.toContain('--my-custom-widget');
-    expect(result.lightModeCSS).not.toContain('inherit');
-    expect(result.tokenCount).toBe(0);
+    expect(result.lightModeCSS).toContain('--my-custom-widget: unset');
+    expect(result.lightModeCSS).not.toContain('var(--my-custom-widget)');
+    expect(result.tokenCount).toBe(1);
   });
 });
 

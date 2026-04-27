@@ -68,7 +68,7 @@ export interface ApplyThemeTokensResult {
 
 // ─── Light-mode placeholder values ──────────────────────────────────────────
 
-function lightPlaceholder(tokenName: string, category: string): string | null {
+function lightPlaceholder(tokenName: string, category: string): string {
   const lower = tokenName.toLowerCase();
 
   switch (category) {
@@ -145,14 +145,17 @@ function lightPlaceholder(tokenName: string, category: string): string | null {
       return '200ms';
 
     default:
-      // Uncategorized token — return null so the caller skips emitting a
-      // declaration entirely. Any value here would be wrong: a self-
-      // referential `var(${tokenName})` is invalid at computed-value time;
-      // `inherit` overrides component fallbacks (`var(--token, fallback)`)
-      // and breaks non-inherited properties; explicit values guess at
-      // semantics we can't infer. Better to leave the token undefined so
-      // the consumer's fallback wins.
-      return null;
+      // Uncategorized token — emit `unset`. Every option here is imperfect:
+      // `var(${tokenName})` is self-referential and invalid; `inherit`
+      // forces inheritance and overrides component fallbacks; explicit
+      // values guess at semantics we cannot infer; skipping the token
+      // entirely makes the scaffold incomplete for any library with
+      // uncategorized variables. `unset` is the least-bad choice — it
+      // resolves to `inherit` for inherited properties and `initial` for
+      // non-inherited ones, which is the closest behavior to "no value
+      // declared." The token still appears in the scaffold so consumers
+      // can override it; they just need to fill in a real value.
+      return 'unset';
   }
 }
 
@@ -204,37 +207,31 @@ export function createTheme(cem: Cem, options: CreateThemeOptions = {}): CreateT
     }
   }
 
-  // Compute light/dark placeholder values per token. `lightPlaceholder` returns
-  // null for uncategorized tokens — those are skipped entirely so consumers
-  // using `var(--token, fallback)` fall back to the component default rather
-  // than inheriting an unrelated value or hitting a self-referential var().
+  // Compute light/dark placeholder values per token. `lightPlaceholder` always
+  // returns a value (uncategorized tokens get `unset` — see lightPlaceholder
+  // for the rationale). All tokens are included in the scaffold so consumers
+  // can override every token in the library's surface.
   const lightValues: Map<string, string> = new Map();
   const darkValues: Map<string, string> = new Map();
-  const emittedTokens: TokenEntry[] = [];
 
   for (const { name, category } of allTokens) {
     const light = lightPlaceholder(name, category);
-    if (light === null) continue;
     lightValues.set(name, light);
-    emittedTokens.push({ name, category });
     const dark = darkPlaceholder(name, category, light);
     if (dark !== light) darkValues.set(name, dark);
   }
 
-  const tokenCount = emittedTokens.length;
+  const tokenCount = allTokens.length;
 
-  // Per-category counts for result metadata — count only emitted tokens so
-  // the reported total matches what actually appears in the scaffold.
+  // Per-category counts for result metadata
   const categories: Record<string, number> = {};
-  for (const { category } of emittedTokens) {
-    categories[category] = (categories[category] ?? 0) + 1;
+  for (const [cat, tokens] of Object.entries(cats)) {
+    if (tokens.length > 0) categories[cat] = tokens.length;
   }
 
   // ─── Light mode CSS ────────────────────────────────────────────────────────
 
-  const lightLines = emittedTokens
-    .map(({ name }) => `  ${name}: ${lightValues.get(name)};`)
-    .join('\n');
+  const lightLines = allTokens.map(({ name }) => `  ${name}: ${lightValues.get(name)};`).join('\n');
   const lightModeCSS = `:root,\n.${themeName}-light {\n  color-scheme: light;\n${lightLines}\n}`;
 
   // ─── Dark mode CSS ─────────────────────────────────────────────────────────
@@ -269,15 +266,12 @@ export function createTheme(cem: Cem, options: CreateThemeOptions = {}): CreateT
     'other',
   ] as const;
 
-  // Filter out tokens whose lightPlaceholder returned null (uncategorized) —
-  // emitting them would write `--token: undefined;` into the full theme file.
   const lightCategoryBlocks = categoryOrder
-    .filter((cat) => (cats[cat] ?? []).some((name) => lightValues.has(name)))
+    .filter((cat) => (cats[cat]?.length ?? 0) > 0)
     .map((cat) => {
       const label =
         cat === 'borderRadius' ? 'Border Radius' : cat.charAt(0).toUpperCase() + cat.slice(1);
       const tokenLines = (cats[cat] ?? [])
-        .filter((name) => lightValues.has(name))
         .map((name) => `  ${name}: ${lightValues.get(name)};`)
         .join('\n');
       return `  /* ── ${label} ──────────────────────────── */\n${tokenLines}`;

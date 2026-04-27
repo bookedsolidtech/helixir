@@ -144,21 +144,16 @@ function rebaseRelativePaths(
     const absolute = isAbsolute(value) ? value : resolve(configDir, value);
     const inRoot = absolute === normalizedRoot || absolute.startsWith(normalizedRoot + sep);
     if (!inRoot) {
-      // Only cemPath enforces the projectRoot containment boundary —
-      // mcp/index.ts has a hard fatal check on it AND git-backed handlers
-      // (diffCem, getHealthDiff via gitShow) reject absolute paths. The
-      // other path fields (tsconfigPath, tokensPath, healthHistoryDir)
-      // have handlers that accept absolute paths via plain resolve(), so
-      // shared/monorepo configs can legitimately point them at
-      // `../tsconfig.base.json`, `/tmp/health-cache`, etc.
-      if (field === 'cemPath') {
-        process.stderr.write(
-          `[helixir] Warning: cemPath in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Using default. (For out-of-tree CEMs set MCP_WC_CEM_PATH directly.)\n`,
-        );
-        dropped.add(field);
-      } else {
-        rebased[field] = absolute;
-      }
+      // Out-of-tree paths from external configs:
+      //   - tsconfigPath/tokensPath/healthHistoryDir: handlers accept
+      //     absolute paths via plain resolve(); preserve them.
+      //   - cemPath: PRESERVE rather than drop. Dropping silently lets
+      //     auto-discovery pick a different in-tree manifest (the wrong
+      //     library), so the server analyzes the wrong workspace with no
+      //     fatal. Preserving means mcp/index.ts's containment check fires
+      //     with a clear error — fail-fast surfaces the invalid config to
+      //     the user instead of producing wrong analysis.
+      rebased[field] = absolute;
       continue;
     }
     // Inside projectRoot: emit project-relative POSIX path so git-backed

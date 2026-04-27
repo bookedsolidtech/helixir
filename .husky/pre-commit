@@ -14,7 +14,7 @@ set -eu
 # ── Gate 1: gitleaks staged scan ──────────────────────────────────────────────
 if command -v gitleaks >/dev/null 2>&1; then
   echo "pre-commit: running gitleaks on staged files..."
-  if ! gitleaks protect --staged --redact --no-banner 2>&1; then
+  if ! gitleaks protect --staged --redact --no-banner --config .gitleaks.toml 2>&1; then
     echo ""
     echo "ERROR: gitleaks detected potential secrets in staged files."
     echo "Review the output above, remove credentials, then re-stage."

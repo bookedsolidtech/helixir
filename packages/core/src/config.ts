@@ -114,14 +114,6 @@ const defaults: McpWcConfig = {
 // (cdnBase, cdnAutoloader, cdnStylesheet) are deliberately excluded.
 const CONFIG_PATH_FIELDS = ['cemPath', 'tsconfigPath', 'tokensPath', 'healthHistoryDir'] as const;
 
-// Only cemPath needs strict containment — git-backed handlers (diffCem,
-// getHealthDiff via GitOperations.gitShow) reject absolute paths and silently
-// fall back to "component not found". healthHistoryDir, tsconfigPath, and
-// tokensPath all use plain `resolve(projectRoot, value)` and accept absolute
-// paths, so dropping them from external configs would silently lose valid
-// shared values (e.g. `../shared/tsconfig.base.json`).
-const STRICT_CONTAINMENT_FIELDS = new Set<string>(['cemPath']);
-
 function rebaseRelativePaths(
   config: Partial<McpWcConfig>,
   configDir: string,
@@ -140,22 +132,14 @@ function rebaseRelativePaths(
     const absolute = isAbsolute(value) ? value : resolve(configDir, value);
     const escapesRoot = absolute !== normalizedRoot && !absolute.startsWith(normalizedRoot + sep);
     if (escapesRoot) {
-      if (STRICT_CONTAINMENT_FIELDS.has(field)) {
-        // cemPath MUST be project-relative — git-backed tools (diffCem,
-        // getHealthDiff via GitOperations.gitShow) reject absolute paths
-        // and silently fall back to "component not found" for every
-        // component. Drop with a warning so defaults take over rather than
-        // letting those tools silently degrade.
-        process.stderr.write(
-          `[helixir] Warning: ${field} in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Git-backed tools (diff/health) require repo-relative paths. Using default.\n`,
-        );
-        dropped.add(field);
-        continue;
-      }
-      // healthHistoryDir / tsconfigPath / tokensPath: handlers tolerate
-      // absolute paths via plain `resolve(projectRoot, value)` so keep the
-      // rebased absolute path rather than discarding a valid shared file
-      // (e.g. ../shared/tsconfig.base.json) from an external config.
+      // Preserve absolute paths even for strict-containment fields. The CLI
+      // (`src/cli/index.ts` → `resolve(projectRoot, cemPath)`) accepts
+      // absolute manifests, and `mcp/index.ts` enforces server-side
+      // containment at startup. Dropping here regresses CLI flows that
+      // intentionally point at a workspace-level CEM via an external
+      // config. Git-backed tools (diffCem, getHealthDiff) only run inside
+      // the MCP server context, where mcp/index.ts already gates path
+      // safety.
       rebased[field] = absolute;
       continue;
     }

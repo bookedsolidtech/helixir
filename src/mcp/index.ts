@@ -165,13 +165,35 @@ export async function main(): Promise<void> {
   const resolvedProjectRoot = resolve(config.projectRoot);
   const cemAbsPath = resolve(resolvedProjectRoot, config.cemPath);
 
-  // Containment check on cemPath. cemPath MUST resolve inside projectRoot
-  // because git-backed handlers (diffCem, getHealthDiff via
-  // GitOperations.gitShow) reject absolute paths. loadConfig drops out-of-
-  // tree cemPath fields from external configs with a warning, so by the
-  // time we get here the path should always be containable. The check
-  // remains as a defense-in-depth guard against env-var path traversal.
-  if (!cemAbsPath.startsWith(resolvedProjectRoot + sep) && cemAbsPath !== resolvedProjectRoot) {
+  // Containment check on cemPath. Skip ONLY when MCP_WC_CONFIG_PATH was
+  // genuinely loaded (file exists AND parses as JSON) — that signals the
+  // user explicitly opted into an external config and may legitimately
+  // point at a CEM outside the workspace. A stale or malformed editor
+  // setting must NOT bypass the guard, otherwise a leftover
+  // helixir.configPath would let an in-repo cemPath silently load an
+  // out-of-tree manifest. Note: git-backed tools (diffCem, getHealthDiff)
+  // still require repo-relative paths and will degrade if the operator
+  // uses an external absolute cemPath; that is documented in
+  // CONTRIBUTING.md as the trade-off for the external-config flow.
+  const explicitConfigPath = process.env['MCP_WC_CONFIG_PATH'];
+  let externalConfigUsed = false;
+  if (explicitConfigPath !== undefined && explicitConfigPath !== '') {
+    const resolvedExplicit = resolve(resolvedProjectRoot, explicitConfigPath);
+    if (existsSync(resolvedExplicit)) {
+      try {
+        JSON.parse(readFileSync(resolvedExplicit, 'utf-8'));
+        externalConfigUsed = true;
+      } catch {
+        // Malformed JSON — loadConfig already warned and fell back; do NOT
+        // grant the bypass.
+      }
+    }
+  }
+  if (
+    !externalConfigUsed &&
+    !cemAbsPath.startsWith(resolvedProjectRoot + sep) &&
+    cemAbsPath !== resolvedProjectRoot
+  ) {
     process.stderr.write(`Fatal: cemPath resolves outside of projectRoot. Refusing to load.\n`);
     process.exit(1);
   }

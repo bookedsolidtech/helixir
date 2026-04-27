@@ -68,7 +68,7 @@ export interface ApplyThemeTokensResult {
 
 // ─── Light-mode placeholder values ──────────────────────────────────────────
 
-function lightPlaceholder(tokenName: string, category: string): string {
+function lightPlaceholder(tokenName: string, category: string): string | null {
   const lower = tokenName.toLowerCase();
 
   switch (category) {
@@ -145,10 +145,14 @@ function lightPlaceholder(tokenName: string, category: string): string {
       return '200ms';
 
     default:
-      // Uncategorized token — emit `inherit` so the cascade resolves it from
-      // a parent scope or the document root. A `var(${tokenName})` reference
-      // here would be self-referential and invalid at computed-value time.
-      return 'inherit';
+      // Uncategorized token — return null so the caller skips emitting a
+      // declaration entirely. Any value here would be wrong: a self-
+      // referential `var(${tokenName})` is invalid at computed-value time;
+      // `inherit` overrides component fallbacks (`var(--token, fallback)`)
+      // and breaks non-inherited properties; explicit values guess at
+      // semantics we can't infer. Better to leave the token undefined so
+      // the consumer's fallback wins.
+      return null;
   }
 }
 
@@ -200,28 +204,37 @@ export function createTheme(cem: Cem, options: CreateThemeOptions = {}): CreateT
     }
   }
 
-  // Compute light/dark placeholder values per token
+  // Compute light/dark placeholder values per token. `lightPlaceholder` returns
+  // null for uncategorized tokens — those are skipped entirely so consumers
+  // using `var(--token, fallback)` fall back to the component default rather
+  // than inheriting an unrelated value or hitting a self-referential var().
   const lightValues: Map<string, string> = new Map();
   const darkValues: Map<string, string> = new Map();
+  const emittedTokens: TokenEntry[] = [];
 
   for (const { name, category } of allTokens) {
     const light = lightPlaceholder(name, category);
+    if (light === null) continue;
     lightValues.set(name, light);
+    emittedTokens.push({ name, category });
     const dark = darkPlaceholder(name, category, light);
     if (dark !== light) darkValues.set(name, dark);
   }
 
-  const tokenCount = allTokens.length;
+  const tokenCount = emittedTokens.length;
 
-  // Per-category counts for result metadata
+  // Per-category counts for result metadata — count only emitted tokens so
+  // the reported total matches what actually appears in the scaffold.
   const categories: Record<string, number> = {};
-  for (const [cat, tokens] of Object.entries(cats)) {
-    if (tokens.length > 0) categories[cat] = tokens.length;
+  for (const { category } of emittedTokens) {
+    categories[category] = (categories[category] ?? 0) + 1;
   }
 
   // ─── Light mode CSS ────────────────────────────────────────────────────────
 
-  const lightLines = allTokens.map(({ name }) => `  ${name}: ${lightValues.get(name)};`).join('\n');
+  const lightLines = emittedTokens
+    .map(({ name }) => `  ${name}: ${lightValues.get(name)};`)
+    .join('\n');
   const lightModeCSS = `:root,\n.${themeName}-light {\n  color-scheme: light;\n${lightLines}\n}`;
 
   // ─── Dark mode CSS ─────────────────────────────────────────────────────────

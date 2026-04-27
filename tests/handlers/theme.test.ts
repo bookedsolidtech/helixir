@@ -170,17 +170,22 @@ describe('createTheme', () => {
     expect(result.darkModeCSS).toContain('#1a1a1a');
   });
 
-  it('emits `inherit` (not a self-referential var()) for tokens with unknown categories', () => {
-    // --my-custom-widget does not match any known category pattern,
-    // so it lands in "other" and hits the default case in lightPlaceholder.
-    // A `var(--my-custom-widget)` value here would be self-referential and
-    // invalid at computed-value time — `inherit` lets the cascade resolve it.
+  it('skips uncategorized tokens entirely so consumer fallbacks in var(--token, fallback) win', () => {
+    // --my-custom-widget does not match any known category pattern, so it
+    // lands in "other" and hits the default case in lightPlaceholder. The
+    // generator must NOT emit a declaration for it — any value here
+    // (`var(--token)` self-referential; `inherit` clobbers component
+    // fallbacks; explicit values guess at semantics we cannot infer) is
+    // wrong. Consumers using `var(--my-custom-widget, fallback)` should
+    // resolve to their fallback, which only happens if the variable is
+    // undefined.
     const cem = makeCem([
       { tagName: 'my-widget', cssProperties: [{ name: '--my-custom-widget' }] },
     ]);
     const result = createTheme(cem);
-    expect(result.lightModeCSS).toContain('--my-custom-widget: inherit');
-    expect(result.lightModeCSS).not.toContain('var(--my-custom-widget)');
+    expect(result.lightModeCSS).not.toContain('--my-custom-widget');
+    expect(result.lightModeCSS).not.toContain('inherit');
+    expect(result.tokenCount).toBe(0);
   });
 });
 

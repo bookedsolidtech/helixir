@@ -132,33 +132,36 @@ function rebaseRelativePaths(
   const dropped = new Set<string>();
   for (const field of CONFIG_PATH_FIELDS) {
     const value = rebased[field];
-    if (typeof value === 'string' && value !== '' && !isAbsolute(value)) {
-      // Resolve the field relative to the config file's directory.
-      const absolute = resolve(configDir, value);
-      const escapesRoot = absolute !== normalizedRoot && !absolute.startsWith(normalizedRoot + sep);
-      if (escapesRoot) {
-        if (STRICT_CONTAINMENT_FIELDS.has(field)) {
-          // src/mcp/index.ts has a hard containment check on cemPath; git-
-          // backed handlers reject absolute paths for healthHistoryDir.
-          // Drop the field with a warning so defaults take over rather than
-          // letting startup crash on what looks like a successfully-loaded
-          // config.
-          process.stderr.write(
-            `[helixir] Warning: ${field} in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Using default.\n`,
-          );
-          dropped.add(field);
-          continue;
-        }
-        // tsconfigPath / tokensPath: handlers tolerate absolute paths, so
-        // keep the rebased absolute path rather than discarding a valid
-        // shared file (e.g. ../tsconfig.base.json) from an external config.
-        rebased[field] = absolute;
+    if (typeof value !== 'string' || value === '') continue;
+    // Resolve to absolute. Relative values rebase against the config file's
+    // directory; already-absolute values still need the containment check
+    // below — an absolute external cemPath would otherwise sneak past the
+    // rebase guard and crash mcp/index.ts at startup.
+    const absolute = isAbsolute(value) ? value : resolve(configDir, value);
+    const escapesRoot = absolute !== normalizedRoot && !absolute.startsWith(normalizedRoot + sep);
+    if (escapesRoot) {
+      if (STRICT_CONTAINMENT_FIELDS.has(field)) {
+        // src/mcp/index.ts has a hard containment check on cemPath; git-
+        // backed handlers reject absolute paths for healthHistoryDir.
+        // Drop the field with a warning so defaults take over rather than
+        // letting startup crash on what looks like a successfully-loaded
+        // config.
+        process.stderr.write(
+          `[helixir] Warning: ${field} in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Using default.\n`,
+        );
+        dropped.add(field);
         continue;
       }
-      // Inside projectRoot: emit project-relative so consumers requiring
-      // repo-relative inputs (containment check, `git show` paths) work.
-      rebased[field] = relative(normalizedRoot, absolute);
+      // tsconfigPath / tokensPath: handlers tolerate absolute paths, so
+      // keep the rebased absolute path rather than discarding a valid
+      // shared file (e.g. ../tsconfig.base.json) from an external config.
+      rebased[field] = absolute;
+      continue;
     }
+    // Inside projectRoot: always emit project-relative so consumers requiring
+    // repo-relative inputs (containment check, `git show` paths) work,
+    // regardless of whether the original value was absolute or relative.
+    rebased[field] = relative(normalizedRoot, absolute);
   }
   // Build the result without the dropped fields rather than mutating with
   // `delete` (lint rule @typescript-eslint/no-dynamic-delete).

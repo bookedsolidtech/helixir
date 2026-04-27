@@ -127,4 +127,17 @@ fi
 # Normalize trailing newlines (cosmetic, non-fatal)
 perl -i -0777 -pe 's/\n+$/\n/' "$COMMIT_MSG_FILE" 2>/dev/null || true
 
+# ── Project extension: commitlint (NOT rea-managed) ──────────────────────────
+# rea v0.11.0's commit-msg hook only handles AI attribution. Helixir relies on
+# conventional commit messages (commitlint.config.cjs); without this tail the
+# release/changeset workflow erodes over time. WARNING: `rea upgrade --force`
+# will overwrite the whole file and strip this block; re-apply after each
+# upgrade until the rea installer ships an extensibility hook for downstream
+# validators.
+if [ -x "node_modules/.bin/commitlint" ]; then
+  node_modules/.bin/commitlint --edit "$COMMIT_MSG_FILE"
+elif command -v pnpm > /dev/null 2>&1; then
+  pnpm exec commitlint --edit "$COMMIT_MSG_FILE"
+fi
+
 exit 0

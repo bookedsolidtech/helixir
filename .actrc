@@ -1,6 +1,9 @@
 -P ubuntu-latest=catthehacker/ubuntu:act-latest
 --bind
 --rm
---pull=false
 --no-cache-server
---action-offline-mode
+# --pull=false and --action-offline-mode used to live here, but they broke
+# first-run local CI (`./scripts/act-ci.sh` would fail before pulling the
+# act image / fetching action sources). Operators can pass either flag
+# explicitly when running offline:
+#   ACT_PULL=false ACT_OFFLINE=1 ./scripts/act-ci.sh

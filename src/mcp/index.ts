@@ -165,15 +165,27 @@ export async function main(): Promise<void> {
   const resolvedProjectRoot = resolve(config.projectRoot);
   const cemAbsPath = resolve(resolvedProjectRoot, config.cemPath);
 
-  // Containment check on cemPath. Skip when MCP_WC_CONFIG_PATH is set —
-  // the user has explicitly opted into an external config and may legitimately
-  // point at a shared CEM outside the workspace (e.g. monorepo with a
-  // workspace-level manifest). Without that opt-in, paths that escape
-  // projectRoot are likely a misconfig (or hostile env) and we refuse.
+  // Containment check on cemPath. Skip ONLY when MCP_WC_CONFIG_PATH was
+  // genuinely loaded — the file exists AND parses as JSON. A stale or
+  // malformed editor setting must NOT bypass the guard, otherwise a leftover
+  // helixir.configPath from a previous workspace would let `MCP_WC_CEM_PATH`
+  // or an in-repo cemPath silently load an out-of-tree manifest.
   const explicitConfigPath = process.env['MCP_WC_CONFIG_PATH'];
-  const externalConfigOptIn = explicitConfigPath !== undefined && explicitConfigPath !== '';
+  let externalConfigUsed = false;
+  if (explicitConfigPath !== undefined && explicitConfigPath !== '') {
+    const resolvedExplicit = resolve(resolvedProjectRoot, explicitConfigPath);
+    if (existsSync(resolvedExplicit)) {
+      try {
+        JSON.parse(readFileSync(resolvedExplicit, 'utf-8'));
+        externalConfigUsed = true;
+      } catch {
+        // Malformed JSON — loadConfig already warned and fell back; do NOT
+        // grant the bypass.
+      }
+    }
+  }
   if (
-    !externalConfigOptIn &&
+    !externalConfigUsed &&
     !cemAbsPath.startsWith(resolvedProjectRoot + sep) &&
     cemAbsPath !== resolvedProjectRoot
   ) {

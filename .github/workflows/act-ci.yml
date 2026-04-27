@@ -57,12 +57,12 @@ jobs:
           if [ "${{ matrix.node-version }}" != "" ]; then
             export NVM_DIR="$HOME/.nvm"
             if [ ! -d "$NVM_DIR" ]; then
-              # Repo-level .actrc enables --action-offline-mode. Don't curl
-              # the nvm installer in air-gapped runs; either fail loudly with
-              # actionable guidance or skip when nvm is intentionally absent.
-              if [ -n "${ACT_OFFLINE_MODE:-}" ] || [ -f "$GITHUB_WORKSPACE/.actrc" ] && grep -q action-offline-mode "$GITHUB_WORKSPACE/.actrc" 2>/dev/null; then
-                echo "[act-ci] Offline mode active and nvm not present at $NVM_DIR" >&2
-                echo "[act-ci]   Pre-install nvm before running ./scripts/act-ci.sh --matrix" >&2
+              # First-run convenience: fetch nvm if not present. Operators
+              # running in air-gapped environments should pre-install nvm
+              # rather than relying on this curl.
+              if [ -n "${ACT_OFFLINE:-}" ]; then
+                echo "[act-ci] Offline mode (ACT_OFFLINE=1) and nvm not present at $NVM_DIR" >&2
+                echo "[act-ci]   Pre-install nvm before running offline:" >&2
                 echo "[act-ci]   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash" >&2
                 exit 1
               fi

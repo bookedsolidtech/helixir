@@ -45,7 +45,7 @@ jobs:
     name: Test Full (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    if: ${{ env.ACT_MATRIX_TESTS == 'true' || env.ACT_FULL_TESTS == 'true' }}
+    if: ${{ env.ACT_MATRIX_TESTS == 'true' }}
     strategy:
       fail-fast: false
       matrix:

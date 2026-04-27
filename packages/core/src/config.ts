@@ -132,21 +132,24 @@ function rebaseRelativePaths(
     const absolute = isAbsolute(value) ? value : resolve(configDir, value);
     const escapesRoot = absolute !== normalizedRoot && !absolute.startsWith(normalizedRoot + sep);
     if (escapesRoot) {
-      // Two reasons to drop fields whose resolved path escapes projectRoot:
-      //   1. tsconfigPath/tokensPath/healthHistoryDir feed straight into
-      //      file I/O — out-of-tree paths could read or write arbitrary
-      //      host files.
-      //   2. cemPath is also unsafe for git-backed handlers: diffCem and
-      //      getHealthDiff pass `config.cemPath` to GitOperations.gitShow,
-      //      whose allowlist only accepts repo-relative paths. An absolute
-      //      out-of-tree cemPath silently fails those tools as
-      //      "component not found".
-      // Drop with a warning so defaults take over rather than handing the
-      // path to a downstream consumer that will reject it.
-      process.stderr.write(
-        `[helixir] Warning: ${field} in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Using default to keep within the workspace boundary.\n`,
-      );
-      dropped.add(field);
+      if (!isAbsolute(value)) {
+        // RELATIVE path that escapes projectRoot — the rebase math gave us
+        // something out-of-tree (e.g. `../shared/cem.json` from a config
+        // that lives outside the workspace). Likely a misconfig: drop with
+        // warning so defaults take over.
+        process.stderr.write(
+          `[helixir] Warning: ${field} in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Using default.\n`,
+        );
+        dropped.add(field);
+        continue;
+      }
+      // ABSOLUTE path the user explicitly chose — trust it. Editor/shared-
+      // config flows legitimately point at out-of-tree manifests
+      // (cemPath), shared tsconfigs, or token files. Trade-off: git-backed
+      // tools (diffCem, getHealthDiff) require repo-relative cemPath and
+      // will degrade to "component not found" for out-of-tree absolute
+      // CEMs — documented in CONTRIBUTING.md.
+      rebased[field] = absolute;
       continue;
     }
     // Inside projectRoot: always emit project-relative so consumers requiring

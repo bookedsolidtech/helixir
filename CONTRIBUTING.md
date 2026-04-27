@@ -23,9 +23,9 @@ pnpm run build
 
 Two external tools are invoked by git hooks. Without them, `git commit` and `git push` fail.
 
-| Tool | Used by | Install |
-|---|---|---|
-| **gitleaks** | `.husky/pre-commit` (secret scan on staged files) | Vendored via `gitleaks-secret-scanner` devDep — `pnpm install` downloads the right binary for your OS. macOS users with Homebrew can also `brew install gitleaks`. |
+| Tool          | Used by                                                                                                                        | Install                                                                                                                                                                                                                                             |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **gitleaks**  | `.husky/pre-commit` (secret scan on staged files)                                                                              | Vendored via `gitleaks-secret-scanner` devDep — `pnpm install` downloads the right binary for your OS. macOS users with Homebrew can also `brew install gitleaks`.                                                                                  |
 | **Codex CLI** | `.husky/pre-push` (`@bookedsolid/rea`'s `rea hook push-gate` runs Codex adversarial review against the diff before every push) | Required because `.rea/policy.yaml` sets `review.codex_required: true`. Install per the Codex docs (e.g. `npm install -g @openai/codex` or your team's wrapper). The push hook will hard-fail if Codex is missing — that is intentional, not a bug. |
 
 If you need to push WITHOUT codex review (e.g. a release-only branch), the rea hook accepts an explicit waiver:

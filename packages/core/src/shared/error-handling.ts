@@ -34,16 +34,21 @@ export function sanitizeErrorMessage(message: string, projectRoot: string): stri
   if (projectRoot) {
     // Normalize projectRoot to ensure no trailing slash
     const normalizedRoot = projectRoot.replace(/\/+$/, '');
-    // Match the projectRoot prefix only when it is NOT followed by another
-    // pathname-continuation character (alphanumeric, underscore, dot, hyphen).
-    // `(?!\w)` alone is too lax — it lets `/repo/app-prod` and
-    // `/repo/app.config` partial-match `/repo/app`, get rewritten to bare
-    // relative fragments, and bypass the later absolute-path redaction.
-    // Excluding `.` and `-` from the boundary closes that hole while still
-    // accepting paths followed by `:` (line numbers), `'` / `"` (quoting),
-    // end-of-string, and whitespace — all common in error messages.
+    // Match the projectRoot prefix only when it is followed by either a
+    // path separator, end-of-string, whitespace, or a small allowlist of
+    // boundary characters (line-number colon, quote, paren, bracket,
+    // brace, comma, semicolon). Anything else — including filename-legal
+    // bytes like `+`, `~`, `=`, `@`, `&` — is treated as a continuation
+    // of a SIBLING directory and the prefix is NOT consumed, so the
+    // sibling path falls through to the [path redacted] redactor below.
+    // The earlier negative-class approach `(?![A-Za-z0-9_.-])` was too
+    // narrow: filenames legitimately contain `+`, `~`, etc., so
+    // /repo/app+prod/secrets.txt was leaking the suffix.
     const escapedRoot = normalizedRoot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const projectRootRegex = new RegExp(escapedRoot + '(?:/[^\\s]*)?(?![A-Za-z0-9_.\\-])', 'g');
+    const projectRootRegex = new RegExp(
+      escapedRoot + '(?:/[^\\s]*)?(?=$|[\\s/:\'"`),;\\]\\}])',
+      'g',
+    );
     sanitized = sanitized.replace(projectRootRegex, (match) => {
       // Compute the path relative to projectRoot
       const relativePath = relative(normalizedRoot, match);

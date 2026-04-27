@@ -132,21 +132,25 @@ function rebaseRelativePaths(
     const absolute = isAbsolute(value) ? value : resolve(configDir, value);
     const escapesRoot = absolute !== normalizedRoot && !absolute.startsWith(normalizedRoot + sep);
     if (escapesRoot) {
-      // Preserve all out-of-tree absolute paths from external configs and
-      // let downstream consumers decide what to do with them:
-      //   - tsconfigPath/tokensPath/healthHistoryDir: handlers accept
-      //     absolute paths via plain resolve(); preserving them lets
-      //     monorepo flows point at shared `../shared/tsconfig.base.json`.
-      //   - cemPath: the MCP server's containment check (src/mcp/index.ts)
-      //     handles the security boundary at startup with a clear fatal
-      //     error when the manifest escapes projectRoot. Silently dropping
-      //     here would let the server start against a discovered in-tree
-      //     CEM, returning analysis of the WRONG library — fail-fast
-      //     downstream is safer than silent wrong-answer.
-      // Trade-off: git-backed tools (diffCem, getHealthDiff) silently
-      // degrade to "component not found" when cemPath is out-of-tree —
-      // documented in CONTRIBUTING.md.
-      rebased[field] = absolute;
+      // ABSOLUTE values: trust the user's explicit choice. Editor/shared-
+      //   config flows legitimately point at out-of-tree manifests
+      //   (cemPath), shared tsconfigs, or token files. mcp/index.ts
+      //   enforces server-side containment for cemPath; CLI flows accept
+      //   absolute paths.
+      // RELATIVE values that escape root: the rebase math gave us
+      //   something out-of-tree (e.g. `dist/cem.json` from a config in
+      //   /shared/ rebased to /shared/dist/cem.json). The user did NOT
+      //   explicitly choose this absolute path — it's a side effect of
+      //   relative resolution. Dropping is safer than handing a path the
+      //   downstream consumer didn't sanction.
+      if (isAbsolute(value)) {
+        rebased[field] = absolute;
+      } else {
+        process.stderr.write(
+          `[helixir] Warning: ${field} in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Using default. (Set ${field} to an absolute path in the external config to override.)\n`,
+        );
+        dropped.add(field);
+      }
       continue;
     }
     // Inside projectRoot: always emit project-relative so consumers requiring

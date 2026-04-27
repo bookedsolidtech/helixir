@@ -165,32 +165,44 @@ export async function main(): Promise<void> {
   const resolvedProjectRoot = resolve(config.projectRoot);
   const cemAbsPath = resolve(resolvedProjectRoot, config.cemPath);
 
-  // Containment check on cemPath. Skip ONLY when MCP_WC_CONFIG_PATH was
-  // genuinely loaded (file exists AND parses as JSON) — that signals the
-  // user explicitly opted into an external config and may legitimately
-  // point at a CEM outside the workspace. A stale or malformed editor
-  // setting must NOT bypass the guard, otherwise a leftover
-  // helixir.configPath would let an in-repo cemPath silently load an
-  // out-of-tree manifest. Note: git-backed tools (diffCem, getHealthDiff)
-  // still require repo-relative paths and will degrade if the operator
-  // uses an external absolute cemPath; that is documented in
-  // CONTRIBUTING.md as the trade-off for the external-config flow.
+  // Containment check on cemPath. Skip ONLY when cemPath actually came
+  // from a successfully-loaded external config (file at MCP_WC_CONFIG_PATH
+  // exists, parses as JSON, AND its `cemPath` field is set). Three layers
+  // of guarding:
+  //   1. MCP_WC_CEM_PATH env var takes priority over external-config
+  //      cemPath in loadConfig — when the operator overrides the manifest
+  //      separately, the bypass should NOT apply (otherwise a stray
+  //      external-config presence would let an env-supplied absolute path
+  //      escape).
+  //   2. Stale/malformed external configs (file missing or non-JSON)
+  //      don't bypass — those just fall through in loadConfig.
+  //   3. External config that doesn't set cemPath also doesn't bypass —
+  //      the manifest came from auto-discovery, not from the external
+  //      file.
+  let cemFromExternalConfig = false;
   const explicitConfigPath = process.env['MCP_WC_CONFIG_PATH'];
-  let externalConfigUsed = false;
-  if (explicitConfigPath !== undefined && explicitConfigPath !== '') {
+  const cemEnvOverride = process.env['MCP_WC_CEM_PATH'];
+  if (
+    explicitConfigPath !== undefined &&
+    explicitConfigPath !== '' &&
+    (cemEnvOverride === undefined || cemEnvOverride === '')
+  ) {
     const resolvedExplicit = resolve(resolvedProjectRoot, explicitConfigPath);
     if (existsSync(resolvedExplicit)) {
       try {
-        JSON.parse(readFileSync(resolvedExplicit, 'utf-8'));
-        externalConfigUsed = true;
+        const parsed = JSON.parse(readFileSync(resolvedExplicit, 'utf-8')) as {
+          cemPath?: unknown;
+        };
+        if (typeof parsed.cemPath === 'string' && parsed.cemPath !== '') {
+          cemFromExternalConfig = true;
+        }
       } catch {
-        // Malformed JSON — loadConfig already warned and fell back; do NOT
-        // grant the bypass.
+        // Malformed JSON — fall through to fail-closed.
       }
     }
   }
   if (
-    !externalConfigUsed &&
+    !cemFromExternalConfig &&
     !cemAbsPath.startsWith(resolvedProjectRoot + sep) &&
     cemAbsPath !== resolvedProjectRoot
   ) {

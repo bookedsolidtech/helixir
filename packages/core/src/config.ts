@@ -114,6 +114,16 @@ const defaults: McpWcConfig = {
 // (cdnBase, cdnAutoloader, cdnStylesheet) are deliberately excluded.
 const CONFIG_PATH_FIELDS = ['cemPath', 'tsconfigPath', 'tokensPath', 'healthHistoryDir'] as const;
 
+// Fields whose downstream consumers do plain file I/O (read tokens, read
+// tsconfig, write health snapshots). External configs that point these
+// outside projectRoot would let arbitrary host files be read or written —
+// drop them with a warning so the workspace remains the security boundary.
+// `cemPath` is intentionally NOT in this set: the CLI legitimately accepts
+// absolute manifests for `helixir analyze`-style flows on workspace-level
+// CEMs, and the MCP server gates its own absolute-cemPath check via the
+// external-config opt-in (see src/mcp/index.ts).
+const FS_BOUNDARY_FIELDS = new Set<string>(['tsconfigPath', 'tokensPath', 'healthHistoryDir']);
+
 function rebaseRelativePaths(
   config: Partial<McpWcConfig>,
   configDir: string,
@@ -132,14 +142,20 @@ function rebaseRelativePaths(
     const absolute = isAbsolute(value) ? value : resolve(configDir, value);
     const escapesRoot = absolute !== normalizedRoot && !absolute.startsWith(normalizedRoot + sep);
     if (escapesRoot) {
-      // Preserve absolute paths even for strict-containment fields. The CLI
-      // (`src/cli/index.ts` → `resolve(projectRoot, cemPath)`) accepts
-      // absolute manifests, and `mcp/index.ts` enforces server-side
-      // containment at startup. Dropping here regresses CLI flows that
-      // intentionally point at a workspace-level CEM via an external
-      // config. Git-backed tools (diffCem, getHealthDiff) only run inside
-      // the MCP server context, where mcp/index.ts already gates path
-      // safety.
+      if (FS_BOUNDARY_FIELDS.has(field)) {
+        // Drop tokensPath/tsconfigPath/healthHistoryDir when they escape
+        // projectRoot — handlers feed them straight into file I/O and an
+        // out-of-tree path lets a nested config read/write arbitrary host
+        // files. Default (workspace-relative) takes over.
+        process.stderr.write(
+          `[helixir] Warning: ${field} in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Using default to keep host filesystem in the workspace boundary.\n`,
+        );
+        dropped.add(field);
+        continue;
+      }
+      // cemPath is preserved as absolute — CLI consumers accept it and the
+      // MCP server gates its own containment via the external-config
+      // opt-in.
       rebased[field] = absolute;
       continue;
     }

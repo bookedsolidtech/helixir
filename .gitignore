@@ -53,6 +53,10 @@ PUBLISHING.md
 .act-secrets
 .act-results.json
 
+# beads (retired in rea migration — directory deleted intentionally; ignore
+# any local re-creation by stale `bd` invocations)
+.beads/
+
 # reagent — AI tooling (stays on developer machine, not committed)
 .claude/hooks/
 .claude/settings.json

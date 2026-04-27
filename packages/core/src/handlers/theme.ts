@@ -269,12 +269,15 @@ export function createTheme(cem: Cem, options: CreateThemeOptions = {}): CreateT
     'other',
   ] as const;
 
+  // Filter out tokens whose lightPlaceholder returned null (uncategorized) —
+  // emitting them would write `--token: undefined;` into the full theme file.
   const lightCategoryBlocks = categoryOrder
-    .filter((cat) => (cats[cat]?.length ?? 0) > 0)
+    .filter((cat) => (cats[cat] ?? []).some((name) => lightValues.has(name)))
     .map((cat) => {
       const label =
         cat === 'borderRadius' ? 'Border Radius' : cat.charAt(0).toUpperCase() + cat.slice(1);
       const tokenLines = (cats[cat] ?? [])
+        .filter((name) => lightValues.has(name))
         .map((name) => `  ${name}: ${lightValues.get(name)};`)
         .join('\n');
       return `  /* ── ${label} ──────────────────────────── */\n${tokenLines}`;

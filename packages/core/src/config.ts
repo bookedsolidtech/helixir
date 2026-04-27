@@ -161,7 +161,10 @@ function rebaseRelativePaths(
     // Inside projectRoot: always emit project-relative so consumers requiring
     // repo-relative inputs (containment check, `git show` paths) work,
     // regardless of whether the original value was absolute or relative.
-    rebased[field] = relative(normalizedRoot, absolute);
+    // Normalize to POSIX separators because git-backed handlers
+    // (GitOperations.gitShow) only accept forward slashes — node's
+    // path.relative() emits backslashes on Windows.
+    rebased[field] = relative(normalizedRoot, absolute).split(sep).join('/');
   }
   // Build the result without the dropped fields rather than mutating with
   // `delete` (lint rule @typescript-eslint/no-dynamic-delete).
@@ -264,27 +267,34 @@ export function loadConfig(): Readonly<McpWcConfig> {
   const cemPathExplicit = process.env['MCP_WC_CEM_PATH'] !== undefined || fileCemPath !== undefined;
 
   if (!cemPathExplicit) {
-    // When the user selected a non-root config via MCP_WC_CONFIG_PATH, run
-    // CEM discovery starting from THAT file's directory rather than the
-    // workspace root — otherwise a monorepo with both a root manifest and a
-    // package-level manifest will load the root CEM even though the user
-    // explicitly pointed at the nested config.
+    // When the user selected a non-root config via MCP_WC_CONFIG_PATH that
+    // lives INSIDE projectRoot (e.g. packages/ds/helixir.mcp.json), run CEM
+    // discovery from that file's directory so package-local CEMs win over
+    // a workspace-root manifest. For external configs (outside projectRoot)
+    // and for fallthrough cases (missing/malformed explicit config),
+    // discovery stays in projectRoot — moving it outside would cause the
+    // server to ignore the workspace's own dist/custom-elements.json.
     const explicitConfigPath = process.env['MCP_WC_CONFIG_PATH'];
+    const normalizedRoot = resolve(effectiveRoot);
     let discoveryRoot = effectiveRoot;
     if (explicitConfigPath !== undefined && explicitConfigPath !== '') {
       const resolvedExplicit = resolve(effectiveRoot, explicitConfigPath);
       if (existsSync(resolvedExplicit)) {
-        discoveryRoot = dirname(resolvedExplicit);
+        const explicitDir = dirname(resolvedExplicit);
+        if (explicitDir === normalizedRoot || explicitDir.startsWith(normalizedRoot + sep)) {
+          discoveryRoot = explicitDir;
+        }
       }
     }
     const discovered = discoverCemPath(discoveryRoot);
     if (discovered !== null) {
-      // discoverCemPath returns a path absolute to discoveryRoot; rebase to
-      // projectRoot so the containment check + git-backed consumers stay happy.
+      // discoverCemPath returns a path relative to discoveryRoot; rebase to
+      // projectRoot so the containment check + git-backed consumers stay
+      // happy. Normalize to POSIX separators for Windows compatibility.
       const absolute = resolve(discoveryRoot, discovered);
-      const normalizedRoot = resolve(effectiveRoot);
       if (absolute === normalizedRoot || absolute.startsWith(normalizedRoot + sep)) {
-        config.cemPath = relative(normalizedRoot, absolute) || discovered;
+        const relPath = relative(normalizedRoot, absolute) || discovered;
+        config.cemPath = relPath.split(sep).join('/');
       } else {
         // Discovered CEM is outside projectRoot — would fail downstream.
         // Fall back to the friendly-error path rather than handing it on.

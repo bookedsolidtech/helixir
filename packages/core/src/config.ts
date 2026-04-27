@@ -132,26 +132,20 @@ function rebaseRelativePaths(
     const absolute = isAbsolute(value) ? value : resolve(configDir, value);
     const escapesRoot = absolute !== normalizedRoot && !absolute.startsWith(normalizedRoot + sep);
     if (escapesRoot) {
-      // FINAL DESIGN (after codex round-trip on this exact question):
-      //
-      // cemPath: drop when out-of-tree. mcp/index.ts's containment check
-      //   would fatal on it, and git-backed handlers (diffCem,
-      //   getHealthDiff via gitShow) reject absolute paths anyway.
-      //   CLI-only users with an external CEM should set MCP_WC_CEM_PATH
-      //   directly — env vars bypass this rebase logic entirely.
-      //
-      // tsconfigPath/tokensPath/healthHistoryDir: preserve. Their handlers
-      //   (handlers/typescript.ts, handlers/tokens.ts, handlers/health.ts)
-      //   accept absolute paths via plain `resolve()`. Dropping a valid
-      //   shared `../shared/tsconfig.base.json` from an editor config
-      //   silently regresses monorepo flows.
-      if (field === 'cemPath') {
-        process.stderr.write(
-          `[helixir] Warning: cemPath in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Using default. (Set MCP_WC_CEM_PATH directly for out-of-tree manifests.)\n`,
-        );
-        dropped.add(field);
-        continue;
-      }
+      // Preserve all out-of-tree absolute paths from external configs and
+      // let downstream consumers decide what to do with them:
+      //   - tsconfigPath/tokensPath/healthHistoryDir: handlers accept
+      //     absolute paths via plain resolve(); preserving them lets
+      //     monorepo flows point at shared `../shared/tsconfig.base.json`.
+      //   - cemPath: the MCP server's containment check (src/mcp/index.ts)
+      //     handles the security boundary at startup with a clear fatal
+      //     error when the manifest escapes projectRoot. Silently dropping
+      //     here would let the server start against a discovered in-tree
+      //     CEM, returning analysis of the WRONG library — fail-fast
+      //     downstream is safer than silent wrong-answer.
+      // Trade-off: git-backed tools (diffCem, getHealthDiff) silently
+      // degrade to "component not found" when cemPath is out-of-tree —
+      // documented in CONTRIBUTING.md.
       rebased[field] = absolute;
       continue;
     }

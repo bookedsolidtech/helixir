@@ -127,9 +127,17 @@ jobs:
           VITEST_EXIT=$?
           set -e
 
-          # Determine pass/fail from output
-          FAILED_TESTS=$(grep -c "^[[:space:]]*[×x]" "$LOGFILE" 2>/dev/null || echo 0)
-          PASSED_TESTS=$(grep -c "^[[:space:]]*[✓✔]" "$LOGFILE" 2>/dev/null || echo 0)
+          # Determine pass/fail from output. `grep -c` already prints `0` on
+          # no-match (and exits non-zero), so a `|| echo 0` fallback would
+          # capture "0\n0" and break the integer comparison below under
+          # bash's `-e` mode. Use `set +e`/`+o pipefail` while we run grep
+          # and tolerate the non-zero exit explicitly.
+          set +e
+          FAILED_TESTS=$(grep -c "^[[:space:]]*[×x]" "$LOGFILE" 2>/dev/null)
+          [ -z "$FAILED_TESTS" ] && FAILED_TESTS=0
+          PASSED_TESTS=$(grep -c "^[[:space:]]*[✓✔]" "$LOGFILE" 2>/dev/null)
+          [ -z "$PASSED_TESTS" ] && PASSED_TESTS=0
+          set -e
 
           echo ""
           cat "$LOGFILE" | tail -30

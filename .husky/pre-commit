@@ -54,4 +54,16 @@ if [ -n "$STAGED_ENV" ]; then
   exit 1
 fi
 
+# ── Gate 3: lint-staged (ESLint + Prettier on staged files) ───────────────────
+# Restores the auto-fix/format pass that this hook used to run before the
+# rea-driven secret-scan rewrite. lint-staged is configured in package.json
+# under the "lint-staged" key.
+if [ -x "node_modules/.bin/lint-staged" ]; then
+  echo "pre-commit: running lint-staged..."
+  node_modules/.bin/lint-staged
+elif command -v pnpm > /dev/null 2>&1; then
+  echo "pre-commit: running lint-staged via pnpm exec..."
+  pnpm exec lint-staged
+fi
+
 exit 0

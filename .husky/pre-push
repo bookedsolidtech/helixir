@@ -18,18 +18,19 @@ if [ -f "${REA_ROOT}/.rea/HALT" ]; then
   exit 1
 fi
 
-REA_BIN=""
+# Each branch exec's directly with proper quoting so paths containing
+# spaces survive (the prior `REA_BIN="node ..."; exec $REA_BIN ...`
+# pattern word-split on the resolved path and produced "not found" for
+# repos in `~/My Code/...`-style locations).
 if [ -x "${REA_ROOT}/node_modules/.bin/rea" ]; then
-  REA_BIN="${REA_ROOT}/node_modules/.bin/rea"
+  exec "${REA_ROOT}/node_modules/.bin/rea" hook push-gate "$@"
 elif [ -f "${REA_ROOT}/dist/cli/index.js" ]; then
-  REA_BIN="node ${REA_ROOT}/dist/cli/index.js"
+  exec node "${REA_ROOT}/dist/cli/index.js" hook push-gate "$@"
 elif command -v rea >/dev/null 2>&1; then
-  REA_BIN="rea"
+  exec rea hook push-gate "$@"
 elif command -v npx >/dev/null 2>&1; then
-  REA_BIN="npx --no-install @bookedsolid/rea"
+  exec npx --no-install @bookedsolid/rea hook push-gate "$@"
 else
   printf "rea: cannot locate the rea CLI.\n" >&2
   exit 2
 fi
-
-exec $REA_BIN hook push-gate "$@"

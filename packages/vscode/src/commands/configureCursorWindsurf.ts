@@ -90,21 +90,20 @@ export function registerConfigureCursorWindsurfCommand(context: vscode.Extension
     // workspace defaults even when the user has selected a different one.
     const env: Record<string, string> = {};
     const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    // MCP_WC_PROJECT_ROOT emission policy:
-    //   - GLOBAL config (~/.cursor or ~/.windsurf, editor spawns from $HOME):
-    //     always emit, otherwise helixir cannot find the workspace.
-    //   - WORKSPACE-LOCAL config (.cursor/mcp.json under workspaceRoot):
-    //     only emit when we are ALSO emitting MCP_WC_CONFIG_PATH, since
-    //     loadConfig() resolves a relative MCP_WC_CONFIG_PATH against
-    //     MCP_WC_PROJECT_ROOT. Without the pair, the relative path falls
-    //     back to the editor host's cwd and the wrong config loads.
-    //     When no configPath is set, skip MCP_WC_PROJECT_ROOT so committed
-    //     workspace configs stay machine-portable (this repo tracks
-    //     .cursor/, so an embedded absolute path would break clones).
-    const isWorkspaceLocal = workspaceRoot && configDir.startsWith(workspaceRoot);
+    // Always emit MCP_WC_PROJECT_ROOT when a workspace is open. Cursor and
+    // Windsurf don't guarantee that the MCP child process's cwd matches the
+    // workspace root — the editor may spawn from $HOME, the install dir, or
+    // anywhere else — so loadConfig() needs an explicit anchor to find
+    // custom-elements.json, tsconfig.json, and token files.
+    //
+    // The portability tradeoff for committed workspace configs is real but
+    // narrow: if a user commits .cursor/mcp.json, every clone will need to
+    // re-run "Helixir: Configure for Cursor/Windsurf" to rewrite the
+    // absolute path. That's an acceptable cost vs. silently broken MCP
+    // resolution on the original author's machine.
     const configPath = vscode.workspace.getConfiguration('helixir').get<string>('configPath', '');
     const hasConfigPath = configPath !== undefined && configPath.trim() !== '';
-    if (workspaceRoot && (!isWorkspaceLocal || hasConfigPath)) {
+    if (workspaceRoot) {
       env['MCP_WC_PROJECT_ROOT'] = workspaceRoot;
     }
     // Forward MCP_WC_CONFIG_PATH only when we can pair it with a known

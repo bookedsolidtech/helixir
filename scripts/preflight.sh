@@ -96,17 +96,51 @@ if [ -n "$COMMON_ANCESTOR" ]; then
     | grep -E '^(src/|packages/[^/]+/src/|packages/[^/]+/action\.yml$)' \
     | grep -v '\.test\.ts$' \
     || true)
-  # Detect publish-relevant package.json edits via line-level diff inspection.
-  # Anchor the match to top-level keys (exactly 2-space indent on `+`/`-` lines)
-  # so nested metadata like `author.name`, `repository.type`, or transitive
-  # `dependencies` blocks inside lockfile-shaped fixtures don't trip the gate.
-  PUBLISH_RELEVANT_FIELDS='"(version|name|files|bin|main|module|types|exports|engines|dependencies|peerDependencies)"'
-  PKG_CHANGED=$(git diff --unified=0 "$COMMON_ANCESTOR"...HEAD -- '*package.json' \
-    | grep -E "^[+-]  ${PUBLISH_RELEVANT_FIELDS}:" \
-    || true)
+  # Detect publish-relevant package.json edits via structural JSON diff.
+  # Top-level keys on the publish-relevant list are compared between the
+  # before and after revisions of every changed package.json. Any added,
+  # removed, or modified entry — including individual dep version bumps
+  # inside `dependencies` / `peerDependencies` — flips the gate. Nested
+  # metadata like `author.name` or `repository.type` is ignored because
+  # only the listed top-level keys are inspected.
+  PKG_FILES=$(git diff --name-only "$COMMON_ANCESTOR"...HEAD -- '*package.json' || true)
+  PKG_CHANGED=""
+  if [ -n "$PKG_FILES" ]; then
+    PKG_CHANGED=$(BASE_REF="$COMMON_ANCESTOR" PKG_FILES="$PKG_FILES" node -e "
+      const { execFileSync } = require('child_process');
+      const baseRef = process.env.BASE_REF;
+      const files = process.env.PKG_FILES.split('\n').filter(Boolean);
+      const fields = [
+        'version','name','files','bin','main','module','types','exports',
+        'engines','dependencies','peerDependencies'
+      ];
+      const readAt = (ref, file) => {
+        try {
+          return JSON.parse(execFileSync('git', ['show', ref + ':' + file], { stdio: ['ignore','pipe','ignore'] }).toString('utf-8'));
+        } catch { return null; }
+      };
+      const stableStringify = (v) => {
+        if (v === null || typeof v !== 'object') return JSON.stringify(v);
+        if (Array.isArray(v)) return '[' + v.map(stableStringify).join(',') + ']';
+        return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + stableStringify(v[k])).join(',') + '}';
+      };
+      const releaseBearing = [];
+      for (const file of files) {
+        const before = readAt(baseRef, file);
+        const after = readAt('HEAD', file);
+        if (!before && !after) continue;
+        for (const field of fields) {
+          if (stableStringify(before && before[field]) !== stableStringify(after && after[field])) {
+            releaseBearing.push(file);
+            break;
+          }
+        }
+      }
+      if (releaseBearing.length) console.log(releaseBearing.join('\n'));
+    " 2>/dev/null || true)
+  fi
   if [ -n "$PKG_CHANGED" ]; then
-    PKG_FILES=$(git diff --name-only "$COMMON_ANCESTOR"...HEAD -- '*package.json' || true)
-    RAW_CHANGED=$(printf '%s\n%s\n' "$RAW_CHANGED" "$PKG_FILES" | grep -v '^$' || true)
+    RAW_CHANGED=$(printf '%s\n%s\n' "$RAW_CHANGED" "$PKG_CHANGED" | grep -v '^$' || true)
   fi
   CHANGED_SOURCES="$RAW_CHANGED"
   if [ -n "$EXCLUDED_PACKAGES" ]; then

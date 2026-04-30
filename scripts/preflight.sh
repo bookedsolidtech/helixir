@@ -97,9 +97,12 @@ if [ -n "$COMMON_ANCESTOR" ]; then
     | grep -v '\.test\.ts$' \
     || true)
   # Detect publish-relevant package.json edits via line-level diff inspection.
+  # Anchor the match to top-level keys (exactly 2-space indent on `+`/`-` lines)
+  # so nested metadata like `author.name`, `repository.type`, or transitive
+  # `dependencies` blocks inside lockfile-shaped fixtures don't trip the gate.
   PUBLISH_RELEVANT_FIELDS='"(version|name|files|bin|main|module|types|exports|engines|dependencies|peerDependencies)"'
   PKG_CHANGED=$(git diff --unified=0 "$COMMON_ANCESTOR"...HEAD -- '*package.json' \
-    | grep -E "^[+-].*${PUBLISH_RELEVANT_FIELDS}" \
+    | grep -E "^[+-]  ${PUBLISH_RELEVANT_FIELDS}:" \
     || true)
   if [ -n "$PKG_CHANGED" ]; then
     PKG_FILES=$(git diff --name-only "$COMMON_ANCESTOR"...HEAD -- '*package.json' || true)

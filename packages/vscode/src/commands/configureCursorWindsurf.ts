@@ -90,26 +90,31 @@ export function registerConfigureCursorWindsurfCommand(context: vscode.Extension
     // workspace defaults even when the user has selected a different one.
     const env: Record<string, string> = {};
     const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    // Only emit MCP_WC_PROJECT_ROOT for the GLOBAL ~/.cursor or
-    // ~/.windsurf config (where the editor spawns from $HOME). For
-    // workspace-local .cursor/mcp.json or .windsurf/mcp.json (configDir
-    // under workspaceRoot), omit it — Cursor/Windsurf already spawn from
-    // the workspace, AND committed/shared workspace configs need to stay
-    // machine-portable (this repo tracks .cursor/, so an absolute path
-    // would break clones on different machines).
+    // MCP_WC_PROJECT_ROOT emission policy:
+    //   - GLOBAL config (~/.cursor or ~/.windsurf, editor spawns from $HOME):
+    //     always emit, otherwise helixir cannot find the workspace.
+    //   - WORKSPACE-LOCAL config (.cursor/mcp.json under workspaceRoot):
+    //     only emit when we are ALSO emitting MCP_WC_CONFIG_PATH, since
+    //     loadConfig() resolves a relative MCP_WC_CONFIG_PATH against
+    //     MCP_WC_PROJECT_ROOT. Without the pair, the relative path falls
+    //     back to the editor host's cwd and the wrong config loads.
+    //     When no configPath is set, skip MCP_WC_PROJECT_ROOT so committed
+    //     workspace configs stay machine-portable (this repo tracks
+    //     .cursor/, so an embedded absolute path would break clones).
     const isWorkspaceLocal = workspaceRoot && configDir.startsWith(workspaceRoot);
-    if (workspaceRoot && !isWorkspaceLocal) {
+    const configPath = vscode.workspace.getConfiguration('helixir').get<string>('configPath', '');
+    const hasConfigPath = configPath !== undefined && configPath.trim() !== '';
+    if (workspaceRoot && (!isWorkspaceLocal || hasConfigPath)) {
       env['MCP_WC_PROJECT_ROOT'] = workspaceRoot;
     }
-    const configPath = vscode.workspace.getConfiguration('helixir').get<string>('configPath', '');
-    // Only forward MCP_WC_CONFIG_PATH when we can pair it with a known
+    // Forward MCP_WC_CONFIG_PATH only when we can pair it with a known
     // MCP_WC_PROJECT_ROOT — without the pair, loadConfig() falls back to
     // the editor host's cwd as projectRoot, which causes relative paths
     // in the selected config to resolve against the wrong tree (and
     // out-of-tree cemPath gets dropped). Skipping configPath entirely in
     // the no-workspace case is safer than emitting a half-configured
     // entry that will silently target the wrong library.
-    if (configPath && configPath.trim() !== '' && workspaceRoot) {
+    if (hasConfigPath && workspaceRoot) {
       // Preserve relative paths verbatim so the generated mcp.json stays
       // portable across machines and clones. loadConfig() resolves
       // relative MCP_WC_CONFIG_PATH against MCP_WC_PROJECT_ROOT at

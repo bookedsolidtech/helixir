@@ -1,4 +1,5 @@
 #!/bin/sh
+# rea:commit-msg v1
 # .husky/commit-msg — optionally BLOCKS commits that contain AI attribution
 #
 # OPT-IN: Only enforces when .rea/policy.yaml contains:
@@ -38,11 +39,37 @@ fi
 
 # ── Check if attribution blocking is enabled ───────────────────────────────────
 # Look for block_ai_attribution: true in .rea/policy.yaml
-# When unset/false, the attribution patterns are skipped, but commitlint still
-# runs at the end of this hook so the conventional-commit contract holds.
-ATTRIBUTION_ACTIVE=0
-if [ -f ".rea/policy.yaml" ] && grep -qE '^block_ai_attribution:[[:space:]]*true' ".rea/policy.yaml" 2>/dev/null; then
-  ATTRIBUTION_ACTIVE=1
+# If not found or not true, exit 0 (normal commit behavior)
+
+# Helper: chain extension fragments under .husky/commit-msg.d/ in lex
+# order. Defined once and called from every exit path so consumers get
+# consistent behavior regardless of whether attribution blocking ran.
+chain_commit_msg_fragments() {
+  REA_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+  ext_dir="${REA_ROOT}/.husky/commit-msg.d"
+  if [ -d "$ext_dir" ]; then
+    for frag in "$ext_dir"/*; do
+      [ -e "$frag" ] || continue
+      [ -f "$frag" ] || continue
+      [ -x "$frag" ] || continue
+      "$frag" "$COMMIT_MSG_FILE"
+    done
+  fi
+}
+
+POLICY_FILE=".rea/policy.yaml"
+if [ ! -f "$POLICY_FILE" ]; then
+  chain_commit_msg_fragments
+  exit 0
+fi
+
+# Simple grep — no YAML parser dependency needed for a boolean flag
+if ! grep -qE '^block_ai_attribution:[[:space:]]*true' "$POLICY_FILE" 2>/dev/null; then
+  # Attribution blocking is disabled — still chain extension fragments
+  # (consumers may want commitlint/conventional-commits checks regardless
+  # of rea's attribution stance).
+  chain_commit_msg_fragments
+  exit 0
 fi
 
 # ── Attribution blocking is enabled — check patterns ───────────────────────────
@@ -50,7 +77,6 @@ fi
 BLOCKED=0
 MATCHES=""
 
-if [ "$ATTRIBUTION_ACTIVE" -eq 1 ]; then
 # Pattern 1: Co-Authored-By with noreply@ email
 if grep -qiE 'Co-Authored-By:.*noreply@' "$COMMIT_MSG_FILE" 2>/dev/null; then
   BLOCKED=1
@@ -84,7 +110,6 @@ if grep -qE '🤖.*[Gg]enerated' "$COMMIT_MSG_FILE" 2>/dev/null; then
   BLOCKED=1
   MATCHES="${MATCHES}$(grep -nE '🤖.*[Gg]enerated' "$COMMIT_MSG_FILE" 2>/dev/null)
 "
-fi
 fi
 
 # ── Block or allow ─────────────────────────────────────────────────────────────
@@ -124,20 +149,14 @@ fi
 # Normalize trailing newlines (cosmetic, non-fatal)
 perl -i -0777 -pe 's/\n+$/\n/' "$COMMIT_MSG_FILE" 2>/dev/null || true
 
-# ── Project extension: commitlint (NOT rea-managed) ──────────────────────────
-# rea v0.11.0's commit-msg hook only handles AI attribution. Helixir relies on
-# conventional commit messages (commitlint.config.cjs); without this tail the
-# release/changeset workflow erodes over time. WARNING: `rea upgrade --force`
-# will overwrite the whole file and strip this block; re-apply after each
-# upgrade until the rea installer ships an extensibility hook for downstream
-# validators.
-if [ -x "node_modules/.bin/commitlint" ]; then
-  node_modules/.bin/commitlint --edit "$COMMIT_MSG_FILE"
-elif command -v pnpm > /dev/null 2>&1; then
-  pnpm exec commitlint --edit "$COMMIT_MSG_FILE"
-else
-  printf 'commit-msg: commitlint not available — install dependencies (pnpm install) before committing.\n' >&2
-  exit 1
-fi
+# ── Extension-hook chaining ────────────────────────────────────────────────────
+# Source every executable file under `.husky/commit-msg.d/` in lexical order.
+# Missing directory = no-op (backward compatible). Each fragment receives the
+# commit-msg file path as $1. Non-zero exit fails the commit (set -e above).
+#
+# Fragments run AFTER rea's attribution check so HALT/governance enforcement
+# happens first; consumers can layer on commitlint, conventional-commits
+# linters, or branch-policy checks without losing rea coverage.
+chain_commit_msg_fragments
 
 exit 0

@@ -1,4 +1,4 @@
-# .rea/policy.yaml — managed by rea v0.4.0
+# .rea/policy.yaml — managed by rea v0.13.0
 # Edit carefully: tightening takes effect on next load; loosening requires human approval.
 version: '1'
 profile: 'bst-internal'
@@ -11,7 +11,8 @@ block_ai_attribution: true
 blocked_paths:
   - '.env'
   - '.env.*'
-  - '.reagent/HALT'
+  - '.rea/HALT'
+  - '.rea/policy.yaml'
 notification_channel: ''
 injection:
   suspicious_blocks_writes: true
@@ -24,3 +25,9 @@ context_protection:
 review:
   concerns_blocks: true
   codex_required: true
+  # 0.13.0 J feature: auto-narrow large branches to the last N commits to
+  # avoid the 10-min codex timeout that wedged the 0.11.0 round-43 retry.
+  # `last_n_commits` is a hard cap; `auto_narrow_threshold` is the trigger.
+  last_n_commits: 10
+  auto_narrow_threshold: 30
+  timeout_ms: 1800000

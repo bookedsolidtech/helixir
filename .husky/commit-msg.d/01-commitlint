@@ -1,0 +1,22 @@
+#!/bin/sh
+# .husky/commit-msg.d/01-commitlint — conventional-commit enforcement
+#
+# Runs after rea's commit-msg body (AI-attribution check + trailing-newline
+# normalize). Validates the message against commitlint.config.cjs so
+# release/changeset workflow keeps semantic-release happy.
+#
+# Hard-fails when commitlint is unavailable: the conventional-commit gate
+# is a project requirement, not an opt-in convenience.
+
+set -eu
+
+COMMIT_MSG_FILE="$1"
+
+if [ -x "node_modules/.bin/commitlint" ]; then
+  exec node_modules/.bin/commitlint --edit "$COMMIT_MSG_FILE"
+elif command -v pnpm >/dev/null 2>&1; then
+  exec pnpm exec commitlint --edit "$COMMIT_MSG_FILE"
+else
+  printf 'commit-msg: commitlint not available — install dependencies (pnpm install) before committing.\n' >&2
+  exit 1
+fi

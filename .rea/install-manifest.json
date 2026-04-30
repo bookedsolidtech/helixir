@@ -1,8 +1,8 @@
 {
-  "version": "0.11.0",
+  "version": "0.13.0",
   "profile": "bst-internal",
   "installed_at": "2026-04-19T16:42:10.152Z",
-  "upgraded_at": "2026-04-26T20:44:25.569Z",
+  "upgraded_at": "2026-04-30T01:40:40.987Z",
   "files": [
     {
       "path": ".claude/hooks/_lib/common.sh",
@@ -151,12 +151,12 @@
     },
     {
       "path": ".husky/commit-msg",
-      "sha256": "ed152fb17c99606844d162e924bffb0563ad3aee800b1a087ac540cd96e82041",
+      "sha256": "e1f5f8a8a7536d13fa5f3fe168326c9caaf5cc14352064f13857a5fceb1eb23f",
       "source": "husky"
     },
     {
       "path": ".husky/pre-push",
-      "sha256": "eea09ad5e7b4200383f7ca09ae8761431268017887d1c5ee8354b3d7b2966a7e",
+      "sha256": "8184bc33231e1c1b225a1887ac06a4611e78d594e4251e05e51773e48519fb5a",
       "source": "husky"
     },
     {
@@ -166,7 +166,7 @@
     },
     {
       "path": "CLAUDE.md#rea:managed:v1",
-      "sha256": "d7af71fcc9477ad7053cb41ae92af90a5723f0af456dec61d6a02b729e5084f9",
+      "sha256": "34aa581ef1b06733525b00efbd5e03509d7b23bffb2e93ba66435ccb645c5d46",
       "source": "claude-md"
     }
   ]

@@ -72,8 +72,8 @@ Exception: simple read-only questions and direct clarifications may be answered 
 ## REA Governance (managed — do not edit this block)
 
 - **Policy**: `.rea/policy.yaml` — profile `bst-internal`
-- **Autonomy**: `L1` (ceiling `L2`)
-- **Blocked paths**: 5 entries — see the policy file
+- **Autonomy**: `L3` (ceiling `L3`)
+- **Blocked paths**: 3 entries — see the policy file
 - **block_ai_attribution**: `true` (enforced by commit-msg hook)
 
 Protected-path changes (`src/gateway/middleware/`, `hooks/`, `src/policy/`,

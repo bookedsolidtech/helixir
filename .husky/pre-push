@@ -31,6 +31,12 @@ if [ -f "${REA_ROOT}/.rea/HALT" ]; then
   exit 1
 fi
 
+# Save git's original pre-push argv (<remote-name> <remote-url>) BEFORE
+# the `set --` branches below clobber $@ with the rea CLI invocation.
+# Extension fragments under .husky/pre-push.d/ need the git argv, not
+# the rea one. Re-injected at the fragment loop site below.
+rea_orig_argv="$*"
+
 # Dispatch the rea CLI as a positional-args list rather than a string
 # (the 0.11.x `exec $REA_BIN ...` pattern broke when REA_ROOT contained
 # whitespace because the unquoted $REA_BIN expansion underwent word
@@ -103,7 +109,7 @@ if [ -d "$ext_dir" ]; then
     # Each fragment runs in its own subprocess with the original git args.
     # Failures propagate via `set -eu` above (loop body inherits, so any
     # non-zero exit blocks the push immediately).
-    "$frag" "$@"
+    "$frag" $rea_orig_argv
   done
 fi
 

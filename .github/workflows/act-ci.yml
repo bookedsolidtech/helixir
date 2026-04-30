@@ -53,7 +53,7 @@ jobs:
         # `--full` flag wants only the host's current Node version. Use
         # ACT_HOST_NODE (set by act-ci.sh from `node --version`) to scope
         # the matrix; otherwise sweep all supported versions.
-        node-version: ${{ (env.ACT_MATRIX_TESTS != 'true' && env.ACT_FULL_TESTS == 'true' && env.ACT_HOST_NODE != '') && fromJSON(format('[{0}]', env.ACT_HOST_NODE)) || fromJSON('[20, 22, 24]') }}
+        node-version: ${{ (env.ACT_MATRIX_TESTS != 'true' && env.ACT_FULL_TESTS == 'true' && env.ACT_HOST_NODE != '') && fromJSON(format('[{0}]', env.ACT_HOST_NODE)) || fromJSON('[22, 24]') }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node ${{ matrix.node-version }} via nvm

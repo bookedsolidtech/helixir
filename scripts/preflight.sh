@@ -84,14 +84,28 @@ EXCLUDED_PACKAGES=$(node -e "
 
 CHANGED_SOURCES=""
 if [ -n "$COMMON_ANCESTOR" ]; then
-  # Release-bearing changes include not just src/ but also publish-affecting
-  # metadata: root package.json, packages/*/package.json (engines, exports,
-  # deps), and the github-action's action.yml. Edits to these can ship a
-  # semver-relevant change without ever touching src/.
-  CHANGED_SOURCES=$(git diff --name-only "$COMMON_ANCESTOR"...HEAD \
-    | grep -E '^(src/|packages/[^/]+/src/|package\.json$|packages/[^/]+/package\.json$|packages/[^/]+/action\.yml$)' \
+  # Release-bearing changes:
+  #   - Source code under src/ or packages/*/src/
+  #   - github-action's action.yml (the published action contract)
+  #   - package.json edits that touch publish-relevant fields (deps,
+  #     peerDependencies, engines, exports, version, files, bin, main,
+  #     module, types). Tooling-only edits (devDependencies, scripts,
+  #     workspace config) explicitly do NOT trigger the gate — those are
+  #     the documented "infra-only" exception.
+  RAW_CHANGED=$(git diff --name-only "$COMMON_ANCESTOR"...HEAD \
+    | grep -E '^(src/|packages/[^/]+/src/|packages/[^/]+/action\.yml$)' \
     | grep -v '\.test\.ts$' \
     || true)
+  # Detect publish-relevant package.json edits via line-level diff inspection.
+  PUBLISH_RELEVANT_FIELDS='"(version|name|files|bin|main|module|types|exports|engines|dependencies|peerDependencies)"'
+  PKG_CHANGED=$(git diff --unified=0 "$COMMON_ANCESTOR"...HEAD -- '*package.json' \
+    | grep -E "^[+-].*${PUBLISH_RELEVANT_FIELDS}" \
+    || true)
+  if [ -n "$PKG_CHANGED" ]; then
+    PKG_FILES=$(git diff --name-only "$COMMON_ANCESTOR"...HEAD -- '*package.json' || true)
+    RAW_CHANGED=$(printf '%s\n%s\n' "$RAW_CHANGED" "$PKG_FILES" | grep -v '^$' || true)
+  fi
+  CHANGED_SOURCES="$RAW_CHANGED"
   if [ -n "$EXCLUDED_PACKAGES" ]; then
     while IFS= read -r excluded_pkg; do
       [ -z "$excluded_pkg" ] && continue

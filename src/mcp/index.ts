@@ -165,18 +165,18 @@ export async function main(): Promise<void> {
   const resolvedProjectRoot = resolve(config.projectRoot);
   const cemAbsPath = resolve(resolvedProjectRoot, config.cemPath);
 
-  // Containment check on cemPath. Skip when the user has explicitly
-  // pointed at an out-of-tree manifest via MCP_WC_CEM_PATH (env override —
-  // shared/monorepo CEMs in central locations are a documented use case
-  // and the operator has explicitly opted in). Otherwise the check stays
-  // fail-closed against accidental path traversal via config files.
-  const cemEnvOverride = process.env['MCP_WC_CEM_PATH'];
-  const envOptIn = cemEnvOverride !== undefined && cemEnvOverride !== '';
-  if (
-    !envOptIn &&
-    !cemAbsPath.startsWith(resolvedProjectRoot + sep) &&
-    cemAbsPath !== resolvedProjectRoot
-  ) {
+  // Containment check on cemPath: must stay inside projectRoot.
+  //
+  // Even with MCP_WC_CEM_PATH explicitly set, we don't bypass: relative
+  // values like `../shared/custom-elements.json` are still
+  // path-traversal vectors, AND out-of-tree absolute paths break
+  // git-backed tools (diffCem, getHealthDiff via GitOperations.gitShow,
+  // which rejects absolute paths). Silently degrading those tools is
+  // worse than fail-fast at startup.
+  //
+  // Operators who genuinely need a shared/monorepo CEM should symlink
+  // it INTO the workspace or vendor it at a stable in-tree location.
+  if (!cemAbsPath.startsWith(resolvedProjectRoot + sep) && cemAbsPath !== resolvedProjectRoot) {
     process.stderr.write(`Fatal: cemPath resolves outside of projectRoot. Refusing to load.\n`);
     process.exit(1);
   }

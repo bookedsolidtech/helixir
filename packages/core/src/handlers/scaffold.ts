@@ -221,14 +221,16 @@ function generateComponentSource(
     // `conventions.packageName` is also unsafe (it is the package of any
     // inherited member, not necessarily the base class).
     //
-    // Use ONLY the package specifier. CEM `superclass.module` points to
-    // where the SAMPLED base class was declared — not a path that resolves
-    // from the new scaffolded component's destination. For local base
-    // classes only recorded as `module`, emit a TODO marker so the consumer
-    // wires the import manually rather than shipping a broken relative
-    // path that breaks compilation in any directory other than the source.
+    // Prefer package (portable to any destination), fall back to module.
+    // CEM `superclass.module` is relative to the sampled declaration, so
+    // it only works when the scaffolded file shares the source layout —
+    // imperfect, but better than emitting a `// TODO` for libraries that
+    // ONLY record local base-class modules. Consumers who scaffold into
+    // a different folder still need to fix the relative path manually.
     const baseSpecifier =
-      baseClass === conventions.baseClass ? (conventions.baseClassPackage ?? null) : null;
+      baseClass === conventions.baseClass
+        ? (conventions.baseClassPackage ?? conventions.baseClassModule ?? null)
+        : null;
     if (baseSpecifier) {
       lines.push(`import { ${baseClass} } from '${baseSpecifier}';`);
     } else {

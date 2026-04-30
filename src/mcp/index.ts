@@ -2,7 +2,7 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { existsSync, readFileSync, watch as fsWatch } from 'fs';
-import { resolve, relative, sep } from 'path';
+import { isAbsolute, resolve, relative, sep } from 'path';
 import { loadConfig } from '../../packages/core/src/config.js';
 import { handleToolError } from '../../packages/core/src/shared/error-handling.js';
 import { CemSchema, loadLibrary, resolveCem } from '../../packages/core/src/handlers/cem.js';
@@ -165,18 +165,25 @@ export async function main(): Promise<void> {
   const resolvedProjectRoot = resolve(config.projectRoot);
   const cemAbsPath = resolve(resolvedProjectRoot, config.cemPath);
 
-  // Containment check on cemPath: must stay inside projectRoot.
-  //
-  // Even with MCP_WC_CEM_PATH explicitly set, we don't bypass: relative
-  // values like `../shared/custom-elements.json` are still
-  // path-traversal vectors, AND out-of-tree absolute paths break
-  // git-backed tools (diffCem, getHealthDiff via GitOperations.gitShow,
-  // which rejects absolute paths). Silently degrading those tools is
-  // worse than fail-fast at startup.
-  //
-  // Operators who genuinely need a shared/monorepo CEM should symlink
-  // it INTO the workspace or vendor it at a stable in-tree location.
-  if (!cemAbsPath.startsWith(resolvedProjectRoot + sep) && cemAbsPath !== resolvedProjectRoot) {
+  // Containment check on cemPath:
+  //   - Bypass ONLY when MCP_WC_CEM_PATH is set to an ABSOLUTE path.
+  //     The env var is a documented escape hatch for editor/CI setups
+  //     that point at a shared/fixture CEM. Absolute = explicit user
+  //     intent, no path-traversal exposure.
+  //   - Relative env-var values (e.g. `../shared/cem.json`) and
+  //     config-file values are still subject to containment — those
+  //     ARE traversal vectors.
+  //   - Trade-off: out-of-tree CEMs degrade git-backed tools (diffCem,
+  //     getHealthDiff) silently because gitShow rejects absolute paths.
+  //     Documented in CONTRIBUTING.md.
+  const cemEnvOverride = process.env['MCP_WC_CEM_PATH'];
+  const envOptIn =
+    cemEnvOverride !== undefined && cemEnvOverride !== '' && isAbsolute(cemEnvOverride);
+  if (
+    !envOptIn &&
+    !cemAbsPath.startsWith(resolvedProjectRoot + sep) &&
+    cemAbsPath !== resolvedProjectRoot
+  ) {
     process.stderr.write(`Fatal: cemPath resolves outside of projectRoot. Refusing to load.\n`);
     process.exit(1);
   }

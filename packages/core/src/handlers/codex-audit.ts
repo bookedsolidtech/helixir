@@ -161,8 +161,24 @@ export async function auditComponentWithCodex(
   }
   // Project the requested-but-not-yet-existing portion through the
   // canonical ancestor so future-real path stays in-tree even when
-  // the user passed a symlinked absolute path.
+  // the user passed a symlinked absolute path. Two pitfalls:
+  //   1. Symlink-aliased absolute paths (round 47) — solved by
+  //      projecting through ancestorReal.
+  //   2. Unresolved `..` in the tail (round 52) — `missing/../../tmp/x`
+  //      leaves ancestor at repo root and tail at `/missing/../../tmp/x`.
+  //      String-concat passes the startsWith check but mkdir resolves
+  //      the `..` and creates outside the project. Reject any tail
+  //      containing `..` segments — there's no legitimate need for
+  //      `..` AFTER an existing ancestor (the ancestor walk already
+  //      resolved the parent traversal that exists on disk).
   const tail = requestedAuditsRoot.slice(ancestor.length);
+  const tailSegments = tail.split(sep).filter((s) => s !== '');
+  if (tailSegments.includes('..')) {
+    throw new MCPError(
+      `auditsRoot contains parent-traversal segments after missing ancestor: "${auditsRootRaw}"`,
+      ErrorCategory.VALIDATION,
+    );
+  }
   const projectedReal = ancestorReal + tail;
   const projectedInProject =
     projectedReal === projectAbs || projectedReal.startsWith(projectAbs + sep);

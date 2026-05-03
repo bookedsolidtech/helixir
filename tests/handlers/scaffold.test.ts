@@ -346,7 +346,12 @@ describe('scaffoldComponent — non-Lit base class import', () => {
     expect(result.component).not.toContain('LitElement,');
   });
 
-  it('falls back to the module path when no package is recorded', () => {
+  it('emits TODO when only a local-relative module path is recorded (runbook §4b)', () => {
+    // Per runbook §4b: package wins, BARE-SPECIFIER module fallback,
+    // local-relative module → TODO. A relative module path (./foo.js)
+    // is source-relative and won't resolve at the scaffold destination,
+    // so the right move is to flag it explicitly rather than emit a
+    // broken-by-default import.
     const MODULE_ONLY_CEM: Cem = {
       schemaVersion: '1.0.0',
       modules: [
@@ -369,7 +374,8 @@ describe('scaffoldComponent — non-Lit base class import', () => {
       ],
     };
     const result = scaffoldComponent({ tagName: 'hx-card' }, MODULE_ONLY_CEM);
-    expect(result.component).toContain("import { CustomBase } from './custom-base.js';");
+    expect(result.component).toContain('TODO: import { CustomBase }');
+    expect(result.component).not.toContain("from './custom-base.js'");
   });
 
   it('emits a TODO import when options.baseClass overrides the detected base class', () => {

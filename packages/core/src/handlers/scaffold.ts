@@ -212,31 +212,43 @@ function generateComponentSource(
   lines.push(`import { customElement, property } from 'lit/decorators.js';`);
   if (baseClass !== 'LitElement') {
     // Only trust origin metadata that belongs to THIS specific base class.
-    // When options.baseClass overrides the detected one (e.g. caller forces
-    // FormAssociatedMixin while the library's detected base is
-    // BookedSolidElement), conventions.baseClassPackage/module describes the
-    // detected class, not the override — using it would import the override
-    // from the wrong package. Use the detected origin only when the names
-    // match; otherwise fall through to the TODO marker.
-    // `conventions.packageName` is also unsafe (it is the package of any
-    // inherited member, not necessarily the base class).
+    // Pinned per `bst-cto-kb/Projects/HELiXiR/HELiXiR migration retry
+    // runbook — rea 0.13.0 (2026-05-03).md` §4b: **package wins,
+    // bare-specifier module fallback, local-relative module → TODO.**
     //
-    // Prefer package (portable to any destination), fall back to module.
-    // CEM `superclass.module` is relative to the sampled declaration, so
-    // it only works when the scaffolded file shares the source layout —
-    // imperfect, but better than emitting a `// TODO` for libraries that
-    // ONLY record local base-class modules. Consumers who scaffold into
-    // a different folder still need to fix the relative path manually.
+    // The runbook recommends "module-first with package fallback" in
+    // the COMMON case where module is a published bare specifier
+    // (matches Node resolution). But CEM `superclass.module` is often
+    // a SOURCE-relative path that won't resolve at an arbitrary
+    // scaffold destination. Codex round-3 P2 correctly flagged that
+    // emitting such imports is broken-by-default. The reconciled
+    // pin: prefer package (portable everywhere); fall back to module
+    // only when it looks like a bare specifier; otherwise TODO.
+    //
+    // When options.baseClass overrides the detected one (e.g. caller
+    // forces FormAssociatedMixin while the library's detected base is
+    // BookedSolidElement), conventions.* describes the detected class,
+    // not the override — using it would import the override from the
+    // wrong package. Use the detected origin only when the names match.
+    const isBareSpecifier = (s: string): boolean =>
+      s !== '' && !s.startsWith('.') && !s.startsWith('/');
+    const moduleIsBare =
+      typeof conventions.baseClassModule === 'string' &&
+      isBareSpecifier(conventions.baseClassModule);
     const baseSpecifier =
       baseClass === conventions.baseClass
-        ? (conventions.baseClassPackage ?? conventions.baseClassModule ?? null)
+        ? (conventions.baseClassPackage ??
+          (moduleIsBare ? conventions.baseClassModule : null) ??
+          null)
         : null;
     if (baseSpecifier) {
       lines.push(`import { ${baseClass} } from '${baseSpecifier}';`);
     } else {
-      // Origin unknown (or override with no available metadata) — emit a TODO
-      // so the generated file flags the missing import explicitly rather than
-      // silently referencing an undefined or wrong symbol.
+      // Origin unknown, override with no metadata, OR module is a
+      // local-relative path that won't resolve at the destination.
+      // Emit a TODO so the generated file flags the missing import
+      // explicitly rather than silently referencing an undefined or
+      // wrong symbol.
       lines.push(`// TODO: import { ${baseClass} } from '<package>';`);
     }
   }

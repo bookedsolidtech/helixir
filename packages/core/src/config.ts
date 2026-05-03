@@ -144,15 +144,21 @@ function rebaseRelativePaths(
     const absolute = isAbsolute(value) ? value : resolve(configDir, value);
     const inRoot = absolute === normalizedRoot || absolute.startsWith(normalizedRoot + sep);
     if (!inRoot) {
-      // Out-of-tree cemPath: drop with warning. Preserving lets the path
-      // reach MCP startup, where the containment check fatals — the
-      // server fails to start at all rather than analyzing the workspace
-      // with defaults. tsconfig/tokens/health are preserved as absolute
-      // because their handlers tolerate absolute paths via plain
-      // resolve().
-      if (field === 'cemPath') {
+      // Out-of-tree cemPath: pinned per `bst-cto-kb/Projects/HELiXiR/
+      // HELiXiR migration retry runbook — rea 0.13.0 (2026-05-03).md` §4a:
+      // **drop with explicit allowlist override.**
+      //
+      // Default is drop (defense-in-depth — out-of-tree absolute paths
+      // are a path-traversal vector for the MCP server). Set
+      // `MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1` to opt back in for
+      // legitimate sibling-repo / vendored-CEM use cases. This pins
+      // codex's flip-flopping (drop R9/R17/R21/R28/R36/R38 vs
+      // preserve R19/R20/R24/R30/R37/R40) into one deliberate position
+      // with a documented escape hatch.
+      const allowExternal = process.env['MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS'] === '1';
+      if (field === 'cemPath' && !allowExternal) {
         process.stderr.write(
-          `[helixir] Warning: cemPath in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Using default. (For out-of-tree CEMs set MCP_WC_CEM_PATH directly.)\n`,
+          `[helixir] Warning: cemPath in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Dropping per defense-in-depth default. (To allow: set MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1, or set MCP_WC_CEM_PATH directly.)\n`,
         );
         dropped.add(field);
       } else {

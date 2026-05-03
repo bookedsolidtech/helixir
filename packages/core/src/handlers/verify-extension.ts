@@ -782,9 +782,26 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
             i = k + 1;
             continue;
           }
-          // Unconditional wrapper (@layer, @scope, etc.) — recurse
-          // into contents with the SAME parent selector so inner
-          // rules still surface their real selectors.
+          // Unconditional wrapper (@layer, @scope, etc.). Two passes:
+          //   1. Extract direct declarations (depth-0 inside the
+          //      at-rule body) and emit them as a leaf for parentSel.
+          //      Codex round-71 P2: without this,
+          //      `button { @layer foo { width: 1.5rem } }` lost the
+          //      width rule because parseBlock treats depth-0 decls
+          //      as orphans.
+          //   2. Recurse into nested rules with the SAME parent so
+          //      inner selector blocks still surface (round 70 P2).
+          if (parentSel !== '') {
+            let atDecl = '';
+            let dd = 0;
+            for (let p = 0; p < inner.length; p++) {
+              const c = inner[p];
+              if (c === '{') dd++;
+              else if (c === '}') dd--;
+              else if (dd === 0) atDecl += c;
+            }
+            if (atDecl.trim() !== '') out.push({ selector: parentSel, body: atDecl });
+          }
           parseBlock(inner, parentSel);
           i = k + 1;
           continue;

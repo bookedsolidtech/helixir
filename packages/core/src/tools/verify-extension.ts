@@ -163,17 +163,18 @@ function findDecl(cem: Cem, tagName: string): CemDeclaration | null {
 }
 
 async function readSourceFile(projectRoot: string, path: string): Promise<string> {
-  // Path containment: reject absolute paths and ../ traversal so the
-  // tool can't be coerced into reading arbitrary host files. The
-  // resolved path must stay inside projectRoot. Codex round-31 P2.
-  if (isAbsolute(path)) {
-    throw new MCPError(`Source path must be project-relative: "${path}"`, ErrorCategory.VALIDATION);
-  }
+  // Path containment: the resolved final path must stay inside
+  // projectRoot. Absolute paths are accepted ONLY when they resolve
+  // inside projectRoot — useful for monorepo callers that pass an
+  // explicit absolute path to a sub-package source file. Same
+  // structure as auditsRoot in handlers/codex-audit.ts (codex
+  // round-37 P2). Codex round-31 P2 (initial guard) + round-41 P1
+  // (in-repo absolute should work).
   const projectAbs = resolve(projectRoot);
-  const abs = resolve(projectAbs, path);
+  const abs = isAbsolute(path) ? path : resolve(projectAbs, path);
   if (abs !== projectAbs && !abs.startsWith(projectAbs + sep)) {
     throw new MCPError(
-      `Source path escapes projectRoot via ../: "${path}"`,
+      `Source path escapes projectRoot: "${path}" resolves to "${abs}"`,
       ErrorCategory.VALIDATION,
     );
   }

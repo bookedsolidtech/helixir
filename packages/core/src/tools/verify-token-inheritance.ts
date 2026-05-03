@@ -295,22 +295,20 @@ function deriveOverlaysFromTokens(
 }
 
 async function loadCssSources(projectRoot: string, paths: string[]): Promise<string[]> {
-  // Path containment: reject absolute paths and ../ traversal so the
-  // tool can't be coerced into reading arbitrary host files. The
-  // resolved path must stay inside projectRoot. Codex round-31 P2.
+  // Path containment: the resolved final path must stay inside
+  // projectRoot. Absolute paths are accepted ONLY when they resolve
+  // inside projectRoot — useful for monorepo callers that pass an
+  // explicit absolute path to a sub-package CSS file. Same structure
+  // as auditsRoot in handlers/codex-audit.ts (codex round-37 P2) +
+  // verify-extension's readSourceFile (round-41). Codex round-31 P2
+  // (initial guard) + round-41 P1.
   const projectAbs = resolve(projectRoot);
   const out: string[] = [];
   for (const p of paths) {
-    if (isAbsolute(p)) {
-      throw new MCPError(
-        `CSS source path must be project-relative: "${p}"`,
-        ErrorCategory.VALIDATION,
-      );
-    }
-    const abs = resolve(projectAbs, p);
+    const abs = isAbsolute(p) ? p : resolve(projectAbs, p);
     if (abs !== projectAbs && !abs.startsWith(projectAbs + sep)) {
       throw new MCPError(
-        `CSS source path escapes projectRoot via ../: "${p}"`,
+        `CSS source path escapes projectRoot: "${p}" resolves to "${abs}"`,
         ErrorCategory.VALIDATION,
       );
     }

@@ -173,20 +173,35 @@ async function loadInlineDtcgDeprecations(config: McpWcConfig): Promise<Deprecat
     : resolve(config.projectRoot, config.tokensPath);
   if (!existsSync(tokensAbs)) return [];
 
+  // Surface read / parse failures via stderr so consumers see why
+  // their inline `$deprecated` metadata isn't being honored. Codex
+  // round-41 P2: silently returning [] here meant a malformed
+  // tokens.json hid every inline deprecation without a single signal.
   let raw: string;
   try {
     raw = await readFile(tokensAbs, 'utf-8');
-  } catch {
+  } catch (err) {
+    process.stderr.write(
+      `[helixir] Warning: could not read tokens.json at ${tokensAbs} for inline $deprecated scan — ${String(err)}\n`,
+    );
     return [];
   }
 
   let parsed: unknown;
   try {
     parsed = JSON.parse(raw);
-  } catch {
+  } catch (err) {
+    process.stderr.write(
+      `[helixir] Warning: tokens.json at ${tokensAbs} is not valid JSON; inline $deprecated scan skipped — ${String(err)}\n`,
+    );
     return [];
   }
-  if (typeof parsed !== 'object' || parsed === null) return [];
+  if (typeof parsed !== 'object' || parsed === null) {
+    process.stderr.write(
+      `[helixir] Warning: tokens.json at ${tokensAbs} top-level is not an object; inline $deprecated scan skipped.\n`,
+    );
+    return [];
+  }
 
   const aliases: DeprecatedAlias[] = [];
   walkDtcgForDeprecations(parsed as Record<string, unknown>, [], aliases);

@@ -254,14 +254,12 @@ function generateComponentSource(
       // `src\\base.js`; either is a local path, not a npm bare specifier.
       // Codex round-13 P2.
       if (s.startsWith('\\') || /^[A-Za-z]:[\\/]/.test(s)) return false;
-      // Conventional repo-directory prefixes (POSIX form)
+      // Normalize Windows backslashes to POSIX so the conventional-prefix
+      // check catches multi-segment paths like `src\\generated\\base.js`
+      // and `node_modules\\pkg\\base.js`. Codex round-21 P2.
+      const normalized = s.includes('\\') ? s.split('\\').join('/') : s;
       for (const prefix of REPO_RELATIVE_PREFIXES) {
-        if (s.startsWith(prefix)) return false;
-      }
-      // Same prefixes, backslash form (Windows-converted POSIX)
-      for (const prefix of REPO_RELATIVE_PREFIXES) {
-        const winPrefix = prefix.replace('/', '\\');
-        if (s.startsWith(winPrefix)) return false;
+        if (normalized.startsWith(prefix)) return false;
       }
       return true;
     };

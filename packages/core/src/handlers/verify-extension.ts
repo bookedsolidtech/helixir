@@ -460,17 +460,22 @@ function checkTouchTarget(
   if (!parentIsInteractive) return [];
 
   const RULE_PATTERN = /([^{}]+)\{([^{}]*)\}/g;
-  // The whole check is gated on parent-component interactivity, so
-  // every selector inside the subclass styles belongs to an
-  // interactive component. We DON'T filter to literal `button` /
-  // `:host` / `[role=...]` selectors — class-only selectors like
-  // `.control` or `.button` are extremely common in helix component
-  // CSS and an interactive component sizing them sub-44px is the
-  // exact regression class we need to catch.
-  // We DO skip selectors that are obviously decorative —
-  // pseudo-elements that paint icons / overlays, and aria-hidden
-  // sub-elements — since those aren't the click surface.
-  // Codex round-44 P2.
+  // Selector heuristic: accept literal interactive elements,
+  // role/tabindex attribute selectors, :host, AND class-name
+  // vocabulary that signals interactivity (`.button`, `.btn`,
+  // `.control`, `.trigger`, `.action`, etc.). Reject layout /
+  // wrapper / decorative classes (`.container`, `.wrapper`, `.row`,
+  // `.col`, `.icon`) and pseudo-elements / aria-hidden subtrees.
+  //
+  // Round-44 P2 widened the filter to ALL selectors (false negatives
+  // on `.control`); round-45 P1 reverted because that produced false
+  // positives on layout helpers (`.container { width: 20px }`,
+  // grid columns). The compromise: enumerate interactive class names
+  // explicitly so `.control`/`.button` are caught while
+  // `.container`/`.row` are not. Matches the runbook §6 pin pattern
+  // — pin the structure, not the regex.
+  const INTERACTIVE_SELECTOR =
+    /(?:^|[\s,>+~])(?:button|a|input|select|textarea|summary|label|:host|\[role\s*=\s*["']?(?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|option|switch|checkbox|radio|combobox|listbox|slider|spinbutton|treeitem|gridcell)["']?\]|\[tabindex(?:=|\])|\.(?:button|btn|control|trigger|action|tab|menuitem|menu-item|option|chip|toggle|switch|checkbox|radio|link|clickable|interactive|target|thumb|handle|nav-item|tile|card-action|cta|hit-area|pressable|swatch-button))(?:[\s,.:[{]|$)/i;
   const DECORATIVE_SELECTOR =
     /::(before|after|placeholder|marker|backdrop|selection|first-line|first-letter)|::part\([^)]*(icon|indicator|chevron|caret|spinner|backdrop)[^)]*\)|\[aria-hidden\b|(?:^|[\s,>+~.])(icon|chevron|caret|spinner|indicator|decoration|ornament|backdrop|overlay|glyph|swatch|dot|pip|bullet|sparkline|sigil|badge-dot)(?:[\s,.:[{]|$)/i;
   const SIZE_RULE = /\b(min-width|min-height|width|height)\s*:\s*([\d.]+)(px|rem)\b/g;
@@ -480,7 +485,9 @@ function checkTouchTarget(
   while ((m = RULE_PATTERN.exec(styles)) !== null) {
     const selector = m[1] ?? '';
     const body = m[2] ?? '';
+    if (selector.trim().startsWith('@')) continue;
     if (DECORATIVE_SELECTOR.test(selector)) continue;
+    if (!INTERACTIVE_SELECTOR.test(selector)) continue;
     let s: RegExpExecArray | null;
     while ((s = SIZE_RULE.exec(body)) !== null) {
       const value = parseFloat(s[2] ?? '0');

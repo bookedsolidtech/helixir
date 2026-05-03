@@ -209,7 +209,32 @@ export function verifyTokenInheritance(
 
 function buildAliasFinding(name: string, canon: CanonicalityResult): AuditFinding {
   const provenance = formatProvenance(canon);
-  const replacement = canon.replacedBy ?? '<unknown>';
+  const hasReplacement =
+    canon.replacedBy !== null && canon.replacedBy !== undefined && canon.replacedBy.trim() !== '';
+  // Plain DTCG `$deprecated: true` (no `$replacedBy`) means the
+  // token is being removed without a rename. Distinct finding —
+  // telling the user to "use <unknown>" as the replacement is wrong.
+  // Codex round-45 P2.
+  if (!hasReplacement) {
+    return {
+      severity: 'P2',
+      classId: '01-token-deprecated-alias',
+      title: `Token \`${name}\` is marked deprecated`,
+      body: [
+        `\`${name}\` is marked deprecated${provenance ? ' ' + provenance : ''} but no canonical replacement is named in the deprecation metadata.`,
+        '',
+        `Treat this as a removal — stop referencing \`${name}\` and migrate to whichever token (or hard-coded value) the upstream library now recommends. Check the upstream changelog for the migration path.`,
+        canon.rationale ? '\n' + canon.rationale : '',
+        canon.removalScheduledFor
+          ? `\nRemoval is scheduled for helix \`${canon.removalScheduledFor}\`.`
+          : '',
+      ]
+        .filter(Boolean)
+        .join('\n'),
+      file: null,
+      line: null,
+    };
+  }
   return {
     severity: 'P2',
     classId: '01-token-deprecated-alias',
@@ -217,7 +242,7 @@ function buildAliasFinding(name: string, canon: CanonicalityResult): AuditFindin
     body: [
       `\`${name}\` is a deprecated alias${provenance ? ' ' + provenance : ''}.`,
       '',
-      `Use the canonical replacement: \`${replacement}\`.`,
+      `Use the canonical replacement: \`${canon.replacedBy}\`.`,
       canon.rationale ? '\n' + canon.rationale : '',
       canon.removalScheduledFor
         ? `\nRemoval is scheduled for helix \`${canon.removalScheduledFor}\`.`
@@ -244,7 +269,9 @@ function buildCssPropDeprecationFinding(
       '',
       `The CEM description (\`${(declaredDescription ?? '').trim() || '<empty>'}\`) does not flag deprecation, so consumers reading the docs would believe \`${name}\` is the current API.`,
       '',
-      `Fix: either remove the \`@cssprop\` from the component (forcing consumers onto the canonical \`${canon.replacedBy ?? '<unknown>'}\`), or annotate the JSDoc with \`@deprecated\` so the CEM reflects the upstream deprecation.`,
+      canon.replacedBy !== null && canon.replacedBy.trim() !== ''
+        ? `Fix: either remove the \`@cssprop\` from the component (forcing consumers onto the canonical \`${canon.replacedBy}\`), or annotate the JSDoc with \`@deprecated\` so the CEM reflects the upstream deprecation.`
+        : `Fix: either remove the \`@cssprop\` from the component (the upstream deprecation does not name a replacement, so consumers should migrate per the upstream changelog) or annotate the JSDoc with \`@deprecated\` so the CEM reflects the upstream deprecation.`,
     ].join('\n'),
     file: null,
     line: null,

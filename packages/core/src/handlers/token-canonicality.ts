@@ -31,7 +31,13 @@ import { MCPError, ErrorCategory } from '../shared/error-handling.js';
 export interface DeprecatedAlias {
   /** The CSS-variable form of the deprecated token name (e.g. "--hx-color-border-on-dark-default"). */
   alias: string;
-  /** The canonical replacement, also CSS-variable form. */
+  /**
+   * The canonical replacement, also CSS-variable form. Empty string
+   * means "deprecated without a named replacement" — the token is
+   * gone but no rename happened (e.g. plain DTCG `$deprecated: true`
+   * without `$replacedBy`). Treat empty as "no canonical". Codex
+   * round-45 P2.
+   */
   replacedBy: string;
   /** Helix release version the deprecation landed in (e.g. "3.2.2"). */
   deprecatedSinceVersion: string | null;

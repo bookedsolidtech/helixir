@@ -155,8 +155,12 @@ function extractTags(name: string): string[] {
   if (
     name.includes('extend') ||
     name === 'verify_extension' ||
-    name === 'verify_token_inheritance'
+    name === 'verify_token_inheritance' ||
+    name === 'audit_component_with_codex'
   ) {
+    // The codex audit lives in the extension workflow too — agents
+    // calling `list_helixir_tools` with tags=['extension'] should
+    // see it. Codex round-35 P2.
     tags.push('extension');
   }
   return [...new Set(tags)];

@@ -95,6 +95,26 @@ export type DeprecatedAliasesFile = z.infer<typeof DeprecatedAliasesFileSchema>;
  * of aliases — empty when no map is configured.
  */
 export async function loadDeprecatedAliases(config: McpWcConfig): Promise<DeprecatedAlias[]> {
+  // Combine aliases from BOTH sources:
+  //   1. Sibling tokens.deprecated.json file (rich metadata: R-round,
+  //      commit, removal version).
+  //   2. Inline DTCG `$deprecated` metadata in tokens.json (lighter —
+  //      flag and optional replacement only).
+  // Codex round-35 P2: returning [] when the sibling file is missing
+  // ignored repos that keep deprecations inline in tokens.json,
+  // making the canonicality layer dead code in those setups.
+  const siblingAliases = await loadSiblingAliases(config);
+  const inlineAliases = await loadInlineDtcgDeprecations(config);
+  // De-dupe by alias name; sibling file (richer metadata) wins.
+  const seen = new Set(siblingAliases.map((a) => a.alias));
+  const merged = [...siblingAliases];
+  for (const a of inlineAliases) {
+    if (!seen.has(a.alias)) merged.push(a);
+  }
+  return merged;
+}
+
+async function loadSiblingAliases(config: McpWcConfig): Promise<DeprecatedAlias[]> {
   const path = resolveAliasesPath(config);
   if (path === null || !existsSync(path)) return [];
 
@@ -125,8 +145,6 @@ export async function loadDeprecatedAliases(config: McpWcConfig): Promise<Deprec
       ErrorCategory.VALIDATION,
     );
   }
-  // Normalize all optional null/undefined fields so callers don't need
-  // to defensively check both.
   return result.data.aliases.map((a) => ({
     alias: a.alias,
     replacedBy: a.replacedBy,
@@ -136,6 +154,88 @@ export async function loadDeprecatedAliases(config: McpWcConfig): Promise<Deprec
     removalScheduledFor: a.removalScheduledFor ?? null,
     rationale: a.rationale ?? null,
   }));
+}
+
+/**
+ * Walk the tokens.json tree and extract every node carrying a
+ * DTCG `$deprecated` metadata entry. Two recognized shapes:
+ *   { "$deprecated": true }                — flag only
+ *   { "$deprecated": "use --new-name" }    — flag + replacement
+ *   { "$deprecated": { "replacedBy": "--new", "since": "3.2.0" } }
+ *
+ * Returns aliases with whatever provenance the inline metadata
+ * carried; missing fields are null.
+ */
+async function loadInlineDtcgDeprecations(config: McpWcConfig): Promise<DeprecatedAlias[]> {
+  if (config.tokensPath === null || config.tokensPath === '') return [];
+  const tokensAbs = isAbsolute(config.tokensPath)
+    ? config.tokensPath
+    : resolve(config.projectRoot, config.tokensPath);
+  if (!existsSync(tokensAbs)) return [];
+
+  let raw: string;
+  try {
+    raw = await readFile(tokensAbs, 'utf-8');
+  } catch {
+    return [];
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return [];
+  }
+  if (typeof parsed !== 'object' || parsed === null) return [];
+
+  const aliases: DeprecatedAlias[] = [];
+  walkDtcgForDeprecations(parsed as Record<string, unknown>, [], aliases);
+  return aliases;
+}
+
+function walkDtcgForDeprecations(
+  node: Record<string, unknown>,
+  path: string[],
+  out: DeprecatedAlias[],
+): void {
+  // A token node has $value. Inspect it for $deprecated.
+  if ('$value' in node) {
+    const dep = node['$deprecated'];
+    if (dep === true || typeof dep === 'string' || (typeof dep === 'object' && dep !== null)) {
+      const cssVar = '--' + path.join('-');
+      let replacedBy = '';
+      let sinceVersion: string | null = null;
+      let rationale: string | null = null;
+      if (typeof dep === 'string') {
+        // "use --new-name" or just the new name
+        const m = dep.match(/--[a-zA-Z0-9_-]+/);
+        replacedBy = m ? m[0] : '';
+        rationale = dep;
+      } else if (typeof dep === 'object' && dep !== null) {
+        const depObj = dep as Record<string, unknown>;
+        if (typeof depObj['replacedBy'] === 'string') replacedBy = depObj['replacedBy'];
+        if (typeof depObj['since'] === 'string') sinceVersion = depObj['since'];
+      }
+      out.push({
+        alias: cssVar,
+        replacedBy,
+        deprecatedSinceVersion: sinceVersion,
+        deprecatedSinceRound: null,
+        deprecatedSinceCommit: null,
+        removalScheduledFor: null,
+        rationale,
+      });
+    }
+    return;
+  }
+  // Group node — recurse into non-`$`-prefixed children.
+  for (const key of Object.keys(node)) {
+    if (key.startsWith('$')) continue;
+    const child = node[key];
+    if (typeof child === 'object' && child !== null) {
+      walkDtcgForDeprecations(child as Record<string, unknown>, [...path, key], out);
+    }
+  }
 }
 
 /**

@@ -398,12 +398,16 @@ export async function main(): Promise<void> {
         return handleCodexAuditTool(name, typedArgs, config, resolveCem(libraryId, cemCache));
       }
       // M4 — token-extension verification. analyze_token_canonicality
-      // doesn't actually need CEM (just the deprecated-aliases map),
-      // so it bypasses the cache-loading gate to support tokens-only
-      // repos and watch-mode reloads. Codex round-33 P3.
+      // only needs the deprecated-aliases map (no CEM data), so it
+      // bypasses the watch-mode reload race. NOTE: the SERVER itself
+      // still requires a CEM at startup (see main()'s containment
+      // check). True "tokens-only repo" support would need separate
+      // work to decouple server bootstrap from CEM presence — out of
+      // scope for this milestone. This bypass only avoids the in-flight
+      // reload race for an already-running server. Codex round-33 P3 +
+      // round-35 P2.
       if (isTokenVerificationTool(name)) {
         if (name === 'analyze_token_canonicality') {
-          // Pass an empty CEM since the handler ignores it for this tool.
           return handleTokenVerificationTool(name, typedArgs, config, {
             schemaVersion: '1.0.0',
             modules: [],

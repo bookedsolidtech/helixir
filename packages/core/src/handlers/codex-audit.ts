@@ -172,24 +172,29 @@ export async function auditComponentWithCodex(
   //      `..` AFTER an existing ancestor (the ancestor walk already
   //      resolved the parent traversal that exists on disk).
   const tail = requestedAuditsRoot.slice(ancestor.length);
-  // Split on BOTH `/` and `\` to catch traversal segments that use the
-  // non-native separator. On Windows, `mkdirSync` follows forward
-  // slashes as real separators, so a tail like `/missing/../../tmp/x`
-  // would otherwise stay as one un-tokenized segment and let `..`
-  // escape via `mkdirSync`. Codex round-59 P1.
-  const tailSegments = tail.split(/[\\/]/).filter((s) => s !== '');
+  // Separator handling differs per-platform:
+  //   - Windows: split on BOTH `/` and `\` because mkdirSync follows
+  //     forward slashes as real separators (round 59 P1).
+  //   - POSIX: split on `/` ONLY because `\` is a legal filename
+  //     character; splitting on it would rewrite valid paths like
+  //     `audit\2026` into `audit/2026` (round 61 P3).
+  const isWin32 = sep === '\\';
+  const SEP_SPLIT = isWin32 ? /[\\/]/ : /\//;
+  const tailSegments = tail.split(SEP_SPLIT).filter((s) => s !== '');
   if (tailSegments.includes('..')) {
     throw new MCPError(
       `auditsRoot contains parent-traversal segments after missing ancestor: "${auditsRootRaw}"`,
       ErrorCategory.VALIDATION,
     );
   }
-  // Normalize separators before the containment check. On Windows,
-  // realpathSync returns backslash form but the tail may still carry
-  // forward slashes, producing a hybrid like `C:\repo/audits` that
-  // string-startsWith would reject as out-of-tree even though
-  // mkdirSync would resolve it correctly. Codex round-60 P2.
-  const normalizeSeps = (p: string): string => p.split(/[\\/]/).join(sep);
+  // Normalize separators before the containment check. ONLY on Windows
+  // — POSIX leaves `\` alone (it's a legal filename character).
+  // realpathSync on Windows returns backslash form but the tail may
+  // still carry forward slashes, producing a hybrid like
+  // `C:\repo/audits` that string-startsWith would reject as
+  // out-of-tree even though mkdirSync would resolve it correctly.
+  // Codex round-60 P2 + round-61 P3.
+  const normalizeSeps = (p: string): string => (isWin32 ? p.split(/[\\/]/).join(sep) : p);
   const projectedReal = normalizeSeps(ancestorReal + tail);
   const projectAbsNorm = normalizeSeps(projectAbs);
   const projectedInProject =

@@ -252,6 +252,7 @@ async function run(): Promise<void> {
 
     // ── Breaking changes diff ─────────────────────────────────────────────────
     let diffData: DiffOutput | null = null;
+    let diffParseFailed = false;
     if (checks.includes('breaking-changes')) {
       const baseRef = process.env['GITHUB_BASE_REF'] ?? '';
       if (!baseRef) {
@@ -267,14 +268,17 @@ async function run(): Promise<void> {
         // indeterminate diffs); only refusing to parse on non-zero
         // exit caused indeterminate scans to be silently treated as
         // passing. Codex round-58 P1.
+        diffParseFailed = false;
         if (stdout) {
           diffData = parseJsonSafe<DiffOutput>(stdout);
           if (!diffData) {
+            diffParseFailed = true;
             core.warning(
               `Could not parse diff output as JSON (exit code ${exitCode}). Treating as failure to avoid silent pass.`,
             );
           }
         } else if (exitCode !== 0) {
+          diffParseFailed = true;
           core.warning(
             `helixir diff exited with code ${exitCode} with no stdout — treating as failure.`,
           );
@@ -375,6 +379,18 @@ async function run(): Promise<void> {
     if (failOnWarning && hasWarnings) {
       const count = diffData?.minor?.length ?? 0;
       core.setFailed(`Warning-level changes detected: ${count} minor change(s) found`);
+      return;
+    }
+
+    // Diff couldn't be parsed at all (CLI exited non-zero with no
+    // usable JSON, e.g. invalid config or git access failure). The
+    // breaking-change check never completed — fail closed rather
+    // than letting the workflow go green on empty data. Codex
+    // round-61 P2.
+    if (diffParseFailed) {
+      core.setFailed(
+        'helixir diff did not produce parseable JSON; breaking-change check did not complete. Failing closed.',
+      );
       return;
     }
 

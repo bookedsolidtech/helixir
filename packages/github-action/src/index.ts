@@ -258,7 +258,7 @@ async function run(): Promise<void> {
       if (!baseRef) {
         core.warning('GITHUB_BASE_REF not set — skipping breaking-changes check');
       } else {
-        const { stdout, exitCode } = await runCli(
+        const { stdout, stderr, exitCode } = await runCli(
           ['diff', '--base', baseRef, '--ci', '--format', 'json', ...baseArgs],
           true,
         );
@@ -266,10 +266,24 @@ async function run(): Promise<void> {
         // Parse JSON regardless of exit code. The CLI 0.6+ stdout is
         // `{ schemaVersion, breaking, indeterminate }`. Older CLIs
         // emitted either a top-level array (legacy ≤0.4) or
-        // `{ breaking, indeterminate }` (transitional 0.5). Normalize
-        // all three into the action's DiffOutput. Codex round-58 P1 /
-        // round-63 P1 / round-69 P1.
+        // `{ breaking, indeterminate }` (transitional 0.5).
+        // Pre-0.6 CLIs also emitted indeterminate components on
+        // stderr as `{indeterminate: [...]}` JSON line — STILL parsed
+        // here because helixir-version pinning lets workflows run
+        // older CLIs against this action. Codex round-58/63/69/76 P1.
         diffParseFailed = false;
+        let stderrIndeterminate: Array<{ tag: string; baseUnavailableReason: string | null }> = [];
+        if (stderr) {
+          for (const line of stderr.split(/\r?\n/)) {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith('{')) continue;
+            const meta = parseJsonSafe<{ indeterminate?: typeof stderrIndeterminate }>(trimmed);
+            if (meta?.indeterminate) {
+              stderrIndeterminate = meta.indeterminate;
+              break;
+            }
+          }
+        }
         if (stdout) {
           const parsed = parseJsonSafe<unknown>(stdout);
           if (parsed === null) {
@@ -279,18 +293,20 @@ async function run(): Promise<void> {
             );
           } else if (Array.isArray(parsed)) {
             // Legacy shape: top-level array of breaking changes.
+            // Pull indeterminate from stderr sidecar for pinned
+            // pre-0.6 CLIs.
             diffData = {
               breaking: parsed as BreakingChange[],
               minor: [],
               added: [],
               removed: [],
-              indeterminate: [],
+              indeterminate: stderrIndeterminate,
             };
           } else if (typeof parsed === 'object') {
             const obj = parsed as DiffOutput;
             diffData = {
               ...obj,
-              indeterminate: obj.indeterminate ?? [],
+              indeterminate: obj.indeterminate ?? stderrIndeterminate,
             };
           } else {
             diffParseFailed = true;

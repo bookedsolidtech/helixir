@@ -766,11 +766,6 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
           // called out @layer because skipping it hid real
           // touch-target regressions inside cascade-layer wrappers.
           const atName = childSel.match(/@([a-zA-Z-]+)/)?.[1]?.toLowerCase() ?? '';
-          const isConditional =
-            atName === 'media' ||
-            atName === 'supports' ||
-            atName === 'container' ||
-            atName === 'document';
           const isSelectorless =
             atName === 'keyframes' ||
             atName === 'font-face' ||
@@ -783,29 +778,34 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
             i = k + 1;
             continue;
           }
-          // For BOTH conditional (@media/@supports/@container) and
-          // unconditional (@layer/@scope/@page) at-rules: recurse
-          // into nested SELECTOR blocks so inner rules surface with
-          // the resolved selector chain. Round 72 P1: skipping
-          // conditional at-rules entirely hid responsive regressions
-          // like `@media (max-width: 600px) { button.star { width: 1.5rem } }`.
+          // ALL other at-rules (conditional @media/@supports/@container
+          // AND unconditional @layer/@scope/@page) are flattened
+          // symmetrically: extract direct decls back to parentSel and
+          // recurse into nested selector blocks. The at-rule predicate
+          // is dropped from the resolved selector chain.
           //
-          // Difference: ONLY unconditional at-rules attach their
-          // direct (depth-0) declarations back to parentSel — those
-          // decls apply unconditionally. Conditional at-rule direct
-          // decls are NOT extracted (they only apply when the
-          // condition matches; emitting them would false-positive
-          // print-only / pointer-only styles).
+          // Round 76 P1: previously skipped conditional at-rule decls
+          // dropped real responsive regressions like
+          // `button { @media (max-width: 600px) { width: 1.5rem } }`.
+          // Round 72 P1: previously skipped conditional at-rule
+          // selector blocks dropped responsive
+          // `@media (...) { button.star { width: 1.5rem } }` cases.
           //
-          // Cost: nested selector rules under @media print still
-          // surface as findings even though they're print-only. This
-          // is the unresolvable round 68/72 flip — we choose
-          // false-positive over false-negative for responsive cases.
-          // Trade-off documented in runbook §6.
-          if (!isConditional && parentSel !== '') {
-            // Same prelude-stripping decl extractor as the regular
-            // selector branch (round 75 P2). Without this, nested
-            // at-rule preludes leak into the parent's decl body.
+          // Cost: print-only / pointer-only false positives. Trade
+          // documented in runbook §6 — favor false-positive over
+          // false-negative for the responsive case (the common case
+          // for touch-target audits).
+          // Extract direct declarations for BOTH conditional and
+          // unconditional at-rules. Round 76 P1: skipping conditional
+          // at-rule decls dropped real responsive regressions like
+          // `button { @media (max-width: 600px) { width: 1.5rem } }`
+          // because parseBlock then sees the decls as orphans and
+          // discards them. Cost: print-only / pointer-only false
+          // positives; matches the round-72 trade for nested
+          // selectors inside at-rules. Final symmetric handling:
+          // ALL at-rule contents that produce decls or selectors
+          // are surfaced; the at-rule predicate is dropped.
+          if (parentSel !== '') {
             const atDecl = extractDirectDeclarations(inner);
             if (atDecl.trim() !== '') out.push({ selector: parentSel, body: atDecl });
           }

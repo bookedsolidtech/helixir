@@ -1026,19 +1026,23 @@ async function scoreCemNativeDimension(
         // Caller didn't supply the full library CEM — preserve existing
         // entry points like generateAuditReport(config, declarations)
         // and direct scoreComponentMultiDimensional(config, decl) calls
-        // that score a single declaration. Pre-M2 this dropped silently;
-        // M2 strict mode (follow-up work) will surface this as `unknown`
-        // for callers that opt in. Until then, callers that pass a full
-        // CEM get the analyzer; callers that don't get N/A.
+        // that score a single declaration. The caller explicitly opted
+        // out of cross-CEM analysis, so this is genuinely N/A.
+        // Codex round-2 P1 pinned this position; M2 strict mode
+        // (follow-up work) will surface this as `unknown` for callers
+        // that opt in.
         return { score: 0, confidence: 'untested', notApplicable: true };
       }
       const fidelity = await analyzeCemSourceFidelity(config, cem, decl);
       if (!fidelity) {
-        // Analyzer ran but couldn't produce a fidelity score (typically:
-        // source files unavailable, or declaration not locatable in the
-        // CEM modules tree). Treat as N/A for now — this is a path the
-        // strict-mode follow-up will revisit.
-        return { score: 0, confidence: 'untested', notApplicable: true };
+        // Analyzer ran (caller passed a CEM) but couldn't produce a
+        // fidelity score (typically: source files unavailable, or
+        // declaration not locatable in the CEM modules tree). The
+        // caller asked for this analysis and we couldn't answer —
+        // that's `unknown`, distinct from the no-CEM case above.
+        // Codex round-8 P2 corrected: "analyzer failed" ≠ "caller
+        // didn't ask," so don't drop the dimension from the grade.
+        return { score: 0, confidence: 'unknown' };
       }
       return fidelity;
     }

@@ -230,8 +230,28 @@ function generateComponentSource(
     // BookedSolidElement), conventions.* describes the detected class,
     // not the override — using it would import the override from the
     // wrong package. Use the detected origin only when the names match.
-    const isBareSpecifier = (s: string): boolean =>
-      s !== '' && !s.startsWith('.') && !s.startsWith('/');
+    // A "bare specifier" is one Node will resolve via package lookup —
+    // a published npm package name. A path that LOOKS bare-ish but
+    // starts with a conventional repo-directory prefix (packages/,
+    // src/, lib/, apps/, dist/, build/, node_modules/) is almost
+    // certainly a repo-relative module path that won't resolve at the
+    // scaffold destination. Reject those too, per codex round-8 P2.
+    const REPO_RELATIVE_PREFIXES = [
+      'packages/',
+      'src/',
+      'lib/',
+      'apps/',
+      'dist/',
+      'build/',
+      'node_modules/',
+    ];
+    const isBareSpecifier = (s: string): boolean => {
+      if (s === '' || s.startsWith('.') || s.startsWith('/')) return false;
+      for (const prefix of REPO_RELATIVE_PREFIXES) {
+        if (s.startsWith(prefix)) return false;
+      }
+      return true;
+    };
     const moduleIsBare =
       typeof conventions.baseClassModule === 'string' &&
       isBareSpecifier(conventions.baseClassModule);

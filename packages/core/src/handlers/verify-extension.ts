@@ -803,7 +803,14 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
             // Balanced-paren extraction so `@scope (:is(.toolbar,
             // .footer))` doesn't truncate at the inner `)`.
             // Codex round-82 P2.
-            const scopeRoot = extractBalancedScopeRoot(childSel);
+            let scopeRoot = extractBalancedScopeRoot(childSel);
+            // CSS nesting `&` resolution: `@scope (&)` means "scope
+            // to the current nested parent". Substitute `&` with
+            // parentSel BEFORE composing into newParent — otherwise
+            // we'd produce literal `& :host` chains. Codex round-87 P2.
+            if (parentSel !== '' && /&/.test(scopeRoot)) {
+              scopeRoot = scopeRoot.replace(/&/g, parentSel);
+            }
             // Cartesian-product expansion. @scope semantics: the
             // scope root is the OUTER container, so resolved selector
             // is `scopeRoot parent` not `parent scopeRoot` —
@@ -811,7 +818,10 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
             // "when this button is inside .toolbar, ..." resolving
             // to `.toolbar button`. Codex round-82 P1.
             let newParent: string;
-            if (scopeRoot === '') {
+            if (scopeRoot === '' || scopeRoot === parentSel) {
+              // Empty scope OR scope-root equals parent (after `&`
+              // substitution) — no composition needed; rules apply
+              // at parent's level. Round-87 P2 follow-on.
               newParent = parentSel;
             } else if (parentSel === '') {
               newParent = scopeRoot;

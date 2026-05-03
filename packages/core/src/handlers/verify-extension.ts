@@ -789,12 +789,35 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
           if (atName === 'scope') {
             const scopeRootMatch = childSel.match(/@scope\s*\(([^)]*)\)/);
             const scopeRoot = scopeRootMatch?.[1]?.trim() ?? '';
-            const newParent =
-              scopeRoot === ''
-                ? parentSel
-                : parentSel === ''
-                  ? scopeRoot
-                  : `${parentSel} ${scopeRoot}`;
+            // Cartesian-product selector-list expansion. Codex round-81 P2.
+            // `.card, .panel` × `@scope (.toolbar, .footer)` →
+            // `.card .toolbar, .card .footer, .panel .toolbar, .panel .footer`.
+            let newParent: string;
+            if (scopeRoot === '') {
+              newParent = parentSel;
+            } else if (parentSel === '') {
+              newParent = scopeRoot;
+            } else {
+              const parentArms = splitTopLevelCommas(parentSel)
+                .map((s) => s.trim())
+                .filter(Boolean);
+              const scopeArms = splitTopLevelCommas(scopeRoot)
+                .map((s) => s.trim())
+                .filter(Boolean);
+              const products: string[] = [];
+              for (const pa of parentArms) {
+                for (const sa of scopeArms) {
+                  products.push(`${pa} ${sa}`);
+                }
+              }
+              newParent = products.join(', ');
+            }
+            // Extract direct decls so `button { @scope (.toolbar) {
+            // width: 1rem } }` doesn't drop the width rule. Round 81 P1.
+            if (newParent !== '') {
+              const scopeDecl = extractDirectDeclarations(inner);
+              if (scopeDecl.trim() !== '') out.push({ selector: newParent, body: scopeDecl });
+            }
             parseBlock(inner, newParent);
             i = k + 1;
             continue;

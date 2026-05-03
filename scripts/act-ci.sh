@@ -149,8 +149,12 @@ elif [[ "$USE_FULL" == true ]]; then
   # major (engines.node now requires >=22; running act under Node 20
   # would hit ENOTSUPPORTED at install time before any test ran).
   HOST_NODE_MAJOR=$(node --version 2>/dev/null | sed -E 's/^v([0-9]+)\..*/\1/' || echo "22")
-  if [[ -z "$HOST_NODE_MAJOR" ]] || [[ "$HOST_NODE_MAJOR" -lt 22 ]]; then
-    echo "[act-ci] Host Node $HOST_NODE_MAJOR is below the helixir engines floor (>=22); coercing to 22 for the act run." >&2
+  # Coerce any unsupported major (anything other than 22 or 24) to
+  # the LTS so install doesn't ENOTSUPPORTED. Codex round-73 P2 +
+  # round-74 P3: engines.node is `^22 || ^24` so odd majors like 23
+  # or 25 are also unsupported, not just <22.
+  if [[ -z "$HOST_NODE_MAJOR" ]] || [[ "$HOST_NODE_MAJOR" != "22" && "$HOST_NODE_MAJOR" != "24" ]]; then
+    echo "[act-ci] Host Node $HOST_NODE_MAJOR is outside the helixir engines floor (^22 || ^24); coercing to 22 for the act run." >&2
     HOST_NODE_MAJOR=22
   fi
   ENV_ARGS="$ENV_ARGS --env ACT_FULL_TESTS=true --env ACT_FULL_NODE_VERSION=$HOST_NODE_MAJOR"

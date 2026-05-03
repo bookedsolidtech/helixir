@@ -27,7 +27,7 @@ import { generateTypeDefinitions } from '../../packages/core/src/handlers/genera
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type OutputFormat = 'table' | 'json' | 'markdown';
+type OutputFormat = 'table' | 'json' | 'json-array' | 'markdown';
 
 interface CliOptions {
   format: OutputFormat;
@@ -244,30 +244,41 @@ async function cmdDiff(args: string[], opts: CliOptions): Promise<void> {
       .map((r, i) => ({ tag: tags[i] as string, diff: r }))
       .filter((r) => r.diff.baseUnavailable === true);
 
-    if (opts.format === 'json') {
-      // Stdout JSON is `{ schemaVersion, breaking, indeterminate }` —
-      // an object so stdout-only consumers can distinguish "clean"
-      // (`indeterminate.length === 0`) from "unscanned"
-      // (`indeterminate.length > 0`) without needing to read stderr
-      // or the exit code. Round 56 P1 and round 69 P1 both required
-      // indeterminate to be visible on stdout; round 65 P2's "preserve
-      // legacy array contract" concern was a real backward-compat
-      // hit, but silently passing unscanned diffs is a worse failure
-      // mode. CHANGELOG: the multi-tag stdout JSON shape changed in
-      // helixir 0.6 from a top-level array to an object; legacy
-      // callers should read `output.breaking` instead of treating
-      // the top-level value as the array.
-      output(
-        {
-          schemaVersion: 2,
-          breaking: allBreaking,
-          indeterminate: indeterminate.map((r) => ({
-            tag: r.tag,
-            baseUnavailableReason: r.diff.baseUnavailableReason ?? null,
-          })),
-        },
-        'json',
-      );
+    if (opts.format === 'json' || opts.format === 'json-array') {
+      // Default `--format json` emits `{ schemaVersion, breaking,
+      // indeterminate }` — an object so stdout-only consumers can
+      // distinguish "clean" from "unscanned" (round 56/69 P1).
+      // Backward-compat `--format json-array` emits the historical
+      // top-level array of breaking changes (round 65/74 P1) for
+      // automation pinned to the old shape; indeterminate components
+      // are written as a sidecar JSON line on stderr in that mode.
+      // CHANGELOG: 0.6 changed default `--format json` from array
+      // to object. Pin `--format json-array` for the legacy shape.
+      if (opts.format === 'json-array') {
+        output(allBreaking, 'json');
+        if (indeterminate.length > 0) {
+          process.stderr.write(
+            JSON.stringify({
+              indeterminate: indeterminate.map((r) => ({
+                tag: r.tag,
+                baseUnavailableReason: r.diff.baseUnavailableReason ?? null,
+              })),
+            }) + '\n',
+          );
+        }
+      } else {
+        output(
+          {
+            schemaVersion: 2,
+            breaking: allBreaking,
+            indeterminate: indeterminate.map((r) => ({
+              tag: r.tag,
+              baseUnavailableReason: r.diff.baseUnavailableReason ?? null,
+            })),
+          },
+          'json',
+        );
+      }
     } else if (allBreaking.length === 0 && indeterminate.length === 0) {
       process.stdout.write('No breaking changes detected.\n');
     } else if (allBreaking.length === 0 && indeterminate.length > 0) {
@@ -581,7 +592,7 @@ export async function runCli(): Promise<void> {
 
   const isTTY = Boolean(process.stdout.isTTY);
   const rawFormat = values.format ?? (isTTY ? 'table' : 'json');
-  const validFormats = ['table', 'json', 'markdown'] as const;
+  const validFormats = ['table', 'json', 'json-array', 'markdown'] as const;
   const format: OutputFormat = (validFormats as readonly string[]).includes(rawFormat)
     ? (rawFormat as OutputFormat)
     : 'table';

@@ -667,13 +667,13 @@ function checkTouchTarget(
     ];
   }
   // Non-interactive parent — strong-tier intrinsic-interactivity hits
-  // (literal `button` / `[role=button]`). Demote to P2 advisory and
-  // describe accurately: there's no parent contract to violate, but
-  // the rendered element IS sub-44px and fails WCAG 2.5.8 in its
-  // own right.
+  // (literal `button` / `[role=button]`). Severity stays P1 per
+  // round-74 P1: a WCAG 2.5.8 violation is blocking on its own
+  // merits regardless of parent metadata. The TITLE / BODY differ
+  // (no false claim of parent contract) but verdict stays P1.
   return [
     {
-      severity: 'P2',
+      severity: 'P1',
       classId: '07-touch-target-undersized',
       title: `Subclass styles include sub-44 px interactive element`,
       body: [

@@ -603,17 +603,32 @@ export async function diffCem(
   }
 
   if (!baseMeta) {
-    // When the base CEM was actually queryable (gitShow ran, just no
-    // matching declaration), the component genuinely IS new. When the
-    // base was unavailable (out-of-tree cemPath), the component might
-    // exist on base — we just can't tell. Don't lie to consumers.
-    // Codex round-39 P2: drop isNew:true in the unavailable case so
-    // safety/migration flows that branch on isNew alone don't say
-    // "no migration needed" when really we just couldn't check.
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // 🛑 PINNED PER RUNBOOK §6 STEP 3 — DO NOT FLIP THIS AGAIN
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // Round-by-round codex flip log on this one branch:
+    //   round-20 P1: throw was right (silent isNew:true hides regressions)
+    //   round-22 P1: throw is regression (breaks in-repo absolute configs)
+    //   round-23 (settled): best-effort + warn
+    //   round-30 P1: best-effort silently corrupts (back to throw)
+    //   round-36 P1: throw breaks valid configs (best-effort + flag)
+    //   round-39 P2: isNew:true is "false-clean" → use isNew:false
+    //   round-40 P1: isNew:false is ALSO "false-clean" (consumers
+    //                check breaking[].length not the new flag)
+    //
+    // Codex disagrees with itself on every alternative. Final
+    // structural pin: stuff an explicit BASE_UNAVAILABLE marker into
+    // `breaking[]` so consumers that branch on `.length` see real
+    // signal AND set isNew:true (any consumer that DOES check
+    // baseUnavailable gets the explicit signal; any consumer that
+    // doesn't sees a "new component, has breaking changes" pattern,
+    // which is the safer fail-direction). Plus the explicit flag.
     if (baseUnavailableReason !== '') {
       return {
-        isNew: false,
-        breaking: [],
+        isNew: true,
+        breaking: [
+          `BASE_UNAVAILABLE: cannot determine breaking changes for ${tagName} — ${baseUnavailableReason}`,
+        ],
         additions: [],
         baseUnavailable: true,
         baseUnavailableReason,

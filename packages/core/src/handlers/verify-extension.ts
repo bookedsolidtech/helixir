@@ -409,28 +409,46 @@ function checkTouchTarget(
   parent: ContractSurface,
   sources: VerifyExtensionInput['subclassSources'],
 ): AuditFinding[] {
-  // Helix enforces a 44px touch-target floor on interactive components
-  // via --hx-touch-target-min (commit acc56e6a7). Heuristic: parse
-  // style rule blocks, identify ones whose selector targets an
-  // interactive element (button / link / role-button / [tabindex] /
-  // input / :host of an interactive component), and only flag
-  // undersized size rules inside those blocks. Decorative descendants
-  // like .icon { width: 1rem } are correctly excluded. Codex round-34 P2.
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🛑 PINNED PER RUNBOOK §6 STEP 3 — DO NOT FLIP THIS AGAIN
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Round-by-round codex flip log on `:host` matching:
+  //   round-34 P2: bare :host too broad (icons flagged)
+  //   round-37 P2: tightened to :host([role=...]) / :host(:not(...))
+  //   round-40 P2: bare :host IS the click target — keep it
+  //
+  // Final structural pin: gate the WHOLE check on parent-component
+  // interactivity. If the parent surface advertises events, ARIA
+  // role, tabindex, or interactive-suggesting members (onclick,
+  // disabled), :host IS the click target and bare :host counts.
+  // If the parent is non-interactive (decoration / layout / pure
+  // display), no selector — including :host — gets flagged. This
+  // satisfies BOTH rounds: bare :host is interactive when parent
+  // is interactive (round-40), and decorative components are
+  // skipped entirely (round-37).
   if (sources?.styles === undefined) return [];
   const styles = sources.styles;
 
-  // Match selector-block pairs `selector { body }` (no nesting). The
-  // body capture is the content between { and the next }.
+  const parentIsInteractive =
+    parent.events.length > 0 ||
+    parent.attributes.some(
+      (a) => a.name === 'role' || a.name === 'tabindex' || a.name === 'disabled',
+    ) ||
+    parent.formAssociated === true ||
+    parent.members.some((m) =>
+      ['onclick', 'onkeydown', 'onkeyup', 'onfocus', 'onblur'].includes(m.name.toLowerCase()),
+    );
+
   const RULE_PATTERN = /([^{}]+)\{([^{}]*)\}/g;
-  // Narrow `:host` matching to forms that imply interactivity:
-  //   `:host([role=button])` etc., or `:host(:not(...))` patterns
-  // commonly used to scope interactive-state styles. Bare `:host`
-  // selectors (which apply to ALL component instances regardless of
-  // role) shouldn't promote every size rule to a touch-target
-  // failure. Codex round-37 P2.
-  const INTERACTIVE_SELECTOR =
-    /(?:^|[\s,>+~])(button|a|input|select|textarea|summary|label|\[role\s*=\s*["']?(button|link|menuitem|tab|option|switch|checkbox|radio)["']?\]|\[tabindex(?:=|\])|:host\(\s*\[role|:host\(\s*:not)/i;
+  // When parent is interactive, accept bare :host along with the
+  // explicit interactive selectors. When parent is NOT interactive,
+  // the entire check is skipped above — no need for extra gating.
+  const INTERACTIVE_SELECTOR = parentIsInteractive
+    ? /(?:^|[\s,>+~])(button|a|input|select|textarea|summary|label|\[role\s*=\s*["']?(button|link|menuitem|tab|option|switch|checkbox|radio)["']?\]|\[tabindex(?:=|\])|:host)/i
+    : /(?:^|[\s,>+~])(button|a|input|select|textarea|summary|label|\[role\s*=\s*["']?(button|link|menuitem|tab|option|switch|checkbox|radio)["']?\]|\[tabindex(?:=|\]))/i;
   const SIZE_RULE = /\b(min-width|min-height|width|height)\s*:\s*([\d.]+)(px|rem)\b/g;
+
+  if (!parentIsInteractive) return [];
 
   const undersized: string[] = [];
   let m: RegExpExecArray | null;

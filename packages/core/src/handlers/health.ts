@@ -552,17 +552,13 @@ export async function getHealthDiff(
     }
   }
   if (outOfTree) {
-    process.stderr.write(
-      `[helixir] Warning: getHealthDiff cannot read base-branch CEM at out-of-tree absolute path ${config.cemPath} — gitShow requires repo-relative paths. Returning 0/F base for ${tagName}. (To restore diff: unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.)\n`,
+    // Throwing is safer than fabricating a 0/F baseline, which would
+    // make every normal component appear to have improved from zero
+    // by tens of points. Codex round-20 P2.
+    throw new MCPError(
+      `getHealthDiff cannot compute base-branch diff: cemPath ${config.cemPath} is out-of-tree (set via MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1) and gitShow requires repo-relative paths. To restore diff, unset the env var or move the CEM in-tree.`,
+      ErrorCategory.VALIDATION,
     );
-    base = {
-      tagName,
-      score: 0,
-      grade: 'F' as const,
-      dimensions: {},
-      issues: ['Base CEM unavailable — cemPath is absolute and out-of-tree'],
-      timestamp: new Date().toISOString(),
-    };
   } else {
     try {
       const cemContent = await git.gitShow(baseBranch, cemPathForGit);

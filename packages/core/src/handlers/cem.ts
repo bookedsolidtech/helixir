@@ -521,15 +521,17 @@ export async function diffCem(
     const projectRootResolved = resolve(config.projectRoot);
     const rel = relative(projectRootResolved, config.cemPath);
     if (rel === '' || rel.startsWith('..') || isAbsolute(rel)) {
-      // Genuinely out-of-tree — gitShow can't read it.
-      process.stderr.write(
-        `[helixir] Warning: diffCem cannot read base-branch CEM at out-of-tree absolute path ${config.cemPath} — gitShow requires repo-relative paths. Diff falls back to treating ${tagName} as new in base. (To restore diff: unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.)\n`,
+      // Genuinely out-of-tree — gitShow can't read it. Throwing is
+      // safer than fabricating `isNew: true`, which would suppress
+      // breaking-change detection by classifying every existing
+      // component as new. Codex round-20 P1.
+      throw new MCPError(
+        `diffCem cannot compute base-branch diff: cemPath ${config.cemPath} is out-of-tree (set via MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1) and gitShow requires repo-relative paths. To restore diff, unset the env var or move the CEM in-tree.`,
+        ErrorCategory.VALIDATION,
       );
-      cemPathForGit = '';
-    } else {
-      // In-repo absolute path — relativize for gitShow.
-      cemPathForGit = rel.split(sep).join('/');
     }
+    // In-repo absolute path — relativize for gitShow.
+    cemPathForGit = rel.split(sep).join('/');
   }
 
   if (cemPathForGit !== '') {

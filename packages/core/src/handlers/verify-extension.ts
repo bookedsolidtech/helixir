@@ -550,14 +550,14 @@ function checkTouchTarget(
   const subclassHasStrongInteractive = STRONG_INTERACTIVE.test(stylesSelectorsOnly);
   const WEAK_INTERACTIVE_CLASS =
     /(?:^|[\s,>+~.])\.(?:button|btn|control|trigger|action|tab|menuitem|menu-item|option|chip|toggle|switch|checkbox|radio|link|clickable|interactive|target|thumb|handle|nav-item|tile|card-action|cta|hit-area|pressable|swatch-button)(?:[\s,.:[{]|$)/i;
-  // Decoration-by-styles guard: when :host has explicit non-interactive
-  // CSS, skip :host RULES specifically — not the whole stylesheet.
-  // A wrapper component can have a non-interactive :host but still
-  // render a real `button` inside; that descendant control should
-  // still be audited. Codex round-50 P1.
-  const HOST_NON_INTERACTIVE =
-    /:host\s*\{[^}]*(?:pointer-events\s*:\s*none|cursor\s*:\s*default)[^}]*\}/i;
-  const hostExplicitlyNonInteractive = HOST_NON_INTERACTIVE.test(styles);
+  // Decoration-by-styles guard, evaluated PER RULE (not stylesheet-wide).
+  // A component might have one bare-:host rule with pointer-events:none
+  // for a disabled state AND a separate undersized interactive :host
+  // rule — the disabled rule must not suppress the audit on the other.
+  // Comment-stripping also happens per-rule body so `/* cursor: default */`
+  // doesn't trigger the guard. Codex round-50 P1 / round-57 P2.
+  const HOST_NON_INTERACTIVE_BODY = /(?:pointer-events\s*:\s*none|cursor\s*:\s*default)/i;
+  const stripComments = (text: string): string => text.replace(/\/\*[\s\S]*?\*\//g, '');
   const DECORATIVE_SELECTOR =
     /::(before|after|placeholder|marker|backdrop|selection|first-line|first-letter)|::part\([^)]*(icon|indicator|chevron|caret|spinner|backdrop)[^)]*\)|\[aria-hidden\b|(?:^|[\s,>+~.])(icon|chevron|caret|spinner|indicator|decoration|ornament|backdrop|overlay|glyph|swatch|dot|pip|bullet|sparkline|sigil|badge-dot)(?:[\s,.:[{]|$)/i;
   const SIZE_RULE = /\b(min-width|min-height|width|height)\s*:\s*([\d.]+)(px|rem)\b/g;
@@ -592,7 +592,13 @@ function checkTouchTarget(
       trimmedSel
         .split(',')
         .every((s) => /^:host(\([^)]*\))?(\s*::?[a-zA-Z-]+(?:\([^)]*\))?)*\s*$/.test(s.trim()));
-    if (hostExplicitlyNonInteractive && isBareHostRule) continue;
+    // Per-rule (not stylesheet-wide) decoration guard. Codex round-57 P2:
+    // a single non-interactive bare-:host (e.g. `:host { pointer-events:
+    // none }` for a disabled state) was previously suppressing audit
+    // of all other bare-:host rules in the file. Now scope per rule —
+    // strip comments from the body before testing so commented-out
+    // declarations don't trigger the skip.
+    if (isBareHostRule && HOST_NON_INTERACTIVE_BODY.test(stripComments(body))) continue;
     const matchesStrong = STRONG_INTERACTIVE.test(selector);
     // :host fires when parent CEM signals interactivity OR the
     // subclass styles contain another strong-interactive selector

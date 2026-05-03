@@ -245,26 +245,29 @@ async function cmdDiff(args: string[], opts: CliOptions): Promise<void> {
       .filter((r) => r.diff.baseUnavailable === true);
 
     if (opts.format === 'json') {
-      // Backward-compat shape: stdout stays the legacy top-level
-      // array of breaking changes (round 65 P2 — third-party CI
-      // scripts deserialize this as an array). Indeterminate
-      // components are surfaced via a SEPARATE stderr JSON line so
-      // round 56's "indeterminate not silently dropped" requirement
-      // is still met without breaking existing array consumers.
-      // The github-action reads both via runCli which captures
-      // stderr, and the CI exit code is still 2 when indeterminate
-      // is non-empty.
-      output(allBreaking, 'json');
-      if (indeterminate.length > 0) {
-        process.stderr.write(
-          JSON.stringify({
-            indeterminate: indeterminate.map((r) => ({
-              tag: r.tag,
-              baseUnavailableReason: r.diff.baseUnavailableReason ?? null,
-            })),
-          }) + '\n',
-        );
-      }
+      // Stdout JSON is `{ schemaVersion, breaking, indeterminate }` —
+      // an object so stdout-only consumers can distinguish "clean"
+      // (`indeterminate.length === 0`) from "unscanned"
+      // (`indeterminate.length > 0`) without needing to read stderr
+      // or the exit code. Round 56 P1 and round 69 P1 both required
+      // indeterminate to be visible on stdout; round 65 P2's "preserve
+      // legacy array contract" concern was a real backward-compat
+      // hit, but silently passing unscanned diffs is a worse failure
+      // mode. CHANGELOG: the multi-tag stdout JSON shape changed in
+      // helixir 0.6 from a top-level array to an object; legacy
+      // callers should read `output.breaking` instead of treating
+      // the top-level value as the array.
+      output(
+        {
+          schemaVersion: 2,
+          breaking: allBreaking,
+          indeterminate: indeterminate.map((r) => ({
+            tag: r.tag,
+            baseUnavailableReason: r.diff.baseUnavailableReason ?? null,
+          })),
+        },
+        'json',
+      );
     } else if (allBreaking.length === 0 && indeterminate.length === 0) {
       process.stdout.write('No breaking changes detected.\n');
     } else if (allBreaking.length === 0 && indeterminate.length > 0) {

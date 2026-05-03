@@ -258,32 +258,18 @@ async function run(): Promise<void> {
       if (!baseRef) {
         core.warning('GITHUB_BASE_REF not set — skipping breaking-changes check');
       } else {
-        const { stdout, stderr, exitCode } = await runCli(
+        const { stdout, exitCode } = await runCli(
           ['diff', '--base', baseRef, '--ci', '--format', 'json', ...baseArgs],
           true,
         );
 
-        // Parse JSON regardless of exit code. The CLI emits structured
-        // JSON on both code 0 (clean) AND code 2 (breaking changes OR
-        // indeterminate diffs). Codex round-58 P1.
-        // Per round-65 P2 the CLI stdout is a TOP-LEVEL ARRAY of
-        // breaking changes (legacy shape, preserved for third-party
-        // CI scripts). Indeterminate components arrive as a separate
-        // JSON line on stderr: `{"indeterminate":[{tag,baseUnavailableReason}]}`.
+        // Parse JSON regardless of exit code. The CLI 0.6+ stdout is
+        // `{ schemaVersion, breaking, indeterminate }`. Older CLIs
+        // emitted either a top-level array (legacy ≤0.4) or
+        // `{ breaking, indeterminate }` (transitional 0.5). Normalize
+        // all three into the action's DiffOutput. Codex round-58 P1 /
+        // round-63 P1 / round-69 P1.
         diffParseFailed = false;
-        let parsedIndeterminate: Array<{ tag: string; baseUnavailableReason: string | null }> = [];
-        // Pull indeterminate from stderr if present (one JSON line).
-        if (stderr) {
-          for (const line of stderr.split(/\r?\n/)) {
-            const trimmed = line.trim();
-            if (!trimmed.startsWith('{')) continue;
-            const meta = parseJsonSafe<{ indeterminate?: typeof parsedIndeterminate }>(trimmed);
-            if (meta?.indeterminate) {
-              parsedIndeterminate = meta.indeterminate;
-              break;
-            }
-          }
-        }
         if (stdout) {
           const parsed = parseJsonSafe<unknown>(stdout);
           if (parsed === null) {
@@ -292,24 +278,19 @@ async function run(): Promise<void> {
               `Could not parse diff output as JSON (exit code ${exitCode}). Treating as failure to avoid silent pass.`,
             );
           } else if (Array.isArray(parsed)) {
-            // Current CLI shape AND legacy shape: top-level array of
-            // breaking changes. Normalize into the action's DiffOutput
-            // (round 63 P1 / round 65 P2).
+            // Legacy shape: top-level array of breaking changes.
             diffData = {
               breaking: parsed as BreakingChange[],
               minor: [],
               added: [],
               removed: [],
-              indeterminate: parsedIndeterminate,
+              indeterminate: [],
             };
           } else if (typeof parsed === 'object') {
-            // Forward-compat: a future CLI version that emits the
-            // object shape on stdout. Merge stderr-side indeterminate
-            // if stdout didn't include it.
             const obj = parsed as DiffOutput;
             diffData = {
               ...obj,
-              indeterminate: obj.indeterminate ?? parsedIndeterminate,
+              indeterminate: obj.indeterminate ?? [],
             };
           } else {
             diffParseFailed = true;

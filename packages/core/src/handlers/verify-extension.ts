@@ -724,22 +724,20 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
         // for parentSel before recursing into any further nested rules.
         // Codex round-66 P2 / round-67 P2.
         if (childSel.startsWith('@')) {
-          // At-rules are CONDITIONAL — declarations directly inside
-          // them only apply when the condition matches (e.g.
-          // `@media print { width: 20px }` doesn't shrink the touch
-          // target on screen). Emitting them as unconditional leaf
-          // rules would produce false-positive audit findings on
-          // print-only or alt-pointer-mode styles. Codex round-67
-          // P2 added the extraction; round-68 P2 reverted it because
-          // the conditionality was being lost. Cost: we miss
-          // shrinking-under-coarse-pointer-only cases. Trade is
-          // correct — prefer false-negative over false-positive on
-          // conditional CSS.
-          // We DO recurse into nested rules so things like
-          // `@media (...) { button { width: 20px } }` still surface
-          // (the inner rule is its own block; codex flagged this as
-          // a separate concern).
-          parseBlock(inner, parentSel);
+          // At-rules are CONDITIONAL. ALL contents — direct
+          // declarations AND nested rules — only apply when the
+          // condition matches (`@media print`, `@media (pointer:
+          // coarse)`, `@container`, `@supports`). Treating them as
+          // unconditional produces false-positive audit findings on
+          // print-only / pointer-only / container-scoped styles.
+          // Codex round-67/68/69 P2 — prior attempts emitted contents
+          // unconditionally; the safe choice is to skip the whole
+          // at-rule block. Cost: false negatives on
+          // shrinking-only-under-coarse-pointer cases (genuine touch
+          // regressions). Trade favors false-negative over false-
+          // positive — surface the unconditional cases first; address
+          // conditional touch-target scoping in a separate pass when
+          // we can interpret the at-rule predicate.
           i = k + 1;
           continue;
         }

@@ -231,16 +231,41 @@ function checkEventContract(
     //   - reactive setter (`set value()`, `set checked()`, etc.) that
     //     the parent typically emits from.
     // Codex round-31 P2.
-    const eventVocab = missing
-      .map((e) => e.name.replace(/^[a-z]+-/, '').replace(/-/g, ''))
-      .filter((s) => s.length >= 3)
-      .map((s) => s.toLowerCase());
+    // Build the event-name vocabulary from the parent's missing
+    // events. We tokenize each event name (drop the `hx-` prefix,
+    // split on hyphens) so a parent event like `hx-value-change`
+    // contributes the tokens `value` and `change` — either of which
+    // appearing in a subclass override (e.g. `onValueChange()` or
+    // `handleChange()`) signals a dispatch-site override.
+    // Codex round-39 P2: keep `on*`-style handlers in the heuristic.
+    const eventTokens = new Set<string>();
+    for (const e of missing) {
+      // Strip prefix like `hx-`, then split on hyphens / camelCase.
+      const stripped = e.name.replace(/^[a-z]+-/, '');
+      for (const tok of stripped.split(/[-_]+/)) {
+        const t = tok.toLowerCase();
+        if (t.length >= 3) eventTokens.add(t);
+      }
+    }
     const methodMatchesEvent = (() => {
-      if (eventVocab.length === 0) return false;
-      const methodNames = [...code.matchAll(/\b([a-zA-Z_$][\w$]*)\s*\([^)]*\)\s*\{/g)].map((m) =>
-        (m[1] ?? '').toLowerCase(),
+      if (eventTokens.size === 0) return false;
+      // Method name normalized to lowercase chunks split on
+      // word-boundary case changes so `onValueChange` matches the
+      // tokens `value` / `change`.
+      const methods = [...code.matchAll(/\b([a-zA-Z_$][\w$]*)\s*\([^)]*\)\s*\{/g)].map(
+        (m) => m[1] ?? '',
       );
-      return methodNames.some((mn) => eventVocab.some((v) => mn.includes(v)));
+      for (const mn of methods) {
+        const chunks = mn
+          .replace(/[A-Z]+/g, (s) => '_' + s.toLowerCase())
+          .toLowerCase()
+          .split(/[^a-z0-9]+/)
+          .filter(Boolean);
+        for (const c of chunks) {
+          if (eventTokens.has(c)) return true;
+        }
+      }
+      return false;
     })();
     const overridesDispatchSite =
       methodMatchesEvent ||

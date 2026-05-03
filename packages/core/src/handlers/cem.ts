@@ -603,12 +603,23 @@ export async function diffCem(
   }
 
   if (!baseMeta) {
-    const result: DiffResult = { isNew: true, breaking: [], additions: [] };
+    // When the base CEM was actually queryable (gitShow ran, just no
+    // matching declaration), the component genuinely IS new. When the
+    // base was unavailable (out-of-tree cemPath), the component might
+    // exist on base — we just can't tell. Don't lie to consumers.
+    // Codex round-39 P2: drop isNew:true in the unavailable case so
+    // safety/migration flows that branch on isNew alone don't say
+    // "no migration needed" when really we just couldn't check.
     if (baseUnavailableReason !== '') {
-      result.baseUnavailable = true;
-      result.baseUnavailableReason = baseUnavailableReason;
+      return {
+        isNew: false,
+        breaking: [],
+        additions: [],
+        baseUnavailable: true,
+        baseUnavailableReason,
+      };
     }
-    return result;
+    return { isNew: true, breaking: [], additions: [] };
   }
 
   const breaking: string[] = [];

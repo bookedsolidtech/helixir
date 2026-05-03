@@ -127,26 +127,36 @@ export async function auditComponentWithCodex(
     ? auditsRootRaw
     : resolve(projectAbs, auditsRootRaw);
 
-  // Walk up to find the deepest existing ancestor; canonicalize it
-  // and verify both the ancestor AND the requested final path stay
-  // inside projectRoot. The final-path check protects against
-  // requested = projectAbs + "/../escape" where the existing ancestor
-  // is projectAbs but the requested path resolves outside.
+  // Walk up to find the deepest existing ancestor and canonicalize
+  // it. This handles symlinked checkouts (e.g. /symlinked/worktree
+  // → /real/worktree) AND collapses any `..` traversal segments
+  // before mkdir runs. We project the requested path through the
+  // canonical ancestor so the post-realpath comparison works for
+  // symlink-aliased absolute paths too. Codex round-43 P1 / round-47 P2.
   let ancestor = requestedAuditsRoot;
   while (!existsSyncFs(ancestor) && ancestor !== dirname(ancestor)) {
     ancestor = dirname(ancestor);
   }
   const ancestorReal = realpathSync(ancestor);
-  // Requested path normalized (no realpath since it doesn't exist
-  // yet — but normalize via resolve to collapse `..` segments).
-  const requestedNormalized = resolve(requestedAuditsRoot);
   const ancestorInProject =
     ancestorReal === projectAbs || ancestorReal.startsWith(projectAbs + sep);
-  const requestedInProject =
-    requestedNormalized === projectAbs || requestedNormalized.startsWith(projectAbs + sep);
-  if (!ancestorInProject || !requestedInProject) {
+  if (!ancestorInProject) {
     throw new MCPError(
-      `auditsRoot escapes projectRoot: "${auditsRootRaw}" resolves to "${requestedNormalized}"`,
+      `auditsRoot escapes projectRoot: "${auditsRootRaw}" resolves to existing ancestor "${ancestorReal}"`,
+      ErrorCategory.VALIDATION,
+    );
+  }
+  // Project the requested-but-not-yet-existing portion through the
+  // canonical ancestor so future-real path stays in-tree even when
+  // the user passed a symlinked absolute path.
+  const requestedNormalized = resolve(requestedAuditsRoot);
+  const tail = requestedNormalized.slice(ancestor.length);
+  const projectedReal = ancestorReal + tail;
+  const projectedInProject =
+    projectedReal === projectAbs || projectedReal.startsWith(projectAbs + sep);
+  if (!projectedInProject) {
+    throw new MCPError(
+      `auditsRoot escapes projectRoot: "${auditsRootRaw}" projects to "${projectedReal}"`,
       ErrorCategory.VALIDATION,
     );
   }

@@ -467,27 +467,28 @@ function checkTouchTarget(
     );
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 🛑 PINNED PER RUNBOOK §6 STEP 3 — GATE ON PARENT-INTERACTIVITY
+  // 🛑 PINNED PER RUNBOOK §6 STEP 3 — TIERED GATE
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // Round flip log on touch-target gating:
-  //   R34: bare :host on icons too broad
-  //   R37: tightened to interactive selectors only
-  //   R40: bare :host IS the click target
-  //   R45: re-gated on parent interactivity
-  //   R48: split into tiered selectors with strong-tier always-fired
-  //   R49: :host promoted to strong (always fires)
-  //   R53: false positives on decorative subclasses; demote
-  //   R55: even strong-interactive selectors should be gated —
-  //         "no parent touch-target contract to preserve" when
-  //         parent isn't interactive
+  // Round flip log on touch-target gating (R34–R62):
+  //   R34/R37/R45/R55: gate the whole check on parent interactivity
+  //   R40/R48/R49/R62: don't gate strong selectors — `button`,
+  //                    `[role=button]` are intrinsically interactive
+  //                    regardless of parent CEM
   //
-  // Final pin: this audit's PURPOSE is verifying subclass
-  // preservation of PARENT contract. If parent has no touch-target
-  // contract (non-interactive), there's nothing to preserve — gate
-  // the entire check on parentIsInteractive. Round 49's "sparse
-  // CEM" concern is an upstream CEM-completeness gap, not this
-  // audit's problem.
-  if (!parentIsInteractive) return [];
+  // Final synthesis: the audit's purpose is "did the subclass
+  // shrink an interactive surface below 44px". A literal `button`
+  // selector is interactive REGARDLESS of what the parent CEM
+  // declares — the user can still click the sub-44px button. So:
+  //   - When parent IS interactive: run all three tiers (strong /
+  //     :host / class vocabulary).
+  //   - When parent is NOT interactive: run ONLY the strong tier
+  //     (literal interactive elements). :host and class vocabulary
+  //     stay gated because they could be decorative without
+  //     parent confirmation.
+  // This satisfies the round-55 "preserve parent contract" framing
+  // (we don't audit ambiguous selectors without a contract) AND the
+  // round-62 "intrinsic interactivity" framing (literal buttons
+  // are buttons regardless).
 
   const RULE_PATTERN = /([^{}]+)\{([^{}]*)\}/g;
   // Selector heuristic: accept literal interactive elements,

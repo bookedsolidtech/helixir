@@ -314,7 +314,12 @@ async function run(): Promise<void> {
           (!failOnWarning || !hasWarnings) &&
           // Indeterminate diffs are never a pass — silence is not safety.
           // Codex round-58 P1.
-          !hasIndeterminate,
+          !hasIndeterminate &&
+          // Diff parse failure is also never a pass — the check never
+          // ran. Without this, downstream workflows reading
+          // steps.helixir.outputs.passed see "true" while setFailed
+          // separately fails the job. Codex round-62 P1.
+          !diffParseFailed,
       ),
     );
 

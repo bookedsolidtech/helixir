@@ -139,7 +139,7 @@ async function cmdAnalyze(args: string[], opts: CliOptions): Promise<void> {
     const decl = getAllDeclarations(cem).find((d) => d.tagName === tag);
     const accessibility = decl ? analyzeAccessibility(decl) : null;
 
-    if (opts.format === 'json') {
+    if (opts.format === 'json' || opts.format === 'json-array') {
       output({ metadata: meta, accessibility }, 'json');
     } else {
       const rows: string[][] = [
@@ -161,7 +161,7 @@ async function cmdAnalyze(args: string[], opts: CliOptions): Promise<void> {
     }
   } else {
     const tags = listAllComponents(cem);
-    if (opts.format === 'json') {
+    if (opts.format === 'json' || opts.format === 'json-array') {
       output(tags, 'json');
     } else {
       output(
@@ -186,7 +186,7 @@ async function cmdHealth(args: string[], opts: CliOptions): Promise<void> {
     }
     const tag = args[0] as string;
     const trend = await getHealthTrend(config, tag);
-    if (opts.format === 'json') {
+    if (opts.format === 'json' || opts.format === 'json-array') {
       output(trend, 'json');
     } else {
       const rows = trend.dataPoints.map((dp) => [dp.date, String(dp.score), dp.grade]);
@@ -210,7 +210,7 @@ async function cmdHealth(args: string[], opts: CliOptions): Promise<void> {
     scores = await scoreAllComponents(config, decls);
   }
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
     output(scores, 'json');
   } else {
     const rows = scores.map((s) => [s.tagName, String(s.score), s.grade, s.issues.join('; ')]);
@@ -360,7 +360,7 @@ async function cmdMigrate(args: string[], opts: CliOptions): Promise<void> {
 
   const guide = await generateMigrationGuide(tag, opts.base, config, cem);
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
     output(guide, 'json');
   } else {
     output(null, opts.format, guide.markdown);
@@ -379,7 +379,7 @@ async function cmdSuggest(args: string[], opts: CliOptions): Promise<void> {
 
   const result = await suggestUsage(tag, config, cem);
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
     output(result, 'json');
   } else {
     const sections: string[] = [`HTML:\n${result.htmlSnippet}`];
@@ -402,7 +402,7 @@ async function cmdBundle(args: string[], opts: CliOptions): Promise<void> {
   const result = await estimateBundleSize(tag, config);
   const fp = result.estimates.full_package;
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
     output(result, 'json');
   } else {
     const rows: string[][] = [
@@ -430,7 +430,7 @@ async function cmdTokens(args: string[], opts: CliOptions): Promise<void> {
     tokens = await getDesignTokens(config);
   }
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
     output(tokens, 'json');
   } else {
     const rows = tokens.map((t) => [t.name, String(t.value), t.category, t.description ?? '']);
@@ -450,7 +450,7 @@ async function cmdCompare(args: string[], opts: CliOptions): Promise<void> {
 
   const result = await compareLibraries({ cemPathA: cemA, cemPathB: cemB }, config);
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
     output(result, 'json');
   } else {
     const rows: string[][] = [
@@ -478,7 +478,7 @@ async function cmdBenchmark(args: string[], opts: CliOptions): Promise<void> {
   const libraries = args.map((p) => ({ label: p, cemPath: p }));
   const result = await benchmarkLibraries(libraries, config);
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
     output(result.scores, 'json');
   } else {
     output(null, opts.format, result.formatted);
@@ -501,7 +501,7 @@ async function cmdValidate(args: string[], opts: CliOptions): Promise<void> {
   const cem = loadCem(config.cemPath, config.projectRoot);
   const result = validateUsage(tag, opts.html, cem);
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
     output(result, 'json');
   } else if (result.issues.length === 0) {
     process.stdout.write('Validation passed — no issues found.\n');
@@ -522,7 +522,7 @@ async function cmdCdn(args: string[], opts: CliOptions): Promise<void> {
   const version = args.length >= 2 ? (args[1] as string) : 'latest';
   const result = await resolveCdnCem(pkg, version, opts.registry, config);
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
     output(result, 'json');
   } else {
     const rows: string[][] = [
@@ -547,7 +547,7 @@ async function cmdGenerateTypes(_args: string[], opts: CliOptions): Promise<void
     writeFileSync(outPath, result.typescript, 'utf-8');
     process.stdout.write(`Wrote TypeScript definitions to ${outPath}\n`);
     process.stdout.write(result.formatted + '\n');
-  } else if (opts.format === 'json') {
+  } else if (opts.format === 'json' || opts.format === 'json-array') {
     output({ typescript: result.typescript, componentCount: result.componentCount }, 'json');
   } else {
     process.stdout.write(result.typescript);

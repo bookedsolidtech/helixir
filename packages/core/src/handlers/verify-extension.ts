@@ -865,9 +865,22 @@ function splitTopLevelCommas(text: string): string[] {
   const out: string[] = [];
   let parenDepth = 0;
   let bracketDepth = 0;
+  let quote: '"' | "'" | null = null;
   let segStart = 0;
   for (let i = 0; i < text.length; i++) {
     const ch = text[i];
+    // Quote handling — selectors like `[data-x=")"]` or
+    // `:is([aria-label="("])` have ( / [ inside string literals
+    // that must NOT mutate paren/bracket depth. Track quote state
+    // and skip depth tracking inside strings. Codex round-77 P2.
+    if (quote !== null) {
+      if (ch === quote && text[i - 1] !== '\\') quote = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'") {
+      quote = ch;
+      continue;
+    }
     if (ch === '(') parenDepth++;
     else if (ch === ')') parenDepth--;
     else if (ch === '[') bracketDepth++;

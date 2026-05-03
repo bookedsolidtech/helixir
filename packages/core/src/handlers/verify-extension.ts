@@ -773,17 +773,17 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
             atName === 'property' ||
             atName === 'font-feature-values' ||
             atName === 'font-palette-values';
-          // @scope is predicate-bearing in a way @media isn't —
-          // `@scope (.toolbar) { button { ... } }` only applies when
-          // the button is inside .toolbar, which is structural rather
-          // than environmental. Flagging unconditionally would
-          // false-positive components never rendered under that
-          // scope. Treat as opaque (skip entirely). Codex round-78 P2.
-          const isStructurallyScoped = atName === 'scope';
-          if (isSelectorless || isStructurallyScoped) {
+          if (isSelectorless) {
+            // @keyframes / @font-face / etc. — contents aren't selectors.
             i = k + 1;
             continue;
           }
+          // @scope handling: round 78 said skip (predicate-bearing,
+          // false-positive on `.toolbar` scope); round 79 said don't
+          // skip (`@scope (:host) { ... }` always applies in the
+          // component). Same trade as @media — recurse so inner
+          // selectors surface, accept the
+          // `@scope (.toolbar)`-style false-positive cost.
           // ALL other at-rules (conditional @media/@supports/@container
           // AND unconditional @layer/@page/@starting-style) are
           // flattened symmetrically: extract direct decls back to
@@ -917,8 +917,21 @@ function extractDirectDeclarations(input: string): string {
   let out = '';
   let depth = 0;
   let segStart = 0;
+  // Quote-aware: CSS values can contain { / } inside string literals
+  // (`content: "{"`, inline SVG data URLs, etc.). Skip depth tracking
+  // inside strings so braces in quoted values don't truncate the
+  // declaration extraction. Codex round-79 P2.
+  let quote: '"' | "'" | null = null;
   for (let p = 0; p < input.length; p++) {
     const c = input[p];
+    if (quote !== null) {
+      if (c === quote && input[p - 1] !== '\\') quote = null;
+      continue;
+    }
+    if (c === '"' || c === "'") {
+      quote = c;
+      continue;
+    }
     if (c === '{') {
       if (depth === 0) {
         // entering a nested block — segStart..p is the prelude;

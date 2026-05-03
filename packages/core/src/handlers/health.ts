@@ -71,12 +71,18 @@ export interface HealthDiff {
   current: ComponentHealth;
   improved: boolean;
   regressed: boolean;
-  scoreDelta: number;
+  /**
+   * Numeric score delta. `null` ONLY when `baseUnavailable` is true
+   * (the diff cannot be computed). Codex round-49 P2: NaN serializes
+   * to JSON null which violates the numeric contract; explicit
+   * nullable type is the correct shape.
+   */
+  scoreDelta: number | null;
   changedDimensions: Array<{
     dimension: string;
-    before: number;
-    after: number;
-    delta: number;
+    before: number | null;
+    after: number | null;
+    delta: number | null;
   }>;
   /**
    * True when the base-branch CEM could not be read (out-of-tree
@@ -628,10 +634,11 @@ export async function getHealthDiff(
   }
 
   // baseUnavailable short-circuit: scoreDelta and changedDimensions
-  // are not derivable from the missing base. Emit explicit NaN /
-  // empty values so JSON consumers see `null` and a single sentinel
-  // dimension entry — never a fictitious "improved" / "regressed"
-  // signal. Codex round-48 P2.
+  // are not derivable from the missing base. Emit explicit `null`
+  // values (the schema declares `number | null` for the indeterminate
+  // case) so consumers see an explicitly-typed indeterminate state
+  // rather than a fictitious zero-or-fake delta. Codex round-48 P2 +
+  // round-49 P2 (nullable instead of NaN).
   if (baseUnavailableReason !== '') {
     const result: HealthDiff = {
       tagName,
@@ -639,13 +646,13 @@ export async function getHealthDiff(
       current,
       improved: false,
       regressed: false,
-      scoreDelta: Number.NaN,
+      scoreDelta: null,
       changedDimensions: [
         {
           dimension: 'BASE_UNAVAILABLE',
-          before: Number.NaN,
-          after: Number.NaN,
-          delta: Number.NaN,
+          before: null,
+          after: null,
+          delta: null,
         },
       ],
       baseUnavailable: true,

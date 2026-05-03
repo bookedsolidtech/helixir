@@ -259,8 +259,17 @@ function checkEventContract(
         (m) => m[1] ?? '',
       );
       for (const mn of methods) {
+        // Acronym-preserving camelCase → snake_case. Standard pattern:
+        // insert a separator BEFORE each capital-after-lowercase, and
+        // BEFORE each capital that begins a new lowercase run inside
+        // an acronym. So `onURLChange` → `on_URL_Change` →
+        // `[on, url, change]`. Without acronym preservation,
+        // `[A-Z]+`-replace turned `URLChange` into `urlchange`
+        // (single chunk) and missed real `url-change` event matches.
+        // Codex round-49 P2.
         const chunks = mn
-          .replace(/[A-Z]+/g, (s) => '_' + s.toLowerCase())
+          .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+          .replace(/([A-Z])([A-Z][a-z])/g, '$1_$2')
           .toLowerCase()
           .split(/[^a-z0-9]+/)
           .filter(Boolean);
@@ -473,22 +482,34 @@ function checkTouchTarget(
   // `.container`/`.row` are not. Matches the runbook §6 pin pattern
   // — pin the structure, not the regex.
   //
-  // Round-48 P2: don't gate the whole check on parent CEM signaling
-  // interactivity — the CEM is often sparse on internal click
-  // surfaces. Instead use TWO regex tiers:
+  // Round-48 P2 / round-49 P2: don't gate the whole check on parent
+  // CEM signaling interactivity — the CEM is often sparse on internal
+  // click surfaces. Two selector tiers:
   //   - Strong tier (always-fired): literal interactive elements
-  //     (`button`, `input`, `[role=...]`, `[tabindex]`) and :host
-  //     when parent shows interactive signals. These are intrinsically
-  //     interactive — no CEM signal needed.
-  //   - Weak tier (parent-interactive only): class-name vocabulary
-  //     (`.button`, `.control`, ...). These look interactive but
-  //     could also be just-styling — only honor them when parent CEM
-  //     confirms interactivity to keep noise down.
+  //     (`button`, `input`, `[role=...]`, `[tabindex]`) AND :host.
+  //     :host moved to strong per round-49 — for an extending custom
+  //     element the host IS the click target by default, and gating
+  //     it on CEM signals reintroduced false negatives whenever the
+  //     CEM was sparse.
+  //   - Weak tier (parent-interactive only): non-:host class-name
+  //     vocabulary (`.button`, `.control`, ...). These look
+  //     interactive but could also be just-styling — only honor them
+  //     when parent CEM confirms interactivity to keep noise down.
+  // Round 34's "bare :host on icons produces noise" concern is
+  // mitigated by the explicit decoration-by-styles guard below
+  // (`pointer-events: none`, `cursor: default` on :host signal a
+  // non-interactive host even when the host itself is referenced).
   const STRONG_INTERACTIVE =
-    /(?:^|[\s,>+~])(?:button|a|input|select|textarea|summary|label|\[role\s*=\s*["']?(?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|option|switch|checkbox|radio|combobox|listbox|slider|spinbutton|treeitem|gridcell)["']?\]|\[tabindex(?:=|\]))(?:[\s,.:[{]|$)/i;
-  const HOST_SELECTOR = /(?:^|[\s,>+~]):host(?:[\s,.:[{(]|$)/i;
+    /(?:^|[\s,>+~])(?:button|a|input|select|textarea|summary|label|:host|\[role\s*=\s*["']?(?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|option|switch|checkbox|radio|combobox|listbox|slider|spinbutton|treeitem|gridcell)["']?\]|\[tabindex(?:=|\]))(?:[\s,.:[{(]|$)/i;
   const WEAK_INTERACTIVE_CLASS =
     /(?:^|[\s,>+~.])\.(?:button|btn|control|trigger|action|tab|menuitem|menu-item|option|chip|toggle|switch|checkbox|radio|link|clickable|interactive|target|thumb|handle|nav-item|tile|card-action|cta|hit-area|pressable|swatch-button)(?:[\s,.:[{]|$)/i;
+  // Decoration-by-styles guard: when :host has explicit non-interactive
+  // CSS, treat the whole rule set as decorative regardless of selector
+  // vocabulary. Catches the round-34 `<hx-icon>` pattern where :host
+  // is sized but explicitly non-interactive.
+  const HOST_NON_INTERACTIVE =
+    /:host\s*\{[^}]*(?:pointer-events\s*:\s*none|cursor\s*:\s*default)[^}]*\}/i;
+  const hostExplicitlyNonInteractive = HOST_NON_INTERACTIVE.test(styles);
   const DECORATIVE_SELECTOR =
     /::(before|after|placeholder|marker|backdrop|selection|first-line|first-letter)|::part\([^)]*(icon|indicator|chevron|caret|spinner|backdrop)[^)]*\)|\[aria-hidden\b|(?:^|[\s,>+~.])(icon|chevron|caret|spinner|indicator|decoration|ornament|backdrop|overlay|glyph|swatch|dot|pip|bullet|sparkline|sigil|badge-dot)(?:[\s,.:[{]|$)/i;
   const SIZE_RULE = /\b(min-width|min-height|width|height)\s*:\s*([\d.]+)(px|rem)\b/g;
@@ -500,12 +521,13 @@ function checkTouchTarget(
     const body = m[2] ?? '';
     if (selector.trim().startsWith('@')) continue;
     if (DECORATIVE_SELECTOR.test(selector)) continue;
-    // Strong tier always counts; :host counts when parent is signaled
-    // interactive; class vocabulary requires parent-interactive too.
+    // Strong tier (incl. :host) always counts; class vocabulary
+    // requires parent-interactive. Skip everything when :host is
+    // explicitly marked non-interactive in styles.
+    if (hostExplicitlyNonInteractive) continue;
     const matchesStrong = STRONG_INTERACTIVE.test(selector);
-    const matchesHost = parentIsInteractive && HOST_SELECTOR.test(selector);
     const matchesClass = parentIsInteractive && WEAK_INTERACTIVE_CLASS.test(selector);
-    if (!matchesStrong && !matchesHost && !matchesClass) continue;
+    if (!matchesStrong && !matchesClass) continue;
     let s: RegExpExecArray | null;
     while ((s = SIZE_RULE.exec(body)) !== null) {
       const value = parseFloat(s[2] ?? '0');

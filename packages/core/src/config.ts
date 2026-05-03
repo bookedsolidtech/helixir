@@ -203,6 +203,17 @@ function rebaseRelativePaths(
 interface ConfigReadResult {
   partial: Partial<McpWcConfig>;
   sourceDir: string | null;
+  /**
+   * True when the config was loaded from MCP_WC_CONFIG_PATH (explicit
+   * external trigger), even if MCP_WC_CONFIG_PATH happens to point at
+   * a file inside projectRoot. Distinct from `sourceDir` location:
+   * an in-repo config file becomes "explicit external" when the env
+   * var was set and the file actually loaded. Drives the
+   * cemPathFromExternalConfig provenance stamp downstream — codex
+   * round-24 P1 (sourceDir-only check rejected legitimate
+   * MCP_WC_CONFIG_PATH=packages/ds/helixir.mcp.json setups).
+   */
+  loadedFromExplicitConfigEnv: boolean;
 }
 
 function readConfigFile(projectRoot: string): ConfigReadResult {
@@ -227,6 +238,7 @@ function readConfigFile(projectRoot: string): ConfigReadResult {
         return {
           partial: rebaseRelativePaths(parsed, dirname(resolvedExplicit), projectRoot),
           sourceDir: dirname(resolvedExplicit),
+          loadedFromExplicitConfigEnv: true,
         };
       } catch {
         // Bad explicit-path JSON — warn and FALL THROUGH to the in-root
@@ -248,10 +260,14 @@ function readConfigFile(projectRoot: string): ConfigReadResult {
   if (existsSync(primaryPath)) {
     try {
       const raw = readFileSync(primaryPath, 'utf-8');
-      return { partial: JSON.parse(raw) as Partial<McpWcConfig>, sourceDir: projectRoot };
+      return {
+        partial: JSON.parse(raw) as Partial<McpWcConfig>,
+        sourceDir: projectRoot,
+        loadedFromExplicitConfigEnv: false,
+      };
     } catch {
       process.stderr.write(`[helixir] Warning: helixir.mcp.json is malformed. Using defaults.\n`);
-      return { partial: {}, sourceDir: null };
+      return { partial: {}, sourceDir: null, loadedFromExplicitConfigEnv: false };
     }
   }
 
@@ -263,14 +279,18 @@ function readConfigFile(projectRoot: string): ConfigReadResult {
     );
     try {
       const raw = readFileSync(legacyPath, 'utf-8');
-      return { partial: JSON.parse(raw) as Partial<McpWcConfig>, sourceDir: projectRoot };
+      return {
+        partial: JSON.parse(raw) as Partial<McpWcConfig>,
+        sourceDir: projectRoot,
+        loadedFromExplicitConfigEnv: false,
+      };
     } catch {
       process.stderr.write(`[helixir] Warning: mcpwc.config.json is malformed. Using defaults.\n`);
-      return { partial: {}, sourceDir: null };
+      return { partial: {}, sourceDir: null, loadedFromExplicitConfigEnv: false };
     }
   }
 
-  return { partial: {}, sourceDir: null };
+  return { partial: {}, sourceDir: null, loadedFromExplicitConfigEnv: false };
 }
 
 export function loadConfig(): Readonly<McpWcConfig> {
@@ -309,20 +329,15 @@ export function loadConfig(): Readonly<McpWcConfig> {
   //   - The flag reflects the actual loader path that ran, not just
   //     the env vars that were set.
   //
-  // Critical: configSourceDir tells us where the JSON ACTUALLY came
-  // from. If MCP_WC_CONFIG_PATH was stale/malformed and the loader
-  // fell back to in-repo discovery, configSourceDir lives inside
-  // projectRoot — and the bypass MUST NOT fire even though the env
-  // var is set. Codex round-19 P1.
+  // Critical: loadedFromExplicitConfigEnv tells us whether the JSON
+  // actually came from MCP_WC_CONFIG_PATH (round-24 P1) — distinct from
+  // the sourceDir heuristic, which mis-classified legitimate
+  // MCP_WC_CONFIG_PATH=packages/ds/helixir.mcp.json setups as "internal."
+  // The right ground truth is "did the explicit env-var loader path run
+  // successfully?" That's what the flag captures.
   const projectRootResolved = resolve(effectiveRoot);
-  const fileCameFromExternal =
-    configSourceDir !== null &&
-    !(
-      resolve(configSourceDir) === projectRootResolved ||
-      resolve(configSourceDir).startsWith(projectRootResolved + sep)
-    );
   if (
-    fileCameFromExternal &&
+    fileConfigResult.loadedFromExplicitConfigEnv &&
     fileCemPath !== undefined &&
     process.env['MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS'] === '1' &&
     typeof config.cemPath === 'string' &&

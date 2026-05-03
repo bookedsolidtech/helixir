@@ -716,13 +716,28 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
         const inner = input.slice(j + 1, k);
         // At-rules (`@media`, `@supports`, `@container`, etc.) are
         // CONDITIONAL wrappers, not selectors. Don't compose them
-        // into the resolved selector chain — recurse into their
-        // contents with the SAME parent selector. Codex round-66 P2:
-        // without this, `@media (...) { button { width: 20px } }`
-        // resolved to `@media (...) button` and got skipped by the
-        // `selector.trim().startsWith('@')` filter, hiding undersized
-        // rules inside responsive/conditional blocks.
+        // into the resolved selector chain. CSS nesting allows BOTH
+        // forms inside an at-rule:
+        //   button { @media (...) { width: 20px } }       — declarations apply to parent
+        //   @media (...) { button { width: 20px } }       — nested rule
+        // For the first form, declarations directly inside the at-rule
+        // body belong to parentSel. Extract them and emit as a leaf
+        // for parentSel before recursing into any further nested rules.
+        // Codex round-66 P2 / round-67 P2.
         if (childSel.startsWith('@')) {
+          // Extract direct (depth-0 within the at-rule body) declarations.
+          let atDecl = '';
+          let dd = 0;
+          for (let p = 0; p < inner.length; p++) {
+            const c = inner[p];
+            if (c === '{') dd++;
+            else if (c === '}') dd--;
+            else if (dd === 0) atDecl += c;
+          }
+          if (atDecl.trim() !== '' && parentSel !== '') {
+            out.push({ selector: parentSel, body: atDecl });
+          }
+          // Recurse into nested rules with the SAME parent selector.
           parseBlock(inner, parentSel);
           i = k + 1;
           continue;

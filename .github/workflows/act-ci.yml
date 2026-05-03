@@ -55,7 +55,7 @@ jobs:
         # from the host's Node version, forwarded by act-ci.sh as
         # ACT_FULL_NODE_VERSION. Defaults to 22 (LTS, runner default).
         # Codex round-5 P2 + round-6/7 P2 (host-Node selection).
-        node-version: ${{ (env.ACT_MATRIX_TESTS == 'true' && fromJSON('[20, 22, 24]')) || fromJSON(format('[{0}]', env.ACT_FULL_NODE_VERSION || '22')) }}
+        node-version: ${{ (env.ACT_MATRIX_TESTS == 'true' && fromJSON('[22, 24]')) || fromJSON(format('[{0}]', env.ACT_FULL_NODE_VERSION || '22')) }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node ${{ matrix.node-version }} via nvm

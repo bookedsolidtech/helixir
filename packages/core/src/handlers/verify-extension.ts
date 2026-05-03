@@ -457,8 +457,6 @@ function checkTouchTarget(
       ['onclick', 'onkeydown', 'onkeyup', 'onfocus', 'onblur'].includes(m.name.toLowerCase()),
     );
 
-  if (!parentIsInteractive) return [];
-
   const RULE_PATTERN = /([^{}]+)\{([^{}]*)\}/g;
   // Selector heuristic: accept literal interactive elements,
   // role/tabindex attribute selectors, :host, AND class-name
@@ -474,8 +472,23 @@ function checkTouchTarget(
   // explicitly so `.control`/`.button` are caught while
   // `.container`/`.row` are not. Matches the runbook §6 pin pattern
   // — pin the structure, not the regex.
-  const INTERACTIVE_SELECTOR =
-    /(?:^|[\s,>+~])(?:button|a|input|select|textarea|summary|label|:host|\[role\s*=\s*["']?(?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|option|switch|checkbox|radio|combobox|listbox|slider|spinbutton|treeitem|gridcell)["']?\]|\[tabindex(?:=|\])|\.(?:button|btn|control|trigger|action|tab|menuitem|menu-item|option|chip|toggle|switch|checkbox|radio|link|clickable|interactive|target|thumb|handle|nav-item|tile|card-action|cta|hit-area|pressable|swatch-button))(?:[\s,.:[{]|$)/i;
+  //
+  // Round-48 P2: don't gate the whole check on parent CEM signaling
+  // interactivity — the CEM is often sparse on internal click
+  // surfaces. Instead use TWO regex tiers:
+  //   - Strong tier (always-fired): literal interactive elements
+  //     (`button`, `input`, `[role=...]`, `[tabindex]`) and :host
+  //     when parent shows interactive signals. These are intrinsically
+  //     interactive — no CEM signal needed.
+  //   - Weak tier (parent-interactive only): class-name vocabulary
+  //     (`.button`, `.control`, ...). These look interactive but
+  //     could also be just-styling — only honor them when parent CEM
+  //     confirms interactivity to keep noise down.
+  const STRONG_INTERACTIVE =
+    /(?:^|[\s,>+~])(?:button|a|input|select|textarea|summary|label|\[role\s*=\s*["']?(?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|option|switch|checkbox|radio|combobox|listbox|slider|spinbutton|treeitem|gridcell)["']?\]|\[tabindex(?:=|\]))(?:[\s,.:[{]|$)/i;
+  const HOST_SELECTOR = /(?:^|[\s,>+~]):host(?:[\s,.:[{(]|$)/i;
+  const WEAK_INTERACTIVE_CLASS =
+    /(?:^|[\s,>+~.])\.(?:button|btn|control|trigger|action|tab|menuitem|menu-item|option|chip|toggle|switch|checkbox|radio|link|clickable|interactive|target|thumb|handle|nav-item|tile|card-action|cta|hit-area|pressable|swatch-button)(?:[\s,.:[{]|$)/i;
   const DECORATIVE_SELECTOR =
     /::(before|after|placeholder|marker|backdrop|selection|first-line|first-letter)|::part\([^)]*(icon|indicator|chevron|caret|spinner|backdrop)[^)]*\)|\[aria-hidden\b|(?:^|[\s,>+~.])(icon|chevron|caret|spinner|indicator|decoration|ornament|backdrop|overlay|glyph|swatch|dot|pip|bullet|sparkline|sigil|badge-dot)(?:[\s,.:[{]|$)/i;
   const SIZE_RULE = /\b(min-width|min-height|width|height)\s*:\s*([\d.]+)(px|rem)\b/g;
@@ -487,7 +500,12 @@ function checkTouchTarget(
     const body = m[2] ?? '';
     if (selector.trim().startsWith('@')) continue;
     if (DECORATIVE_SELECTOR.test(selector)) continue;
-    if (!INTERACTIVE_SELECTOR.test(selector)) continue;
+    // Strong tier always counts; :host counts when parent is signaled
+    // interactive; class vocabulary requires parent-interactive too.
+    const matchesStrong = STRONG_INTERACTIVE.test(selector);
+    const matchesHost = parentIsInteractive && HOST_SELECTOR.test(selector);
+    const matchesClass = parentIsInteractive && WEAK_INTERACTIVE_CLASS.test(selector);
+    if (!matchesStrong && !matchesHost && !matchesClass) continue;
     let s: RegExpExecArray | null;
     while ((s = SIZE_RULE.exec(body)) !== null) {
       const value = parseFloat(s[2] ?? '0');

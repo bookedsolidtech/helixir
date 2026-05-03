@@ -577,22 +577,23 @@ export async function getHealthDiff(
   }
   let baseUnavailableReason = '';
   if (outOfTree) {
-    // Paired with diffCem.ts. Per round-46 pin, the out-of-tree case
-    // returns the advisory diff with baseUnavailable: true rather
-    // than throwing — the HealthDiff schema already declares the
-    // flag, so the throw branch contradicted the contract. Base is
-    // set to a placeholder so the result still type-checks; callers
-    // that check baseUnavailable get the metadata, callers that
-    // ignore the flag see no fictitious deltas (current vs current
-    // produces zero deltas since we copy current into base).
+    // Paired with diffCem.ts. Per round-46/47/48 pins, the out-of-tree
+    // case returns the advisory diff with baseUnavailable: true.
+    // Round 47 set base = current which produced zero deltas — that
+    // looked like "no change" to legacy consumers. Round 48 fix:
+    // base.score is set to NaN so scoreDelta computes to NaN. NaN
+    // serializes as JSON `null`, so any consumer reading the field
+    // gets a noticeable signal rather than a fake "0 delta". The
+    // same applies to changedDimensions — every entry will have
+    // NaN before/delta values that JSON-serialize as null.
     const redactedPath = config.cemPath.split(/[\\/]/).pop() ?? '<absolute>';
     baseUnavailableReason = `cemPath (basename: ${redactedPath}) is out-of-tree relative to the git repo root; gitShow requires repo-relative paths. To restore real diff, unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.`;
     base = {
       tagName,
-      score: current.score,
-      grade: current.grade,
-      dimensions: { ...current.dimensions },
-      issues: [],
+      score: Number.NaN,
+      grade: 'F',
+      dimensions: {},
+      issues: [`BASE_UNAVAILABLE: ${baseUnavailableReason}`],
       timestamp: current.timestamp,
     };
   } else {
@@ -624,6 +625,33 @@ export async function getHealthDiff(
         timestamp: new Date().toISOString(),
       };
     }
+  }
+
+  // baseUnavailable short-circuit: scoreDelta and changedDimensions
+  // are not derivable from the missing base. Emit explicit NaN /
+  // empty values so JSON consumers see `null` and a single sentinel
+  // dimension entry — never a fictitious "improved" / "regressed"
+  // signal. Codex round-48 P2.
+  if (baseUnavailableReason !== '') {
+    const result: HealthDiff = {
+      tagName,
+      base,
+      current,
+      improved: false,
+      regressed: false,
+      scoreDelta: Number.NaN,
+      changedDimensions: [
+        {
+          dimension: 'BASE_UNAVAILABLE',
+          before: Number.NaN,
+          after: Number.NaN,
+          delta: Number.NaN,
+        },
+      ],
+      baseUnavailable: true,
+      baseUnavailableReason,
+    };
+    return result;
   }
 
   const scoreDelta = current.score - base.score;
@@ -665,10 +693,6 @@ export async function getHealthDiff(
     scoreDelta: Math.round(scoreDelta * 10) / 10,
     changedDimensions,
   };
-  if (baseUnavailableReason !== '') {
-    result.baseUnavailable = true;
-    result.baseUnavailableReason = baseUnavailableReason;
-  }
   return result;
 }
 

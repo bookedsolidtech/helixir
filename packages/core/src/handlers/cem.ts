@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isAbsolute } from 'node:path';
 import type { McpWcConfig } from '../config.js';
 import { GitOperations } from '../shared/git.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
@@ -500,21 +501,34 @@ export async function diffCem(
   // Get current branch component metadata from cached CEM
   const current = parseCem(tagName, cem);
 
-  // Read base branch's CEM via git show — no stash, no checkout, no working-tree mutation
+  // Read base branch's CEM via git show — no stash, no checkout, no working-tree mutation.
+  //
+  // Guard: gitShow's allowlist rejects absolute paths. When a user opted
+  // into MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1, config.cemPath is absolute
+  // and downstream diff would silently fall back to "component is new" for
+  // every component. Surface that explicitly to stderr so the user knows
+  // the diff is degraded, then continue with baseMeta = null. Codex
+  // round-10 P1.
   const gitOps = new GitOperations();
 
   let baseMeta: ComponentMetadata | null = null;
 
-  try {
-    const cemContent = await gitOps.gitShow(baseBranch, config.cemPath);
-    const rawJson: unknown = JSON.parse(cemContent);
-    const baseCem = CemSchema.parse(rawJson);
-    const baseDecl = findDeclaration(baseCem, tagName);
-    if (baseDecl) {
-      baseMeta = mapDeclaration(baseDecl);
+  if (isAbsolute(config.cemPath)) {
+    process.stderr.write(
+      `[helixir] Warning: diffCem cannot read base-branch CEM at absolute path ${config.cemPath} — gitShow requires repo-relative paths. Diff falls back to treating ${tagName} as new in base. (To restore diff: unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.)\n`,
+    );
+  } else {
+    try {
+      const cemContent = await gitOps.gitShow(baseBranch, config.cemPath);
+      const rawJson: unknown = JSON.parse(cemContent);
+      const baseCem = CemSchema.parse(rawJson);
+      const baseDecl = findDeclaration(baseCem, tagName);
+      if (baseDecl) {
+        baseMeta = mapDeclaration(baseDecl);
+      }
+    } catch {
+      // CEM missing or unreadable on base branch — component is new
     }
-  } catch {
-    // CEM missing or unreadable on base branch — component is new
   }
 
   if (!baseMeta) {

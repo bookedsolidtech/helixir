@@ -1,5 +1,5 @@
 import { readFile, readdir } from 'node:fs/promises';
-import { resolve, join, relative } from 'node:path';
+import { resolve, join, relative, isAbsolute } from 'node:path';
 import { z } from 'zod';
 import { GitOperations } from '../shared/git.js';
 import type { McpWcConfig } from '../config.js';
@@ -533,15 +533,42 @@ export async function getHealthDiff(
   const git = gitOps ?? new GitOperations();
 
   let base: ComponentHealth;
-  try {
-    const cemContent = await git.gitShow(baseBranch, config.cemPath);
-    const cem = CemSchema.parse(JSON.parse(cemContent));
-    const baseDecl = cem.modules
-      .flatMap((m) => m.declarations ?? [])
-      .find((d) => d.tagName === tagName);
-    if (baseDecl) {
-      base = scoreCemFallback(baseDecl);
-    } else {
+  // Guard: gitShow rejects absolute paths. When the user opted into
+  // MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1, config.cemPath is absolute and
+  // the diff would silently treat every component as "not found in base."
+  // Surface the limitation explicitly. Codex round-10 P1.
+  if (isAbsolute(config.cemPath)) {
+    process.stderr.write(
+      `[helixir] Warning: getHealthDiff cannot read base-branch CEM at absolute path ${config.cemPath} — gitShow requires repo-relative paths. Returning 0/F base for ${tagName}. (To restore diff: unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.)\n`,
+    );
+    base = {
+      tagName,
+      score: 0,
+      grade: 'F' as const,
+      dimensions: {},
+      issues: ['Base CEM unavailable — cemPath is absolute (external opt-in active)'],
+      timestamp: new Date().toISOString(),
+    };
+  } else {
+    try {
+      const cemContent = await git.gitShow(baseBranch, config.cemPath);
+      const cem = CemSchema.parse(JSON.parse(cemContent));
+      const baseDecl = cem.modules
+        .flatMap((m) => m.declarations ?? [])
+        .find((d) => d.tagName === tagName);
+      if (baseDecl) {
+        base = scoreCemFallback(baseDecl);
+      } else {
+        base = {
+          tagName,
+          score: 0,
+          grade: 'F',
+          dimensions: {},
+          issues: ['Component not found in base branch'],
+          timestamp: new Date().toISOString(),
+        };
+      }
+    } catch {
       base = {
         tagName,
         score: 0,
@@ -551,15 +578,6 @@ export async function getHealthDiff(
         timestamp: new Date().toISOString(),
       };
     }
-  } catch {
-    base = {
-      tagName,
-      score: 0,
-      grade: 'F',
-      dimensions: {},
-      issues: ['Component not found in base branch'],
-      timestamp: new Date().toISOString(),
-    };
   }
 
   const scoreDelta = current.score - base.score;

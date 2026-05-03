@@ -1014,17 +1014,29 @@ function extractDirectDeclarations(input: string): string {
  * Codex round-82 P2.
  */
 function extractBalancedScopeRoot(childSel: string): string {
-  const idx = childSel.indexOf('(');
+  // CSS @scope prelude has three forms:
+  //   @scope (root) { ... }                 → start: root, no limit
+  //   @scope (root) to (limit) { ... }      → start: root, limit: limit
+  //   @scope to (limit) { ... }             → start: NONE (limit-only)
+  // We want the START selector only; limit-only scopes have no
+  // ancestor constraint and should leave parentSel alone.
+  // Codex round-83 P2.
+  const afterAt = childSel.replace(/^@scope\s*/i, '');
+  // If first non-whitespace token is `to`, it's a limit-only scope
+  // — no start selector to incorporate.
+  if (/^to\s*\(/i.test(afterAt)) return '';
+  // Find the first `(` of the START clause and balance-walk.
+  const idx = afterAt.indexOf('(');
   if (idx === -1) return '';
   let depth = 1;
   let j = idx + 1;
-  while (j < childSel.length && depth > 0) {
-    const ch = childSel[j];
+  while (j < afterAt.length && depth > 0) {
+    const ch = afterAt[j];
     if (ch === '(') depth++;
     else if (ch === ')') depth--;
     if (depth === 0) break;
     j++;
   }
   if (depth !== 0) return '';
-  return childSel.slice(idx + 1, j).trim();
+  return afterAt.slice(idx + 1, j).trim();
 }

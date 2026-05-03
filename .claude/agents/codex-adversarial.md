@@ -36,7 +36,7 @@ You may read additional files in the repo if needed for context, but do so read-
 5. **Parse the Codex output** — extract structured findings.
 6. **Classify findings** by category: security, correctness, edge cases, test gaps, API design, performance.
 7. **Assign verdict**: `pass` (no material findings), `concerns` (findings worth addressing but not blocking), `blocking` (findings that must be fixed before merge).
-8. **Emit an audit entry** (optional in 0.11.0+) — the pre-push gate does not consult audit records to decide pass/fail, so you are no longer REQUIRED to emit a `codex.review` record on every interactive review. However, append one anyway via the public `@bookedsolid/rea/audit` helper when it helps forensic traceability (investigation of an intermittent verdict, review-history audit, etc.):
+8. **Emit an audit entry — REQUIRED** for every `/codex-review` invocation. The pre-push gate does not consult audit records to decide pass/fail (post-0.11.0 the gate is stateless), but the `/codex-review` slash command's Step 3 verifies an audit entry was appended for this run and surfaces "review never happened" to the user when one is missing. The two specs are a contract pair — audit emission is what tells the operator their interactive review actually completed. Append via the public `@bookedsolid/rea/audit` helper:
 
    ```ts
    import { appendAuditRecord, CODEX_REVIEW_TOOL_NAME, CODEX_REVIEW_SERVER_NAME, Tier, InvocationStatus } from '@bookedsolid/rea/audit';

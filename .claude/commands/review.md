@@ -7,6 +7,7 @@ allowed-tools:
   - Bash(git branch:*)
   - Bash(git status:*)
   - Read
+  - Agent
 ---
 
 # /review — Code Review on Current Changes

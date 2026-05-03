@@ -3,6 +3,7 @@ description: Activate the REA kill switch — writes .rea/HALT with a reason, bl
 argument-hint: "<reason>"
 allowed-tools:
   - Bash(npx rea freeze:*)
+  - Read
 ---
 
 # /freeze — Activate the Kill Switch

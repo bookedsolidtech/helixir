@@ -7,6 +7,7 @@ allowed-tools:
   - Bash(git branch:*)
   - Bash(git rev-parse:*)
   - Read
+  - Agent
 ---
 
 # /codex-review — Adversarial Review via Codex
@@ -54,23 +55,17 @@ Invoke the `codex-adversarial` agent with:
 
 The agent wraps `/codex:adversarial-review` and returns structured findings.
 
-## Step 3 — Record to audit log
+## Step 3 — (Optional) verify audit entry
 
-Every Codex invocation produces an audit entry. The `codex-adversarial` agent writes it via the middleware chain automatically, but verify the entry was recorded:
+Audit emission is **optional** in 0.11.0+. The pre-push gate is stateless and does not consult audit records to decide pass/fail; the agent's structured findings ARE the review. The agent will append an audit entry when it helps forensic traceability (intermittent verdicts, review-history audits) but its absence is not a failure.
+
+If you want to confirm an entry was written for this run:
 
 ```bash
 tail -n 1 .rea/audit.jsonl
 ```
 
-The entry must include:
-
-- `tool: "codex-adversarial-review"`
-- `head_sha: <SHA>`
-- `target: <ref>`
-- `finding_count: <N>`
-- `verdict: pass | concerns | blocking`
-
-If the audit entry is missing, report it clearly — do not proceed as if the review happened.
+A `codex-adversarial-review` entry with `head_sha`, `target`, `finding_count`, and `verdict` fields is informative — but DO NOT treat its absence as a failure. The review happened if the agent returned text. (Pre-0.15.0 this step was a hard verification gate that contradicted the agent's "audit optional" contract — see Helix Finding 3, 2026-05-03.)
 
 ## Step 4 — Report
 

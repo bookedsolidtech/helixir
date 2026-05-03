@@ -31,53 +31,53 @@ if [ -f "${REA_ROOT}/.rea/HALT" ]; then
   exit 1
 fi
 
-# Save git's original pre-push argv (<remote-name> <remote-url>) BEFORE
-# the `set --` branches below clobber $@ with the rea CLI invocation.
-# Extension fragments under .husky/pre-push.d/ need the git argv, not
-# the rea one. Re-injected at the fragment loop site below.
-rea_orig_arg1="${1:-}"
-rea_orig_arg2="${2:-}"
-
 # Dispatch the rea CLI as a positional-args list rather than a string
 # (the 0.11.x `exec $REA_BIN ...` pattern broke when REA_ROOT contained
 # whitespace because the unquoted $REA_BIN expansion underwent word
 # splitting; `/Users/jane/My Projects/repo` produced four argv tokens
 # instead of two). The `set --` form below preserves spaces verbatim.
 #
-# The pre-push stdin carries one line per refspec; `exec` inherits stdin
-# unchanged. $@ on entry carries git's <remote-name> <remote-url>; we
-# preserve those by appending "$@" inside each `set --` arm.
+# 0.13.2 fix: the dispatch + invocation runs inside a SUBSHELL so the
+# `set --` rewrite does NOT bleed into the parent's $@. Before 0.13.2,
+# the parent's $@ ended up as the rea-CLI argv (`node /path/dist/cli/index.js
+# hook push-gate <remote-name> <remote-url>`) and the extension-fragment
+# loop below passed that mangled argv to fragments instead of git's
+# original `<remote-name> <remote-url>`. The subshell scopes the rewrite
+# so fragments see git's argv unchanged.
+#
+# The pre-push stdin carries one line per refspec; the subshell inherits
+# stdin unchanged. $@ on entry carries git's <remote-name> <remote-url>;
+# the subshell sees those as its initial $@, appends them inside each
+# `set --` arm, and the parent's $@ is preserved.
 
-if [ -x "${REA_ROOT}/node_modules/.bin/rea" ]; then
-  set -- "${REA_ROOT}/node_modules/.bin/rea" hook push-gate "$@"
-elif [ -f "${REA_ROOT}/dist/cli/index.js" ] && [ -f "${REA_ROOT}/package.json" ] && grep -q '"name": *"@bookedsolid/rea"' "${REA_ROOT}/package.json" 2>/dev/null; then
-  # rea's own repo (dogfood) — the package is not installed under
-  # node_modules here because we ARE the package. The built CLI
-  # entry point lives at dist/cli/index.js; node runs it directly.
-  # Gate this branch on `package.json` declaring `@bookedsolid/rea` so a
-  # consumer repo that happens to ship its own `dist/cli/index.js` does
-  # not get this hook executing the consumer's unrelated build.
-  set -- node "${REA_ROOT}/dist/cli/index.js" hook push-gate "$@"
-elif command -v rea >/dev/null 2>&1; then
-  set -- rea hook push-gate "$@"
-elif command -v npx >/dev/null 2>&1; then
-  # Last resort: npx will resolve the package from npm or the cache.
-  # Pass `--no-install` so a rare cache-cold machine surfaces a clear
-  # error instead of silently downloading at push time.
-  set -- npx --no-install @bookedsolid/rea hook push-gate "$@"
+if (
+  if [ -x "${REA_ROOT}/node_modules/.bin/rea" ]; then
+    set -- "${REA_ROOT}/node_modules/.bin/rea" hook push-gate "$@"
+  elif [ -f "${REA_ROOT}/dist/cli/index.js" ] && [ -f "${REA_ROOT}/package.json" ] && grep -q '"name": *"@bookedsolid/rea"' "${REA_ROOT}/package.json" 2>/dev/null; then
+    # rea's own repo (dogfood) — the package is not installed under
+    # node_modules here because we ARE the package. The built CLI
+    # entry point lives at dist/cli/index.js; node runs it directly.
+    # Gate this branch on `package.json` declaring `@bookedsolid/rea` so a
+    # consumer repo that happens to ship its own `dist/cli/index.js` does
+    # not get this hook executing the consumer's unrelated build.
+    set -- node "${REA_ROOT}/dist/cli/index.js" hook push-gate "$@"
+  elif command -v rea >/dev/null 2>&1; then
+    set -- rea hook push-gate "$@"
+  elif command -v npx >/dev/null 2>&1; then
+    # Last resort: npx will resolve the package from npm or the cache.
+    # Pass `--no-install` so a rare cache-cold machine surfaces a clear
+    # error instead of silently downloading at push time.
+    set -- npx --no-install @bookedsolid/rea hook push-gate "$@"
+  else
+    printf 'rea: cannot locate the rea CLI. Install locally (`pnpm add -D @bookedsolid/rea`) or globally (`npm i -g @bookedsolid/rea`).\n' >&2
+    exit 2
+  fi
+  exec "$@"
+); then
+  rea_status=0
 else
-  printf 'rea: cannot locate the rea CLI. Install locally (`pnpm add -D @bookedsolid/rea`) or globally (`npm i -g @bookedsolid/rea`).\n' >&2
-  exit 2
+  rea_status=$?
 fi
-
-# Run the rea push-gate FIRST. We capture its exit and explicitly propagate
-# instead of `exec`-ing — extension fragments must only run after rea's own
-# governance work succeeds. The fragments are user code; surfacing them
-# AFTER rea's body (HALT check, Codex review, audit write) preserves the
-# governance contract while letting consumers chain their own checks (e.g.
-# commitlint, branch-policy linters) without losing rea coverage.
-"$@"
-rea_status=$?
 if [ "$rea_status" -ne 0 ]; then
   exit "$rea_status"
 fi
@@ -110,7 +110,7 @@ if [ -d "$ext_dir" ]; then
     # Each fragment runs in its own subprocess with the original git args.
     # Failures propagate via `set -eu` above (loop body inherits, so any
     # non-zero exit blocks the push immediately).
-    "$frag" "$rea_orig_arg1" "$rea_orig_arg2"
+    "$frag" "$@"
   done
 fi
 

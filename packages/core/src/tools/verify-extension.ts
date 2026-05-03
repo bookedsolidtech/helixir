@@ -10,7 +10,7 @@
 
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
-import { isAbsolute, resolve } from 'node:path';
+import { isAbsolute, resolve, sep } from 'node:path';
 import { z } from 'zod';
 
 import type { McpWcConfig } from '../config.js';
@@ -153,7 +153,20 @@ function findDecl(cem: Cem, tagName: string): CemDeclaration | null {
 }
 
 async function readSourceFile(projectRoot: string, path: string): Promise<string> {
-  const abs = isAbsolute(path) ? path : resolve(projectRoot, path);
+  // Path containment: reject absolute paths and ../ traversal so the
+  // tool can't be coerced into reading arbitrary host files. The
+  // resolved path must stay inside projectRoot. Codex round-31 P2.
+  if (isAbsolute(path)) {
+    throw new MCPError(`Source path must be project-relative: "${path}"`, ErrorCategory.VALIDATION);
+  }
+  const projectAbs = resolve(projectRoot);
+  const abs = resolve(projectAbs, path);
+  if (abs !== projectAbs && !abs.startsWith(projectAbs + sep)) {
+    throw new MCPError(
+      `Source path escapes projectRoot via ../: "${path}"`,
+      ErrorCategory.VALIDATION,
+    );
+  }
   if (!existsSync(abs)) {
     throw new MCPError(`Source file not found: ${path}`, ErrorCategory.NOT_FOUND);
   }

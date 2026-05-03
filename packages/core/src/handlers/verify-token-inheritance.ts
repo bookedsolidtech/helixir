@@ -72,8 +72,16 @@ export function verifyTokenInheritance(
   const findings: AuditFinding[] = [];
 
   const cssProps = input.decl.cssProperties ?? [];
+  // Normalize DTCG dot-notation token names (`color.primary.400`) to
+  // CSS-variable form (`--color-primary-400`). Without this,
+  // component cssProperties like `--hx-color-action-primary-bg`
+  // never match the parsed token list, and defect class 02 / 03
+  // / 14 lookups silently miss every real token. Codex round-31 P1.
   const tokenIndex = new Map<string, DesignToken>();
-  for (const t of input.tokens) tokenIndex.set('--' + t.name, t);
+  for (const t of input.tokens) {
+    const cssVar = '--' + t.name.replace(/\./g, '-');
+    tokenIndex.set(cssVar, t);
+  }
 
   // ── 01-token-deprecated-alias + 14-cssprop-deprecation-drift ─────────
   // For every CSS prop declared on the component, check whether it

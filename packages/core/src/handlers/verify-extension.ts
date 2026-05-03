@@ -216,13 +216,31 @@ function checkEventContract(
   // and shouldn't escalate. Codex round-27 P2 + round-28 P1.
   if (sources?.code !== undefined && missing.length > 0) {
     const code = sources.code;
-    // Heuristic for "this method might be the dispatch path":
-    // names like handleX, onX, emitX, dispatchX, fireX, _emitX, or
-    // explicit setters that the parent emits change events from
-    // (set value(), set checked(), etc.).
+    // Heuristic for "this method might be the dispatch path." `handle*`
+    // alone is too broad — `handleFocus`, `handleBlur`, `handleClick`
+    // are common helpers that don't touch event dispatch. Tighten to:
+    //   - method name LITERALLY mentions one of the parent's event
+    //     names (e.g. `handleChange` when parent fires `hx-change` /
+    //     `change`), OR
+    //   - explicit dispatch-verb prefix on a private helper
+    //     (`_emit*`, `_dispatch*`, `_fire*`), OR
+    //   - reactive setter (`set value()`, `set checked()`, etc.) that
+    //     the parent typically emits from.
+    // Codex round-31 P2.
+    const eventVocab = missing
+      .map((e) => e.name.replace(/^[a-z]+-/, '').replace(/-/g, ''))
+      .filter((s) => s.length >= 3)
+      .map((s) => s.toLowerCase());
+    const methodMatchesEvent = (() => {
+      if (eventVocab.length === 0) return false;
+      const methodNames = [...code.matchAll(/\b([a-zA-Z_$][\w$]*)\s*\([^)]*\)\s*\{/g)].map((m) =>
+        (m[1] ?? '').toLowerCase(),
+      );
+      return methodNames.some((mn) => eventVocab.some((v) => mn.includes(v)));
+    })();
     const overridesDispatchSite =
-      /\b(handle|on|emit|dispatch|fire)[A-Z][\w$]*\s*\([^)]*\)\s*\{/.test(code) ||
-      /\b_(handle|emit|dispatch|fire)[A-Z]?[\w$]*\s*\([^)]*\)\s*\{/.test(code) ||
+      methodMatchesEvent ||
+      /\b_(emit|dispatch|fire)[A-Z]?[\w$]*\s*\([^)]*\)\s*\{/.test(code) ||
       /\bset\s+(value|checked|selected|expanded|open|disabled)\s*\([^)]*\)\s*\{/.test(code);
     const hasSuperCall = /\bsuper\s*\.\s*[a-zA-Z_$][\w$]*\s*\(/.test(code);
     const dispatchesEvent = /\bdispatchEvent\s*\(/.test(code);

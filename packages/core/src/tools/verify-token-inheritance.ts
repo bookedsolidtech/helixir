@@ -8,7 +8,7 @@
 
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
-import { isAbsolute, resolve } from 'node:path';
+import { isAbsolute, resolve, sep } from 'node:path';
 import { z } from 'zod';
 
 import type { McpWcConfig } from '../config.js';
@@ -225,8 +225,11 @@ function deriveOverlaysFromTokens(
 ): { dark?: Set<string>; highContrast?: Set<string> } | undefined {
   const dark = new Set<string>();
   const highContrast = new Set<string>();
+  // Same DTCG dot→dash normalization as verify-token-inheritance.ts
+  // tokenIndex build. Codex round-31 P1.
+  const toCssVar = (n: string): string => '--' + n.replace(/\./g, '-');
   for (const t of tokens) {
-    const cssVar = '--' + t.name;
+    const cssVar = toCssVar(t.name);
     const lower = t.name.toLowerCase();
     // Dark coverage detection — recognizes (in order):
     //   - flat-name prefix:  `dark-color-foo`     (kebab DTCG)
@@ -239,13 +242,11 @@ function deriveOverlaysFromTokens(
       lower.includes('.dark.') ||
       lower.endsWith('.dark');
     if (isDark) {
-      const canonical =
-        '--' +
-        t.name
-          .replace(/^dark[-.]/i, '')
-          .replace(/\.dark$/i, '')
-          .replace(/\.dark\./gi, '.');
-      dark.add(canonical);
+      const stripped = t.name
+        .replace(/^dark[-.]/i, '')
+        .replace(/\.dark$/i, '')
+        .replace(/\.dark\./gi, '.');
+      dark.add(toCssVar(stripped));
       dark.add(cssVar);
     }
     const isHc =
@@ -258,16 +259,14 @@ function deriveOverlaysFromTokens(
       lower.endsWith('.hc') ||
       lower.endsWith('.high-contrast');
     if (isHc) {
-      const canonical =
-        '--' +
-        t.name
-          .replace(/^hc[-.]/i, '')
-          .replace(/^high-contrast[-.]/i, '')
-          .replace(/\.hc$/i, '')
-          .replace(/\.high-contrast$/i, '')
-          .replace(/\.hc\./gi, '.')
-          .replace(/\.high-contrast\./gi, '.');
-      highContrast.add(canonical);
+      const stripped = t.name
+        .replace(/^hc[-.]/i, '')
+        .replace(/^high-contrast[-.]/i, '')
+        .replace(/\.hc$/i, '')
+        .replace(/\.high-contrast$/i, '')
+        .replace(/\.hc\./gi, '.')
+        .replace(/\.high-contrast\./gi, '.');
+      highContrast.add(toCssVar(stripped));
       highContrast.add(cssVar);
     }
   }
@@ -279,9 +278,25 @@ function deriveOverlaysFromTokens(
 }
 
 async function loadCssSources(projectRoot: string, paths: string[]): Promise<string[]> {
+  // Path containment: reject absolute paths and ../ traversal so the
+  // tool can't be coerced into reading arbitrary host files. The
+  // resolved path must stay inside projectRoot. Codex round-31 P2.
+  const projectAbs = resolve(projectRoot);
   const out: string[] = [];
   for (const p of paths) {
-    const abs = isAbsolute(p) ? p : resolve(projectRoot, p);
+    if (isAbsolute(p)) {
+      throw new MCPError(
+        `CSS source path must be project-relative: "${p}"`,
+        ErrorCategory.VALIDATION,
+      );
+    }
+    const abs = resolve(projectAbs, p);
+    if (abs !== projectAbs && !abs.startsWith(projectAbs + sep)) {
+      throw new MCPError(
+        `CSS source path escapes projectRoot via ../: "${p}"`,
+        ErrorCategory.VALIDATION,
+      );
+    }
     if (!existsSync(abs)) {
       throw new MCPError(`CSS source path not found: ${p}`, ErrorCategory.NOT_FOUND);
     }

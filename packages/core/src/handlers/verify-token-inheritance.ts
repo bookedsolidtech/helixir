@@ -89,10 +89,30 @@ export function verifyTokenInheritance(
   }
 
   // ── 02-token-cascade-gap ────────────────────────────────────────────
+  // Limit cascade-gap checks to props that are actual THEME tokens —
+  // i.e. the design-token list contains a matching entry. Component
+  // CSS props for spacing / sizing / animation timing aren't
+  // overlay-driven and would produce noise. Codex round-30 P2.
   if (input.overlays) {
     for (const prop of cssProps) {
       const name = prop.name;
       if (!name.startsWith('--')) continue;
+      // Only check tokens we recognize as theme-driven (color or
+      // surface-tier). The token index keys are `--<name>`; the
+      // `category` heuristic catches helix's `color.*`,
+      // `surface.*`, `border.*` groups that participate in dark/HC
+      // overlays. Spacing / sizing / motion are excluded.
+      const token = tokenIndex.get(name);
+      if (token === undefined) continue;
+      const cat = token.category.toLowerCase();
+      const isOverlayDriven =
+        cat.startsWith('color') ||
+        cat.startsWith('surface') ||
+        cat.startsWith('border') ||
+        cat.startsWith('shadow') ||
+        cat.startsWith('outline');
+      if (!isOverlayDriven) continue;
+
       const missingOverlays: string[] = [];
       if (input.overlays.dark && !input.overlays.dark.has(name)) {
         missingOverlays.push('dark');

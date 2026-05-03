@@ -558,20 +558,22 @@ export async function diffCem(
     : resolve(config.projectRoot, config.cemPath);
   const relFromRepo = relative(relativizationBase, cemAbsForRel);
   if (relFromRepo === '' || relFromRepo.startsWith('..') || isAbsolute(relFromRepo)) {
-    // Genuinely out-of-tree relative to the repo root.
+    // Genuinely out-of-tree relative to the repo root. Throwing is
+    // settled per codex round-20 + round-30 (consistent on this case)
+    // — the alternative best-effort approach silently treated every
+    // existing component as new in base, which suppressed real
+    // breaking-change detection. Round-22's "throw is a regression"
+    // applied to IN-REPO absolute paths (handled by the relativize
+    // branch below), not to truly out-of-tree paths.
     const redactedPath = cemAbsForRel.split(/[\\/]/).pop() ?? '<absolute>';
-    process.stderr.write(
-      `[helixir] Warning: diffCem cannot read base-branch CEM at out-of-tree absolute path (basename: ${redactedPath}); gitShow requires repo-relative paths. Diff will treat ${tagName} as new in base. (To restore diff: unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.)\n`,
+    throw new MCPError(
+      `diffCem cannot compute base-branch diff: cemPath (basename: ${redactedPath}) is out-of-tree relative to the git repo root and gitShow requires repo-relative paths. To restore diff, unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.`,
+      ErrorCategory.VALIDATION,
     );
-    cemPathForGit = '';
-  } else if (isAbsolute(config.cemPath)) {
-    // Absolute in-repo: convert to repo-root-relative POSIX form.
-    cemPathForGit = relFromRepo.split(sep).join('/');
-  } else {
-    // Relative path from config — also rebase against repo root in case
-    // projectRoot is a subpackage of the repo.
-    cemPathForGit = relFromRepo.split(sep).join('/');
   }
+  // In-repo absolute → relativize. Plain relative → also rebase
+  // against repo root in case projectRoot is a subpackage.
+  cemPathForGit = relFromRepo.split(sep).join('/');
 
   if (cemPathForGit !== '') {
     try {

@@ -567,24 +567,17 @@ export async function getHealthDiff(
     cemPathForGit = relFromRepo.split(sep).join('/');
   }
   if (outOfTree) {
-    // Pinned position per runbook §6 step 3 (see diffCem in cem.ts for
-    // the full flip history). Best-effort + warn: emit stderr warning
-    // with the absolute path REDACTED to its basename to avoid leaking
-    // host filesystem paths through tool responses (codex round-22 P2),
-    // and synthesize a 0/F base. Consumers that want stronger semantics
-    // should opt into M2 strict mode.
+    // Throw — settled per codex round-20 + round-30 (consistent on this
+    // case). The synthetic 0/F baseline made every normal component
+    // appear to improve from zero by tens of points, hiding genuine
+    // regressions. Round-22's "throw is a regression" applied to
+    // IN-REPO absolute paths (handled by the relativize branch above),
+    // not to truly out-of-tree paths.
     const redactedPath = config.cemPath.split(/[\\/]/).pop() ?? '<absolute>';
-    process.stderr.write(
-      `[helixir] Warning: getHealthDiff cannot read base-branch CEM at out-of-tree absolute path (basename: ${redactedPath}); gitShow requires repo-relative paths. Returning 0/F base for ${tagName}. (To restore diff: unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.)\n`,
+    throw new MCPError(
+      `getHealthDiff cannot compute base-branch diff: cemPath (basename: ${redactedPath}) is out-of-tree relative to the git repo root and gitShow requires repo-relative paths. To restore diff, unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.`,
+      ErrorCategory.VALIDATION,
     );
-    base = {
-      tagName,
-      score: 0,
-      grade: 'F' as const,
-      dimensions: {},
-      issues: ['Base CEM unavailable — cemPath is absolute and out-of-tree'],
-      timestamp: new Date().toISOString(),
-    };
   } else {
     try {
       const cemContent = await git.gitShow(baseBranch, cemPathForGit);

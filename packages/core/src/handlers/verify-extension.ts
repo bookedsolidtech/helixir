@@ -787,11 +787,16 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
           // `:host button.star`. Strong-tier matching then sees the
           // real selector chain.
           if (atName === 'scope') {
-            const scopeRootMatch = childSel.match(/@scope\s*\(([^)]*)\)/);
-            const scopeRoot = scopeRootMatch?.[1]?.trim() ?? '';
-            // Cartesian-product selector-list expansion. Codex round-81 P2.
-            // `.card, .panel` × `@scope (.toolbar, .footer)` →
-            // `.card .toolbar, .card .footer, .panel .toolbar, .panel .footer`.
+            // Balanced-paren extraction so `@scope (:is(.toolbar,
+            // .footer))` doesn't truncate at the inner `)`.
+            // Codex round-82 P2.
+            const scopeRoot = extractBalancedScopeRoot(childSel);
+            // Cartesian-product expansion. @scope semantics: the
+            // scope root is the OUTER container, so resolved selector
+            // is `scopeRoot parent` not `parent scopeRoot` —
+            // `button { @scope (.toolbar) { width: 1rem } }` means
+            // "when this button is inside .toolbar, ..." resolving
+            // to `.toolbar button`. Codex round-82 P1.
             let newParent: string;
             if (scopeRoot === '') {
               newParent = parentSel;
@@ -805,9 +810,9 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
                 .map((s) => s.trim())
                 .filter(Boolean);
               const products: string[] = [];
-              for (const pa of parentArms) {
-                for (const sa of scopeArms) {
-                  products.push(`${pa} ${sa}`);
+              for (const sa of scopeArms) {
+                for (const pa of parentArms) {
+                  products.push(`${sa} ${pa}`);
                 }
               }
               newParent = products.join(', ');
@@ -999,4 +1004,27 @@ function extractDirectDeclarations(input: string): string {
     out += input.slice(segStart);
   }
   return out;
+}
+
+/**
+ * Extract the @scope root predicate from a `@scope (...)` selector,
+ * with balanced-paren handling so functional pseudos inside the
+ * predicate don't truncate. `@scope (:is(.toolbar, .footer))` →
+ * `:is(.toolbar, .footer)`. Returns '' when no scope root present.
+ * Codex round-82 P2.
+ */
+function extractBalancedScopeRoot(childSel: string): string {
+  const idx = childSel.indexOf('(');
+  if (idx === -1) return '';
+  let depth = 1;
+  let j = idx + 1;
+  while (j < childSel.length && depth > 0) {
+    const ch = childSel[j];
+    if (ch === '(') depth++;
+    else if (ch === ')') depth--;
+    if (depth === 0) break;
+    j++;
+  }
+  if (depth !== 0) return '';
+  return childSel.slice(idx + 1, j).trim();
 }

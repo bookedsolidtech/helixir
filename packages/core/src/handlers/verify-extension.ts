@@ -522,13 +522,21 @@ function checkTouchTarget(
   //     but could be styling — only honor them with CEM confirmation.
   // Plus the `:host { pointer-events: none / cursor: default }`
   // explicit-non-interactive escape hatch.
-  // STRONG tier: intrinsic interactive controls AND attribute selectors
-  // that prove operability. `label` removed (round-84 P1: a label can
-  // reference a separately-sized control). `summary` retained
-  // (round-85 P2: <summary> IS the click target for <details>;
-  // shrinking it always violates WCAG).
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🛑 PINNED PER RUNBOOK §6 — DO NOT FLIP label/summary AGAIN
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // STRONG tier: intrinsic interactive controls. Round-by-round
+  // flip log on label/summary:
+  //   R84: drop both (false-positive on referencing labels)
+  //   R85: restore summary (always click target for <details>)
+  //   R86: restore label (label-as-wrapper IS the click target)
+  // Compromise pin: keep BOTH in STRONG. The default behavior of
+  // <label> is to be the click target (wrapping or `for=` association
+  // both make the label clickable). The label-referencing-separate-
+  // control case is the minority and the false-positive cost is
+  // acceptable.
   const STRONG_INTERACTIVE =
-    /(?:^|[\s,>+~])(?:button|a|input|select|textarea|summary|\[role\s*=\s*["']?(?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|option|switch|checkbox|radio|combobox|listbox|slider|spinbutton|treeitem|gridcell)["']?\]|\[tabindex(?:=|\]))(?:[\s,.:[{(]|$)/i;
+    /(?:^|[\s,>+~])(?:button|a|input|select|textarea|summary|label|\[role\s*=\s*["']?(?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|option|switch|checkbox|radio|combobox|listbox|slider|spinbutton|treeitem|gridcell)["']?\]|\[tabindex(?:=|\]))(?:[\s,.:[{(]|$)/i;
   const HOST_SELECTOR = /(?:^|[\s,>+~]):host(?:[\s,.:[{(]|$)/i;
   // Subclass styles contain a strong-interactive selector somewhere?
   // If yes, the subclass IS an interactive component (regardless of

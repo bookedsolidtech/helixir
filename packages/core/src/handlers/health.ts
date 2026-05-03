@@ -1035,14 +1035,20 @@ async function scoreCemNativeDimension(
       }
       const fidelity = await analyzeCemSourceFidelity(config, cem, decl);
       if (!fidelity) {
-        // Analyzer ran (caller passed a CEM) but couldn't produce a
-        // fidelity score (typically: source files unavailable, or
-        // declaration not locatable in the CEM modules tree). The
-        // caller asked for this analysis and we couldn't answer —
-        // that's `unknown`, distinct from the no-CEM case above.
-        // Codex round-8 P2 corrected: "analyzer failed" ≠ "caller
-        // didn't ask," so don't drop the dimension from the grade.
-        return { score: 0, confidence: 'unknown' };
+        // Analyzer ran but couldn't produce a fidelity score (typically:
+        // library has no local source tree, source files unavailable,
+        // or declaration not locatable in the CEM modules tree).
+        //
+        // FLIP-PIN: codex round-8 P2 wanted `unknown` here ("analyzer
+        // failed ≠ caller didn't ask"). Codex round-9 P1 reversed:
+        // "keep N/A when a library has no local source tree."
+        // Per runbook §6 step 3, both positions are defensible and
+        // codex is unstable on the call. We hold N/A — same as the
+        // no-CEM case above — because the most common trigger is
+        // "library has no source tree to compare against," which is
+        // genuinely N/A. M2 strict mode (follow-up) will let callers
+        // opt into surfacing this as `unknown`.
+        return { score: 0, confidence: 'untested', notApplicable: true };
       }
       return fidelity;
     }

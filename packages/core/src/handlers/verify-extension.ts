@@ -504,8 +504,27 @@ function checkTouchTarget(
   const HOST_SELECTOR = /(?:^|[\s,>+~]):host(?:[\s,.:[{(]|$)/i;
   // Subclass styles contain a strong-interactive selector somewhere?
   // If yes, the subclass IS an interactive component (regardless of
-  // CEM signals on the parent), so bare :host fires too.
-  const subclassHasStrongInteractive = STRONG_INTERACTIVE.test(styles);
+  // CEM signals on the parent), so bare :host fires too. Match
+  // against SELECTOR TEXT only — comments / declarations / property
+  // values that happen to mention `button` / `[role=button]` /
+  // `tabindex` would otherwise spuriously promote :host. Codex
+  // round-54 P2.
+  const stylesSelectorsOnly = (() => {
+    // Strip block comments first to avoid `/* see button styles */`
+    // contributing.
+    const noComments = styles.replace(/\/\*[\s\S]*?\*\//g, '');
+    // Extract every selector portion (text BEFORE each `{`). The
+    // RULE_PATTERN below picks up non-brace runs followed by `{...}`;
+    // we want the same selector spans concatenated.
+    const selOnly: string[] = [];
+    const RULE_HEAD = /([^{}]+)\{[^{}]*\}/g;
+    let m: RegExpExecArray | null;
+    while ((m = RULE_HEAD.exec(noComments)) !== null) {
+      selOnly.push(m[1] ?? '');
+    }
+    return selOnly.join('\n');
+  })();
+  const subclassHasStrongInteractive = STRONG_INTERACTIVE.test(stylesSelectorsOnly);
   const WEAK_INTERACTIVE_CLASS =
     /(?:^|[\s,>+~.])\.(?:button|btn|control|trigger|action|tab|menuitem|menu-item|option|chip|toggle|switch|checkbox|radio|link|clickable|interactive|target|thumb|handle|nav-item|tile|card-action|cta|hit-area|pressable|swatch-button)(?:[\s,.:[{]|$)/i;
   // Decoration-by-styles guard: when :host has explicit non-interactive
@@ -526,7 +545,16 @@ function checkTouchTarget(
     const selector = m[1] ?? '';
     const body = m[2] ?? '';
     if (selector.trim().startsWith('@')) continue;
-    if (DECORATIVE_SELECTOR.test(selector)) continue;
+    // Per-arm decorative check: `button, .icon { ... }` should still
+    // fire on `button`. Split the selector list by comma and skip
+    // only when EVERY arm is decorative. Codex round-54 P2.
+    const selectorArms = selector
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (selectorArms.length > 0 && selectorArms.every((arm) => DECORATIVE_SELECTOR.test(arm))) {
+      continue;
+    }
     // Strong tier (incl. :host) always counts; class vocabulary
     // requires parent-interactive. When :host is explicitly marked
     // non-interactive in styles, skip ONLY bare-:host rules

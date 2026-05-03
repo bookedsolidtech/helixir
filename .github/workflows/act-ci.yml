@@ -51,24 +51,46 @@ jobs:
       fail-fast: false
       matrix:
         # ACT_MATRIX_TESTS=true → all three (parity with ci-matrix.yml).
-        # ACT_FULL_TESTS=true (without --matrix) → current Node only,
-        # the lighter-weight escape hatch documented by act-ci.sh --full.
-        # Codex round-5 P2.
-        node-version: ${{ (env.ACT_MATRIX_TESTS == 'true' && fromJSON('[20, 22, 24]')) || fromJSON('[24]') }}
+        # ACT_FULL_TESTS=true (without --matrix) → single host-Node entry.
+        # The actual Node version for --full is selected by act-ci.sh from
+        # the host (the developer's local Node) and forwarded as
+        # ACT_FULL_NODE_VERSION. The matrix entry is just a placeholder
+        # that the setup step interprets — empty string means "skip nvm
+        # and use whatever Node the runner already has." Codex round-5 P2
+        # + round-6 P2 (host-Node selection).
+        node-version: ${{ (env.ACT_MATRIX_TESTS == 'true' && fromJSON('[20, 22, 24]')) || fromJSON('[""]') }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node ${{ matrix.node-version }} via nvm
         run: |
-          if [ "${{ matrix.node-version }}" != "" ]; then
-            export NVM_DIR="$HOME/.nvm"
-            if [ ! -d "$NVM_DIR" ]; then
-              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-            fi
-            . "$NVM_DIR/nvm.sh"
-            nvm install ${{ matrix.node-version }}
-            nvm use ${{ matrix.node-version }}
-            echo "Node version: $(node --version)"
+          # Empty matrix.node-version → --full mode: use the runner's
+          # existing Node without bootstrapping nvm. This preserves the
+          # offline guard codex round-6 P3 flagged: no curl-piped install
+          # unless we actually need a non-default Node. The runner image
+          # ships with Node 22 LTS; that's the host-Node default.
+          if [ -z "${{ matrix.node-version }}" ]; then
+            echo "Node version (host default): $(node --version)"
+            exit 0
           fi
+
+          # Matrix mode (20/22/24): use nvm. Guard the nvm install
+          # behind an offline check — if curl can't reach github (or
+          # we're in an offline-mode container), skip the bootstrap and
+          # rely on whatever nvm/Node the image already has. Codex
+          # round-6 P3.
+          export NVM_DIR="$HOME/.nvm"
+          if [ ! -d "$NVM_DIR" ]; then
+            if curl -sf -o /dev/null --max-time 5 https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh; then
+              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+            else
+              echo "Offline or github unreachable; skipping nvm bootstrap. Falling back to runner Node $(node --version)"
+              exit 0
+            fi
+          fi
+          . "$NVM_DIR/nvm.sh"
+          nvm install ${{ matrix.node-version }}
+          nvm use ${{ matrix.node-version }}
+          echo "Node version: $(node --version)"
       - name: Setup pnpm
         run: |
           corepack enable

@@ -886,11 +886,18 @@ export async function scoreComponentMultiDimensional(
  * means "this component genuinely has nothing here" (N/A) or "we cannot
  * tell because the CEM data is missing" (unknown).
  *
- * Rule: if EVERY required CEM key is `absent`, the analyzer never had a
- * chance — verdict is `unknown` (`measured: true, score: 0, confidence: 'unknown'`).
- * If at least one required key is `present` (even if its array is empty),
- * the component has authoritatively declared "nothing here" and the
- * dimension is `notApplicable: true`.
+ * Rule: if ANY required CEM key is `absent`, the analyzer is missing
+ * inputs it might have used — verdict is `unknown`
+ * (`measured: true, score: 0, confidence: 'unknown'`).
+ * Only when EVERY required key is `present` (even if its array is empty)
+ * has the component authoritatively declared "nothing here" — and only
+ * then is the dimension `notApplicable: true`.
+ *
+ * The "any absent → unknown" rule catches mixed-quality manifests, e.g.
+ * `members: []` with `events` key missing entirely. Pre-this-rule, the
+ * analyzer returned null, this helper marked it N/A, and the events-key
+ * gap dropped silently from the weighted score. Now it surfaces as
+ * unknown and pulls the grade down — exactly what M2 promises.
  *
  * `unknown` is the M2 anti-gaslighting verdict: it pulls the weighted
  * score down and counts against `Grade.maxUntestedCritical`, so missing
@@ -900,15 +907,17 @@ function resolveAnalyzerNull(
   decl: CemDeclaration,
   requiredKeys: CemPresenceKey[],
 ): { score: 0; confidence: ConfidenceLevel; notApplicable?: boolean } {
-  const allAbsent = requiredKeys.every((key) => cemHas(decl, key) === 'absent');
-  if (allAbsent) {
-    // Input data missing — answer is "unknown," not "fine."
+  const anyAbsent = requiredKeys.some((key) => cemHas(decl, key) === 'absent');
+  if (anyAbsent) {
+    // At least one required input is missing — answer is "unknown."
     // Note: we deliberately do NOT set notApplicable here, so the
     // dimension flows into the weighted score with a 0 and pulls the
     // grade down. Pre-M2, this case was silently dropped from grading.
     return { score: 0, confidence: 'unknown' };
   }
-  // CEM data present but empty — dimension is legitimately N/A.
+  // Every required key is present (arrays may be empty) — dimension is
+  // legitimately N/A: the component has authoritatively declared
+  // "nothing here."
   return { score: 0, confidence: 'untested', notApplicable: true };
 }
 
@@ -977,7 +986,11 @@ async function scoreCemNativeDimension(
 
     case 'API Surface Quality': {
       const api = analyzeApiSurface(decl);
-      if (!api) return resolveAnalyzerNull(decl, ['attributes', 'members', 'description']);
+      // analyzeApiSurface only inspects `members`, so a present
+      // `description` doesn't make the dimension legitimately N/A —
+      // the analyzer never looked at it. Pre-fix this masked stale
+      // CEMs that kept top-level metadata but dropped `members`.
+      if (!api) return resolveAnalyzerNull(decl, ['members']);
       return api;
     }
 
@@ -1015,15 +1028,29 @@ async function scoreCemNativeDimension(
     }
 
     case 'Naming Consistency': {
-      if (!namingConventions) {
-        // No library-wide conventions provided — single-component scoring
-        // can't compute consistency. That's `unknown`, not silently fine.
+      // Prefer pre-computed conventions (passed from
+      // scoreAllComponentsMultiDimensional which detects them once for
+      // the whole library). Fall back to detecting from the CEM in this
+      // single-component path — callers like score_component and
+      // generateAuditReport pass a CEM but no precomputed conventions,
+      // and the data needed to detect conventions is right there in
+      // the CEM. Only emit `unknown` when neither is available.
+      let conventions = namingConventions;
+      if (!conventions && cem) {
+        // Flatten the CEM into a flat declarations list — the convention
+        // detector only needs the declarations, not the module structure.
+        const allDecls = cem.modules.flatMap((m) => m.declarations ?? []);
+        conventions = detectLibraryConventions(allDecls);
+      }
+      if (!conventions) {
+        // No conventions available and no CEM to derive them from —
+        // single-component scoring can't compute consistency.
         return { score: 0, confidence: 'unknown' };
       }
-      const naming = analyzeNamingConsistency(decl, namingConventions);
+      const naming = analyzeNamingConsistency(decl, conventions);
       if (!naming) {
         // Analyzer returned null even with conventions — typically a
-        // declaration with no name/attributes/members to compare. N/A.
+        // declaration with no name/attributes/members to compare.
         return resolveAnalyzerNull(decl, ['attributes', 'members']);
       }
       return naming;

@@ -60,6 +60,15 @@ export interface McpWcConfig {
   readonly watch: boolean;
   /** Optional scoring configuration for customizing health dimension weights. */
   readonly scoring?: ScoringConfig;
+  /**
+   * Provenance flag: true when cemPath was preserved as an absolute
+   * out-of-tree path through the MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1
+   * opt-in on an actual external config file (MCP_WC_CONFIG_PATH).
+   * Used by the MCP server's startup containment check to bypass
+   * the in-root requirement only for paths that genuinely came from
+   * the trusted external-config opt-in. Codex round-14 P1.
+   */
+  readonly cemPathFromExternalConfig?: boolean;
 }
 
 /** Mutable version used internally during config construction. */
@@ -163,6 +172,17 @@ function rebaseRelativePaths(
         dropped.add(field);
       } else {
         rebased[field] = absolute;
+        // Mark provenance: this absolute cemPath came from the
+        // external-config opt-in path. The MCP server's startup
+        // containment check uses this to decide whether to allow
+        // the out-of-tree path. Without this flag, the startup
+        // check could be tricked by a relative MCP_WC_CEM_PATH
+        // override or a fallback-to-in-repo discovery path that
+        // happened to be evaluated while the opt-in env was set.
+        // Codex round-14 P1.
+        if (field === 'cemPath') {
+          rebased['cemPathFromExternalConfig'] = true;
+        }
       }
       continue;
     }

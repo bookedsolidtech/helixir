@@ -185,22 +185,14 @@ export async function main(): Promise<void> {
   const cemEnvOverride = process.env['MCP_WC_CEM_PATH'];
   const envCemOptIn =
     cemEnvOverride !== undefined && cemEnvOverride !== '' && isAbsolute(cemEnvOverride);
-  // External-config opt-in is ONLY honored when ALL of:
-  //   1. MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1 (explicit user opt-in)
-  //   2. MCP_WC_CONFIG_PATH is set (cemPath could come from external
-  //      config file)
-  //   3. MCP_WC_CEM_PATH is NOT set — env vars override config files
-  //      in loadConfig(), so if MCP_WC_CEM_PATH is set the cemPath
-  //      came from env, NOT from the external config. Codex round-13
-  //      P1: a relative MCP_WC_CEM_PATH like `../shared/cem.json`
-  //      could otherwise bypass containment under this opt-in.
-  // Codex round-12 P1 (initial fix), round-13 P1 (provenance tightening).
-  const externalConfigPath = process.env['MCP_WC_CONFIG_PATH'];
-  const envConfigOptIn =
-    process.env['MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS'] === '1' &&
-    externalConfigPath !== undefined &&
-    externalConfigPath !== '' &&
-    (cemEnvOverride === undefined || cemEnvOverride === '');
+  // External-config opt-in: the loader stamps cemPathFromExternalConfig
+  // when the cemPath was actually preserved from the trusted
+  // MCP_WC_CONFIG_PATH external file via the
+  // MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1 opt-in. This is provenance
+  // ground-truth — env-var inference fell over for the cases codex
+  // rounds 12, 13, and 14 flagged (relative MCP_WC_CEM_PATH override,
+  // missing/malformed external path falling back to in-repo discovery).
+  const envConfigOptIn = config.cemPathFromExternalConfig === true;
   if (
     !envCemOptIn &&
     !envConfigOptIn &&

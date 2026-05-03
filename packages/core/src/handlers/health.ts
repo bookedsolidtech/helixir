@@ -988,7 +988,11 @@ async function scoreCemNativeDimension(
 
     case 'Type Coverage': {
       const tc = analyzeTypeCoverage(decl);
-      if (!tc) return resolveAnalyzerNull(decl, ['attributes', 'members']);
+      // analyzeTypeCoverage inspects fields (members), methods (members),
+      // AND events. Include events in the required-keys list so a CEM
+      // missing the events key is correctly flagged as unknown rather
+      // than N/A. Codex round 3.
+      if (!tc) return resolveAnalyzerNull(decl, ['members', 'events']);
       if (tc.score < 50) {
         issues.push(`Type coverage is low (${tc.score}%)`);
       }

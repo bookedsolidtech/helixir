@@ -809,18 +809,30 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
             // + .icon) { ... } }` must expand to
             // `button + .icon, a + .icon`, NOT
             // `button, a + .icon` (precedence bug). Codex round-87/88 P2.
+            //
+            // Track whether `&` was expanded so the downstream
+            // cartesian product knows NOT to re-multiply against
+            // parent — round-89 P2: `button, a { @scope (&) { ... } }`
+            // produced `button button, button a, a button, a a`
+            // because cartesian re-crossed parent arms after & had
+            // already substituted them.
+            let scopeRootIsPureAmpExpansion = false;
             if (parentSel !== '' && /&/.test(scopeRoot)) {
               const parentArmsForAmp = splitTopLevelCommas(parentSel)
                 .map((s) => s.trim())
                 .filter(Boolean);
+              const scopeArmsForAmp = splitTopLevelCommas(scopeRoot)
+                .map((s) => s.trim())
+                .filter(Boolean);
+              // Pure & expansion: every scope arm contains `&` and
+              // resolves entirely from parent expansion (no extra
+              // selectors mixed in). In that case scopeRoot already
+              // IS the resolved selector — skip cartesian.
+              scopeRootIsPureAmpExpansion = scopeArmsForAmp.every((sa) => sa.trim() === '&');
               if (parentArmsForAmp.length === 1) {
                 const onlyArm = parentArmsForAmp[0] ?? '';
                 scopeRoot = scopeRoot.replace(/&/g, onlyArm);
               } else {
-                // Multi-arm: expand each scope arm × each parent arm.
-                const scopeArmsForAmp = splitTopLevelCommas(scopeRoot)
-                  .map((s) => s.trim())
-                  .filter(Boolean);
                 const expanded: string[] = [];
                 for (const sa of scopeArmsForAmp) {
                   if (/&/.test(sa)) {
@@ -841,11 +853,13 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
             // "when this button is inside .toolbar, ..." resolving
             // to `.toolbar button`. Codex round-82 P1.
             let newParent: string;
-            if (scopeRoot === '' || scopeRoot === parentSel) {
-              // Empty scope OR scope-root equals parent (after `&`
-              // substitution) — no composition needed; rules apply
-              // at parent's level. Round-87 P2 follow-on.
-              newParent = parentSel;
+            if (scopeRoot === '' || scopeRoot === parentSel || scopeRootIsPureAmpExpansion) {
+              // Empty scope OR scope-root equals parent OR scopeRoot
+              // was fully derived from `&` substitution — no further
+              // composition; scopeRoot already represents the right
+              // selector chain. Round-89 P2 added the pure-amp check.
+              newParent = scopeRoot === '' ? parentSel : scopeRoot;
+              if (scopeRootIsPureAmpExpansion) newParent = scopeRoot;
             } else if (parentSel === '') {
               newParent = scopeRoot;
             } else {

@@ -524,10 +524,19 @@ function checkTouchTarget(
     if (DECORATIVE_SELECTOR.test(selector)) continue;
     // Strong tier (incl. :host) always counts; class vocabulary
     // requires parent-interactive. When :host is explicitly marked
-    // non-interactive in styles, skip ONLY :host rules — descendant
-    // selectors like `button` keep being audited.
-    const isHostSelector = /(?:^|[\s,>+~]):host(?:[\s,.:[{(]|$)/i.test(selector);
-    if (hostExplicitlyNonInteractive && isHostSelector) continue;
+    // non-interactive in styles, skip ONLY bare-:host rules
+    // (`:host`, `:host(.state)`, `:host:hover`) — selectors with a
+    // descendant or child combinator (`:host button`, `:host > .x`)
+    // are NOT skipped because the descendant element may still be
+    // the click target. Codex round-51 P2.
+    const trimmedSel = selector.trim();
+    const isBareHostRule =
+      /^:host(\([^)]*\))?(\s*::?[a-zA-Z-]+(?:\([^)]*\))?)*\s*$/.test(trimmedSel) ||
+      // `:host(...) , :host` and similar comma-separated bare-host lists
+      trimmedSel
+        .split(',')
+        .every((s) => /^:host(\([^)]*\))?(\s*::?[a-zA-Z-]+(?:\([^)]*\))?)*\s*$/.test(s.trim()));
+    if (hostExplicitlyNonInteractive && isBareHostRule) continue;
     const matchesStrong = STRONG_INTERACTIVE.test(selector);
     const matchesClass = parentIsInteractive && WEAK_INTERACTIVE_CLASS.test(selector);
     if (!matchesStrong && !matchesClass) continue;

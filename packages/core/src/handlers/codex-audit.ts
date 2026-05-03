@@ -127,16 +127,26 @@ export async function auditComponentWithCodex(
     ? auditsRootRaw
     : resolve(projectAbs, auditsRootRaw);
 
-  // Walk up to find the deepest existing ancestor of the NORMALIZED
-  // (resolve()-collapsed) path. Walking the raw path causes failures
-  // when the input contains `..` after a symlinked segment — e.g.
-  // `link/../audits` where `link` is a symlinked dir, the raw walk
-  // realpaths through `link` and the parent traversal then escapes
-  // the project. Normalizing first makes `..` segments cancel
-  // BEFORE we touch realpath. Codex round-43 P1 / round-47 P2 /
-  // round-50 P2.
-  const requestedNormalized = resolve(requestedAuditsRoot);
-  let ancestor = requestedNormalized;
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🛑 PINNED PER RUNBOOK §6 STEP 3 — RAW WALK ONLY
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Codex flip log on the ancestor walk:
+  //   R43: validate before mkdir
+  //   R47: project through canonical ancestor for symlink-aliased
+  //         absolute paths (raw walk passes since realpath collapses
+  //         the symlink before the startsWith check)
+  //   R50: normalize via resolve() first to handle `link/../audits`
+  //   R51: REVERT — normalize-first hides attacks where `link` is
+  //         a symlink pointing outside projectRoot. `link/../target`
+  //         on disk first follows the symlink and `..` then escapes,
+  //         which raw realpath correctly catches but resolve()
+  //         collapses to an in-tree path before any realpath runs.
+  //
+  // Raw walk wins on security. The R50 concern (`..` after an
+  // in-tree symlink) was a niche legitimate case sacrificed for the
+  // R51 attack class. Walk the raw path, realpath each ancestor,
+  // require every realpath to stay inside projectRoot.
+  let ancestor = requestedAuditsRoot;
   while (!existsSyncFs(ancestor) && ancestor !== dirname(ancestor)) {
     ancestor = dirname(ancestor);
   }
@@ -152,7 +162,7 @@ export async function auditComponentWithCodex(
   // Project the requested-but-not-yet-existing portion through the
   // canonical ancestor so future-real path stays in-tree even when
   // the user passed a symlinked absolute path.
-  const tail = requestedNormalized.slice(ancestor.length);
+  const tail = requestedAuditsRoot.slice(ancestor.length);
   const projectedReal = ancestorReal + tail;
   const projectedInProject =
     projectedReal === projectAbs || projectedReal.startsWith(projectAbs + sep);

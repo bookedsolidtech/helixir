@@ -103,6 +103,32 @@ import {
   handleExtendCall,
   isExtendTool,
 } from '../../packages/core/src/tools/extend.js';
+// M3 — per-component codex audit pipeline
+import {
+  CODEX_AUDIT_TOOL_DEFINITIONS,
+  handleCodexAuditTool,
+  isCodexAuditTool,
+} from '../../packages/core/src/tools/codex-audit.js';
+// M4 — token-extension verification (R12-R32 alias awareness)
+import {
+  TOKEN_VERIFICATION_TOOL_DEFINITIONS,
+  handleTokenVerificationTool,
+  isTokenVerificationTool,
+} from '../../packages/core/src/tools/verify-token-inheritance.js';
+// M5 — component-extension contract verification
+import {
+  VERIFY_EXTENSION_TOOL_DEFINITIONS,
+  handleVerifyExtensionTool,
+  isVerifyExtensionTool,
+} from '../../packages/core/src/tools/verify-extension.js';
+// M6 — adoption: machine-readable tool catalog so agents can
+// auto-discover what to call instead of greping docs.
+import {
+  TOOL_CATALOG_TOOL_DEFINITIONS,
+  handleToolCatalogCall,
+  isToolCatalogTool,
+  setCatalogedTools,
+} from '../../packages/core/src/tools/tool-catalog.js';
 import { createErrorResponse } from '../../packages/core/src/shared/mcp-helpers.js';
 import type { MCPToolResult } from '../../packages/core/src/shared/mcp-helpers.js';
 
@@ -246,8 +272,18 @@ export async function main(): Promise<void> {
     ...THEME_TOOL_DEFINITIONS,
     ...SCAFFOLD_TOOL_DEFINITIONS,
     ...EXTEND_TOOL_DEFINITIONS,
+    // M3 / M4 / M5 — per-component audit, token-inheritance verification,
+    // extension contract verification.
+    ...CODEX_AUDIT_TOOL_DEFINITIONS,
+    ...TOKEN_VERIFICATION_TOOL_DEFINITIONS,
+    ...VERIFY_EXTENSION_TOOL_DEFINITIONS,
+    // M6 — agent-discoverable tool catalog.
+    ...TOOL_CATALOG_TOOL_DEFINITIONS,
     ...tsTools,
   ];
+
+  // Tell the catalog handler which tools exist (drives list_helixir_tools).
+  setCatalogedTools(coreTools);
 
   const allTools = [...coreTools, ...TOKEN_TOOL_DEFINITIONS];
 
@@ -351,6 +387,38 @@ export async function main(): Promise<void> {
           );
         return handleExtendCall(name, typedArgs, resolveCem(libraryId, cemCache));
       }
+      // M3 — per-component codex audit. Requires CEM for surface extraction.
+      if (isCodexAuditTool(name)) {
+        if (cemCache === null || cemReloading)
+          return createErrorResponse(
+            'CEM not yet loaded — server is still initializing. Please retry.',
+          );
+        return handleCodexAuditTool(name, typedArgs, config, resolveCem(libraryId, cemCache));
+      }
+      // M4 — token-extension verification. Requires CEM + tokens.
+      if (isTokenVerificationTool(name)) {
+        if (cemCache === null || cemReloading)
+          return createErrorResponse(
+            'CEM not yet loaded — server is still initializing. Please retry.',
+          );
+        return handleTokenVerificationTool(
+          name,
+          typedArgs,
+          config,
+          resolveCem(libraryId, cemCache),
+        );
+      }
+      // M5 — component-extension contract verification. Requires CEM
+      // for both parent and subclass declarations.
+      if (isVerifyExtensionTool(name)) {
+        if (cemCache === null || cemReloading)
+          return createErrorResponse(
+            'CEM not yet loaded — server is still initializing. Please retry.',
+          );
+        return handleVerifyExtensionTool(name, typedArgs, config, resolveCem(libraryId, cemCache));
+      }
+      // M6 — tool catalog. No CEM dependency.
+      if (isToolCatalogTool(name)) return handleToolCatalogCall(name, typedArgs, config);
       if (isBenchmarkTool(name)) return handleBenchmarkCall(name, typedArgs, config);
       if (isTypegenerateTool(name)) {
         if (cemCache === null || cemReloading)

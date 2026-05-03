@@ -65,6 +65,17 @@ The orchestrator (`subagent_type: "rea-orchestrator"`) is the primary routing la
 
 Exception: simple read-only questions and direct clarifications may be answered without delegation.
 
+## When extending a helix component, you MUST call
+
+The field-report finding ("32 helixir tools available, 0 invoked") was a discoverability failure, not a tool failure. Specific calls for component-shaped work:
+
+- **First call to discover available tools:** `list_helixir_tools` (filter by tag — `audit`, `verify`, `tokens`, `extension`, `scaffold`)
+- **Before scaffolding a subclass:** `verify_token_inheritance` and `verify_extension` against the parent — they catch slot drift, ARIA regressions, deprecated token aliases, and the rest of the defect-corpus classes 01–14
+- **After scaffolding:** `audit_component_with_codex <tagName>` — runs the per-component codex audit, cached by contract-surface hash so re-runs cost nothing
+- **For library-wide health:** `score_component` / `audit_library` — but in M2-strict mode (`unknown` verdict surfaces missing CEM data instead of silently scoring A)
+
+Defect-corpus and falsifiability ledger live in `bst-cto-kb/Projects/HELiXiR/Audits/`. Every M3/M4/M5 finding cites a class id and a helix commit so consumers can trace the rule back to its origin.
+
 <!-- rea-managed:end -->
 
 <!-- rea:managed:start v=1 -->

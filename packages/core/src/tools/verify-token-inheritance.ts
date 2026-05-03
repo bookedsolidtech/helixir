@@ -42,6 +42,11 @@ const VerifyTokenInheritanceArgsSchema = z.object({
       highContrast: z.array(z.string()).optional(),
     })
     .optional(),
+  /**
+   * Optional library ID for multi-library workspaces. Resolved by the
+   * dispatcher before this handler runs. Codex round-33 P2.
+   */
+  libraryId: z.string().optional(),
 });
 
 const AnalyzeTokenCanonicalityArgsSchema = z.object({
@@ -50,6 +55,8 @@ const AnalyzeTokenCanonicalityArgsSchema = z.object({
    * the loaded map. When provided, returns just that one token's status.
    */
   tokenName: z.string().optional(),
+  /** Optional library ID for multi-library workspaces. Codex round-33 P2. */
+  libraryId: z.string().optional(),
 });
 
 // ─── Tool definitions ──────────────────────────────────────────────────────
@@ -82,6 +89,11 @@ export const TOKEN_VERIFICATION_TOOL_DEFINITIONS = [
           description:
             'Optional pre-computed CSS-prop key sets per theme overlay. Used by the cascade-gap check.',
         },
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID for multi-library workspaces (resolved by the dispatcher).',
+        },
       },
       required: ['tagName'],
       additionalProperties: false,
@@ -98,6 +110,11 @@ export const TOKEN_VERIFICATION_TOOL_DEFINITIONS = [
           type: 'string',
           description:
             'CSS variable name (e.g. "--hx-color-border-on-dark-default"). Omit to dump every alias in the map.',
+        },
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID for multi-library workspaces (resolved by the dispatcher).',
         },
       },
       additionalProperties: false,

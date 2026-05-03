@@ -26,6 +26,12 @@ const AuditComponentArgsSchema = z.object({
   force: z.boolean().optional().default(false),
   /** Override the audits-output root. Defaults to <projectRoot>/audits/. */
   auditsRoot: z.string().optional(),
+  /**
+   * Optional library ID for multi-library workspaces. Resolved by the
+   * dispatcher before this handler runs; declared here so Zod accepts
+   * the standard arg without rejecting it as unknown. Codex round-33 P2.
+   */
+  libraryId: z.string().optional(),
 });
 
 // ─── Tool definitions ──────────────────────────────────────────────────────
@@ -52,6 +58,11 @@ export const CODEX_AUDIT_TOOL_DEFINITIONS = [
           type: 'string',
           description:
             'Override the audits output directory. Defaults to <projectRoot>/audits/. Use for monorepo setups that prefer per-package audit dirs.',
+        },
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID for multi-library workspaces (resolved by the dispatcher).',
         },
       },
       required: ['tagName'],

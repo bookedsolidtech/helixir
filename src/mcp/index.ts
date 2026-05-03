@@ -397,8 +397,18 @@ export async function main(): Promise<void> {
           );
         return handleCodexAuditTool(name, typedArgs, config, resolveCem(libraryId, cemCache));
       }
-      // M4 — token-extension verification. Requires CEM + tokens.
+      // M4 — token-extension verification. analyze_token_canonicality
+      // doesn't actually need CEM (just the deprecated-aliases map),
+      // so it bypasses the cache-loading gate to support tokens-only
+      // repos and watch-mode reloads. Codex round-33 P3.
       if (isTokenVerificationTool(name)) {
+        if (name === 'analyze_token_canonicality') {
+          // Pass an empty CEM since the handler ignores it for this tool.
+          return handleTokenVerificationTool(name, typedArgs, config, {
+            schemaVersion: '1.0.0',
+            modules: [],
+          });
+        }
         if (cemCache === null || cemReloading)
           return createErrorResponse(
             'CEM not yet loaded — server is still initializing. Please retry.',

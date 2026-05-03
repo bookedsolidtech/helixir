@@ -339,7 +339,14 @@ export function parseCodexFindings(raw: unknown): {
     throw new MCPError('Codex returned non-object output.', ErrorCategory.VALIDATION);
   }
   const obj = raw as Record<string, unknown>;
-  const findingsRaw = Array.isArray(obj['findings']) ? obj['findings'] : [];
+  // A response without a `findings` array is structurally invalid —
+  // codex CLI schema change or partial truncation. Throwing here is
+  // safer than silently normalizing to [] (which would produce a
+  // false-clean `verdict: "pass"` and cache it). Codex round-33 P2.
+  if (!Array.isArray(obj['findings'])) {
+    throw new MCPError('Codex output missing required `findings` array.', ErrorCategory.VALIDATION);
+  }
+  const findingsRaw = obj['findings'];
   const findings: AuditFinding[] = [];
   for (const f of findingsRaw) {
     if (typeof f !== 'object' || f === null) continue;

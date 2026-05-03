@@ -38,6 +38,11 @@ const VerifyExtensionArgsSchema = z.object({
       styles: z.string().optional(),
     })
     .optional(),
+  /**
+   * Optional library ID for multi-library workspaces. Resolved by the
+   * dispatcher before this handler runs. Codex round-33 P2.
+   */
+  libraryId: z.string().optional(),
 });
 
 // ─── Tool definitions ──────────────────────────────────────────────────────
@@ -73,6 +78,11 @@ export const VERIFY_EXTENSION_TOOL_DEFINITIONS = [
           additionalProperties: false,
           description:
             'Optional subclass source paths for deeper checks. Without these, the audit only inspects the CEM surface.',
+        },
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional library ID for multi-library workspaces (resolved by the dispatcher).',
         },
       },
       required: ['parentTagName', 'subclassTagName'],

@@ -142,8 +142,14 @@ if [[ "$USE_MATRIX" == true ]]; then
   ENV_ARGS="$ENV_ARGS --env ACT_MATRIX_TESTS=true --env ACT_FULL_TESTS=true"
   TEST_MODE="full suite + Node 20/22/24 matrix (CI Matrix parity)"
 elif [[ "$USE_FULL" == true ]]; then
-  ENV_ARGS="$ENV_ARGS --env ACT_FULL_TESTS=true"
-  TEST_MODE="full suite (current Node)"
+  # Capture the host's major Node version so the workflow tests against
+  # the developer's actual runtime, not whatever the act runner image
+  # happens to ship. Codex round-7 P2. Falls back to 22 (LTS) when node
+  # is missing locally — same as the runner default.
+  HOST_NODE_MAJOR=$(node --version 2>/dev/null | sed -E 's/^v([0-9]+)\..*/\1/' || echo "22")
+  if [[ -z "$HOST_NODE_MAJOR" ]]; then HOST_NODE_MAJOR=22; fi
+  ENV_ARGS="$ENV_ARGS --env ACT_FULL_TESTS=true --env ACT_FULL_NODE_VERSION=$HOST_NODE_MAJOR"
+  TEST_MODE="full suite (host Node $HOST_NODE_MAJOR)"
 else
   TEST_MODE="standard (quality-gates)"
 fi

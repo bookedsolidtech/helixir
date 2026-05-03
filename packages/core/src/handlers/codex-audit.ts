@@ -184,9 +184,16 @@ export async function auditComponentWithCodex(
       ErrorCategory.VALIDATION,
     );
   }
-  const projectedReal = ancestorReal + tail;
+  // Normalize separators before the containment check. On Windows,
+  // realpathSync returns backslash form but the tail may still carry
+  // forward slashes, producing a hybrid like `C:\repo/audits` that
+  // string-startsWith would reject as out-of-tree even though
+  // mkdirSync would resolve it correctly. Codex round-60 P2.
+  const normalizeSeps = (p: string): string => p.split(/[\\/]/).join(sep);
+  const projectedReal = normalizeSeps(ancestorReal + tail);
+  const projectAbsNorm = normalizeSeps(projectAbs);
   const projectedInProject =
-    projectedReal === projectAbs || projectedReal.startsWith(projectAbs + sep);
+    projectedReal === projectAbsNorm || projectedReal.startsWith(projectAbsNorm + sep);
   if (!projectedInProject) {
     throw new MCPError(
       `auditsRoot escapes projectRoot: "${auditsRootRaw}" projects to "${projectedReal}"`,

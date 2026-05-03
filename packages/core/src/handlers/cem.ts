@@ -146,6 +146,18 @@ export interface DiffResult {
   isNew: boolean;
   breaking: string[];
   additions: string[];
+  /**
+   * True when the base-branch CEM could not be read (e.g. cemPath is
+   * out-of-tree under MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1 — gitShow
+   * rejects absolute/external paths). Consumers should treat the diff
+   * as advisory rather than authoritative — `isNew: true` may be the
+   * fallback, not a real new-component signal. Codex round-36 P1
+   * compromise on the round-30 throw: report explicitly instead of
+   * silently degrading or failing hard.
+   */
+  baseUnavailable?: boolean;
+  /** Human-readable reason when baseUnavailable is true. */
+  baseUnavailableReason?: string;
 }
 
 // --- Presence helpers ---
@@ -557,23 +569,24 @@ export async function diffCem(
     ? config.cemPath
     : resolve(config.projectRoot, config.cemPath);
   const relFromRepo = relative(relativizationBase, cemAbsForRel);
+  let baseUnavailableReason = '';
   if (relFromRepo === '' || relFromRepo.startsWith('..') || isAbsolute(relFromRepo)) {
-    // Genuinely out-of-tree relative to the repo root. Throwing is
-    // settled per codex round-20 + round-30 (consistent on this case)
-    // — the alternative best-effort approach silently treated every
-    // existing component as new in base, which suppressed real
-    // breaking-change detection. Round-22's "throw is a regression"
-    // applied to IN-REPO absolute paths (handled by the relativize
-    // branch below), not to truly out-of-tree paths.
+    // Genuinely out-of-tree. Compromise per codex round-36 P1: don't
+    // throw (round-30's previous resolution) and don't silently
+    // synthesize (round-23's pre-30 behavior). Mark the result as
+    // baseUnavailable + emit warning, return best-effort isNew:true
+    // fallback. Consumers can detect the flag and downgrade their
+    // confidence in the diff. Pinned with round-by-round flip
+    // history per runbook §6 step 3 — this is the unsettled case.
     const redactedPath = cemAbsForRel.split(/[\\/]/).pop() ?? '<absolute>';
-    throw new MCPError(
-      `diffCem cannot compute base-branch diff: cemPath (basename: ${redactedPath}) is out-of-tree relative to the git repo root and gitShow requires repo-relative paths. To restore diff, unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.`,
-      ErrorCategory.VALIDATION,
-    );
+    baseUnavailableReason = `cemPath (basename: ${redactedPath}) is out-of-tree relative to the git repo root; gitShow requires repo-relative paths. To restore real diff, unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.`;
+    process.stderr.write(`[helixir] Warning: diffCem ${baseUnavailableReason}\n`);
+    cemPathForGit = '';
+  } else {
+    // In-repo absolute → relativize. Plain relative → also rebase
+    // against repo root in case projectRoot is a subpackage.
+    cemPathForGit = relFromRepo.split(sep).join('/');
   }
-  // In-repo absolute → relativize. Plain relative → also rebase
-  // against repo root in case projectRoot is a subpackage.
-  cemPathForGit = relFromRepo.split(sep).join('/');
 
   if (cemPathForGit !== '') {
     try {
@@ -590,7 +603,12 @@ export async function diffCem(
   }
 
   if (!baseMeta) {
-    return { isNew: true, breaking: [], additions: [] };
+    const result: DiffResult = { isNew: true, breaking: [], additions: [] };
+    if (baseUnavailableReason !== '') {
+      result.baseUnavailable = true;
+      result.baseUnavailableReason = baseUnavailableReason;
+    }
+    return result;
   }
 
   const breaking: string[] = [];

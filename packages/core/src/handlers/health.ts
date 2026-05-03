@@ -78,6 +78,15 @@ export interface HealthDiff {
     after: number;
     delta: number;
   }>;
+  /**
+   * True when the base-branch CEM could not be read (out-of-tree
+   * cemPath under the external-paths opt-in). Consumers should treat
+   * `improved` / `scoreDelta` as advisory rather than authoritative —
+   * the synthetic `0/F` baseline produces fictitious improvements.
+   * Codex round-36 P1 compromise on round-30's throw approach.
+   */
+  baseUnavailable?: boolean;
+  baseUnavailableReason?: string;
 }
 
 // ─── Zod schema for per-component history JSON files ─────────────────────────
@@ -566,18 +575,25 @@ export async function getHealthDiff(
   } else {
     cemPathForGit = relFromRepo.split(sep).join('/');
   }
+  let baseUnavailableReason = '';
   if (outOfTree) {
-    // Throw — settled per codex round-20 + round-30 (consistent on this
-    // case). The synthetic 0/F baseline made every normal component
-    // appear to improve from zero by tens of points, hiding genuine
-    // regressions. Round-22's "throw is a regression" applied to
-    // IN-REPO absolute paths (handled by the relativize branch above),
-    // not to truly out-of-tree paths.
+    // Compromise per codex round-36 P1: don't throw (round-30) and
+    // don't silently synthesize without signal (round-23 pre-30).
+    // Synthesize the 0/F baseline AND mark the result as
+    // baseUnavailable so consumers can detect and downgrade their
+    // confidence in `improved` / `scoreDelta`. Pinned with round-by-
+    // round flip history per runbook §6 step 3.
     const redactedPath = config.cemPath.split(/[\\/]/).pop() ?? '<absolute>';
-    throw new MCPError(
-      `getHealthDiff cannot compute base-branch diff: cemPath (basename: ${redactedPath}) is out-of-tree relative to the git repo root and gitShow requires repo-relative paths. To restore diff, unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.`,
-      ErrorCategory.VALIDATION,
-    );
+    baseUnavailableReason = `cemPath (basename: ${redactedPath}) is out-of-tree relative to the git repo root; gitShow requires repo-relative paths. To restore real diff, unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.`;
+    process.stderr.write(`[helixir] Warning: getHealthDiff ${baseUnavailableReason}\n`);
+    base = {
+      tagName,
+      score: 0,
+      grade: 'F' as const,
+      dimensions: {},
+      issues: ['Base CEM unavailable — cemPath is absolute and out-of-tree'],
+      timestamp: new Date().toISOString(),
+    };
   } else {
     try {
       const cemContent = await git.gitShow(baseBranch, cemPathForGit);
@@ -639,7 +655,7 @@ export async function getHealthDiff(
     }
   }
 
-  return {
+  const result: HealthDiff = {
     tagName,
     base,
     current,
@@ -648,6 +664,11 @@ export async function getHealthDiff(
     scoreDelta: Math.round(scoreDelta * 10) / 10,
     changedDimensions,
   };
+  if (baseUnavailableReason !== '') {
+    result.baseUnavailable = true;
+    result.baseUnavailableReason = baseUnavailableReason;
+  }
+  return result;
 }
 
 /**

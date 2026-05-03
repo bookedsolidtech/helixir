@@ -117,18 +117,22 @@ function checkAriaWiring(parent: ContractSurface, subclass: ContractSurface): Au
   const subclassAriaNames = new Set(subclassAriaAttrs.map((a) => a.name));
   const missing = parentAriaAttrs.filter((a) => !subclassAriaNames.has(a.name));
   if (missing.length === 0) return [];
-  // Codex round-27 P2: a partial ARIA delta (subclass adds ONE attr
-  // like aria-expanded while inheriting role/aria-controls) shouldn't
-  // be flagged as a drop. Only flag when the subclass declares MOST
-  // of the parent's ARIA surface (heuristic: ≥ half of parent attrs
-  // present in subclass), which signals "I intended to redeclare the
-  // ARIA contract but missed this one." A subclass with 1 ARIA attr
-  // out of parent's 4 is clearly extending, not redeclaring.
+  // Round-27 P2 vs round-36 P2 codex flip on partial ARIA deltas.
+  // Compromise: ALWAYS report the missing attrs, but downgrade severity
+  // when the subclass clearly looks like it's extending (declared
+  // < half of parent's ARIA — likely added one new attr while
+  // inheriting the rest) rather than redeclaring (declared ≥ half —
+  // looks intentional and the gap is a real drop). This preserves
+  // round-36's "report partial redeclarations" while honoring round-27's
+  // "don't false-P1 on extension". Severity ladder: P1 when subclass
+  // appears to redeclare ≥ half, P2 (advisory) when it looks like
+  // pure extension. Pinned per runbook §6 step 3.
   const declaredFromParent = parentAriaAttrs.filter((a) => subclassAriaNames.has(a.name)).length;
-  if (declaredFromParent < parentAriaAttrs.length / 2) return [];
+  const looksLikeRedeclaration = declaredFromParent >= parentAriaAttrs.length / 2;
+  const severity: 'P1' | 'P2' = looksLikeRedeclaration ? 'P1' : 'P2';
   return [
     {
-      severity: 'P1',
+      severity,
       classId: '05-aria-regression',
       title: `Subclass drops parent ARIA wiring: ${missing.map((a) => a.name).join(', ')}`,
       body: [

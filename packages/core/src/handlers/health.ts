@@ -3,8 +3,8 @@ import { resolve, join, relative } from 'node:path';
 import { z } from 'zod';
 import { GitOperations } from '../shared/git.js';
 import type { McpWcConfig } from '../config.js';
-import { CemSchema } from './cem.js';
-import type { Cem, CemDeclaration } from './cem.js';
+import { CemSchema, cemHas } from './cem.js';
+import type { Cem, CemDeclaration, CemPresenceKey } from './cem.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
 import { analyzeAccessibility } from './accessibility.js';
 import { analyzeTypeCoverage } from './analyzers/type-coverage.js';
@@ -38,8 +38,8 @@ export interface ComponentHealth {
   grade: 'A' | 'B' | 'C' | 'D' | 'F';
   dimensions: Record<string, number>;
   dimensionWeights?: Record<string, number>;
-  dimensionConfidence?: Record<string, 'verified' | 'heuristic' | 'untested'>;
-  confidenceSummary?: { verified: number; heuristic: number; untested: number };
+  dimensionConfidence?: Record<string, ConfidenceLevel>;
+  confidenceSummary?: { verified: number; heuristic: number; untested: number; unknown: number };
   issues: string[];
   timestamp: string;
 }
@@ -91,7 +91,7 @@ const HistoryFileSchema = z.object({
       z.object({
         score: z.number(),
         weight: z.number().optional(),
-        confidence: z.enum(['verified', 'heuristic', 'untested']).optional(),
+        confidence: z.enum(['verified', 'heuristic', 'untested', 'unknown']).optional(),
         details: z.record(z.unknown()).optional(),
       }),
     )
@@ -102,6 +102,8 @@ const HistoryFileSchema = z.object({
       verified: z.number(),
       heuristic: z.number(),
       untested: z.number(),
+      // Backwards-compatible: older history files won't have `unknown`.
+      unknown: z.number().optional(),
     })
     .optional(),
 });
@@ -116,12 +118,17 @@ interface HistoryFileRaw {
     {
       score: number;
       weight?: number;
-      confidence?: 'verified' | 'heuristic' | 'untested';
+      confidence?: ConfidenceLevel;
       details?: Record<string, unknown>;
     }
   >;
   issues: Array<{ message: string }>;
-  overallConfidence?: { verified: number; heuristic: number; untested: number };
+  overallConfidence?: {
+    verified: number;
+    heuristic: number;
+    untested: number;
+    unknown?: number;
+  };
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -146,7 +153,7 @@ function proportional(count: number, total: number, maxPoints: number): number {
 function historyToHealth(file: HistoryFileRaw): ComponentHealth {
   const dimensions: Record<string, number> = {};
   const dimensionWeights: Record<string, number> = {};
-  const dimensionConfidence: Record<string, 'verified' | 'heuristic' | 'untested'> = {};
+  const dimensionConfidence: Record<string, ConfidenceLevel> = {};
 
   for (const [key, val] of Object.entries(file.breakdown ?? {})) {
     dimensions[key] = val.score;
@@ -172,7 +179,15 @@ function historyToHealth(file: HistoryFileRaw): ComponentHealth {
 
   if (hasWeights) result.dimensionWeights = dimensionWeights;
   if (hasConfidence) result.dimensionConfidence = dimensionConfidence;
-  if (file.overallConfidence) result.confidenceSummary = file.overallConfidence;
+  if (file.overallConfidence) {
+    // Older history files predate `unknown` — default to 0 for back-compat.
+    result.confidenceSummary = {
+      verified: file.overallConfidence.verified,
+      heuristic: file.overallConfidence.heuristic,
+      untested: file.overallConfidence.untested,
+      unknown: file.overallConfidence.unknown ?? 0,
+    };
+  }
 
   return result;
 }
@@ -668,7 +683,7 @@ export interface MultiDimensionalHealth {
   score: number;
   grade: 'A' | 'B' | 'C' | 'D' | 'F';
   dimensions: DimensionResult[];
-  confidenceSummary: { verified: number; heuristic: number; untested: number };
+  confidenceSummary: { verified: number; heuristic: number; untested: number; unknown: number };
   gradingNotes: string[];
   issues: string[];
   timestamp: string;
@@ -849,7 +864,7 @@ export async function scoreComponentMultiDimensional(
   const { grade, gradingNotes } = calculateGrade(weightedScore, dimensions);
 
   // Confidence summary
-  const confidenceSummary = { verified: 0, heuristic: 0, untested: 0 };
+  const confidenceSummary = { verified: 0, heuristic: 0, untested: 0, unknown: 0 };
   for (const d of dimensions) {
     confidenceSummary[d.confidence]++;
   }
@@ -864,6 +879,37 @@ export async function scoreComponentMultiDimensional(
     issues,
     timestamp: new Date().toISOString(),
   };
+}
+
+/**
+ * When an analyzer returns `null` (no data to score), decide whether that
+ * means "this component genuinely has nothing here" (N/A) or "we cannot
+ * tell because the CEM data is missing" (unknown).
+ *
+ * Rule: if EVERY required CEM key is `absent`, the analyzer never had a
+ * chance — verdict is `unknown` (`measured: true, score: 0, confidence: 'unknown'`).
+ * If at least one required key is `present` (even if its array is empty),
+ * the component has authoritatively declared "nothing here" and the
+ * dimension is `notApplicable: true`.
+ *
+ * `unknown` is the M2 anti-gaslighting verdict: it pulls the weighted
+ * score down and counts against `Grade.maxUntestedCritical`, so missing
+ * CEM data is no longer silently rewarded.
+ */
+function resolveAnalyzerNull(
+  decl: CemDeclaration,
+  requiredKeys: CemPresenceKey[],
+): { score: 0; confidence: ConfidenceLevel; notApplicable?: boolean } {
+  const allAbsent = requiredKeys.every((key) => cemHas(decl, key) === 'absent');
+  if (allAbsent) {
+    // Input data missing — answer is "unknown," not "fine."
+    // Note: we deliberately do NOT set notApplicable here, so the
+    // dimension flows into the weighted score with a 0 and pulls the
+    // grade down. Pre-M2, this case was silently dropped from grading.
+    return { score: 0, confidence: 'unknown' };
+  }
+  // CEM data present but empty — dimension is legitimately N/A.
+  return { score: 0, confidence: 'untested', notApplicable: true };
 }
 
 /**
@@ -922,7 +968,7 @@ async function scoreCemNativeDimension(
 
     case 'Type Coverage': {
       const tc = analyzeTypeCoverage(decl);
-      if (!tc) return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+      if (!tc) return resolveAnalyzerNull(decl, ['attributes', 'members']);
       if (tc.score < 50) {
         issues.push(`Type coverage is low (${tc.score}%)`);
       }
@@ -931,48 +977,54 @@ async function scoreCemNativeDimension(
 
     case 'API Surface Quality': {
       const api = analyzeApiSurface(decl);
-      if (!api) return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+      if (!api) return resolveAnalyzerNull(decl, ['attributes', 'members', 'description']);
       return api;
     }
 
     case 'CSS Architecture': {
       const css = analyzeCssArchitecture(decl);
-      if (!css) return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+      if (!css) return resolveAnalyzerNull(decl, ['cssProperties', 'cssParts']);
       return css;
     }
 
     case 'Event Architecture': {
       const evt = analyzeEventArchitecture(decl);
-      if (!evt) return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+      if (!evt) return resolveAnalyzerNull(decl, ['events']);
       return evt;
     }
 
     case 'CEM-Source Fidelity': {
       if (!config || !cem) {
-        return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+        // Config / CEM unavailable in this scoring path — we have no
+        // chance to measure source-vs-CEM divergence. That's `unknown`.
+        return { score: 0, confidence: 'unknown' };
       }
       const fidelity = await analyzeCemSourceFidelity(config, cem, decl);
       if (!fidelity) {
-        return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+        // Analyzer ran but couldn't produce a fidelity score. Treat as
+        // `unknown` — pre-M2 this dropped silently out of the grade.
+        return { score: 0, confidence: 'unknown' };
       }
       return fidelity;
     }
 
     case 'Slot Architecture': {
       const slotResult = analyzeSlotArchitecture(decl);
-      if (!slotResult) {
-        return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
-      }
+      if (!slotResult) return resolveAnalyzerNull(decl, ['slots']);
       return slotResult;
     }
 
     case 'Naming Consistency': {
       if (!namingConventions) {
-        return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+        // No library-wide conventions provided — single-component scoring
+        // can't compute consistency. That's `unknown`, not silently fine.
+        return { score: 0, confidence: 'unknown' };
       }
       const naming = analyzeNamingConsistency(decl, namingConventions);
       if (!naming) {
-        return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+        // Analyzer returned null even with conventions — typically a
+        // declaration with no name/attributes/members to compare. N/A.
+        return resolveAnalyzerNull(decl, ['attributes', 'members']);
       }
       return naming;
     }

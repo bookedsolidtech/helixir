@@ -7,7 +7,16 @@
 
 export type DimensionTier = 'critical' | 'important' | 'advanced';
 export type DimensionSource = 'cem-native' | 'external';
-export type ConfidenceLevel = 'verified' | 'heuristic' | 'untested';
+/**
+ * Confidence in a dimension's score.
+ * - verified: measured from authoritative source (e.g. real test run, CEM key present and parsed)
+ * - heuristic: inferred from CEM-adjacent signal (e.g. JSDoc hints, naming patterns)
+ * - untested: no external measurement supplied (typical for `external`-source dimensions)
+ * - unknown: we cannot answer this question because the input data is incomplete
+ *   (e.g. CEM key absent). Distinct from `untested` — `unknown` is a hard
+ *   "I don't know" caused by missing input, not by missing measurement.
+ */
+export type ConfidenceLevel = 'verified' | 'heuristic' | 'untested' | 'unknown';
 
 export interface DimensionDefinition {
   name: string;
@@ -186,6 +195,12 @@ export const DIMENSION_WEIGHT_KEYS: Readonly<Record<string, string>> = {
 interface GradeThreshold {
   minWeighted: number;
   minCritical: number;
+  /**
+   * Maximum number of critical dimensions that may be either `untested`
+   * (no external measurement) or `unknown` (input data missing) without
+   * dropping a grade tier. Both verdicts represent "we can't confidently
+   * measure this," and stack against the same budget.
+   */
   maxUntestedCritical: number;
 }
 
@@ -212,8 +227,12 @@ export function calculateGrade(weightedScore: number, dimensions: DimensionResul
   const criticalNames: readonly string[] = DIMENSION_CLASSIFICATION.critical;
   const criticalDims = dimensions.filter((d) => criticalNames.includes(d.name));
 
-  const measuredCritical = criticalDims.filter((d) => d.measured);
-  const untestedCritical = criticalDims.filter((d) => !d.measured);
+  // A dimension counts against the "untested critical" budget when it is
+  // either unmeasured (no signal at all) OR measured-but-unknown (signal
+  // exists but is incomplete — typically CEM key absent). Both are
+  // "we can't confidently grade this critical dimension."
+  const measuredCritical = criticalDims.filter((d) => d.measured && d.confidence !== 'unknown');
+  const untestedCritical = criticalDims.filter((d) => !d.measured || d.confidence === 'unknown');
 
   // Check for penalty conditions
   let gradeCap: 'A' | 'B' | 'C' | 'D' | 'F' | null = null;

@@ -141,6 +141,52 @@ export interface DiffResult {
   additions: string[];
 }
 
+// --- Presence helpers ---
+
+/**
+ * The CEM keys an analyzer might inspect on a declaration to decide whether
+ * a dimension is measurable. Used by `cemHas` to give analyzers an explicit,
+ * type-checked way to distinguish "key absent" from "key present, empty".
+ *
+ * Adding a new key here is a deliberate act — every site that branches on
+ * presence should opt in via this enum so the absent-vs-empty distinction
+ * is searchable.
+ */
+export type CemPresenceKey =
+  | 'attributes'
+  | 'members'
+  | 'events'
+  | 'slots'
+  | 'cssProperties'
+  | 'cssParts'
+  | 'description'
+  | 'summary'
+  | 'superclass'
+  | 'mixins';
+
+/**
+ * Returns whether the CEM declaration explicitly carries the named key.
+ *
+ * - `'present'`: the key exists on the declaration (array length may be 0
+ *   — that's still "present and empty," meaning the component has authoritatively
+ *   declared "no slots / no events / no css parts").
+ * - `'absent'`: the key is undefined. The declaration says nothing — the
+ *   analyzer cannot tell whether the component truly has none, or whether
+ *   the CEM regen dropped the data. This is the case M2 surfaces as
+ *   `confidence: 'unknown'`.
+ *
+ * Use this from analyzers that consume CEM data to anchor the
+ * absent-vs-empty distinction explicitly. Without it, analyzers that
+ * read `decl.slots ?? []` cannot tell the two cases apart and silently
+ * award the dimension full credit when data is missing.
+ */
+export function cemHas(decl: CemDeclaration, key: CemPresenceKey): 'present' | 'absent' {
+  // Index into a CemDeclaration whose Zod schema marks every member as optional.
+  // We deliberately read the raw key — `undefined` ≠ `[]`.
+  const value = (decl as Record<string, unknown>)[key];
+  return value === undefined ? 'absent' : 'present';
+}
+
 // --- Source path helpers ---
 
 /**

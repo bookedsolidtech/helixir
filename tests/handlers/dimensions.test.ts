@@ -311,6 +311,61 @@ describe('calculateGrade', () => {
     expect(result.gradingNotes.some((n) => n.includes('untested'))).toBe(true);
   });
 
+  // M2: `unknown` confidence = "input data missing" must count against
+  // maxUntestedCritical the same way `untested` does. Without this, a CEM
+  // with absent keys would silently exclude its dimensions from grading
+  // and the component would still score A — exactly the gaslighting
+  // pattern documented in defect-corpus class 12.
+  it('unknown-confidence critical dimensions count against maxUntestedCritical (same as untested)', () => {
+    const dims = DIMENSION_REGISTRY.map((def) => ({
+      name: def.name,
+      score: def.name === 'CEM-Source Fidelity' ? 0 : 95,
+      weight: def.weight,
+      tier: def.tier,
+      // CEM-Source Fidelity is critical — mark it `unknown` (input absent),
+      // not `untested` (no measurement). Both should drop the grade.
+      confidence: def.name === 'CEM-Source Fidelity' ? ('unknown' as const) : ('verified' as const),
+      // `measured: true` here — the analyzer ran, it just couldn't answer.
+      // This is the case M2 fixes: pre-M2, this dimension would have
+      // come back `notApplicable: true / measured: false` and dropped
+      // from the weighted score entirely.
+      measured: true,
+    }));
+    const result = calculateGrade(92, dims);
+    expect(result.grade).not.toBe('A');
+    expect(result.gradingNotes.some((n) => n.includes('untested'))).toBe(true);
+  });
+
+  it('mixing untested + unknown stacks against the same critical budget', () => {
+    // Grade B allows up to 1 untested critical. With 1 untested + 1 unknown,
+    // we have 2 in the pool and B should be unreachable.
+    const dims = DIMENSION_REGISTRY.map((def) => {
+      const isTestCoverage = def.name === 'Test Coverage';
+      const isFidelity = def.name === 'CEM-Source Fidelity';
+      let confidence: 'verified' | 'untested' | 'unknown' = 'verified';
+      let measured = true;
+      if (isTestCoverage) {
+        confidence = 'untested';
+        measured = false;
+      } else if (isFidelity) {
+        confidence = 'unknown';
+        measured = true;
+      }
+      return {
+        name: def.name,
+        score: isTestCoverage || isFidelity ? 0 : 95,
+        weight: def.weight,
+        tier: def.tier,
+        confidence,
+        measured,
+      };
+    });
+    const result = calculateGrade(85, dims);
+    // 2 in the untested+unknown pool — A=0, B=1, both gated; C=2 is the
+    // ceiling. Result must be C or worse.
+    expect(['C', 'D', 'F']).toContain(result.grade);
+  });
+
   it('a component with 95% CEM but 0% type coverage cannot get above C', () => {
     const dims = makeFullDimensions(
       {

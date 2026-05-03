@@ -157,14 +157,20 @@ describe('scoreComponentMultiDimensional', () => {
     const cemNative = result.dimensions.filter(
       (d) => DIMENSION_REGISTRY.find((r) => r.name === d.name)?.source === 'cem-native',
     );
-    // CEM-Source Fidelity requires a cem parameter and source files, so it's not measured in unit tests
+    // M2 anti-hallucination behavior: CEM-Source Fidelity and Naming Consistency
+    // can't run without a CEM / library conventions in this single-component
+    // unit-test path. Pre-M2 they returned `notApplicable: true` and silently
+    // dropped from the grade. Post-M2 they return `confidence: 'unknown',
+    // measured: true, score: 0` — they pull the score down and count against
+    // the untested-critical budget. That's the anti-gaslighting fix.
     const cemSourceFidelity = cemNative.find((d) => d.name === 'CEM-Source Fidelity');
     expect(cemSourceFidelity).toBeDefined();
-    expect(cemSourceFidelity?.measured).toBe(false);
-    // Naming Consistency requires library-wide conventions (passed via scoreAllComponentsMultiDimensional)
+    expect(cemSourceFidelity?.measured).toBe(true);
+    expect(cemSourceFidelity?.confidence).toBe('unknown');
     const namingConsistency = cemNative.find((d) => d.name === 'Naming Consistency');
     expect(namingConsistency).toBeDefined();
-    expect(namingConsistency?.measured).toBe(false);
+    expect(namingConsistency?.measured).toBe(true);
+    expect(namingConsistency?.confidence).toBe('unknown');
     const measurableNative = cemNative.filter(
       (d) => d.name !== 'CEM-Source Fidelity' && d.name !== 'Naming Consistency',
     );
@@ -186,7 +192,12 @@ describe('scoreComponentMultiDimensional', () => {
     const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
     expect(result.confidenceSummary).toBeDefined();
     expect(result.confidenceSummary.verified).toBeGreaterThan(0);
-    expect(result.confidenceSummary.untested).toBe(7); // 5 external + CEM-Source Fidelity + Naming Consistency (no cem/conventions in unit tests)
+    // M2: CEM-Source Fidelity and Naming Consistency are now `unknown`
+    // (couldn't measure — input absent), not `untested` (no external data).
+    // 5 untested = the 5 external dims; 2 unknown = the two cem-native
+    // dimensions that couldn't run.
+    expect(result.confidenceSummary.untested).toBe(5);
+    expect(result.confidenceSummary.unknown).toBe(2);
   });
 
   it('includes a timestamp', async () => {
@@ -297,15 +308,21 @@ describe('enterprise grade algorithm integration', () => {
     expect(tcDim!.score).toBeLessThan(100);
   });
 
-  it('untested critical dimensions (Test Coverage) affect grade', async () => {
+  it('untested + unknown critical dimensions affect grade', async () => {
     const config = makeConfig();
     const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
-    // Test Coverage is untested → should generate grading notes
+    // Test Coverage is untested (no external history) → in untested-critical bucket.
     const testDim = result.dimensions.find((d) => d.name === 'Test Coverage');
     expect(testDim!.measured).toBe(false);
     expect(testDim!.confidence).toBe('untested');
-    // Grading notes should mention untested
-    expect(result.gradingNotes.some((n) => n.includes('untested'))).toBe(true);
+    // M2: CEM-Source Fidelity is `unknown` here (no CEM passed). It both pulls
+    // the weighted score down (score 0, weight 10) AND counts against the
+    // untested-critical budget. Pre-M2 it dropped silently — that was the
+    // gaslighting pattern. Post-M2 the grade for an otherwise-perfect component
+    // run without a CEM is no better than C.
+    const fidelityDim = result.dimensions.find((d) => d.name === 'CEM-Source Fidelity');
+    expect(fidelityDim!.confidence).toBe('unknown');
+    expect(['C', 'D', 'F']).toContain(result.grade);
   });
 
   it('grade is A-F string', async () => {

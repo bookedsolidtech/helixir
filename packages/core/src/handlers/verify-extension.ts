@@ -504,9 +504,10 @@ function checkTouchTarget(
   const WEAK_INTERACTIVE_CLASS =
     /(?:^|[\s,>+~.])\.(?:button|btn|control|trigger|action|tab|menuitem|menu-item|option|chip|toggle|switch|checkbox|radio|link|clickable|interactive|target|thumb|handle|nav-item|tile|card-action|cta|hit-area|pressable|swatch-button)(?:[\s,.:[{]|$)/i;
   // Decoration-by-styles guard: when :host has explicit non-interactive
-  // CSS, treat the whole rule set as decorative regardless of selector
-  // vocabulary. Catches the round-34 `<hx-icon>` pattern where :host
-  // is sized but explicitly non-interactive.
+  // CSS, skip :host RULES specifically — not the whole stylesheet.
+  // A wrapper component can have a non-interactive :host but still
+  // render a real `button` inside; that descendant control should
+  // still be audited. Codex round-50 P1.
   const HOST_NON_INTERACTIVE =
     /:host\s*\{[^}]*(?:pointer-events\s*:\s*none|cursor\s*:\s*default)[^}]*\}/i;
   const hostExplicitlyNonInteractive = HOST_NON_INTERACTIVE.test(styles);
@@ -522,9 +523,11 @@ function checkTouchTarget(
     if (selector.trim().startsWith('@')) continue;
     if (DECORATIVE_SELECTOR.test(selector)) continue;
     // Strong tier (incl. :host) always counts; class vocabulary
-    // requires parent-interactive. Skip everything when :host is
-    // explicitly marked non-interactive in styles.
-    if (hostExplicitlyNonInteractive) continue;
+    // requires parent-interactive. When :host is explicitly marked
+    // non-interactive in styles, skip ONLY :host rules — descendant
+    // selectors like `button` keep being audited.
+    const isHostSelector = /(?:^|[\s,>+~]):host(?:[\s,.:[{(]|$)/i.test(selector);
+    if (hostExplicitlyNonInteractive && isHostSelector) continue;
     const matchesStrong = STRONG_INTERACTIVE.test(selector);
     const matchesClass = parentIsInteractive && WEAK_INTERACTIVE_CLASS.test(selector);
     if (!matchesStrong && !matchesClass) continue;

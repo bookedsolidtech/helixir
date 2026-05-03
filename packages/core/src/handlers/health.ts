@@ -67,7 +67,15 @@ export interface HealthSummary {
 
 export interface HealthDiff {
   tagName: string;
-  base: ComponentHealth;
+  /**
+   * Base-branch component health. `null` ONLY when `baseUnavailable`
+   * is true — the base CEM could not be loaded so no scoring was
+   * performed. Codex round-50 P2: previous attempts to populate base
+   * with sentinel NaN values broke the ComponentHealth.score numeric
+   * contract on JSON serialization. Explicit nullable is the
+   * correct shape for the indeterminate state.
+   */
+  base: ComponentHealth | null;
   current: ComponentHealth;
   improved: boolean;
   regressed: boolean;
@@ -582,21 +590,22 @@ export async function getHealthDiff(
     cemPathForGit = relFromRepo.split(sep).join('/');
   }
   let baseUnavailableReason = '';
+  let baseUnavailable = false;
   if (outOfTree) {
-    // Paired with diffCem.ts. Per round-46/47/48 pins, the out-of-tree
-    // case returns the advisory diff with baseUnavailable: true.
-    // Round 47 set base = current which produced zero deltas — that
-    // looked like "no change" to legacy consumers. Round 48 fix:
-    // base.score is set to NaN so scoreDelta computes to NaN. NaN
-    // serializes as JSON `null`, so any consumer reading the field
-    // gets a noticeable signal rather than a fake "0 delta". The
-    // same applies to changedDimensions — every entry will have
-    // NaN before/delta values that JSON-serialize as null.
+    // Paired with diffCem.ts. Per round-46/47/48/49/50 pins, the
+    // out-of-tree case returns the advisory diff with
+    // baseUnavailable: true. Round 47 (base = current) leaked into
+    // legacy consumers as fake "no change". Round 48 (base.score =
+    // NaN) violated the numeric contract on JSON serialization.
+    // Round 50: base widened to nullable; we leave the local
+    // variable as a placeholder that's REPLACED with null in the
+    // short-circuit return below.
     const redactedPath = config.cemPath.split(/[\\/]/).pop() ?? '<absolute>';
     baseUnavailableReason = `cemPath (basename: ${redactedPath}) is out-of-tree relative to the git repo root; gitShow requires repo-relative paths. To restore real diff, unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.`;
+    baseUnavailable = true;
     base = {
       tagName,
-      score: Number.NaN,
+      score: 0,
       grade: 'F',
       dimensions: {},
       issues: [`BASE_UNAVAILABLE: ${baseUnavailableReason}`],
@@ -633,16 +642,13 @@ export async function getHealthDiff(
     }
   }
 
-  // baseUnavailable short-circuit: scoreDelta and changedDimensions
-  // are not derivable from the missing base. Emit explicit `null`
-  // values (the schema declares `number | null` for the indeterminate
-  // case) so consumers see an explicitly-typed indeterminate state
-  // rather than a fictitious zero-or-fake delta. Codex round-48 P2 +
-  // round-49 P2 (nullable instead of NaN).
-  if (baseUnavailableReason !== '') {
+  // baseUnavailable short-circuit: base is null, scoreDelta is null,
+  // single sentinel changedDimensions entry. Schema-correct
+  // representation of "diff cannot be computed". Codex round-50 P2.
+  if (baseUnavailable) {
     const result: HealthDiff = {
       tagName,
-      base,
+      base: null,
       current,
       improved: false,
       regressed: false,

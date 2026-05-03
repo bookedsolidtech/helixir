@@ -185,17 +185,22 @@ export async function main(): Promise<void> {
   const cemEnvOverride = process.env['MCP_WC_CEM_PATH'];
   const envCemOptIn =
     cemEnvOverride !== undefined && cemEnvOverride !== '' && isAbsolute(cemEnvOverride);
-  // External-config opt-in is ONLY honored when BOTH
-  // MCP_WC_CONFIG_PATH and the allowlist env are set. Without
-  // MCP_WC_CONFIG_PATH, the cemPath came from somewhere else
-  // (e.g. a relative MCP_WC_CEM_PATH like `../shared/cem.json`)
-  // and that's still a traversal vector that must be blocked.
-  // Codex round-12 P1.
+  // External-config opt-in is ONLY honored when ALL of:
+  //   1. MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1 (explicit user opt-in)
+  //   2. MCP_WC_CONFIG_PATH is set (cemPath could come from external
+  //      config file)
+  //   3. MCP_WC_CEM_PATH is NOT set — env vars override config files
+  //      in loadConfig(), so if MCP_WC_CEM_PATH is set the cemPath
+  //      came from env, NOT from the external config. Codex round-13
+  //      P1: a relative MCP_WC_CEM_PATH like `../shared/cem.json`
+  //      could otherwise bypass containment under this opt-in.
+  // Codex round-12 P1 (initial fix), round-13 P1 (provenance tightening).
   const externalConfigPath = process.env['MCP_WC_CONFIG_PATH'];
   const envConfigOptIn =
     process.env['MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS'] === '1' &&
     externalConfigPath !== undefined &&
-    externalConfigPath !== '';
+    externalConfigPath !== '' &&
+    (cemEnvOverride === undefined || cemEnvOverride === '');
   if (
     !envCemOptIn &&
     !envConfigOptIn &&

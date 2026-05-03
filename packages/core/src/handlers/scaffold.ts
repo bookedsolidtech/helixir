@@ -246,9 +246,22 @@ function generateComponentSource(
       'node_modules/',
     ];
     const isBareSpecifier = (s: string): boolean => {
-      if (s === '' || s.startsWith('.') || s.startsWith('/')) return false;
+      if (s === '') return false;
+      // POSIX path prefixes
+      if (s.startsWith('.') || s.startsWith('/')) return false;
+      // Windows path prefixes: backslash-leading and drive-letter forms.
+      // CEMs generated on Windows can record `C:\\repo\\base.js` or
+      // `src\\base.js`; either is a local path, not a npm bare specifier.
+      // Codex round-13 P2.
+      if (s.startsWith('\\') || /^[A-Za-z]:[\\/]/.test(s)) return false;
+      // Conventional repo-directory prefixes (POSIX form)
       for (const prefix of REPO_RELATIVE_PREFIXES) {
         if (s.startsWith(prefix)) return false;
+      }
+      // Same prefixes, backslash form (Windows-converted POSIX)
+      for (const prefix of REPO_RELATIVE_PREFIXES) {
+        const winPrefix = prefix.replace('/', '\\');
+        if (s.startsWith(winPrefix)) return false;
       }
       return true;
     };

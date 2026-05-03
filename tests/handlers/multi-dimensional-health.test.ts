@@ -157,16 +157,16 @@ describe('scoreComponentMultiDimensional', () => {
     const cemNative = result.dimensions.filter(
       (d) => DIMENSION_REGISTRY.find((r) => r.name === d.name)?.source === 'cem-native',
     );
-    // M2 anti-hallucination behavior: CEM-Source Fidelity and Naming Consistency
-    // can't run without a CEM / library conventions in this single-component
-    // unit-test path. Pre-M2 they returned `notApplicable: true` and silently
-    // dropped from the grade. Post-M2 they return `confidence: 'unknown',
-    // measured: true, score: 0` — they pull the score down and count against
-    // the untested-critical budget. That's the anti-gaslighting fix.
+    // CEM-Source Fidelity stays N/A when no CEM is passed — caller hasn't
+    // asked for cross-CEM analysis (preserves existing entry points like
+    // generateAuditReport(config, declarations) per round-2 codex review).
+    // Strict mode (M2 follow-up work) will surface this as `unknown` for
+    // callers that opt in.
     const cemSourceFidelity = cemNative.find((d) => d.name === 'CEM-Source Fidelity');
     expect(cemSourceFidelity).toBeDefined();
-    expect(cemSourceFidelity?.measured).toBe(true);
-    expect(cemSourceFidelity?.confidence).toBe('unknown');
+    expect(cemSourceFidelity?.measured).toBe(false);
+    // Naming Consistency: when no precomputed conventions are passed AND
+    // no CEM is available to derive them from, it's `unknown`.
     const namingConsistency = cemNative.find((d) => d.name === 'Naming Consistency');
     expect(namingConsistency).toBeDefined();
     expect(namingConsistency?.measured).toBe(true);
@@ -192,12 +192,13 @@ describe('scoreComponentMultiDimensional', () => {
     const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
     expect(result.confidenceSummary).toBeDefined();
     expect(result.confidenceSummary.verified).toBeGreaterThan(0);
-    // M2: CEM-Source Fidelity and Naming Consistency are now `unknown`
-    // (couldn't measure — input absent), not `untested` (no external data).
-    // 5 untested = the 5 external dims; 2 unknown = the two cem-native
-    // dimensions that couldn't run.
-    expect(result.confidenceSummary.untested).toBe(5);
-    expect(result.confidenceSummary.unknown).toBe(2);
+    // 5 external dims have no history → untested. CEM-Source Fidelity
+    // is N/A (no CEM passed → caller didn't opt into cross-CEM analysis,
+    // preserves existing callers per round-2 codex review) but emits
+    // confidence=untested in the summary bucket. Net: 6 untested.
+    // Naming Consistency: no conventions, no CEM → `unknown`.
+    expect(result.confidenceSummary.untested).toBe(6);
+    expect(result.confidenceSummary.unknown).toBe(1);
   });
 
   it('includes a timestamp', async () => {
@@ -308,21 +309,17 @@ describe('enterprise grade algorithm integration', () => {
     expect(tcDim!.score).toBeLessThan(100);
   });
 
-  it('untested + unknown critical dimensions affect grade', async () => {
+  it('untested critical dimensions affect grade', async () => {
     const config = makeConfig();
     const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
     // Test Coverage is untested (no external history) → in untested-critical bucket.
     const testDim = result.dimensions.find((d) => d.name === 'Test Coverage');
     expect(testDim!.measured).toBe(false);
     expect(testDim!.confidence).toBe('untested');
-    // M2: CEM-Source Fidelity is `unknown` here (no CEM passed). It both pulls
-    // the weighted score down (score 0, weight 10) AND counts against the
-    // untested-critical budget. Pre-M2 it dropped silently — that was the
-    // gaslighting pattern. Post-M2 the grade for an otherwise-perfect component
-    // run without a CEM is no better than C.
-    const fidelityDim = result.dimensions.find((d) => d.name === 'CEM-Source Fidelity');
-    expect(fidelityDim!.confidence).toBe('unknown');
-    expect(['C', 'D', 'F']).toContain(result.grade);
+    // CEM-Source Fidelity stays N/A in this single-component path
+    // (round-2 codex review pinned this — preserves existing callers).
+    // Test Coverage alone (1 untested critical) gates A but B is reachable.
+    expect(result.gradingNotes.some((n) => n.includes('untested'))).toBe(true);
   });
 
   it('grade is A-F string', async () => {

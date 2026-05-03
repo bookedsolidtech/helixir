@@ -17,7 +17,7 @@ export interface AuditSummary {
   averageScore: number;
   gradeDistribution: { A: number; B: number; C: number; D: number; F: number };
   dimensionAverages: Record<string, number>;
-  confidenceSummary: { verified: number; heuristic: number; untested: number };
+  confidenceSummary: { verified: number; heuristic: number; untested: number; unknown: number };
   timestamp: string;
 }
 
@@ -38,7 +38,7 @@ export async function generateAuditReport(
 
   const gradeDistribution = { A: 0, B: 0, C: 0, D: 0, F: 0 };
   const dimensionTotals: Record<string, { sum: number; count: number }> = {};
-  const globalConfidence = { verified: 0, heuristic: 0, untested: 0 };
+  const globalConfidence = { verified: 0, heuristic: 0, untested: 0, unknown: 0 };
   let totalScore = 0;
 
   for (const decl of withTag) {
@@ -63,11 +63,16 @@ export async function generateAuditReport(
       }
     }
 
-    // Aggregate confidence
+    // Aggregate confidence — including the M2 `unknown` bucket so the
+    // library-level summary surfaces the same anti-gaslighting signal
+    // as per-component results. Without this, a library full of
+    // CEM-incomplete components would show a clean confidence rollup
+    // even though every component flagged unknowns.
     if (health.confidenceSummary) {
       globalConfidence.verified += health.confidenceSummary.verified;
       globalConfidence.heuristic += health.confidenceSummary.heuristic;
       globalConfidence.untested += health.confidenceSummary.untested;
+      globalConfidence.unknown += health.confidenceSummary.unknown;
     }
   }
 

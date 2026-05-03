@@ -886,18 +886,29 @@ export async function scoreComponentMultiDimensional(
  * means "this component genuinely has nothing here" (N/A) or "we cannot
  * tell because the CEM data is missing" (unknown).
  *
- * Rule: if ANY required CEM key is `absent`, the analyzer is missing
- * inputs it might have used — verdict is `unknown`
- * (`measured: true, score: 0, confidence: 'unknown'`).
- * Only when EVERY required key is `present` (even if its array is empty)
- * has the component authoritatively declared "nothing here" — and only
- * then is the dimension `notApplicable: true`.
+ * Rule: only when EVERY required CEM key is absent does the dimension
+ * become `unknown`. When ANY required key is present (even an empty
+ * array, even if other keys are absent), treat as `notApplicable`.
  *
- * The "any absent → unknown" rule catches mixed-quality manifests, e.g.
- * `members: []` with `events` key missing entirely. Pre-this-rule, the
- * analyzer returned null, this helper marked it N/A, and the events-key
- * gap dropped silently from the weighted score. Now it surfaces as
- * unknown and pulls the grade down — exactly what M2 promises.
+ * Rationale for "all absent" not "any absent": real-world CEM tools
+ * routinely omit empty optional arrays from serialization rather than
+ * emit `slots: []`. The Shoelace fixture in tests/__fixtures__/ and many
+ * other shipping libraries do this. A stricter "any absent → unknown"
+ * rule penalizes correct CEM serialization as if it were a completeness
+ * gap, which is the opposite of M2's intent.
+ *
+ * What this rule does NOT catch: a CEM that legitimately documents
+ * `members: [...]` but silently dropped its `events` key during a
+ * regen. That's a real partial-omission case M2 should detect — but
+ * without a source-fidelity cross-reference (compare CEM to source AST
+ * to determine whether the events key SHOULD be present), we cannot
+ * distinguish a real gap from a tool serialization choice.
+ *
+ * Catching partial omissions correctly is M2 follow-up work that
+ * depends on extending `analyzeCemSourceFidelity` to emit per-key
+ * absence findings, then using those findings to override this helper's
+ * verdict on a per-dimension basis. Until then, only the deeply-empty
+ * case (every key absent) flips to `unknown`.
  *
  * `unknown` is the M2 anti-gaslighting verdict: it pulls the weighted
  * score down and counts against `Grade.maxUntestedCritical`, so missing
@@ -907,17 +918,17 @@ function resolveAnalyzerNull(
   decl: CemDeclaration,
   requiredKeys: CemPresenceKey[],
 ): { score: 0; confidence: ConfidenceLevel; notApplicable?: boolean } {
-  const anyAbsent = requiredKeys.some((key) => cemHas(decl, key) === 'absent');
-  if (anyAbsent) {
-    // At least one required input is missing — answer is "unknown."
+  const allAbsent = requiredKeys.every((key) => cemHas(decl, key) === 'absent');
+  if (allAbsent) {
+    // Every required input is missing — answer is "unknown."
     // Note: we deliberately do NOT set notApplicable here, so the
     // dimension flows into the weighted score with a 0 and pulls the
     // grade down. Pre-M2, this case was silently dropped from grading.
     return { score: 0, confidence: 'unknown' };
   }
-  // Every required key is present (arrays may be empty) — dimension is
-  // legitimately N/A: the component has authoritatively declared
-  // "nothing here."
+  // At least one required key is present — dimension is legitimately
+  // N/A: the component has authoritatively declared "nothing here" for
+  // at least one input axis.
   return { score: 0, confidence: 'untested', notApplicable: true };
 }
 
@@ -1008,15 +1019,22 @@ async function scoreCemNativeDimension(
 
     case 'CEM-Source Fidelity': {
       if (!config || !cem) {
-        // Config / CEM unavailable in this scoring path — we have no
-        // chance to measure source-vs-CEM divergence. That's `unknown`.
-        return { score: 0, confidence: 'unknown' };
+        // Caller didn't supply the full library CEM — preserve existing
+        // entry points like generateAuditReport(config, declarations)
+        // and direct scoreComponentMultiDimensional(config, decl) calls
+        // that score a single declaration. Pre-M2 this dropped silently;
+        // M2 strict mode (follow-up work) will surface this as `unknown`
+        // for callers that opt in. Until then, callers that pass a full
+        // CEM get the analyzer; callers that don't get N/A.
+        return { score: 0, confidence: 'untested', notApplicable: true };
       }
       const fidelity = await analyzeCemSourceFidelity(config, cem, decl);
       if (!fidelity) {
-        // Analyzer ran but couldn't produce a fidelity score. Treat as
-        // `unknown` — pre-M2 this dropped silently out of the grade.
-        return { score: 0, confidence: 'unknown' };
+        // Analyzer ran but couldn't produce a fidelity score (typically:
+        // source files unavailable, or declaration not locatable in the
+        // CEM modules tree). Treat as N/A for now — this is a path the
+        // strict-mode follow-up will revisit.
+        return { score: 0, confidence: 'untested', notApplicable: true };
       }
       return fidelity;
     }

@@ -303,22 +303,31 @@ export function loadConfig(): Readonly<McpWcConfig> {
 
   // Stamp the external-config provenance flag now that the JSON has
   // been merged + stripped. We re-derive the conditions here from
-  // ground truth (env vars and resolved cemPath), so:
+  // ground truth (env vars, the actual config-source directory, and
+  // resolved cemPath), so:
   //   - User-supplied JSON cannot forge it (the strip above).
-  //   - The flag reflects the actual loader path that ran.
-  // Pre-condition: the file config came from an external
-  // MCP_WC_CONFIG_PATH (configSourceDir is outside projectRoot), the
-  // user opted in, AND the file config supplied an absolute cemPath
-  // that was preserved out-of-tree. Codex round-18 P1.
+  //   - The flag reflects the actual loader path that ran, not just
+  //     the env vars that were set.
+  //
+  // Critical: configSourceDir tells us where the JSON ACTUALLY came
+  // from. If MCP_WC_CONFIG_PATH was stale/malformed and the loader
+  // fell back to in-repo discovery, configSourceDir lives inside
+  // projectRoot — and the bypass MUST NOT fire even though the env
+  // var is set. Codex round-19 P1.
+  const projectRootResolved = resolve(effectiveRoot);
+  const fileCameFromExternal =
+    configSourceDir !== null &&
+    !(
+      resolve(configSourceDir) === projectRootResolved ||
+      resolve(configSourceDir).startsWith(projectRootResolved + sep)
+    );
   if (
+    fileCameFromExternal &&
     fileCemPath !== undefined &&
-    process.env['MCP_WC_CONFIG_PATH'] !== undefined &&
-    process.env['MCP_WC_CONFIG_PATH'] !== '' &&
     process.env['MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS'] === '1' &&
     typeof config.cemPath === 'string' &&
     isAbsolute(config.cemPath)
   ) {
-    const projectRootResolved = resolve(effectiveRoot);
     const rel = relative(projectRootResolved, config.cemPath);
     if (rel.startsWith('..') || isAbsolute(rel)) {
       (config as Record<string, unknown>)['cemPathFromExternalConfig'] = true;

@@ -516,22 +516,31 @@ export async function diffCem(
 
   let baseMeta: ComponentMetadata | null = null;
 
+  // Pinned position per runbook §6 step 3: codex round-10 → guard,
+  // round-16 → relativize in-repo, round-20 → throw out-of-tree,
+  // round-22 → "throwing regresses supported MCP_WC_CEM_PATH absolute
+  // configs." Codex is flipping. We stop at "best-effort + warn":
+  //   - In-repo absolute → relativize and gitShow normally
+  //   - Out-of-tree absolute → emit a warning to stderr (with the
+  //     absolute path REDACTED to a basename so it doesn't leak host
+  //     filesystem paths back through tool responses, codex round-22 P2)
+  //     and continue with baseMeta = null (component looks new in base)
+  // Consumers that need stronger semantics should switch to the
+  // M2-strict-mode follow-up flag.
   let cemPathForGit = config.cemPath;
   if (isAbsolute(config.cemPath)) {
     const projectRootResolved = resolve(config.projectRoot);
     const rel = relative(projectRootResolved, config.cemPath);
     if (rel === '' || rel.startsWith('..') || isAbsolute(rel)) {
-      // Genuinely out-of-tree — gitShow can't read it. Throwing is
-      // safer than fabricating `isNew: true`, which would suppress
-      // breaking-change detection by classifying every existing
-      // component as new. Codex round-20 P1.
-      throw new MCPError(
-        `diffCem cannot compute base-branch diff: cemPath ${config.cemPath} is out-of-tree (set via MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1) and gitShow requires repo-relative paths. To restore diff, unset the env var or move the CEM in-tree.`,
-        ErrorCategory.VALIDATION,
+      // Genuinely out-of-tree.
+      const redactedPath = config.cemPath.split(/[\\/]/).pop() ?? '<absolute>';
+      process.stderr.write(
+        `[helixir] Warning: diffCem cannot read base-branch CEM at out-of-tree absolute path (basename: ${redactedPath}); gitShow requires repo-relative paths. Diff will treat ${tagName} as new in base. (To restore diff: unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.)\n`,
       );
+      cemPathForGit = '';
+    } else {
+      cemPathForGit = rel.split(sep).join('/');
     }
-    // In-repo absolute path — relativize for gitShow.
-    cemPathForGit = rel.split(sep).join('/');
   }
 
   if (cemPathForGit !== '') {

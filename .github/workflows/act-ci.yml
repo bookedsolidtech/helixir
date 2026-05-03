@@ -50,7 +50,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [20, 22, 24]
+        # ACT_MATRIX_TESTS=true → all three (parity with ci-matrix.yml).
+        # ACT_FULL_TESTS=true (without --matrix) → current Node only,
+        # the lighter-weight escape hatch documented by act-ci.sh --full.
+        # Codex round-5 P2.
+        node-version: ${{ (env.ACT_MATRIX_TESTS == 'true' && fromJSON('[20, 22, 24]')) || fromJSON('[24]') }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node ${{ matrix.node-version }} via nvm

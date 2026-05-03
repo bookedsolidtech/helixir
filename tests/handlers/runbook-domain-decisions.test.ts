@@ -93,6 +93,105 @@ describe('runbook §4a — out-of-tree cemPath drop with allowlist override', ()
   });
 });
 
+// ─── M2 design pin: resolveAnalyzerNull "all absent" rule ──────────────────
+//
+// This is NOT a runbook §4 decision — it's an M2 design choice the codex
+// push-gate has flipped on across rounds:
+//   round 1 → "any absent → unknown" (catches partial gaps but penalizes
+//             real CEMs that omit empty optional arrays as a normal
+//             serialization choice — Shoelace fixture is the canonical
+//             example)
+//   round 2 → "all absent → unknown" (preserves Shoelace; misses partial
+//             omissions like members:[] + missing events key)
+//   round 5 → "any absent" again
+//
+// Pinned position: **all absent → unknown.** Catching partial omissions
+// correctly requires source-fidelity cross-reference (compare CEM to
+// source AST to know whether a key SHOULD be present), which is M2
+// follow-up work. Until then, only deeply-empty CEMs flip to unknown;
+// real-world libraries with normal serialization keep their existing
+// scoring contract.
+//
+// This test exists per runbook §6 step 3 — pin the decision with a
+// regression test so future codex flips on the same code are caught
+// with named context.
+
+describe('M2 design pin — resolveAnalyzerNull "all absent → unknown"', () => {
+  let projectDir: string;
+  beforeEach(() => {
+    vi.unstubAllEnvs();
+    projectDir = mkdtempSync(join(tmpdir(), 'helixir-m2-pin-'));
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    rmSync(projectDir, { recursive: true, force: true });
+  });
+
+  it('returns N/A (not unknown) for partially-empty CEMs that omit one optional key', async () => {
+    // members: present (empty), events: ABSENT.
+    // Type Coverage requires both members and events. Pre-pin (codex
+    // rounds 1 and 5 position): this would flag as `unknown`. Post-pin:
+    // it's N/A because at least one input axis (members) is
+    // authoritatively declared empty.
+    const partialDecl = {
+      kind: 'class' as const,
+      name: 'PartialDecl',
+      tagName: 'partial-decl',
+      members: [],
+      // events: deliberately absent
+    };
+    const { scoreComponentMultiDimensional } =
+      await import('../../packages/core/src/handlers/health.js');
+    const config = {
+      cemPath: 'custom-elements.json',
+      projectRoot: projectDir,
+      componentPrefix: '',
+      healthHistoryDir: '.mcp-wc/health',
+      tsconfigPath: 'tsconfig.json',
+      tokensPath: null,
+      cdnBase: null,
+      watch: false,
+    };
+    const result = await scoreComponentMultiDimensional(config, partialDecl);
+    const typeCoverage = result.dimensions.find((d) => d.name === 'Type Coverage');
+    expect(typeCoverage).toBeDefined();
+    // Pin: NOT 'unknown' — the dimension is N/A because members is
+    // present-but-empty (component has authoritatively declared "no
+    // members to type-cover"). If this assertion ever fails because
+    // someone flipped to "any absent", READ THE RUNBOOK §6 STEP 3
+    // and the comment above before changing it.
+    expect(typeCoverage?.confidence).not.toBe('unknown');
+  });
+
+  it('returns unknown for fully-empty CEMs that omit ALL required keys', async () => {
+    // No members, no events, no slots, no cssProperties, no cssParts.
+    // CSS Architecture requires both cssProperties AND cssParts —
+    // both absent → unknown.
+    const emptyDecl = {
+      kind: 'class' as const,
+      name: 'EmptyDecl',
+      tagName: 'empty-decl',
+      description: 'A component whose CEM omits every structured key.',
+    };
+    const { scoreComponentMultiDimensional } =
+      await import('../../packages/core/src/handlers/health.js');
+    const config = {
+      cemPath: 'custom-elements.json',
+      projectRoot: projectDir,
+      componentPrefix: '',
+      healthHistoryDir: '.mcp-wc/health',
+      tsconfigPath: 'tsconfig.json',
+      tokensPath: null,
+      cdnBase: null,
+      watch: false,
+    };
+    const result = await scoreComponentMultiDimensional(config, emptyDecl);
+    const cssArch = result.dimensions.find((d) => d.name === 'CSS Architecture');
+    expect(cssArch).toBeDefined();
+    expect(cssArch?.confidence).toBe('unknown');
+  });
+});
+
 // ─── §4b: scaffold base-class import precedence ─────────────────────────────
 //
 // Decision: package wins, bare-specifier module fallback,

@@ -592,8 +592,7 @@ function checkTouchTarget(
     // Per-arm decorative check: `button, .icon { ... }` should still
     // fire on `button`. Split the selector list by comma and skip
     // only when EVERY arm is decorative. Codex round-54 P2.
-    const selectorArms = selector
-      .split(',')
+    const selectorArms = splitTopLevelCommas(selector)
       .map((s) => s.trim())
       .filter(Boolean);
     if (selectorArms.length > 0 && selectorArms.every((arm) => DECORATIVE_SELECTOR.test(arm))) {
@@ -610,9 +609,9 @@ function checkTouchTarget(
     const isBareHostRule =
       /^:host(\([^)]*\))?(\s*::?[a-zA-Z-]+(?:\([^)]*\))?)*\s*$/.test(trimmedSel) ||
       // `:host(...) , :host` and similar comma-separated bare-host lists
-      trimmedSel
-        .split(',')
-        .every((s) => /^:host(\([^)]*\))?(\s*::?[a-zA-Z-]+(?:\([^)]*\))?)*\s*$/.test(s.trim()));
+      splitTopLevelCommas(trimmedSel).every((s) =>
+        /^:host(\([^)]*\))?(\s*::?[a-zA-Z-]+(?:\([^)]*\))?)*\s*$/.test(s.trim()),
+      );
     // Per-rule (not stylesheet-wide) decoration guard. Codex round-57 P2:
     // a single non-interactive bare-:host (e.g. `:host { pointer-events:
     // none }` for a disabled state) was previously suppressing audit
@@ -725,19 +724,21 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
         // for parentSel before recursing into any further nested rules.
         // Codex round-66 P2 / round-67 P2.
         if (childSel.startsWith('@')) {
-          // Extract direct (depth-0 within the at-rule body) declarations.
-          let atDecl = '';
-          let dd = 0;
-          for (let p = 0; p < inner.length; p++) {
-            const c = inner[p];
-            if (c === '{') dd++;
-            else if (c === '}') dd--;
-            else if (dd === 0) atDecl += c;
-          }
-          if (atDecl.trim() !== '' && parentSel !== '') {
-            out.push({ selector: parentSel, body: atDecl });
-          }
-          // Recurse into nested rules with the SAME parent selector.
+          // At-rules are CONDITIONAL — declarations directly inside
+          // them only apply when the condition matches (e.g.
+          // `@media print { width: 20px }` doesn't shrink the touch
+          // target on screen). Emitting them as unconditional leaf
+          // rules would produce false-positive audit findings on
+          // print-only or alt-pointer-mode styles. Codex round-67
+          // P2 added the extraction; round-68 P2 reverted it because
+          // the conditionality was being lost. Cost: we miss
+          // shrinking-under-coarse-pointer-only cases. Trade is
+          // correct — prefer false-negative over false-positive on
+          // conditional CSS.
+          // We DO recurse into nested rules so things like
+          // `@media (...) { button { width: 20px } }` still surface
+          // (the inner rule is its own block; codex flagged this as
+          // a separate concern).
           parseBlock(inner, parentSel);
           i = k + 1;
           continue;
@@ -770,12 +771,13 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
 
 function resolveNestedSelector(parent: string, child: string): string {
   if (parent === '') return child;
-  const childArms = child
-    .split(',')
+  // Paren/bracket-aware comma split so commas inside `:is(.a, .b)`,
+  // `:where(...)`, `:not(...)`, `[attr=",..."]`, etc. are NOT treated
+  // as selector-list separators. Codex round-68 P2.
+  const childArms = splitTopLevelCommas(child)
     .map((s) => s.trim())
     .filter(Boolean);
-  const parentArms = parent
-    .split(',')
+  const parentArms = splitTopLevelCommas(parent)
     .map((s) => s.trim())
     .filter(Boolean);
   const out: string[] = [];
@@ -789,4 +791,29 @@ function resolveNestedSelector(parent: string, child: string): string {
     }
   }
   return out.join(', ');
+}
+
+/**
+ * Split a CSS selector list on top-level commas, respecting parens
+ * and brackets. `:is(.a, .b)` stays as one arm; `[attr=",x"]`
+ * stays as one arm; `button, .icon` becomes two arms. Codex round-68 P2.
+ */
+function splitTopLevelCommas(text: string): string[] {
+  const out: string[] = [];
+  let parenDepth = 0;
+  let bracketDepth = 0;
+  let segStart = 0;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === '(') parenDepth++;
+    else if (ch === ')') parenDepth--;
+    else if (ch === '[') bracketDepth++;
+    else if (ch === ']') bracketDepth--;
+    else if (ch === ',' && parenDepth === 0 && bracketDepth === 0) {
+      out.push(text.slice(segStart, i));
+      segStart = i + 1;
+    }
+  }
+  out.push(text.slice(segStart));
+  return out;
 }

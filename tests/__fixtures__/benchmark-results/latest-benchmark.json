@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-03-28T01:43:36.588Z",
+  "timestamp": "2026-05-03T13:13:01.488Z",
   "scorecards": {
     "material": {
       "library": "material",
       "componentCount": 97,
-      "averageScore": 55.71,
+      "averageScore": 45.66,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
         "C": 0,
-        "D": 1,
-        "F": 96
+        "D": 0,
+        "F": 97
       },
       "dimensionAverages": {
         "CEM Completeness": 71.78,
@@ -30,55 +30,55 @@
       },
       "top5": [
         {
-          "tagName": "md-divider",
-          "score": 77.9,
-          "grade": "F"
-        },
-        {
-          "tagName": "md-elevation",
-          "score": 75,
-          "grade": "F"
-        },
-        {
-          "tagName": "catalog-component-header-title",
-          "score": 75,
-          "grade": "F"
-        },
-        {
-          "tagName": "catalog-component-header",
-          "score": 75,
-          "grade": "F"
-        },
-        {
           "tagName": "hct-slider",
-          "score": 74.2,
+          "score": 64.3,
+          "grade": "F"
+        },
+        {
+          "tagName": "md-divider",
+          "score": 62.3,
+          "grade": "F"
+        },
+        {
+          "tagName": "test-assist-chip",
+          "score": 58.7,
+          "grade": "F"
+        },
+        {
+          "tagName": "story-knob-panel",
+          "score": 56.6,
+          "grade": "F"
+        },
+        {
+          "tagName": "md-navigation-drawer-modal",
+          "score": 55.6,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "test-element-internals",
-          "score": 37.8,
-          "grade": "F"
-        },
-        {
-          "tagName": "md-sub-menu",
-          "score": 39.8,
-          "grade": "F"
-        },
-        {
-          "tagName": "md-checkbox",
-          "score": 40.3,
-          "grade": "F"
-        },
-        {
-          "tagName": "md-slider",
-          "score": 40.8,
+          "score": 30.3,
           "grade": "F"
         },
         {
           "tagName": "test-custom-state-set",
-          "score": 41.7,
+          "score": 33.3,
+          "grade": "F"
+        },
+        {
+          "tagName": "md-sub-menu",
+          "score": 34.5,
+          "grade": "F"
+        },
+        {
+          "tagName": "test-default-value-form-associated",
+          "score": 34.7,
+          "grade": "F"
+        },
+        {
+          "tagName": "md-checkbox",
+          "score": 34.9,
           "grade": "F"
         }
       ],
@@ -87,7 +87,7 @@
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Significantly below average (26). Major drag on scores."
         },
         {
@@ -129,7 +129,7 @@
           "dimension": "Slot Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Significantly below average (26). Major drag on scores."
         },
         {
@@ -143,7 +143,7 @@
           "dimension": "Event Architecture",
           "average": 34.28,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Near average."
         },
         {
@@ -185,20 +185,20 @@
       "confidenceBreakdown": {
         "verified": 185,
         "heuristic": 426,
-        "untested": 747
+        "untested": 501
       },
-      "timestamp": "2026-03-28T01:43:36.580Z"
+      "timestamp": "2026-05-03T13:13:01.486Z"
     },
     "spectrum": {
       "library": "spectrum",
       "componentCount": 89,
-      "averageScore": 54.52,
+      "averageScore": 48.13,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
         "C": 0,
-        "D": 3,
-        "F": 86
+        "D": 0,
+        "F": 89
       },
       "dimensionAverages": {
         "CEM Completeness": 60.11,
@@ -218,55 +218,55 @@
       },
       "top5": [
         {
-          "tagName": "sp-table-head-cell",
-          "score": 65.5,
-          "grade": "D"
-        },
-        {
-          "tagName": "sp-table-checkbox-cell",
-          "score": 64.8,
-          "grade": "F"
-        },
-        {
           "tagName": "sp-accordion-item",
-          "score": 64.7,
+          "score": 60.4,
           "grade": "F"
         },
         {
-          "tagName": "sp-contextual-help",
-          "score": 64.1,
+          "tagName": "sp-toast",
+          "score": 59.5,
           "grade": "F"
         },
         {
-          "tagName": "sp-tab-panel",
-          "score": 64,
+          "tagName": "sp-picker",
+          "score": 58.5,
+          "grade": "F"
+        },
+        {
+          "tagName": "sp-action-menu",
+          "score": 58.1,
+          "grade": "F"
+        },
+        {
+          "tagName": "sp-radio",
+          "score": 58,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
-          "tagName": "overlay-trigger",
-          "score": 39.9,
-          "grade": "F"
-        },
-        {
           "tagName": "sp-slider-handle",
-          "score": 40.6,
+          "score": 35.2,
           "grade": "F"
         },
         {
           "tagName": "sp-table-row",
-          "score": 41.9,
+          "score": 36.3,
+          "grade": "F"
+        },
+        {
+          "tagName": "overlay-trigger",
+          "score": 37.3,
           "grade": "F"
         },
         {
           "tagName": "sp-switch",
-          "score": 41.9,
+          "score": 39.1,
           "grade": "F"
         },
         {
-          "tagName": "sp-dropzone",
-          "score": 43.9,
+          "tagName": "sp-icon",
+          "score": 39.7,
           "grade": "F"
         }
       ],
@@ -310,7 +310,7 @@
           "dimension": "CSS Architecture",
           "average": 1.12,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Significantly below average (30). Major drag on scores."
         },
         {
@@ -373,14 +373,14 @@
       "confidenceBreakdown": {
         "verified": 241,
         "heuristic": 404,
-        "untested": 601
+        "untested": 445
       },
-      "timestamp": "2026-03-28T01:43:36.585Z"
+      "timestamp": "2026-05-03T13:13:01.486Z"
     },
     "vaadin": {
       "library": "vaadin",
       "componentCount": 96,
-      "averageScore": 67.81,
+      "averageScore": 58.33,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -407,54 +407,54 @@
       "top5": [
         {
           "tagName": "vaadin-master-detail-layout",
-          "score": 77.7,
+          "score": 67.3,
           "grade": "D"
         },
         {
           "tagName": "vaadin-popover",
-          "score": 76.5,
+          "score": 66.3,
           "grade": "F"
         },
         {
           "tagName": "vaadin-rich-text-editor",
-          "score": 76.5,
+          "score": 66.3,
           "grade": "F"
         },
         {
           "tagName": "vaadin-select",
-          "score": 75.7,
+          "score": 65.6,
           "grade": "F"
         },
         {
           "tagName": "vaadin-crud",
-          "score": 75.5,
+          "score": 65.5,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "vaadin-map",
-          "score": 43.5,
+          "score": 37.3,
           "grade": "F"
         },
         {
           "tagName": "vaadin-field-highlighter",
-          "score": 50,
+          "score": 40,
           "grade": "F"
         },
         {
-          "tagName": "vaadin-virtual-list",
-          "score": 55.2,
+          "tagName": "vaadin-iconset",
+          "score": 45.9,
           "grade": "F"
         },
         {
-          "tagName": "vaadin-board",
-          "score": 55.8,
+          "tagName": "vaadin-vertical-layout",
+          "score": 47,
           "grade": "F"
         },
         {
-          "tagName": "vaadin-board-row",
-          "score": 55.8,
+          "tagName": "vaadin-horizontal-layout",
+          "score": 47,
           "grade": "F"
         }
       ],
@@ -463,7 +463,7 @@
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Significantly below average (32). Major drag on scores."
         },
         {
@@ -505,7 +505,7 @@
           "dimension": "Slot Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Significantly below average (32). Major drag on scores."
         },
         {
@@ -561,19 +561,19 @@
       "confidenceBreakdown": {
         "verified": 188,
         "heuristic": 439,
-        "untested": 717
+        "untested": 523
       },
-      "timestamp": "2026-03-28T01:43:36.585Z"
+      "timestamp": "2026-05-03T13:13:01.486Z"
     },
     "fluentui": {
       "library": "fluentui",
       "componentCount": 41,
-      "averageScore": 65.27,
+      "averageScore": 55.32,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
-        "C": 1,
-        "D": 0,
+        "C": 0,
+        "D": 1,
         "F": 40
       },
       "dimensionAverages": {
@@ -595,54 +595,54 @@
       "top5": [
         {
           "tagName": "fluent-radio-group",
-          "score": 79.4,
-          "grade": "C"
-        },
-        {
-          "tagName": "fluent-dropdown-option",
-          "score": 78.2,
-          "grade": "F"
-        },
-        {
-          "tagName": "fluent-listbox",
-          "score": 75.8,
-          "grade": "F"
-        },
-        {
-          "tagName": "fluent-text",
-          "score": 73.8,
-          "grade": "F"
+          "score": 68.8,
+          "grade": "D"
         },
         {
           "tagName": "fluent-toggle-button",
-          "score": 73.2,
+          "score": 68.3,
+          "grade": "F"
+        },
+        {
+          "tagName": "fluent-dropdown-option",
+          "score": 67.8,
+          "grade": "F"
+        },
+        {
+          "tagName": "fluent-menu-item",
+          "score": 67.7,
+          "grade": "F"
+        },
+        {
+          "tagName": "fluent-menu",
+          "score": 67,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
-          "tagName": "fluent-tabs",
-          "score": 49.7,
+          "tagName": "fluent-dialog-body",
+          "score": 34.7,
           "grade": "F"
         },
         {
-          "tagName": "fluent-drawer",
-          "score": 55.4,
+          "tagName": "fluent-tab-panel",
+          "score": 37,
+          "grade": "F"
+        },
+        {
+          "tagName": "fluent-tabs",
+          "score": 39.8,
           "grade": "F"
         },
         {
           "tagName": "fluent-dialog",
-          "score": 56.3,
+          "score": 45.1,
           "grade": "F"
         },
         {
           "tagName": "fluent-tablist",
-          "score": 56.8,
-          "grade": "F"
-        },
-        {
-          "tagName": "fluent-field",
-          "score": 57.5,
+          "score": 45.5,
           "grade": "F"
         }
       ],
@@ -700,7 +700,7 @@
           "dimension": "CSS Architecture",
           "average": 29.27,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Near average."
         },
         {
@@ -749,20 +749,20 @@
       "confidenceBreakdown": {
         "verified": 142,
         "heuristic": 139,
-        "untested": 293
+        "untested": 205
       },
-      "timestamp": "2026-03-28T01:43:36.585Z"
+      "timestamp": "2026-05-03T13:13:01.486Z"
     },
     "carbon": {
       "library": "carbon",
       "componentCount": 110,
-      "averageScore": 53.16,
+      "averageScore": 45.45,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
         "C": 0,
-        "D": 1,
-        "F": 109
+        "D": 0,
+        "F": 110
       },
       "dimensionAverages": {
         "CEM Completeness": 85.83,
@@ -783,54 +783,54 @@
       "top5": [
         {
           "tagName": "bx-select-item-group",
-          "score": 75.5,
+          "score": 60.4,
           "grade": "F"
         },
         {
           "tagName": "bx-select-item",
-          "score": 75.5,
+          "score": 60.4,
           "grade": "F"
         },
         {
           "tagName": "bx-header-menu",
-          "score": 69.3,
+          "score": 60.1,
           "grade": "F"
         },
         {
-          "tagName": "bx-content-switcher-item",
-          "score": 68.8,
-          "grade": "D"
+          "tagName": "bx-input",
+          "score": 59.3,
+          "grade": "F"
         },
         {
-          "tagName": "bx-code-snippet",
-          "score": 66.3,
+          "tagName": "bx-dropdown",
+          "score": 57.7,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "bx-accordion",
-          "score": 40.3,
+          "score": 32.2,
           "grade": "F"
         },
         {
           "tagName": "bx-side-nav-items",
-          "score": 42.1,
+          "score": 33.7,
           "grade": "F"
         },
         {
           "tagName": "bx-header",
-          "score": 42.1,
+          "score": 33.7,
           "grade": "F"
         },
         {
           "tagName": "bx-tile-group",
-          "score": 42.1,
+          "score": 33.7,
           "grade": "F"
         },
         {
           "tagName": "bx-structured-list-header-cell",
-          "score": 42.1,
+          "score": 33.7,
           "grade": "F"
         }
       ],
@@ -874,7 +874,7 @@
           "dimension": "Slot Architecture",
           "average": 10.18,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Below average (26). Room for improvement."
         },
         {
@@ -937,14 +937,14 @@
       "confidenceBreakdown": {
         "verified": 350,
         "heuristic": 397,
-        "untested": 793
+        "untested": 550
       },
-      "timestamp": "2026-03-28T01:43:36.585Z"
+      "timestamp": "2026-05-03T13:13:01.486Z"
     },
     "ui5": {
       "library": "ui5",
       "componentCount": 170,
-      "averageScore": 42.01,
+      "averageScore": 33.24,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -970,55 +970,55 @@
       },
       "top5": [
         {
+          "tagName": "ui5-avatar",
+          "score": 38.5,
+          "grade": "F"
+        },
+        {
+          "tagName": "ui5-input",
+          "score": 38.5,
+          "grade": "F"
+        },
+        {
+          "tagName": "ui5-menu-item",
+          "score": 37.9,
+          "grade": "F"
+        },
+        {
           "tagName": "ui5-navigation-menu",
-          "score": 70.6,
+          "score": 37.7,
           "grade": "F"
         },
         {
-          "tagName": "ui5-search-item-group",
-          "score": 69.4,
-          "grade": "F"
-        },
-        {
-          "tagName": "ui5-user-menu-item",
-          "score": 69.4,
-          "grade": "F"
-        },
-        {
-          "tagName": "ui5-user-menu-item-group",
-          "score": 69.4,
-          "grade": "F"
-        },
-        {
-          "tagName": "ui5-user-settings-appearance-view-group",
-          "score": 69.4,
+          "tagName": "ui5-navigation-menu-item",
+          "score": 37.6,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "ui5-time-selection-clocks",
-          "score": 30.5,
+          "score": 24.4,
           "grade": "F"
         },
         {
           "tagName": "ui5-side-navigation-item",
-          "score": 32.9,
+          "score": 26.3,
           "grade": "F"
         },
         {
           "tagName": "ui5-menu-item-group",
-          "score": 33.3,
+          "score": 26.7,
           "grade": "F"
         },
         {
           "tagName": "ui5-user-settings-account-view",
-          "score": 33.3,
+          "score": 26.7,
           "grade": "F"
         },
         {
           "tagName": "ui5-dialog",
-          "score": 34.2,
+          "score": 27.3,
           "grade": "F"
         }
       ],
@@ -1034,7 +1034,7 @@
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Below average (20). Room for improvement."
         },
         {
@@ -1076,7 +1076,7 @@
           "dimension": "Slot Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Below average (20). Room for improvement."
         },
         {
@@ -1125,14 +1125,14 @@
       "confidenceBreakdown": {
         "verified": 494,
         "heuristic": 582,
-        "untested": 1304
+        "untested": 850
       },
-      "timestamp": "2026-03-28T01:43:36.586Z"
+      "timestamp": "2026-05-03T13:13:01.487Z"
     },
     "calcite": {
       "library": "calcite",
       "componentCount": 106,
-      "averageScore": 40.7,
+      "averageScore": 32.56,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -1159,54 +1159,54 @@
       "top5": [
         {
           "tagName": "calcite-combobox",
-          "score": 48.3,
+          "score": 38.7,
           "grade": "F"
         },
         {
           "tagName": "calcite-input-time-picker",
-          "score": 48,
+          "score": 38.4,
           "grade": "F"
         },
         {
           "tagName": "calcite-input-date-picker",
-          "score": 47.7,
+          "score": 38.1,
           "grade": "F"
         },
         {
           "tagName": "calcite-autocomplete",
-          "score": 47.5,
+          "score": 38,
           "grade": "F"
         },
         {
           "tagName": "calcite-carousel",
-          "score": 46.5,
+          "score": 37.2,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "calcite-accordion",
-          "score": 29.2,
+          "score": 23.3,
           "grade": "F"
         },
         {
           "tagName": "calcite-shell",
-          "score": 31.3,
+          "score": 25.1,
           "grade": "F"
         },
         {
           "tagName": "calcite-tab",
-          "score": 31.8,
+          "score": 25.5,
           "grade": "F"
         },
         {
           "tagName": "calcite-stack",
-          "score": 32.5,
+          "score": 26,
           "grade": "F"
         },
         {
           "tagName": "calcite-scrim",
-          "score": 33.5,
+          "score": 26.8,
           "grade": "F"
         }
       ],
@@ -1229,14 +1229,14 @@
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Below average (19). Room for improvement."
         },
         {
           "dimension": "Event Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Below average (19). Room for improvement."
         },
         {
@@ -1278,7 +1278,7 @@
           "dimension": "Slot Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Below average (19). Room for improvement."
         },
         {
@@ -1313,14 +1313,14 @@
       "confidenceBreakdown": {
         "verified": 318,
         "heuristic": 318,
-        "untested": 848
+        "untested": 530
       },
-      "timestamp": "2026-03-28T01:43:36.586Z"
+      "timestamp": "2026-05-03T13:13:01.487Z"
     },
     "porsche": {
       "library": "porsche",
       "componentCount": 91,
-      "averageScore": 50.31,
+      "averageScore": 40.48,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -1346,55 +1346,55 @@
       },
       "top5": [
         {
-          "tagName": "p-table-body",
-          "score": 69.4,
+          "tagName": "p-multi-select",
+          "score": 45.7,
           "grade": "F"
         },
         {
-          "tagName": "p-table-head-row",
-          "score": 69.4,
+          "tagName": "p-select",
+          "score": 45.7,
           "grade": "F"
         },
         {
-          "tagName": "p-table-head",
-          "score": 69.4,
+          "tagName": "p-checkbox-wrapper",
+          "score": 45.3,
           "grade": "F"
         },
         {
-          "tagName": "p-table-row",
-          "score": 69.4,
+          "tagName": "p-link-tile",
+          "score": 44.8,
           "grade": "F"
         },
         {
-          "tagName": "p-text-list-item",
-          "score": 69.4,
+          "tagName": "p-button",
+          "score": 44.7,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
+          "tagName": "p-select-option",
+          "score": 35.3,
+          "grade": "F"
+        },
+        {
+          "tagName": "p-segmented-control-item",
+          "score": 35.3,
+          "grade": "F"
+        },
+        {
+          "tagName": "p-multi-select-option",
+          "score": 35.3,
+          "grade": "F"
+        },
+        {
           "tagName": "p-toast-item",
-          "score": 42.7,
+          "score": 37,
           "grade": "F"
         },
         {
-          "tagName": "p-table",
-          "score": 42.7,
-          "grade": "F"
-        },
-        {
-          "tagName": "p-stepper-horizontal",
-          "score": 42.7,
-          "grade": "F"
-        },
-        {
-          "tagName": "p-link-tile-product",
-          "score": 42.7,
-          "grade": "F"
-        },
-        {
-          "tagName": "p-inline-notification",
-          "score": 42.7,
+          "tagName": "p-text-list-item",
+          "score": 37,
           "grade": "F"
         }
       ],
@@ -1410,7 +1410,7 @@
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Significantly below average (24). Major drag on scores."
         },
         {
@@ -1452,7 +1452,7 @@
           "dimension": "Slot Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Significantly below average (24). Major drag on scores."
         },
         {
@@ -1501,20 +1501,20 @@
       "confidenceBreakdown": {
         "verified": 268,
         "heuristic": 304,
-        "untested": 702
+        "untested": 455
       },
-      "timestamp": "2026-03-28T01:43:36.588Z"
+      "timestamp": "2026-05-03T13:13:01.487Z"
     },
     "ionic": {
       "library": "ionic",
       "componentCount": 97,
-      "averageScore": 51.8,
+      "averageScore": 41.41,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
         "C": 0,
-        "D": 1,
-        "F": 96
+        "D": 0,
+        "F": 97
       },
       "dimensionAverages": {
         "CEM Completeness": 54.74,
@@ -1534,55 +1534,55 @@
       },
       "top5": [
         {
-          "tagName": "ion-app",
-          "score": 72.1,
+          "tagName": "ion-picker",
+          "score": 50.5,
           "grade": "F"
         },
         {
-          "tagName": "ion-avatar",
-          "score": 69.4,
+          "tagName": "ion-accordion",
+          "score": 48.7,
           "grade": "F"
         },
         {
-          "tagName": "ion-card-content",
-          "score": 69.4,
+          "tagName": "ion-segment-button",
+          "score": 47.9,
           "grade": "F"
         },
         {
-          "tagName": "ion-item-group",
-          "score": 69.4,
+          "tagName": "ion-range",
+          "score": 46.8,
           "grade": "F"
         },
         {
-          "tagName": "ion-reorder",
-          "score": 69.4,
+          "tagName": "ion-datetime-button",
+          "score": 46.7,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "ion-tabs",
-          "score": 40,
+          "score": 34.7,
           "grade": "F"
         },
         {
           "tagName": "ion-route",
-          "score": 40,
+          "score": 34.7,
           "grade": "F"
         },
         {
           "tagName": "ion-route-redirect",
-          "score": 40,
+          "score": 34.7,
           "grade": "F"
         },
         {
           "tagName": "ion-breadcrumbs",
-          "score": 41.1,
+          "score": 35.6,
           "grade": "F"
         },
         {
           "tagName": "ion-content",
-          "score": 41.2,
+          "score": 35.7,
           "grade": "F"
         }
       ],
@@ -1598,7 +1598,7 @@
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Significantly below average (24). Major drag on scores."
         },
         {
@@ -1640,7 +1640,7 @@
           "dimension": "Slot Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Significantly below average (24). Major drag on scores."
         },
         {
@@ -1689,14 +1689,14 @@
       "confidenceBreakdown": {
         "verified": 283,
         "heuristic": 331,
-        "untested": 744
+        "untested": 485
       },
-      "timestamp": "2026-03-28T01:43:36.588Z"
+      "timestamp": "2026-05-03T13:13:01.488Z"
     },
     "wired": {
       "library": "wired",
       "componentCount": 26,
-      "averageScore": 54.31,
+      "averageScore": 43.44,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -1723,54 +1723,54 @@
       "top5": [
         {
           "tagName": "wired-dialog",
-          "score": 63.7,
+          "score": 50.9,
           "grade": "F"
         },
         {
           "tagName": "wired-calendar",
-          "score": 59.2,
+          "score": 47.3,
           "grade": "F"
         },
         {
           "tagName": "wired-combo",
-          "score": 58.7,
+          "score": 46.9,
           "grade": "F"
         },
         {
           "tagName": "wired-input",
-          "score": 58.2,
+          "score": 46.5,
           "grade": "F"
         },
         {
           "tagName": "wired-listbox",
-          "score": 57.8,
+          "score": 46.3,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "wired-divider",
-          "score": 48.3,
+          "score": 38.7,
           "grade": "F"
         },
         {
           "tagName": "wired-card",
-          "score": 49.2,
+          "score": 39.3,
           "grade": "F"
         },
         {
           "tagName": "wired-image",
-          "score": 49.8,
+          "score": 39.9,
           "grade": "F"
         },
         {
           "tagName": "wired-spinner",
-          "score": 50.2,
+          "score": 40.1,
           "grade": "F"
         },
         {
           "tagName": "wired-fab",
-          "score": 50.7,
+          "score": 40.5,
           "grade": "F"
         }
       ],
@@ -1779,14 +1779,14 @@
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Significantly below average (25). Major drag on scores."
         },
         {
           "dimension": "Event Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Significantly below average (25). Major drag on scores."
         },
         {
@@ -1828,7 +1828,7 @@
           "dimension": "Slot Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Significantly below average (25). Major drag on scores."
         },
         {
@@ -1877,14 +1877,14 @@
       "confidenceBreakdown": {
         "verified": 78,
         "heuristic": 78,
-        "untested": 208
+        "untested": 130
       },
-      "timestamp": "2026-03-28T01:43:36.588Z"
+      "timestamp": "2026-05-03T13:13:01.488Z"
     },
     "elix": {
       "library": "elix",
       "componentCount": 74,
-      "averageScore": 67.98,
+      "averageScore": 36.26,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -1911,54 +1911,54 @@
       "top5": [
         {
           "tagName": "elix-arrow-direction-button",
-          "score": 70.6,
+          "score": 37.7,
           "grade": "F"
         },
         {
           "tagName": "elix-border-button",
-          "score": 70.6,
+          "score": 37.7,
           "grade": "F"
         },
         {
           "tagName": "elix-button",
-          "score": 70.6,
+          "score": 37.7,
           "grade": "F"
         },
         {
           "tagName": "elix-calendar-day-button",
-          "score": 70.6,
+          "score": 37.7,
           "grade": "F"
         },
         {
           "tagName": "elix-expand-collapse-toggle",
-          "score": 70.6,
+          "score": 37.7,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "elix-popup-source",
-          "score": 63.1,
+          "score": 33.7,
           "grade": "F"
         },
         {
           "tagName": "elix-popup",
-          "score": 63.1,
+          "score": 33.7,
           "grade": "F"
         },
         {
           "tagName": "elix-overlay",
-          "score": 63.1,
+          "score": 33.7,
           "grade": "F"
         },
         {
           "tagName": "elix-multi-select-list-box",
-          "score": 63.1,
+          "score": 33.7,
           "grade": "F"
         },
         {
           "tagName": "elix-menu-item",
-          "score": 63.1,
+          "score": 33.7,
           "grade": "F"
         }
       ],
@@ -1967,28 +1967,28 @@
           "dimension": "Type Coverage",
           "average": 0,
           "tier": "critical",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "API Surface Quality",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "Event Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Below average (20). Room for improvement."
         },
         {
@@ -2030,7 +2030,7 @@
           "dimension": "Slot Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Below average (20). Room for improvement."
         },
         {
@@ -2065,88 +2065,88 @@
       "confidenceBreakdown": {
         "verified": 148,
         "heuristic": 148,
-        "untested": 740
+        "untested": 370
       },
-      "timestamp": "2026-03-28T01:43:36.588Z"
+      "timestamp": "2026-05-03T13:13:01.488Z"
     },
     "helix": {
       "library": "helix",
       "componentCount": 102,
-      "averageScore": 88.43,
+      "averageScore": 85.47,
       "gradeDistribution": {
         "A": 0,
-        "B": 19,
-        "C": 14,
-        "D": 16,
-        "F": 53
+        "B": 20,
+        "C": 17,
+        "D": 11,
+        "F": 54
       },
       "dimensionAverages": {
-        "CEM Completeness": 99.81,
-        "Accessibility": 44.04,
-        "Type Coverage": 94.66,
-        "API Surface Quality": 89.29,
-        "CSS Architecture": 97.75,
+        "CEM Completeness": 99.95,
+        "Accessibility": 44.23,
+        "Type Coverage": 95.04,
+        "API Surface Quality": 89.53,
+        "CSS Architecture": 97.97,
         "Event Architecture": 56.86,
         "Test Coverage": 0,
         "Bundle Size": 0,
         "Story Coverage": 0,
         "Performance": 0,
         "Drupal Readiness": 0,
-        "CEM-Source Fidelity": 91.29,
+        "CEM-Source Fidelity": 92.24,
         "Slot Architecture": 72.85,
-        "Naming Consistency": 98.67
+        "Naming Consistency": 98.63
       },
       "top5": [
+        {
+          "tagName": "hx-radio-group",
+          "score": 97.4,
+          "grade": "B"
+        },
         {
           "tagName": "hx-menu",
           "score": 96.1,
           "grade": "B"
         },
         {
+          "tagName": "hx-combobox",
+          "score": 95.9,
+          "grade": "B"
+        },
+        {
+          "tagName": "hx-file-upload",
+          "score": 95.6,
+          "grade": "B"
+        },
+        {
           "tagName": "hx-dropdown",
           "score": 95.3,
-          "grade": "B"
-        },
-        {
-          "tagName": "hx-tree-view",
-          "score": 95.3,
-          "grade": "C"
-        },
-        {
-          "tagName": "hx-menu-item",
-          "score": 95.1,
-          "grade": "B"
-        },
-        {
-          "tagName": "hx-overflow-menu",
-          "score": 94.7,
           "grade": "B"
         }
       ],
       "bottom5": [
         {
-          "tagName": "hx-grid-item",
-          "score": 74.8,
-          "grade": "F"
-        },
-        {
-          "tagName": "hx-button-group",
-          "score": 75.7,
-          "grade": "F"
-        },
-        {
-          "tagName": "hx-patient-banner",
-          "score": 76.3,
-          "grade": "F"
-        },
-        {
           "tagName": "hx-menu-divider",
-          "score": 77.8,
+          "score": 63.6,
           "grade": "F"
         },
         {
-          "tagName": "hx-theme",
-          "score": 78,
+          "tagName": "hx-grid-item",
+          "score": 64.8,
+          "grade": "F"
+        },
+        {
+          "tagName": "hx-structured-list-row",
+          "score": 71.2,
+          "grade": "F"
+        },
+        {
+          "tagName": "hx-style-scope",
+          "score": 72,
+          "grade": "F"
+        },
+        {
+          "tagName": "hx-icon",
+          "score": 72.4,
           "grade": "F"
         }
       ],
@@ -2188,7 +2188,7 @@
         },
         {
           "dimension": "Accessibility",
-          "average": 44.04,
+          "average": 44.23,
           "tier": "critical",
           "confidence": "heuristic",
           "note": "Near average."
@@ -2197,7 +2197,7 @@
           "dimension": "Event Architecture",
           "average": 56.86,
           "tier": "important",
-          "confidence": "heuristic",
+          "confidence": "unknown",
           "note": "Near average."
         },
         {
@@ -2209,42 +2209,42 @@
         },
         {
           "dimension": "API Surface Quality",
-          "average": 89.29,
+          "average": 89.53,
           "tier": "important",
           "confidence": "heuristic",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "CEM-Source Fidelity",
-          "average": 91.29,
+          "average": 92.24,
           "tier": "critical",
           "confidence": "heuristic",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "Type Coverage",
-          "average": 94.66,
+          "average": 95.04,
           "tier": "critical",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "CSS Architecture",
-          "average": 97.75,
+          "average": 97.97,
           "tier": "important",
           "confidence": "heuristic",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "Naming Consistency",
-          "average": 98.67,
+          "average": 98.63,
           "tier": "important",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "CEM Completeness",
-          "average": 99.81,
+          "average": 99.95,
           "tier": "critical",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
@@ -2253,9 +2253,9 @@
       "confidenceBreakdown": {
         "verified": 393,
         "heuristic": 459,
-        "untested": 576
+        "untested": 520
       },
-      "timestamp": "2026-03-28T01:43:36.588Z"
+      "timestamp": "2026-05-03T13:13:01.488Z"
     }
   },
   "comparisonTable": {
@@ -2263,84 +2263,84 @@
       {
         "rank": 1,
         "library": "helix",
-        "averageScore": 88.43,
+        "averageScore": 85.47,
         "componentCount": 102,
         "grade": "B"
       },
       {
         "rank": 2,
-        "library": "elix",
-        "averageScore": 67.98,
-        "componentCount": 74,
-        "grade": "D"
+        "library": "vaadin",
+        "averageScore": 58.33,
+        "componentCount": 96,
+        "grade": "F"
       },
       {
         "rank": 3,
-        "library": "vaadin",
-        "averageScore": 67.81,
-        "componentCount": 96,
-        "grade": "D"
+        "library": "fluentui",
+        "averageScore": 55.32,
+        "componentCount": 41,
+        "grade": "F"
       },
       {
         "rank": 4,
-        "library": "fluentui",
-        "averageScore": 65.27,
-        "componentCount": 41,
-        "grade": "D"
+        "library": "spectrum",
+        "averageScore": 48.13,
+        "componentCount": 89,
+        "grade": "F"
       },
       {
         "rank": 5,
         "library": "material",
-        "averageScore": 55.71,
+        "averageScore": 45.66,
         "componentCount": 97,
         "grade": "F"
       },
       {
         "rank": 6,
-        "library": "spectrum",
-        "averageScore": 54.52,
-        "componentCount": 89,
+        "library": "carbon",
+        "averageScore": 45.45,
+        "componentCount": 110,
         "grade": "F"
       },
       {
         "rank": 7,
         "library": "wired",
-        "averageScore": 54.31,
+        "averageScore": 43.44,
         "componentCount": 26,
         "grade": "F"
       },
       {
         "rank": 8,
-        "library": "carbon",
-        "averageScore": 53.16,
-        "componentCount": 110,
-        "grade": "F"
-      },
-      {
-        "rank": 9,
         "library": "ionic",
-        "averageScore": 51.8,
+        "averageScore": 41.41,
         "componentCount": 97,
         "grade": "F"
       },
       {
-        "rank": 10,
+        "rank": 9,
         "library": "porsche",
-        "averageScore": 50.31,
+        "averageScore": 40.48,
         "componentCount": 91,
+        "grade": "F"
+      },
+      {
+        "rank": 10,
+        "library": "elix",
+        "averageScore": 36.26,
+        "componentCount": 74,
         "grade": "F"
       },
       {
         "rank": 11,
         "library": "ui5",
-        "averageScore": 42.01,
+        "averageScore": 33.24,
         "componentCount": 170,
         "grade": "F"
       },
       {
         "rank": 12,
         "library": "calcite",
-        "averageScore": 40.7,
+        "averageScore": 32.56,
         "componentCount": 106,
         "grade": "F"
       }
@@ -2351,7 +2351,7 @@
         "rankings": [
           {
             "library": "helix",
-            "average": 99.81,
+            "average": 99.95,
             "rank": 1
           },
           {
@@ -2410,14 +2410,14 @@
             "rank": 12
           }
         ],
-        "spread": 45.22
+        "spread": 45.36
       },
       {
         "dimension": "Accessibility",
         "rankings": [
           {
             "library": "helix",
-            "average": 44.04,
+            "average": 44.23,
             "rank": 1
           },
           {
@@ -2476,14 +2476,14 @@
             "rank": 12
           }
         ],
-        "spread": 42.89
+        "spread": 43.08
       },
       {
         "dimension": "Type Coverage",
         "rankings": [
           {
             "library": "helix",
-            "average": 94.66,
+            "average": 95.04,
             "rank": 1
           },
           {
@@ -2542,14 +2542,14 @@
             "rank": 12
           }
         ],
-        "spread": 94.66
+        "spread": 95.04
       },
       {
         "dimension": "API Surface Quality",
         "rankings": [
           {
             "library": "helix",
-            "average": 89.29,
+            "average": 89.53,
             "rank": 1
           },
           {
@@ -2608,14 +2608,14 @@
             "rank": 12
           }
         ],
-        "spread": 89.29
+        "spread": 89.53
       },
       {
         "dimension": "CSS Architecture",
         "rankings": [
           {
             "library": "helix",
-            "average": 97.75,
+            "average": 97.97,
             "rank": 1
           },
           {
@@ -2674,7 +2674,7 @@
             "rank": 12
           }
         ],
-        "spread": 97.75
+        "spread": 97.97
       },
       {
         "dimension": "Event Architecture",
@@ -3082,7 +3082,7 @@
           },
           {
             "library": "helix",
-            "average": 91.29,
+            "average": 92.24,
             "rank": 2
           },
           {
@@ -3244,7 +3244,7 @@
           },
           {
             "library": "helix",
-            "average": 98.67,
+            "average": 98.63,
             "rank": 8
           },
           {
@@ -3278,70 +3278,70 @@
       "Slot Architecture",
       "Event Architecture"
     ],
-    "timestamp": "2026-03-28T01:43:36.588Z"
+    "timestamp": "2026-05-03T13:13:01.488Z"
   },
   "performance": {
-    "totalMs": 3730,
+    "totalMs": 2336,
     "phases": [
       {
         "name": "load-libraries",
-        "durationMs": 173
+        "durationMs": 127
       },
       {
         "name": "score-all-libraries",
-        "durationMs": 3546
+        "durationMs": 2206
       },
       {
         "name": "score-material",
-        "durationMs": 483
+        "durationMs": 226
       },
       {
         "name": "score-spectrum",
-        "durationMs": 216
+        "durationMs": 109
       },
       {
         "name": "score-vaadin",
-        "durationMs": 1125
+        "durationMs": 753
       },
       {
         "name": "score-fluentui",
-        "durationMs": 63
+        "durationMs": 50
       },
       {
         "name": "score-carbon",
-        "durationMs": 213
+        "durationMs": 68
       },
       {
         "name": "score-ui5",
-        "durationMs": 169
+        "durationMs": 140
       },
       {
         "name": "score-calcite",
-        "durationMs": 268
+        "durationMs": 180
       },
       {
         "name": "score-porsche",
-        "durationMs": 222
+        "durationMs": 82
       },
       {
         "name": "score-ionic",
-        "durationMs": 166
+        "durationMs": 68
       },
       {
         "name": "score-wired",
-        "durationMs": 32
+        "durationMs": 53
       },
       {
         "name": "score-elix",
-        "durationMs": 436
+        "durationMs": 270
       },
       {
         "name": "score-helix",
-        "durationMs": 152
+        "durationMs": 207
       },
       {
         "name": "generate-scorecards",
-        "durationMs": 11
+        "durationMs": 3
       },
       {
         "name": "generate-comparison",

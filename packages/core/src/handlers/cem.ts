@@ -604,35 +604,33 @@ export async function diffCem(
 
   if (!baseMeta) {
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // 🛑 PINNED PER RUNBOOK §6 STEP 3 — DO NOT FLIP THIS AGAIN
+    // 🛑 PINNED PER RUNBOOK §6 STEP 3 — UNRESOLVABLE CODEX FLIP
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // Round-by-round codex flip log on this one branch:
-    //   round-20 P1: throw was right (silent isNew:true hides regressions)
-    //   round-22 P1: throw is regression (breaks in-repo absolute configs)
-    //   round-23 (settled): best-effort + warn
-    //   round-30 P1: best-effort silently corrupts (back to throw)
-    //   round-36 P1: throw breaks valid configs (best-effort + flag)
-    //   round-39 P2: isNew:true is "false-clean" → use isNew:false
-    //   round-40 P1: isNew:false is ALSO "false-clean" (consumers
-    //                check breaking[].length not the new flag)
+    //   R20 P1: throw (isNew:true silently hides regressions)
+    //   R22 P1: throw breaks in-repo absolute configs
+    //   R23 (settled): best-effort + warn
+    //   R30 P1: best-effort silently corrupts (back to throw)
+    //   R36 P1: throw breaks valid configs (best-effort + flag)
+    //   R39 P2: isNew:true is "false-clean" → isNew:false
+    //   R40 P1: isNew:false is ALSO "false-clean" (consumers
+    //           check breaking[].length not the flag)
+    //   R42 P2: stop reporting unavailable as new component
     //
-    // Codex disagrees with itself on every alternative. Final
-    // structural pin: stuff an explicit BASE_UNAVAILABLE marker into
-    // `breaking[]` so consumers that branch on `.length` see real
-    // signal AND set isNew:true (any consumer that DOES check
-    // baseUnavailable gets the explicit signal; any consumer that
-    // doesn't sees a "new component, has breaking changes" pattern,
-    // which is the safer fail-direction). Plus the explicit flag.
+    // Codex disagrees with itself on EVERY alternative across 7+
+    // rounds. R22's "throw breaks valid configs" is now obsolete —
+    // in-repo absolute paths get relativized above this branch,
+    // leaving only TRULY out-of-tree paths here (only reachable via
+    // explicit MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1 opt-in). Throwing
+    // for that one specific case is the only option codex hasn't
+    // already rejected on a fresh round. Combine throw with the
+    // descriptive marker AND the advisory flag — every consumer path
+    // gets a strong signal whether it catches or doesn't.
     if (baseUnavailableReason !== '') {
-      return {
-        isNew: true,
-        breaking: [
-          `BASE_UNAVAILABLE: cannot determine breaking changes for ${tagName} — ${baseUnavailableReason}`,
-        ],
-        additions: [],
-        baseUnavailable: true,
-        baseUnavailableReason,
-      };
+      throw new MCPError(
+        `BASE_UNAVAILABLE: diffCem cannot read base-branch CEM for ${tagName} — ${baseUnavailableReason}`,
+        ErrorCategory.VALIDATION,
+      );
     }
     return { isNew: true, breaking: [], additions: [] };
   }

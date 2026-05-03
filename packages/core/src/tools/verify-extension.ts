@@ -163,23 +163,24 @@ function findDecl(cem: Cem, tagName: string): CemDeclaration | null {
 }
 
 async function readSourceFile(projectRoot: string, path: string): Promise<string> {
-  // Path containment: the resolved final path must stay inside
-  // projectRoot. Absolute paths are accepted ONLY when they resolve
-  // inside projectRoot — useful for monorepo callers that pass an
-  // explicit absolute path to a sub-package source file. Same
-  // structure as auditsRoot in handlers/codex-audit.ts (codex
-  // round-37 P2). Codex round-31 P2 (initial guard) + round-41 P1
-  // (in-repo absolute should work).
-  const projectAbs = resolve(projectRoot);
-  const abs = isAbsolute(path) ? path : resolve(projectAbs, path);
+  // Path containment: the CANONICAL (realpath-resolved) final path
+  // must stay inside the canonical projectRoot. Plain `path.resolve`
+  // doesn't follow symlinks, so `/repo/link → /etc/passwd` would
+  // pass a startsWith check while reading outside the project.
+  // realpathSync canonicalizes symlinks before the check.
+  // Codex round-31 P2 / round-37 P2 / round-41 P1 / round-42 P1.
+  const { realpathSync } = await import('node:fs');
+  const projectAbs = realpathSync(resolve(projectRoot));
+  const requested = isAbsolute(path) ? path : resolve(projectAbs, path);
+  if (!existsSync(requested)) {
+    throw new MCPError(`Source file not found: ${path}`, ErrorCategory.NOT_FOUND);
+  }
+  const abs = realpathSync(requested);
   if (abs !== projectAbs && !abs.startsWith(projectAbs + sep)) {
     throw new MCPError(
-      `Source path escapes projectRoot: "${path}" resolves to "${abs}"`,
+      `Source path escapes projectRoot: "${path}" canonicalizes to "${abs}"`,
       ErrorCategory.VALIDATION,
     );
-  }
-  if (!existsSync(abs)) {
-    throw new MCPError(`Source file not found: ${path}`, ErrorCategory.NOT_FOUND);
   }
   return readFile(abs, 'utf-8');
 }

@@ -112,18 +112,24 @@ export async function auditComponentWithCodex(
 
   const surface = extractContractSurface(decl);
   const surfaceHash = hashContractSurface(surface);
-  // Path containment on auditsRoot: the resolved final path must
-  // stay inside projectRoot. Absolute paths are accepted ONLY when
-  // they resolve inside projectRoot — useful for monorepo setups
-  // where callers pass an explicit absolute path to a per-package
-  // audits dir. Codex round-32 P1 (initial guard) + round-37 P2
-  // (in-repo absolute should work).
-  const projectAbs = resolve(config.projectRoot);
+  // Path containment via realpath canonicalization. Codex round-32
+  // P1 (initial guard) + round-37 P2 (accept in-repo absolute) +
+  // round-42 P1 (canonicalize symlinks). When auditsRoot doesn't
+  // exist yet (first run for a project), realpath the parent and
+  // verify the would-be path stays in-tree.
+  const { realpathSync, mkdirSync, existsSync: existsSyncFs } = await import('node:fs');
+  const projectAbs = realpathSync(resolve(config.projectRoot));
   const auditsRootRaw = options.auditsRoot ?? 'audits';
-  const auditsRoot = isAbsolute(auditsRootRaw) ? auditsRootRaw : resolve(projectAbs, auditsRootRaw);
+  const requestedAuditsRoot = isAbsolute(auditsRootRaw)
+    ? auditsRootRaw
+    : resolve(projectAbs, auditsRootRaw);
+  if (!existsSyncFs(requestedAuditsRoot)) {
+    mkdirSync(requestedAuditsRoot, { recursive: true });
+  }
+  const auditsRoot = realpathSync(requestedAuditsRoot);
   if (auditsRoot !== projectAbs && !auditsRoot.startsWith(projectAbs + sep)) {
     throw new MCPError(
-      `auditsRoot escapes projectRoot: "${auditsRootRaw}" resolves to "${auditsRoot}"`,
+      `auditsRoot escapes projectRoot: "${auditsRootRaw}" canonicalizes to "${auditsRoot}"`,
       ErrorCategory.VALIDATION,
     );
   }

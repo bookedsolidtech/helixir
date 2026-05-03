@@ -295,25 +295,22 @@ function deriveOverlaysFromTokens(
 }
 
 async function loadCssSources(projectRoot: string, paths: string[]): Promise<string[]> {
-  // Path containment: the resolved final path must stay inside
-  // projectRoot. Absolute paths are accepted ONLY when they resolve
-  // inside projectRoot — useful for monorepo callers that pass an
-  // explicit absolute path to a sub-package CSS file. Same structure
-  // as auditsRoot in handlers/codex-audit.ts (codex round-37 P2) +
-  // verify-extension's readSourceFile (round-41). Codex round-31 P2
-  // (initial guard) + round-41 P1.
-  const projectAbs = resolve(projectRoot);
+  // Path containment via realpath canonicalization (codex round-42 P1
+  // — symlinks otherwise bypass the prefix check).
+  const { realpathSync } = await import('node:fs');
+  const projectAbs = realpathSync(resolve(projectRoot));
   const out: string[] = [];
   for (const p of paths) {
-    const abs = isAbsolute(p) ? p : resolve(projectAbs, p);
+    const requested = isAbsolute(p) ? p : resolve(projectAbs, p);
+    if (!existsSync(requested)) {
+      throw new MCPError(`CSS source path not found: ${p}`, ErrorCategory.NOT_FOUND);
+    }
+    const abs = realpathSync(requested);
     if (abs !== projectAbs && !abs.startsWith(projectAbs + sep)) {
       throw new MCPError(
-        `CSS source path escapes projectRoot: "${p}" resolves to "${abs}"`,
+        `CSS source path escapes projectRoot: "${p}" canonicalizes to "${abs}"`,
         ErrorCategory.VALIDATION,
       );
-    }
-    if (!existsSync(abs)) {
-      throw new MCPError(`CSS source path not found: ${p}`, ErrorCategory.NOT_FOUND);
     }
     out.push(await readFile(abs, 'utf-8'));
   }

@@ -83,17 +83,43 @@ export function verifyTokenInheritance(
     tokenIndex.set(cssVar, t);
   }
 
-  // ── 01-token-deprecated-alias + 14-cssprop-deprecation-drift ─────────
-  // For every CSS prop declared on the component, check whether it
-  // resolves to a deprecated alias.
+  // Build the audit set: declared @cssprops UNION actual var()
+  // references in the component's CSS. The CEM @cssprop list is the
+  // PUBLIC contract surface — what consumers can override — but
+  // subclasses commonly use tokens internally that aren't redeclared
+  // as @cssprop. Codex round-34 P1: scanning only @cssprop misses
+  // those internal usages, leaving deprecated aliases / cascade gaps
+  // silently active in real CSS. Now scan both surfaces and
+  // deduplicate by CSS-var name.
+  const auditedCssProps = new Map<string, { description: string | undefined; declared: boolean }>();
   for (const prop of cssProps) {
-    const name = prop.name;
-    if (!name.startsWith('--')) continue;
+    if (!prop.name.startsWith('--')) continue;
+    auditedCssProps.set(prop.name, { description: prop.description, declared: true });
+  }
+  if (input.cssSources && input.cssSources.length > 0) {
+    const VAR_PATTERN = /var\(\s*(--[a-zA-Z0-9_-]+)/g;
+    for (const css of input.cssSources) {
+      let m: RegExpExecArray | null;
+      while ((m = VAR_PATTERN.exec(css)) !== null) {
+        const varName = m[1];
+        if (varName !== undefined && !auditedCssProps.has(varName)) {
+          auditedCssProps.set(varName, { description: undefined, declared: false });
+        }
+      }
+    }
+  }
+
+  // ── 01-token-deprecated-alias + 14-cssprop-deprecation-drift ─────────
+  for (const [name, { description, declared }] of auditedCssProps) {
     const canon = resolveCanonicality(name, input.aliases);
     if (canon.canonical) continue;
-
     findings.push(buildAliasFinding(name, canon));
-    findings.push(buildCssPropDeprecationFinding(name, canon, prop.description));
+    // Only emit the cssprop-deprecation finding when the token is
+    // actually declared as a public @cssprop (otherwise there's no
+    // documentation surface to flag deprecation on).
+    if (declared) {
+      findings.push(buildCssPropDeprecationFinding(name, canon, description));
+    }
   }
 
   // ── 02-token-cascade-gap ────────────────────────────────────────────
@@ -102,8 +128,7 @@ export function verifyTokenInheritance(
   // CSS props for spacing / sizing / animation timing aren't
   // overlay-driven and would produce noise. Codex round-30 P2.
   if (input.overlays) {
-    for (const prop of cssProps) {
-      const name = prop.name;
+    for (const [name] of auditedCssProps) {
       if (!name.startsWith('--')) continue;
       // Only check tokens we recognize as theme-driven (color or
       // surface-tier). The token index keys are `--<name>`; the

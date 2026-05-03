@@ -345,14 +345,14 @@ describe('verify_extension — 06-forced-colors-missing', () => {
 // ─── Defect class 07 — touch target undersized ─────────────────────────────
 
 describe('verify_extension — 07-touch-target-undersized', () => {
-  it('flags subclass with sub-44px width override', () => {
+  it('flags subclass with sub-44px size on an interactive selector', () => {
     const parent = buttonParent();
     const subclass = emptyDecl('figgy-rating');
     const { findings } = verifyExtension({
       parent,
       subclass,
       subclassSources: {
-        styles: `.star { width: 1.5rem; height: 1.5rem; }`,
+        styles: `button.star { width: 1.5rem; height: 1.5rem; }`,
       },
     });
     const tt = findings.find((f) => f.classId === '07-touch-target-undersized');
@@ -360,14 +360,28 @@ describe('verify_extension — 07-touch-target-undersized', () => {
     expect(tt?.severity).toBe('P1');
   });
 
-  it('passes when subclass keeps min-width at 44px floor', () => {
+  it('does NOT flag undersized rules on decorative descendants (codex round-34 P2)', () => {
     const parent = buttonParent();
     const subclass = emptyDecl('figgy-rating');
     const { findings } = verifyExtension({
       parent,
       subclass,
       subclassSources: {
-        styles: `.star { width: 100%; min-width: 2.75rem; min-height: 2.75rem; }`,
+        // .icon is decorative, not the click target — should be silent.
+        styles: `.icon { width: 1rem; height: 1rem; }`,
+      },
+    });
+    expect(findings.filter((f) => f.classId === '07-touch-target-undersized')).toEqual([]);
+  });
+
+  it('passes when interactive selector keeps min-width at 44px floor', () => {
+    const parent = buttonParent();
+    const subclass = emptyDecl('figgy-rating');
+    const { findings } = verifyExtension({
+      parent,
+      subclass,
+      subclassSources: {
+        styles: `button.star { width: 100%; min-width: 2.75rem; min-height: 2.75rem; }`,
       },
     });
     expect(findings.filter((f) => f.classId === '07-touch-target-undersized')).toEqual([]);

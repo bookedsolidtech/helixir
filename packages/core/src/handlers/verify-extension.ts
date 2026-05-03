@@ -280,8 +280,16 @@ function checkAccessibleLabelPattern(
   if (sources?.code === undefined) return [];
 
   const code = sources.code;
-  // Subclass overrides _effectiveLabel? If yes, must trim and have devWarn guard.
-  if (!/\b_effectiveLabel\b/.test(code)) return [];
+  // Subclass OVERRIDES _effectiveLabel? Match only definition forms
+  // (method, getter, setter, arrow assignment), not bare references
+  // like `super._effectiveLabel` or `this._effectiveLabel` reads.
+  // Codex round-34 P2.
+  const overridesEffectiveLabel =
+    /(^|[\n;{}])\s*_effectiveLabel\s*\([^)]*\)\s*\{/.test(code) ||
+    /(^|[\n;{}])\s*get\s+_effectiveLabel\s*\([^)]*\)\s*\{/.test(code) ||
+    /(^|[\n;{}])\s*set\s+_effectiveLabel\s*\([^)]*\)\s*\{/.test(code) ||
+    /(^|[\n;{}])\s*_effectiveLabel\s*=\s*\(?[^)]*\)?\s*=>/.test(code);
+  if (!overridesEffectiveLabel) return [];
 
   const hasTrim = /\.\s*trim\s*\(\)/.test(code);
   const hasDevWarn = /\bdevWarn\b|\bconsole\.warn\b/.test(code);
@@ -359,24 +367,36 @@ function checkTouchTarget(
   sources: VerifyExtensionInput['subclassSources'],
 ): AuditFinding[] {
   // Helix enforces a 44px touch-target floor on interactive components
-  // via --hx-touch-target-min (commit acc56e6a7). Heuristic: when the
-  // subclass overrides width/height/min-* on what looks like an
-  // interactive selector with a value < 44px, flag it.
+  // via --hx-touch-target-min (commit acc56e6a7). Heuristic: parse
+  // style rule blocks, identify ones whose selector targets an
+  // interactive element (button / link / role-button / [tabindex] /
+  // input / :host of an interactive component), and only flag
+  // undersized size rules inside those blocks. Decorative descendants
+  // like .icon { width: 1rem } are correctly excluded. Codex round-34 P2.
   if (sources?.styles === undefined) return [];
   const styles = sources.styles;
 
-  // Crude regex — picks up explicit pixel and rem values <44px.
-  // 44px = 2.75rem at 16px base.
+  // Match selector-block pairs `selector { body }` (no nesting). The
+  // body capture is the content between { and the next }.
+  const RULE_PATTERN = /([^{}]+)\{([^{}]*)\}/g;
+  const INTERACTIVE_SELECTOR =
+    /(?:^|[\s,>+~])(button|a|input|select|textarea|summary|label|\[role\s*=\s*["']?(button|link|menuitem|tab|option|switch|checkbox|radio)["']?\]|\[tabindex(?:=|\])|:host\b)/i;
+  const SIZE_RULE = /\b(min-width|min-height|width|height)\s*:\s*([\d.]+)(px|rem)\b/g;
+
   const undersized: string[] = [];
-  const sizeRules = styles.matchAll(
-    /(?:^|[\s{;])\s*(min-width|min-height|width|height)\s*:\s*([\d.]+)(px|rem)\b/g,
-  );
-  for (const m of sizeRules) {
-    const value = parseFloat(m[2] ?? '0');
-    const unit = m[3] ?? 'px';
-    const px = unit === 'rem' ? value * 16 : value;
-    if (px > 0 && px < 44) {
-      undersized.push(`${m[1]}: ${value}${unit}`);
+  let m: RegExpExecArray | null;
+  while ((m = RULE_PATTERN.exec(styles)) !== null) {
+    const selector = m[1] ?? '';
+    const body = m[2] ?? '';
+    if (!INTERACTIVE_SELECTOR.test(selector)) continue;
+    let s: RegExpExecArray | null;
+    while ((s = SIZE_RULE.exec(body)) !== null) {
+      const value = parseFloat(s[2] ?? '0');
+      const unit = s[3] ?? 'px';
+      const px = unit === 'rem' ? value * 16 : value;
+      if (px > 0 && px < 44) {
+        undersized.push(`${selector.trim()} { ${s[1]}: ${value}${unit} }`);
+      }
     }
   }
   if (undersized.length === 0) return [];

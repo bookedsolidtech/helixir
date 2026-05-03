@@ -232,26 +232,29 @@ function checkEventContract(
     //     the parent typically emits from.
     // Codex round-31 P2.
     // Build the event-name vocabulary from the parent's missing
-    // events. We tokenize each event name (drop the `hx-` prefix,
-    // split on hyphens) so a parent event like `hx-value-change`
-    // contributes the tokens `value` and `change` — either of which
-    // appearing in a subclass override (e.g. `onValueChange()` or
-    // `handleChange()`) signals a dispatch-site override.
-    // Codex round-39 P2: keep `on*`-style handlers in the heuristic.
-    const eventTokens = new Set<string>();
+    // events. Each event contributes its FULL token sequence (e.g.
+    // `hx-value-change` → ['value', 'change']) — a method name is
+    // considered a dispatch-site override only when it contains the
+    // ENTIRE consecutive sequence as a substring of its normalized
+    // chunks. So `onValueChange` / `handleValueChange` match a
+    // `hx-value-change` event, but generic `handleChange` /
+    // `onOpen` do NOT match (they'd need `value`/`change` together
+    // or `*-open` to be a single-token event).
+    // Codex round-39 P2: keep `on*`-style handlers eligible.
+    // Codex round-44 P2: tightened single-token matching so generic
+    // helpers (`handleChange`, `onOpen`) don't trigger suppression
+    // findings on multi-token parent events.
+    const eventSequences: string[][] = [];
     for (const e of missing) {
-      // Strip prefix like `hx-`, then split on hyphens / camelCase.
       const stripped = e.name.replace(/^[a-z]+-/, '');
-      for (const tok of stripped.split(/[-_]+/)) {
-        const t = tok.toLowerCase();
-        if (t.length >= 3) eventTokens.add(t);
-      }
+      const seq = stripped
+        .split(/[-_]+/)
+        .map((t) => t.toLowerCase())
+        .filter((t) => t.length >= 2);
+      if (seq.length > 0) eventSequences.push(seq);
     }
     const methodMatchesEvent = (() => {
-      if (eventTokens.size === 0) return false;
-      // Method name normalized to lowercase chunks split on
-      // word-boundary case changes so `onValueChange` matches the
-      // tokens `value` / `change`.
+      if (eventSequences.length === 0) return false;
       const methods = [...code.matchAll(/\b([a-zA-Z_$][\w$]*)\s*\([^)]*\)\s*\{/g)].map(
         (m) => m[1] ?? '',
       );
@@ -261,8 +264,23 @@ function checkEventContract(
           .toLowerCase()
           .split(/[^a-z0-9]+/)
           .filter(Boolean);
-        for (const c of chunks) {
-          if (eventTokens.has(c)) return true;
+        for (const seq of eventSequences) {
+          if (seq.length === 0) continue;
+          // Look for the full sequence appearing consecutively in
+          // the method's chunks. Single-token events still match a
+          // single chunk, but multi-token events require all tokens
+          // present in order — so `handleChange` won't satisfy a
+          // `value-change` event.
+          for (let i = 0; i + seq.length <= chunks.length; i++) {
+            let ok = true;
+            for (let k = 0; k < seq.length; k++) {
+              if (chunks[i + k] !== seq[k]) {
+                ok = false;
+                break;
+              }
+            }
+            if (ok) return true;
+          }
         }
       }
       return false;
@@ -439,23 +457,30 @@ function checkTouchTarget(
       ['onclick', 'onkeydown', 'onkeyup', 'onfocus', 'onblur'].includes(m.name.toLowerCase()),
     );
 
-  const RULE_PATTERN = /([^{}]+)\{([^{}]*)\}/g;
-  // When parent is interactive, accept bare :host along with the
-  // explicit interactive selectors. When parent is NOT interactive,
-  // the entire check is skipped above — no need for extra gating.
-  const INTERACTIVE_SELECTOR = parentIsInteractive
-    ? /(?:^|[\s,>+~])(button|a|input|select|textarea|summary|label|\[role\s*=\s*["']?(button|link|menuitem|tab|option|switch|checkbox|radio)["']?\]|\[tabindex(?:=|\])|:host)/i
-    : /(?:^|[\s,>+~])(button|a|input|select|textarea|summary|label|\[role\s*=\s*["']?(button|link|menuitem|tab|option|switch|checkbox|radio)["']?\]|\[tabindex(?:=|\]))/i;
-  const SIZE_RULE = /\b(min-width|min-height|width|height)\s*:\s*([\d.]+)(px|rem)\b/g;
-
   if (!parentIsInteractive) return [];
+
+  const RULE_PATTERN = /([^{}]+)\{([^{}]*)\}/g;
+  // The whole check is gated on parent-component interactivity, so
+  // every selector inside the subclass styles belongs to an
+  // interactive component. We DON'T filter to literal `button` /
+  // `:host` / `[role=...]` selectors — class-only selectors like
+  // `.control` or `.button` are extremely common in helix component
+  // CSS and an interactive component sizing them sub-44px is the
+  // exact regression class we need to catch.
+  // We DO skip selectors that are obviously decorative —
+  // pseudo-elements that paint icons / overlays, and aria-hidden
+  // sub-elements — since those aren't the click surface.
+  // Codex round-44 P2.
+  const DECORATIVE_SELECTOR =
+    /::(before|after|placeholder|marker|backdrop|selection|first-line|first-letter)|::part\([^)]*(icon|indicator|chevron|caret|spinner|backdrop)[^)]*\)|\[aria-hidden\b|(?:^|[\s,>+~.])(icon|chevron|caret|spinner|indicator|decoration|ornament|backdrop|overlay|glyph|swatch|dot|pip|bullet|sparkline|sigil|badge-dot)(?:[\s,.:[{]|$)/i;
+  const SIZE_RULE = /\b(min-width|min-height|width|height)\s*:\s*([\d.]+)(px|rem)\b/g;
 
   const undersized: string[] = [];
   let m: RegExpExecArray | null;
   while ((m = RULE_PATTERN.exec(styles)) !== null) {
     const selector = m[1] ?? '';
     const body = m[2] ?? '';
-    if (!INTERACTIVE_SELECTOR.test(selector)) continue;
+    if (DECORATIVE_SELECTOR.test(selector)) continue;
     let s: RegExpExecArray | null;
     while ((s = SIZE_RULE.exec(body)) !== null) {
       const value = parseFloat(s[2] ?? '0');

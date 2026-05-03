@@ -91,28 +91,50 @@ export function verifyTokenInheritance(
   // those internal usages, leaving deprecated aliases / cascade gaps
   // silently active in real CSS. Now scan both surfaces and
   // deduplicate by CSS-var name.
-  const auditedCssProps = new Map<string, { description: string | undefined; declared: boolean }>();
+  //
+  // Each entry tracks whether the var appears as a PRIMARY reference
+  // (`var(--x, ...)` first arg) or only as a FALLBACK position
+  // (`var(--canonical, var(--alias))`). Aliases used only as
+  // migration-support fallbacks are intentional and must not flag
+  // 01-token-deprecated-alias. Codex round-44 P2.
+  const auditedCssProps = new Map<
+    string,
+    { description: string | undefined; declared: boolean; primary: boolean }
+  >();
   for (const prop of cssProps) {
     if (!prop.name.startsWith('--')) continue;
-    auditedCssProps.set(prop.name, { description: prop.description, declared: true });
+    auditedCssProps.set(prop.name, {
+      description: prop.description,
+      declared: true,
+      primary: true,
+    });
   }
   if (input.cssSources && input.cssSources.length > 0) {
-    const VAR_PATTERN = /var\(\s*(--[a-zA-Z0-9_-]+)/g;
     for (const css of input.cssSources) {
-      let m: RegExpExecArray | null;
-      while ((m = VAR_PATTERN.exec(css)) !== null) {
-        const varName = m[1];
-        if (varName !== undefined && !auditedCssProps.has(varName)) {
-          auditedCssProps.set(varName, { description: undefined, declared: false });
+      const refs = scanVarReferences(css);
+      for (const [varName, { primary }] of refs) {
+        const existing = auditedCssProps.get(varName);
+        if (existing === undefined) {
+          auditedCssProps.set(varName, {
+            description: undefined,
+            declared: false,
+            primary,
+          });
+        } else if (primary && !existing.primary) {
+          existing.primary = true;
         }
       }
     }
   }
 
   // ── 01-token-deprecated-alias + 14-cssprop-deprecation-drift ─────────
-  for (const [name, { description, declared }] of auditedCssProps) {
+  for (const [name, { description, declared, primary }] of auditedCssProps) {
     const canon = resolveCanonicality(name, input.aliases);
     if (canon.canonical) continue;
+    // Skip aliases that only appear in `var(--canonical, var(--alias))`
+    // fallback position — that's the canonical migration pattern,
+    // not a deprecated-alias usage. Codex round-44 P2.
+    if (!primary) continue;
     findings.push(buildAliasFinding(name, canon));
     // Only emit the cssprop-deprecation finding when the token is
     // actually declared as a public @cssprop (otherwise there's no
@@ -294,4 +316,66 @@ function stripRootTokenBlocks(css: string): string {
   // Remove `:root { ... }` blocks since those are the canonical token
   // definitions — finding literals inside them is noise.
   return css.replace(/:root\s*\{[^}]*\}/g, '');
+}
+
+// ─── var() reference scanner ────────────────────────────────────────────────
+
+/**
+ * Scan CSS source for `var(--name, fallback)` calls and classify each
+ * referenced custom-property name as either PRIMARY (first arg of any
+ * var() call) or FALLBACK-ONLY (only ever appears nested inside the
+ * fallback portion of another var()).
+ *
+ * The `var(--canonical, var(--alias))` pattern is the standard
+ * migration shape — `--alias` exists only as a safety net while
+ * consumers transition. Flagging it as a deprecated-alias usage is
+ * a false positive. Codex round-44 P2.
+ */
+function scanVarReferences(css: string): Map<string, { primary: boolean }> {
+  const out = new Map<string, { primary: boolean }>();
+  const visit = (text: string, position: 'primary' | 'fallback'): void => {
+    let i = 0;
+    while (i < text.length) {
+      const idx = text.indexOf('var(', i);
+      if (idx === -1) break;
+      let depth = 1;
+      let j = idx + 4;
+      while (j < text.length && depth > 0) {
+        const ch = text[j];
+        if (ch === '(') depth++;
+        else if (ch === ')') depth--;
+        if (depth === 0) break;
+        j++;
+      }
+      const inner = text.slice(idx + 4, j);
+      const nameMatch = /^\s*(--[a-zA-Z0-9_-]+)/.exec(inner);
+      if (nameMatch && nameMatch[1] !== undefined) {
+        const name = nameMatch[1];
+        if (position === 'primary') {
+          out.set(name, { primary: true });
+        } else {
+          const existing = out.get(name);
+          if (existing === undefined) out.set(name, { primary: false });
+        }
+        const commaIdx = findTopLevelComma(inner);
+        if (commaIdx !== -1) {
+          visit(inner.slice(commaIdx + 1), 'fallback');
+        }
+      }
+      i = j + 1;
+    }
+  };
+  visit(css, 'primary');
+  return out;
+}
+
+function findTopLevelComma(text: string): number {
+  let depth = 0;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === '(') depth++;
+    else if (ch === ')') depth--;
+    else if (ch === ',' && depth === 0) return i;
+  }
+  return -1;
 }

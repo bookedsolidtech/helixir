@@ -32,6 +32,12 @@ interface DiffOutput {
   minor: BreakingChange[];
   added: string[];
   removed: string[];
+  /**
+   * Components for which the base CEM could not be loaded — diff
+   * cannot be computed. Treat as not-yet-checked, NOT as clean.
+   * Codex round-58 P1.
+   */
+  indeterminate?: Array<{ tag: string; baseUnavailableReason: string | null }>;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -226,13 +232,22 @@ async function run(): Promise<void> {
           true,
         );
 
-        if (exitCode === 0 && stdout) {
+        // Parse JSON regardless of exit code. The CLI emits structured
+        // JSON on both code 0 (clean) AND code 2 (breaking changes OR
+        // indeterminate diffs); only refusing to parse on non-zero
+        // exit caused indeterminate scans to be silently treated as
+        // passing. Codex round-58 P1.
+        if (stdout) {
           diffData = parseJsonSafe<DiffOutput>(stdout);
           if (!diffData) {
-            core.warning('Could not parse diff output as JSON');
+            core.warning(
+              `Could not parse diff output as JSON (exit code ${exitCode}). Treating as failure to avoid silent pass.`,
+            );
           }
-        } else {
-          core.warning(`helixir diff exited with code ${exitCode}`);
+        } else if (exitCode !== 0) {
+          core.warning(
+            `helixir diff exited with code ${exitCode} with no stdout — treating as failure.`,
+          );
         }
       }
     }
@@ -242,6 +257,7 @@ async function run(): Promise<void> {
     const failingComponents = components.filter((c) => c.score < threshold);
     const hasBreaking = (diffData?.breaking ?? []).length > 0;
     const hasWarnings = (diffData?.minor ?? []).length > 0;
+    const hasIndeterminate = (diffData?.indeterminate ?? []).length > 0;
 
     const avgScore = components.length
       ? Math.round(components.reduce((s, c) => s + c.score, 0) / components.length)
@@ -250,12 +266,21 @@ async function run(): Promise<void> {
     core.setOutput('health-score', avgScore >= 0 ? String(avgScore) : '');
     core.setOutput('failing-components', String(failingComponents.length));
     core.setOutput('breaking-changes-count', String((diffData?.breaking ?? []).length));
+    core.setOutput('indeterminate-diffs-count', String((diffData?.indeterminate ?? []).length));
+    if (hasIndeterminate) {
+      core.warning(
+        `${(diffData?.indeterminate ?? []).length} component(s) returned INDETERMINATE diffs — base CEM unavailable. Treating as quality-gate failure.`,
+      );
+    }
     core.setOutput(
       'passed',
       String(
         failingComponents.length === 0 &&
           (!failOnBreaking || !hasBreaking) &&
-          (!failOnWarning || !hasWarnings),
+          (!failOnWarning || !hasWarnings) &&
+          // Indeterminate diffs are never a pass — silence is not safety.
+          // Codex round-58 P1.
+          !hasIndeterminate,
       ),
     );
 

@@ -201,7 +201,23 @@ export async function auditComponentWithCodex(
     for (const seg of tailSegments) {
       cursor = cursor + sep + seg;
       if (!existsSyncFs(cursor)) {
-        mkdirSync(cursor);
+        // Tolerate EEXIST: another concurrent auditComponentWithCodex
+        // call may have just created this same segment. EEXIST is
+        // benign — the validation that follows still catches any
+        // escape via realpath. Codex round-58 P2.
+        try {
+          mkdirSync(cursor);
+        } catch (err) {
+          if (
+            err instanceof Error &&
+            'code' in err &&
+            (err as NodeJS.ErrnoException).code === 'EEXIST'
+          ) {
+            // Race winner created it; we proceed to validate.
+          } else {
+            throw err;
+          }
+        }
         const cursorReal = realpathSync(cursor);
         if (cursorReal !== projectAbs && !cursorReal.startsWith(projectAbs + sep)) {
           // The dir we just created escapes projectRoot — almost

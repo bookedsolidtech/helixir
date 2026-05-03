@@ -778,20 +778,31 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
             atName === 'property' ||
             atName === 'font-feature-values' ||
             atName === 'font-palette-values';
-          if (isConditional || isSelectorless) {
+          if (isSelectorless) {
+            // @keyframes / @font-face / etc. — contents aren't selectors.
             i = k + 1;
             continue;
           }
-          // Unconditional wrapper (@layer, @scope, etc.). Two passes:
-          //   1. Extract direct declarations (depth-0 inside the
-          //      at-rule body) and emit them as a leaf for parentSel.
-          //      Codex round-71 P2: without this,
-          //      `button { @layer foo { width: 1.5rem } }` lost the
-          //      width rule because parseBlock treats depth-0 decls
-          //      as orphans.
-          //   2. Recurse into nested rules with the SAME parent so
-          //      inner selector blocks still surface (round 70 P2).
-          if (parentSel !== '') {
+          // For BOTH conditional (@media/@supports/@container) and
+          // unconditional (@layer/@scope/@page) at-rules: recurse
+          // into nested SELECTOR blocks so inner rules surface with
+          // the resolved selector chain. Round 72 P1: skipping
+          // conditional at-rules entirely hid responsive regressions
+          // like `@media (max-width: 600px) { button.star { width: 1.5rem } }`.
+          //
+          // Difference: ONLY unconditional at-rules attach their
+          // direct (depth-0) declarations back to parentSel — those
+          // decls apply unconditionally. Conditional at-rule direct
+          // decls are NOT extracted (they only apply when the
+          // condition matches; emitting them would false-positive
+          // print-only / pointer-only styles).
+          //
+          // Cost: nested selector rules under @media print still
+          // surface as findings even though they're print-only. This
+          // is the unresolvable round 68/72 flip — we choose
+          // false-positive over false-negative for responsive cases.
+          // Trade-off documented in runbook §6.
+          if (!isConditional && parentSel !== '') {
             let atDecl = '';
             let dd = 0;
             for (let p = 0; p < inner.length; p++) {

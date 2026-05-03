@@ -714,6 +714,19 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
           k++;
         }
         const inner = input.slice(j + 1, k);
+        // At-rules (`@media`, `@supports`, `@container`, etc.) are
+        // CONDITIONAL wrappers, not selectors. Don't compose them
+        // into the resolved selector chain — recurse into their
+        // contents with the SAME parent selector. Codex round-66 P2:
+        // without this, `@media (...) { button { width: 20px } }`
+        // resolved to `@media (...) button` and got skipped by the
+        // `selector.trim().startsWith('@')` filter, hiding undersized
+        // rules inside responsive/conditional blocks.
+        if (childSel.startsWith('@')) {
+          parseBlock(inner, parentSel);
+          i = k + 1;
+          continue;
+        }
         const resolved = resolveNestedSelector(parentSel, childSel);
         // Extract THIS level's declarations (non-nested portion of inner).
         // Walk inner, collecting only depth-0 chars.

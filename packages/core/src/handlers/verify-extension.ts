@@ -804,12 +804,35 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
             // .footer))` doesn't truncate at the inner `)`.
             // Codex round-82 P2.
             let scopeRoot = extractBalancedScopeRoot(childSel);
-            // CSS nesting `&` resolution: `@scope (&)` means "scope
-            // to the current nested parent". Substitute `&` with
-            // parentSel BEFORE composing into newParent — otherwise
-            // we'd produce literal `& :host` chains. Codex round-87 P2.
+            // CSS nesting `&` resolution. Per-arm expansion when
+            // parentSel is a selector list: `button, a { @scope (&
+            // + .icon) { ... } }` must expand to
+            // `button + .icon, a + .icon`, NOT
+            // `button, a + .icon` (precedence bug). Codex round-87/88 P2.
             if (parentSel !== '' && /&/.test(scopeRoot)) {
-              scopeRoot = scopeRoot.replace(/&/g, parentSel);
+              const parentArmsForAmp = splitTopLevelCommas(parentSel)
+                .map((s) => s.trim())
+                .filter(Boolean);
+              if (parentArmsForAmp.length === 1) {
+                const onlyArm = parentArmsForAmp[0] ?? '';
+                scopeRoot = scopeRoot.replace(/&/g, onlyArm);
+              } else {
+                // Multi-arm: expand each scope arm × each parent arm.
+                const scopeArmsForAmp = splitTopLevelCommas(scopeRoot)
+                  .map((s) => s.trim())
+                  .filter(Boolean);
+                const expanded: string[] = [];
+                for (const sa of scopeArmsForAmp) {
+                  if (/&/.test(sa)) {
+                    for (const pa of parentArmsForAmp) {
+                      expanded.push(sa.replace(/&/g, pa));
+                    }
+                  } else {
+                    expanded.push(sa);
+                  }
+                }
+                scopeRoot = expanded.join(', ');
+              }
             }
             // Cartesian-product expansion. @scope semantics: the
             // scope root is the OUTER container, so resolved selector

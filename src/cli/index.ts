@@ -245,7 +245,21 @@ async function cmdDiff(args: string[], opts: CliOptions): Promise<void> {
       .filter((r) => r.diff.baseUnavailable === true);
 
     if (opts.format === 'json') {
-      output(allBreaking, 'json');
+      // Codex round-56 P1: include both breaking changes AND
+      // indeterminate components so JSON consumers can distinguish
+      // a clean scan ([] / { indeterminate: [] }) from an
+      // unscannable one. Previously only `allBreaking` was emitted
+      // and indeterminate components vanished from the JSON output.
+      output(
+        {
+          breaking: allBreaking,
+          indeterminate: indeterminate.map((r) => ({
+            tag: r.tag,
+            baseUnavailableReason: r.diff.baseUnavailableReason ?? null,
+          })),
+        },
+        'json',
+      );
     } else if (allBreaking.length === 0 && indeterminate.length === 0) {
       process.stdout.write('No breaking changes detected.\n');
     } else if (allBreaking.length === 0 && indeterminate.length > 0) {

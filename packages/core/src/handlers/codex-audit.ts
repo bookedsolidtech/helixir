@@ -321,11 +321,6 @@ export function parseCodexFindings(raw: unknown): {
     throw new MCPError('Codex returned non-object output.', ErrorCategory.VALIDATION);
   }
   const obj = raw as Record<string, unknown>;
-  const verdictRaw = obj['verdict'];
-  const verdict: AuditVerdict =
-    verdictRaw === 'pass' || verdictRaw === 'concerns' || verdictRaw === 'blocking'
-      ? verdictRaw
-      : 'concerns';
   const findingsRaw = Array.isArray(obj['findings']) ? obj['findings'] : [];
   const findings: AuditFinding[] = [];
   for (const f of findingsRaw) {
@@ -342,6 +337,14 @@ export function parseCodexFindings(raw: unknown): {
       line: typeof fo['line'] === 'number' ? (fo['line'] as number) : null,
     });
   }
+  // Compute the verdict from the parsed findings, NOT from whatever
+  // codex returned in `verdict`. Codex sometimes ships P1 findings
+  // alongside `verdict: 'pass'`; trusting that contradiction would
+  // mark the audit clean despite real blockers. Codex round-29 P2.
+  const hasBlocking = findings.some((f) => f.severity === 'P1');
+  const hasConcerns = findings.some((f) => f.severity === 'P2' || f.severity === 'P3');
+  const verdict: AuditVerdict = hasBlocking ? 'blocking' : hasConcerns ? 'concerns' : 'pass';
+
   const reviewText =
     typeof obj['reviewText'] === 'string' ? (obj['reviewText'] as string) : undefined;
   return reviewText !== undefined ? { verdict, findings, reviewText } : { verdict, findings };

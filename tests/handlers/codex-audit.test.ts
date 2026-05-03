@@ -520,9 +520,12 @@ describe('renderAuditPrompt', () => {
 // ─── Codex output parser ────────────────────────────────────────────────────
 
 describe('parseCodexFindings', () => {
-  it('normalizes valid output', () => {
+  it('derives the verdict from the parsed findings (codex round-29 P2)', () => {
+    // Codex sometimes ships P1 findings alongside `verdict: 'pass'`.
+    // Pinned per round-29: trust the findings, not the verdict claim.
+    // P1 finding → blocking, regardless of what codex's verdict said.
     const parsed = parseCodexFindings({
-      verdict: 'concerns',
+      verdict: 'pass', // contradicts the P1 below
       findings: [
         {
           severity: 'P1',
@@ -535,17 +538,31 @@ describe('parseCodexFindings', () => {
       ],
       reviewText: 'short summary',
     });
-    expect(parsed.verdict).toBe('concerns');
+    expect(parsed.verdict).toBe('blocking');
     expect(parsed.findings).toHaveLength(1);
     expect(parsed.findings[0]?.classId).toBe('05-aria-regression');
     expect(parsed.reviewText).toBe('short summary');
   });
 
-  it('defaults invalid severities to P3 and unknown verdicts to concerns', () => {
+  it('returns pass when there are zero findings', () => {
+    const parsed = parseCodexFindings({ verdict: 'pass', findings: [] });
+    expect(parsed.verdict).toBe('pass');
+  });
+
+  it('returns concerns for P2 / P3 findings only', () => {
+    const parsed = parseCodexFindings({
+      verdict: 'pass',
+      findings: [{ severity: 'P2', title: 'x', body: 'y' }],
+    });
+    expect(parsed.verdict).toBe('concerns');
+  });
+
+  it('defaults invalid severities to P3', () => {
     const parsed = parseCodexFindings({
       verdict: 'maybe',
       findings: [{ severity: 'critical', title: 'x', body: 'y' }],
     });
+    // P3 finding → concerns verdict.
     expect(parsed.verdict).toBe('concerns');
     expect(parsed.findings[0]?.severity).toBe('P3');
   });

@@ -195,13 +195,26 @@ export function buildCanonicalityIndex(
 // ─── Internals ──────────────────────────────────────────────────────────────
 
 function resolveAliasesPath(config: McpWcConfig): string | null {
+  // Resolve the tokens.json absolute path first so we can use its
+  // directory as the base for the relative env override below — the
+  // env var is conceptually a sibling pointer to tokens.json, not
+  // a project-root-relative path. Codex round-29 P2.
+  const tokensAbs =
+    config.tokensPath !== null && config.tokensPath !== ''
+      ? isAbsolute(config.tokensPath)
+        ? config.tokensPath
+        : resolve(config.projectRoot, config.tokensPath)
+      : null;
+
   const envPath = process.env['MCP_WC_TOKENS_DEPRECATED_PATH'];
   if (envPath !== undefined && envPath !== '') {
-    return isAbsolute(envPath) ? envPath : resolve(config.projectRoot, envPath);
+    if (isAbsolute(envPath)) return envPath;
+    // Relative env value: prefer tokens.json's directory (sibling
+    // semantics). Fall back to projectRoot if no tokensPath is
+    // configured.
+    const base = tokensAbs !== null ? dirname(tokensAbs) : config.projectRoot;
+    return resolve(base, envPath);
   }
-  if (config.tokensPath === null || config.tokensPath === '') return null;
-  const tokensAbs = isAbsolute(config.tokensPath)
-    ? config.tokensPath
-    : resolve(config.projectRoot, config.tokensPath);
+  if (tokensAbs === null) return null;
   return join(dirname(tokensAbs), 'tokens.deprecated.json');
 }

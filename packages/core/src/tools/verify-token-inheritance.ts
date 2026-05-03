@@ -228,23 +228,44 @@ function deriveOverlaysFromTokens(
   for (const t of tokens) {
     const cssVar = '--' + t.name;
     const lower = t.name.toLowerCase();
-    if (lower.startsWith('dark-') || lower.includes('.dark.')) {
-      // Strip the overlay prefix to get the canonical CSS-prop name
-      // the cascade-gap check compares against.
-      const canonical = '--' + t.name.replace(/^dark[-.]/i, '').replace(/\.dark\./gi, '.');
+    // Dark coverage detection — recognizes (in order):
+    //   - flat-name prefix:  `dark-color-foo`     (kebab DTCG)
+    //   - top-level group:   `dark.color.foo`     (nested DTCG)
+    //   - nested suffix:     `color.foo.dark`     (alt DTCG style)
+    // Codex round-29 P2 added the top-level `dark.` recognition.
+    const isDark =
+      lower.startsWith('dark-') ||
+      lower.startsWith('dark.') ||
+      lower.includes('.dark.') ||
+      lower.endsWith('.dark');
+    if (isDark) {
+      const canonical =
+        '--' +
+        t.name
+          .replace(/^dark[-.]/i, '')
+          .replace(/\.dark$/i, '')
+          .replace(/\.dark\./gi, '.');
       dark.add(canonical);
       dark.add(cssVar);
     }
-    if (
+    const isHc =
       lower.startsWith('hc-') ||
+      lower.startsWith('hc.') ||
       lower.startsWith('high-contrast-') ||
-      lower.includes('.high-contrast.')
-    ) {
+      lower.startsWith('high-contrast.') ||
+      lower.includes('.hc.') ||
+      lower.includes('.high-contrast.') ||
+      lower.endsWith('.hc') ||
+      lower.endsWith('.high-contrast');
+    if (isHc) {
       const canonical =
         '--' +
         t.name
           .replace(/^hc[-.]/i, '')
           .replace(/^high-contrast[-.]/i, '')
+          .replace(/\.hc$/i, '')
+          .replace(/\.high-contrast$/i, '')
+          .replace(/\.hc\./gi, '.')
           .replace(/\.high-contrast\./gi, '.');
       highContrast.add(canonical);
       highContrast.add(cssVar);

@@ -778,12 +778,27 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
             i = k + 1;
             continue;
           }
-          // @scope handling: round 78 said skip (predicate-bearing,
-          // false-positive on `.toolbar` scope); round 79 said don't
-          // skip (`@scope (:host) { ... }` always applies in the
-          // component). Same trade as @media — recurse so inner
-          // selectors surface, accept the
-          // `@scope (.toolbar)`-style false-positive cost.
+          // @scope handling: round 78 said skip; round 79 said recurse;
+          // round 80 said recurse BUT preserve the scope root in the
+          // resolved selector. Incorporate the @scope root into
+          // parentSel so `@scope (.toolbar) { .btn {...} }` resolves
+          // to `.toolbar .btn` (correct cascade semantics) and
+          // `@scope (:host) { button.star {...} }` resolves to
+          // `:host button.star`. Strong-tier matching then sees the
+          // real selector chain.
+          if (atName === 'scope') {
+            const scopeRootMatch = childSel.match(/@scope\s*\(([^)]*)\)/);
+            const scopeRoot = scopeRootMatch?.[1]?.trim() ?? '';
+            const newParent =
+              scopeRoot === ''
+                ? parentSel
+                : parentSel === ''
+                  ? scopeRoot
+                  : `${parentSel} ${scopeRoot}`;
+            parseBlock(inner, newParent);
+            i = k + 1;
+            continue;
+          }
           // ALL other at-rules (conditional @media/@supports/@container
           // AND unconditional @layer/@page/@starting-style) are
           // flattened symmetrically: extract direct decls back to
@@ -916,11 +931,13 @@ function splitTopLevelCommas(text: string): string[] {
 function extractDirectDeclarations(input: string): string {
   let out = '';
   let depth = 0;
+  let parenDepth = 0;
   let segStart = 0;
-  // Quote-aware: CSS values can contain { / } inside string literals
-  // (`content: "{"`, inline SVG data URLs, etc.). Skip depth tracking
-  // inside strings so braces in quoted values don't truncate the
-  // declaration extraction. Codex round-79 P2.
+  // Quote-aware (round 79 P2): CSS values can contain { / } inside
+  // string literals.
+  // Paren-aware (round 80 P2): unquoted url() values like
+  // `url(data:image/svg+xml;utf8,...)` contain `;` inside parens
+  // that must NOT be treated as declaration terminators.
   let quote: '"' | "'" | null = null;
   for (let p = 0; p < input.length; p++) {
     const c = input[p];
@@ -930,6 +947,14 @@ function extractDirectDeclarations(input: string): string {
     }
     if (c === '"' || c === "'") {
       quote = c;
+      continue;
+    }
+    if (c === '(') {
+      parenDepth++;
+      continue;
+    }
+    if (c === ')') {
+      if (parenDepth > 0) parenDepth--;
       continue;
     }
     if (c === '{') {
@@ -942,7 +967,7 @@ function extractDirectDeclarations(input: string): string {
     } else if (c === '}') {
       depth--;
       if (depth === 0) segStart = p + 1;
-    } else if (depth === 0 && c === ';') {
+    } else if (depth === 0 && parenDepth === 0 && c === ';') {
       out += input.slice(segStart, p + 1);
       segStart = p + 1;
     }

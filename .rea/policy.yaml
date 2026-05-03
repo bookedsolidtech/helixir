@@ -1,4 +1,4 @@
-# .rea/policy.yaml — managed by rea v0.13.0
+# .rea/policy.yaml — managed by rea v0.14.0
 # Edit carefully: tightening takes effect on next load; loosening requires human approval.
 version: '1'
 profile: 'bst-internal'
@@ -31,3 +31,8 @@ review:
   last_n_commits: 10
   auto_narrow_threshold: 30
   timeout_ms: 1800000
+  # 0.13.4+ codex CLI customization (now wired in rea 0.14.0). Pins the
+  # push-gate to the flagship gpt-5.4 model at high reasoning instead of
+  # the default codex-auto-review at medium. Kills the round-43–56 flips.
+  codex_model: 'gpt-5.4'
+  codex_reasoning_effort: 'high'

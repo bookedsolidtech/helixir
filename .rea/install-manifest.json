@@ -1,8 +1,8 @@
 {
-  "version": "0.13.0",
+  "version": "0.14.0",
   "profile": "bst-internal",
   "installed_at": "2026-04-19T16:42:10.152Z",
-  "upgraded_at": "2026-04-30T01:40:40.987Z",
+  "upgraded_at": "2026-05-03T19:15:58.113Z",
   "files": [
     {
       "path": ".claude/hooks/_lib/common.sh",
@@ -31,7 +31,7 @@
     },
     {
       "path": ".claude/hooks/blocked-paths-enforcer.sh",
-      "sha256": "be98dd8ddad684ae72cf4b00a4643137c38c1aae7778a52061878a7cdf236f2a",
+      "sha256": "0f6c5a9424b0f69b362ff4283e233de246259249e9da11b08396d4c475133ac4",
       "source": "hook"
     },
     {
@@ -61,7 +61,7 @@
     },
     {
       "path": ".claude/hooks/secret-scanner.sh",
-      "sha256": "8dc770ddddc75ca793294cca14d2856a3cded499f3e3c1ec93594dba8f80e279",
+      "sha256": "f17f3cf65a521b1c156e6d990b25a5ea51173a12c3fb9c02600279f18d5f4fcf",
       "source": "hook"
     },
     {
@@ -71,7 +71,7 @@
     },
     {
       "path": ".claude/hooks/settings-protection.sh",
-      "sha256": "93ed80780148a628c40ea41cbadf5fef0069c3cea82311cecffaaaa09b1c1f18",
+      "sha256": "8bc294cf2244a6bf8f2bc637be6773215cea77fd269a8045a1bb5c8603d1aeba",
       "source": "hook"
     },
     {
@@ -156,7 +156,7 @@
     },
     {
       "path": ".husky/pre-push",
-      "sha256": "8184bc33231e1c1b225a1887ac06a4611e78d594e4251e05e51773e48519fb5a",
+      "sha256": "9503dcd048f98177ab06327680e01e6f3d1487e1416e2189895b498716a61fa8",
       "source": "husky"
     },
     {
@@ -166,7 +166,7 @@
     },
     {
       "path": "CLAUDE.md#rea:managed:v1",
-      "sha256": "34aa581ef1b06733525b00efbd5e03509d7b23bffb2e93ba66435ccb645c5d46",
+      "sha256": "ffb68d7188adf1a5c5398441df99072cc239d780648380709f774ff7b609a32d",
       "source": "claude-md"
     }
   ]

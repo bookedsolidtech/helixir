@@ -84,7 +84,7 @@ Defect-corpus and falsifiability ledger live in `bst-cto-kb/Projects/HELiXiR/Aud
 
 - **Policy**: `.rea/policy.yaml` — profile `bst-internal`
 - **Autonomy**: `L3` (ceiling `L3`)
-- **Blocked paths**: 3 entries — see the policy file
+- **Blocked paths**: 4 entries — see the policy file
 - **block_ai_attribution**: `true` (enforced by commit-msg hook)
 
 Protected-path changes (`src/gateway/middleware/`, `hooks/`, `src/policy/`,

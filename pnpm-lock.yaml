@@ -23,8 +23,8 @@ importers:
         version: 3.25.76
     devDependencies:
       '@bookedsolid/rea':
-        specifier: ^0.13.3
-        version: 0.13.3
+        specifier: ^0.14.0
+        version: 0.14.0
       '@changesets/cli':
         specifier: ^2.29.4
         version: 2.30.0(@types/node@22.19.13)
@@ -259,8 +259,8 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
-  '@bookedsolid/rea@0.13.3':
-    resolution: {integrity: sha512-0OqGMy2yMNulo2OcB4E2gxd8J9Ar3eQ4x2/ILMvoZOQs18dY+HF/eIJ+YYQpzRbl3g11qPqnvhZ3ElG1druQ2g==}
+  '@bookedsolid/rea@0.14.0':
+    resolution: {integrity: sha512-Ya51WBfddu8amLea2vYohOUlOGBnrMSM9V9diCRyYb9sL9+iSpanR7WPHrlHAcLqOQLpU1UJpXJP16M+qVGEvA==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -3897,7 +3897,7 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@bookedsolid/rea@0.13.3':
+  '@bookedsolid/rea@0.14.0':
     dependencies:
       '@anthropic-ai/sdk': 0.90.0(zod@3.25.76)
       '@clack/prompts': 1.3.0

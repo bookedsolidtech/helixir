@@ -295,6 +295,12 @@ export function loadConfig(): Readonly<McpWcConfig> {
   // scoring needs special validation — extract before mass-assign and apply separately
   const rawScoringFromFile = (safeFileConfig as Record<string, unknown>)['scoring'];
   delete (safeFileConfig as Record<string, unknown>)['scoring'];
+  // Strip cemPathFromExternalConfig — this is an internal provenance
+  // flag stamped only by rebaseRelativePaths when the runtime opt-in
+  // fires. Accepting it from user-supplied JSON would let any local
+  // helixir.mcp.json forge "trusted external config" provenance and
+  // bypass the startup containment check. Codex round-15 P1.
+  delete (safeFileConfig as Record<string, unknown>)['cemPathFromExternalConfig'];
   Object.assign(config, safeFileConfig);
 
   // Apply validated scoring config (weights must be positive numbers)
@@ -373,6 +379,13 @@ export function loadConfig(): Readonly<McpWcConfig> {
     const val = process.env[envKey];
     if (val !== undefined) {
       (config as Record<string, unknown>)[configKey] = val;
+      // If MCP_WC_CEM_PATH overrides cemPath, the new value did NOT
+      // come from the trusted external-config opt-in path — clear the
+      // provenance flag so the startup containment check evaluates
+      // the new path on its own merits. Codex round-15 P1.
+      if (envKey === 'MCP_WC_CEM_PATH') {
+        (config as Record<string, unknown>)['cemPathFromExternalConfig'] = false;
+      }
     }
   }
   for (const [envKey, configKey] of Object.entries(ENV_MAP_NULLABLE)) {

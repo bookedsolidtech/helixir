@@ -537,14 +537,32 @@ function checkTouchTarget(
     // Strip block comments first to avoid `/* see button styles */`
     // contributing.
     const noComments = styles.replace(/\/\*[\s\S]*?\*\//g, '');
-    // Extract every selector portion (text BEFORE each `{`). The
-    // RULE_PATTERN below picks up non-brace runs followed by `{...}`;
-    // we want the same selector spans concatenated.
+    // Extract every selector portion — text BEFORE each `{`. Walk the
+    // string brace-aware so nested CSS like
+    // `button { &::before { ... } }` contributes BOTH `button` AND
+    // `&::before` (not just the inner block as a regex-only extractor
+    // would). Codex round-63 P2.
     const selOnly: string[] = [];
-    const RULE_HEAD = /([^{}]+)\{[^{}]*\}/g;
-    let m: RegExpExecArray | null;
-    while ((m = RULE_HEAD.exec(noComments)) !== null) {
-      selOnly.push(m[1] ?? '');
+    let depth = 0;
+    let segmentStart = 0;
+    for (let i = 0; i < noComments.length; i++) {
+      const ch = noComments[i];
+      if (ch === '{') {
+        // Push the selector head (segmentStart..i) at ANY depth so
+        // nested rules contribute their selectors too. The
+        // segmentStart was last reset by `}` (closing a block) or
+        // `;` (declaration terminator inside a block) — both leave
+        // the cursor at the start of the next selector head.
+        const head = noComments.slice(segmentStart, i);
+        if (head.trim() !== '') selOnly.push(head);
+        depth++;
+        segmentStart = i + 1;
+      } else if (ch === '}') {
+        depth = Math.max(0, depth - 1);
+        segmentStart = i + 1;
+      } else if (depth >= 1 && ch === ';') {
+        segmentStart = i + 1;
+      }
     }
     return selOnly.join('\n');
   })();

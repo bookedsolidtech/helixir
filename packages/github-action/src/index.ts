@@ -265,16 +265,34 @@ async function run(): Promise<void> {
 
         // Parse JSON regardless of exit code. The CLI emits structured
         // JSON on both code 0 (clean) AND code 2 (breaking changes OR
-        // indeterminate diffs); only refusing to parse on non-zero
-        // exit caused indeterminate scans to be silently treated as
-        // passing. Codex round-58 P1.
+        // indeterminate diffs). Codex round-58 P1.
         diffParseFailed = false;
         if (stdout) {
-          diffData = parseJsonSafe<DiffOutput>(stdout);
-          if (!diffData) {
+          const parsed = parseJsonSafe<unknown>(stdout);
+          if (parsed === null) {
             diffParseFailed = true;
             core.warning(
               `Could not parse diff output as JSON (exit code ${exitCode}). Treating as failure to avoid silent pass.`,
+            );
+          } else if (Array.isArray(parsed)) {
+            // Legacy CLI shape (helixir-version pinned to older
+            // releases): top-level array of breaking changes. Normalize
+            // into the current { breaking, indeterminate } object so
+            // downstream pass/fail logic doesn't read it as "no
+            // breaking changes". Codex round-63 P1.
+            diffData = {
+              breaking: parsed as BreakingChange[],
+              minor: [],
+              added: [],
+              removed: [],
+              indeterminate: [],
+            };
+          } else if (typeof parsed === 'object') {
+            diffData = parsed as DiffOutput;
+          } else {
+            diffParseFailed = true;
+            core.warning(
+              `helixir diff JSON was neither array nor object (exit code ${exitCode}). Treating as failure.`,
             );
           }
         } else if (exitCode !== 0) {

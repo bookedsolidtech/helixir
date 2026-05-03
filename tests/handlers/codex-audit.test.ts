@@ -346,11 +346,14 @@ describe('audit-cache', () => {
 
 describe('auditComponentWithCodex', () => {
   let projectRoot: string;
-  let auditsRoot: string;
+  // Project-relative auditsRoot — the handler enforces containment
+  // and rejects absolute paths per codex round-32 P1.
+  const auditsRoot = 'audits';
+  let auditsRootAbs: string;
 
   beforeEach(() => {
     projectRoot = mkdtempSync(join(tmpdir(), 'helixir-m3-pipe-'));
-    auditsRoot = join(projectRoot, 'audits');
+    auditsRootAbs = join(projectRoot, 'audits');
   });
   afterEach(() => {
     rmSync(projectRoot, { recursive: true, force: true });
@@ -491,8 +494,9 @@ describe('auditComponentWithCodex', () => {
       runCodex: runner,
       auditsRoot,
     });
-    expect(existsSync(join(auditsRoot, 'hx-button', 'index.json'))).toBe(true);
-    const read = readCachedAudit(auditsRoot, 'hx-button', result.entry.surfaceHash);
+    // Direct on-disk verification uses the absolute resolved path.
+    expect(existsSync(join(auditsRootAbs, 'hx-button', 'index.json'))).toBe(true);
+    const read = readCachedAudit(auditsRootAbs, 'hx-button', result.entry.surfaceHash);
     expect(read?.reviewText).toBe('audited hx-button');
   });
 });

@@ -28,7 +28,7 @@
 
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { isAbsolute, resolve, sep } from 'node:path';
 
 import type { McpWcConfig } from '../config.js';
 import type { Cem, CemDeclaration } from './cem.js';
@@ -112,7 +112,25 @@ export async function auditComponentWithCodex(
 
   const surface = extractContractSurface(decl);
   const surfaceHash = hashContractSurface(surface);
-  const auditsRoot = resolve(config.projectRoot, options.auditsRoot ?? 'audits');
+  // Path containment on auditsRoot: caller-supplied override must
+  // resolve inside projectRoot. Without this, an absolute or ../-
+  // traversing override could write audit files anywhere on disk.
+  // Codex round-32 P1.
+  const projectAbs = resolve(config.projectRoot);
+  const auditsRootRaw = options.auditsRoot ?? 'audits';
+  if (isAbsolute(auditsRootRaw)) {
+    throw new MCPError(
+      `auditsRoot must be project-relative: "${auditsRootRaw}"`,
+      ErrorCategory.VALIDATION,
+    );
+  }
+  const auditsRoot = resolve(projectAbs, auditsRootRaw);
+  if (auditsRoot !== projectAbs && !auditsRoot.startsWith(projectAbs + sep)) {
+    throw new MCPError(
+      `auditsRoot escapes projectRoot via ../: "${auditsRootRaw}"`,
+      ErrorCategory.VALIDATION,
+    );
+  }
 
   if (!options.force) {
     const cached = readCachedAudit(auditsRoot, tagName, surfaceHash);

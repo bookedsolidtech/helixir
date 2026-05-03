@@ -109,23 +109,53 @@ function buildSparkbar(score: number): string {
 }
 
 function buildBreakingChangesSection(diff: DiffOutput): string {
-  if (diff.breaking.length === 0 && diff.minor.length === 0) {
+  // Defensive: the multi-component CLI shape (`{breaking, indeterminate}`)
+  // omits `minor` / `added` / `removed`, so default each array. Codex
+  // round-59 P2 — without this, the comment builder threw TypeError
+  // on `diff.minor.length`.
+  const breaking = diff.breaking ?? [];
+  const minor = diff.minor ?? [];
+  const indeterminate = diff.indeterminate ?? [];
+
+  if (breaking.length === 0 && minor.length === 0 && indeterminate.length === 0) {
     return '### Breaking Changes\n\n✅ No breaking changes detected.';
   }
 
   const lines: string[] = ['### Breaking Changes'];
 
-  if (diff.breaking.length > 0) {
+  if (breaking.length > 0) {
     lines.push('\n**🚨 Breaking:**');
-    diff.breaking.forEach((c) => {
+    breaking.forEach((c) => {
+      // Tolerate both shapes:
+      //  - rich BreakingChange { component, description, type }
+      //  - CLI multi-tag { tag, change }
+      const anyC = c as unknown as {
+        component?: string;
+        description?: string;
+        type?: string;
+        tag?: string;
+        change?: string;
+      };
+      const name = anyC.component ?? anyC.tag ?? '<unknown>';
+      const desc = anyC.description ?? anyC.change ?? '';
+      const tag = anyC.type ?? '';
+      lines.push(`- \`${name}\`: ${desc}${tag ? ` *(${tag})*` : ''}`);
+    });
+  }
+
+  if (minor.length > 0) {
+    lines.push('\n**⚠️ Minor:**');
+    minor.forEach((c) => {
       lines.push(`- \`${c.component}\`: ${c.description} *(${c.type})*`);
     });
   }
 
-  if (diff.minor.length > 0) {
-    lines.push('\n**⚠️ Minor:**');
-    diff.minor.forEach((c) => {
-      lines.push(`- \`${c.component}\`: ${c.description} *(${c.type})*`);
+  if (indeterminate.length > 0) {
+    lines.push(
+      '\n**❓ Indeterminate (base CEM unavailable — treat as not-yet-checked, NOT as clean):**',
+    );
+    indeterminate.forEach((c) => {
+      lines.push(`- \`${c.tag}\`: ${c.baseUnavailableReason ?? '<no reason given>'}`);
     });
   }
 
@@ -337,14 +367,27 @@ async function run(): Promise<void> {
     }
 
     if (failOnBreaking && hasBreaking) {
-      const count = diffData?.breaking.length ?? 0;
+      const count = diffData?.breaking?.length ?? 0;
       core.setFailed(`Breaking changes detected: ${count} breaking change(s) found`);
       return;
     }
 
     if (failOnWarning && hasWarnings) {
-      const count = diffData?.minor.length ?? 0;
+      const count = diffData?.minor?.length ?? 0;
       core.setFailed(`Warning-level changes detected: ${count} minor change(s) found`);
+      return;
+    }
+
+    // Indeterminate diffs are a hard quality-gate failure — silence is
+    // not safety. Must run after the other fail-conditions and outside
+    // the PR-comment block, otherwise non-PR events / comment:false
+    // configs would leave the workflow green despite the indeterminate
+    // state. Codex round-59 P2.
+    if (hasIndeterminate) {
+      const count = diffData?.indeterminate?.length ?? 0;
+      core.setFailed(
+        `Diff INDETERMINATE for ${count} component(s) — base CEM unavailable. Treating as quality-gate failure (silence is not safety).`,
+      );
       return;
     }
 

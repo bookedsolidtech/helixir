@@ -172,7 +172,12 @@ export async function auditComponentWithCodex(
   //      `..` AFTER an existing ancestor (the ancestor walk already
   //      resolved the parent traversal that exists on disk).
   const tail = requestedAuditsRoot.slice(ancestor.length);
-  const tailSegments = tail.split(sep).filter((s) => s !== '');
+  // Split on BOTH `/` and `\` to catch traversal segments that use the
+  // non-native separator. On Windows, `mkdirSync` follows forward
+  // slashes as real separators, so a tail like `/missing/../../tmp/x`
+  // would otherwise stay as one un-tokenized segment and let `..`
+  // escape via `mkdirSync`. Codex round-59 P1.
+  const tailSegments = tail.split(/[\\/]/).filter((s) => s !== '');
   if (tailSegments.includes('..')) {
     throw new MCPError(
       `auditsRoot contains parent-traversal segments after missing ancestor: "${auditsRootRaw}"`,

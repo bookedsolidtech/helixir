@@ -165,22 +165,30 @@ export async function main(): Promise<void> {
   const resolvedProjectRoot = resolve(config.projectRoot);
   const cemAbsPath = resolve(resolvedProjectRoot, config.cemPath);
 
-  // Containment check on cemPath:
-  //   - Bypass ONLY when MCP_WC_CEM_PATH is set to an ABSOLUTE path.
-  //     The env var is a documented escape hatch for editor/CI setups
-  //     that point at a shared/fixture CEM. Absolute = explicit user
-  //     intent, no path-traversal exposure.
-  //   - Relative env-var values (e.g. `../shared/cem.json`) and
-  //     config-file values are still subject to containment — those
-  //     ARE traversal vectors.
-  //   - Trade-off: out-of-tree CEMs degrade git-backed tools (diffCem,
-  //     getHealthDiff) silently because gitShow rejects absolute paths.
-  //     Documented in CONTRIBUTING.md.
+  // Containment check on cemPath. Bypass paths (any of which is enough):
+  //   - MCP_WC_CEM_PATH is set to an ABSOLUTE path. Documented escape hatch
+  //     for editor/CI setups that point at a shared/fixture CEM. Absolute
+  //     = explicit user intent, no path-traversal exposure.
+  //   - MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1 was set AND the absolute
+  //     cemPath came through loadConfig's external-config opt-in
+  //     (config.ts §4a). Without this, sibling/vendored CEMs configured
+  //     through helixir.mcp.json are dropped at load time but the user
+  //     thinks they opted in successfully. Codex round-11 P1.
+  //
+  // Relative env-var values (e.g. `../shared/cem.json`) and unaccepted
+  // config-file values are still subject to containment — those ARE
+  // traversal vectors.
+  //
+  // Trade-off: out-of-tree CEMs degrade git-backed tools (diffCem,
+  // getHealthDiff) — both surface this with stderr warnings at call
+  // time so the user knows which features are degraded.
   const cemEnvOverride = process.env['MCP_WC_CEM_PATH'];
-  const envOptIn =
+  const envCemOptIn =
     cemEnvOverride !== undefined && cemEnvOverride !== '' && isAbsolute(cemEnvOverride);
+  const envConfigOptIn = process.env['MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS'] === '1';
   if (
-    !envOptIn &&
+    !envCemOptIn &&
+    !envConfigOptIn &&
     !cemAbsPath.startsWith(resolvedProjectRoot + sep) &&
     cemAbsPath !== resolvedProjectRoot
   ) {

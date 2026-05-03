@@ -112,24 +112,54 @@ export async function auditComponentWithCodex(
 
   const surface = extractContractSurface(decl);
   const surfaceHash = hashContractSurface(surface);
-  // Path containment via realpath canonicalization. Codex round-32
-  // P1 (initial guard) + round-37 P2 (accept in-repo absolute) +
-  // round-42 P1 (canonicalize symlinks). When auditsRoot doesn't
-  // exist yet (first run for a project), realpath the parent and
-  // verify the would-be path stays in-tree.
+  // Path containment via realpath canonicalization. Validate BEFORE
+  // any mkdir so an attacker can't trigger arbitrary directory
+  // creation outside the project even if the throw fires immediately
+  // after. Strategy: realpath the deepest existing ancestor of the
+  // requested path, then verify it stays in-tree. Only mkdir once
+  // the path is proven safe. Codex round-32 P1 / round-37 P2 /
+  // round-42 P1 / round-43 P1 (validation order).
   const { realpathSync, mkdirSync, existsSync: existsSyncFs } = await import('node:fs');
+  const { dirname } = await import('node:path');
   const projectAbs = realpathSync(resolve(config.projectRoot));
   const auditsRootRaw = options.auditsRoot ?? 'audits';
   const requestedAuditsRoot = isAbsolute(auditsRootRaw)
     ? auditsRootRaw
     : resolve(projectAbs, auditsRootRaw);
+
+  // Walk up to find the deepest existing ancestor; canonicalize it
+  // and verify both the ancestor AND the requested final path stay
+  // inside projectRoot. The final-path check protects against
+  // requested = projectAbs + "/../escape" where the existing ancestor
+  // is projectAbs but the requested path resolves outside.
+  let ancestor = requestedAuditsRoot;
+  while (!existsSyncFs(ancestor) && ancestor !== dirname(ancestor)) {
+    ancestor = dirname(ancestor);
+  }
+  const ancestorReal = realpathSync(ancestor);
+  // Requested path normalized (no realpath since it doesn't exist
+  // yet — but normalize via resolve to collapse `..` segments).
+  const requestedNormalized = resolve(requestedAuditsRoot);
+  const ancestorInProject =
+    ancestorReal === projectAbs || ancestorReal.startsWith(projectAbs + sep);
+  const requestedInProject =
+    requestedNormalized === projectAbs || requestedNormalized.startsWith(projectAbs + sep);
+  if (!ancestorInProject || !requestedInProject) {
+    throw new MCPError(
+      `auditsRoot escapes projectRoot: "${auditsRootRaw}" resolves to "${requestedNormalized}"`,
+      ErrorCategory.VALIDATION,
+    );
+  }
+  // Safe to create now.
   if (!existsSyncFs(requestedAuditsRoot)) {
     mkdirSync(requestedAuditsRoot, { recursive: true });
   }
   const auditsRoot = realpathSync(requestedAuditsRoot);
   if (auditsRoot !== projectAbs && !auditsRoot.startsWith(projectAbs + sep)) {
+    // Final defense: post-mkdir realpath in case a TOCTOU symlink
+    // appeared between validation and mkdir.
     throw new MCPError(
-      `auditsRoot escapes projectRoot: "${auditsRootRaw}" canonicalizes to "${auditsRoot}"`,
+      `auditsRoot escapes projectRoot post-mkdir: canonicalizes to "${auditsRoot}"`,
       ErrorCategory.VALIDATION,
     );
   }

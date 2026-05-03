@@ -490,7 +490,6 @@ function checkTouchTarget(
   // round-62 "intrinsic interactivity" framing (literal buttons
   // are buttons regardless).
 
-  const RULE_PATTERN = /([^{}]+)\{([^{}]*)\}/g;
   // Selector heuristic: accept literal interactive elements,
   // role/tabindex attribute selectors, :host, AND class-name
   // vocabulary that signals interactivity (`.button`, `.btn`,
@@ -581,11 +580,14 @@ function checkTouchTarget(
     /::(before|after|placeholder|marker|backdrop|selection|first-line|first-letter)|::part\([^)]*(icon|indicator|chevron|caret|spinner|backdrop)[^)]*\)|\[aria-hidden\b|(?:^|[\s,>+~.])(icon|chevron|caret|spinner|indicator|decoration|ornament|backdrop|overlay|glyph|swatch|dot|pip|bullet|sparkline|sigil|badge-dot)(?:[\s,.:[{]|$)/i;
   const SIZE_RULE = /\b(min-width|min-height|width|height)\s*:\s*([\d.]+)(px|rem)\b/g;
 
+  // Flatten nested CSS into (resolved_selector, body) pairs so the
+  // size-rule scan reaches rules at every nesting depth. Without
+  // this, `button { &.star { width: 1.5rem } }` was processed as
+  // outer-block-only, dropping the inner rule entirely. Codex
+  // round-65 P2.
+  const flatRules = flattenNestedCss(styles);
   const undersized: string[] = [];
-  let m: RegExpExecArray | null;
-  while ((m = RULE_PATTERN.exec(styles)) !== null) {
-    const selector = m[1] ?? '';
-    const body = m[2] ?? '';
+  for (const { selector, body } of flatRules) {
     if (selector.trim().startsWith('@')) continue;
     // Per-arm decorative check: `button, .icon { ... }` should still
     // fire on `button`. Split the selector list by comma and skip
@@ -626,6 +628,9 @@ function checkTouchTarget(
       HOST_SELECTOR.test(selector) && (parentIsInteractive || subclassHasStrongInteractive);
     const matchesClass = parentIsInteractive && WEAK_INTERACTIVE_CLASS.test(selector);
     if (!matchesStrong && !matchesHost && !matchesClass) continue;
+    // Reset stateful /g regex between bodies so a partial match in
+    // one body doesn't skip matches in the next.
+    SIZE_RULE.lastIndex = 0;
     let s: RegExpExecArray | null;
     while ((s = SIZE_RULE.exec(body)) !== null) {
       const value = parseFloat(s[2] ?? '0');
@@ -654,4 +659,106 @@ function checkTouchTarget(
       line: null,
     },
   ];
+}
+
+// ─── CSS nesting flattener ──────────────────────────────────────────────────
+
+/**
+ * Parse CSS source (with possible nesting) and emit one entry per
+ * leaf rule with its resolved selector chain. Comments are stripped.
+ *
+ * For input like `button { color: red; &.star { width: 1.5rem } }`
+ * this produces:
+ *   - { selector: 'button', body: 'color: red;' }
+ *   - { selector: 'button.star', body: 'width: 1.5rem' }
+ *
+ * The `&` substitution handles the common nesting pattern; without
+ * `&`, the child selector is descendant-joined to the parent (CSS
+ * nesting spec semantics, simplified).
+ *
+ * Codex round-65 P2: the prior regex-only RULE_PATTERN missed nested
+ * rules entirely, so subclass styles using CSS nesting bypassed the
+ * touch-target audit.
+ */
+function flattenNestedCss(css: string): Array<{ selector: string; body: string }> {
+  const text = css.replace(/\/\*[\s\S]*?\*\//g, '');
+  const out: Array<{ selector: string; body: string }> = [];
+
+  const parseBlock = (input: string, parentSel: string): void => {
+    let i = 0;
+    while (i < input.length) {
+      while (i < input.length && /\s/.test(input[i] ?? '')) i++;
+      if (i >= input.length) break;
+      // Find next `{` or `;` at this depth.
+      let j = i;
+      let depth = 0;
+      while (j < input.length) {
+        const ch = input[j];
+        if (depth === 0 && ch === '{') break;
+        if (depth === 0 && ch === ';') break;
+        if (depth === 0 && ch === '}') break;
+        if (ch === '{') depth++;
+        else if (ch === '}') depth--;
+        j++;
+      }
+      if (j >= input.length) break;
+      if (input[j] === '{') {
+        const childSel = input.slice(i, j).trim();
+        // Find matching `}`.
+        let k = j + 1;
+        let bDepth = 1;
+        while (k < input.length && bDepth > 0) {
+          if (input[k] === '{') bDepth++;
+          else if (input[k] === '}') bDepth--;
+          if (bDepth === 0) break;
+          k++;
+        }
+        const inner = input.slice(j + 1, k);
+        const resolved = resolveNestedSelector(parentSel, childSel);
+        // Extract THIS level's declarations (non-nested portion of inner).
+        // Walk inner, collecting only depth-0 chars.
+        let declOnly = '';
+        let d = 0;
+        for (let p = 0; p < inner.length; p++) {
+          const c = inner[p];
+          if (c === '{') d++;
+          else if (c === '}') d--;
+          else if (d === 0) declOnly += c;
+        }
+        if (declOnly.trim() !== '') out.push({ selector: resolved, body: declOnly });
+        // Recurse into nested children with the resolved selector as new parent.
+        parseBlock(inner, resolved);
+        i = k + 1;
+      } else {
+        // declaration at top level (orphan); skip past `;` or `}`.
+        i = j + 1;
+      }
+    }
+  };
+
+  parseBlock(text, '');
+  return out;
+}
+
+function resolveNestedSelector(parent: string, child: string): string {
+  if (parent === '') return child;
+  const childArms = child
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const parentArms = parent
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const out: string[] = [];
+  for (const ca of childArms) {
+    for (const pa of parentArms) {
+      if (ca.includes('&')) {
+        out.push(ca.replace(/&/g, pa));
+      } else {
+        out.push(`${pa} ${ca}`);
+      }
+    }
+  }
+  return out.join(', ');
 }

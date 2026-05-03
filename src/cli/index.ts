@@ -245,21 +245,26 @@ async function cmdDiff(args: string[], opts: CliOptions): Promise<void> {
       .filter((r) => r.diff.baseUnavailable === true);
 
     if (opts.format === 'json') {
-      // Codex round-56 P1: include both breaking changes AND
-      // indeterminate components so JSON consumers can distinguish
-      // a clean scan ([] / { indeterminate: [] }) from an
-      // unscannable one. Previously only `allBreaking` was emitted
-      // and indeterminate components vanished from the JSON output.
-      output(
-        {
-          breaking: allBreaking,
-          indeterminate: indeterminate.map((r) => ({
-            tag: r.tag,
-            baseUnavailableReason: r.diff.baseUnavailableReason ?? null,
-          })),
-        },
-        'json',
-      );
+      // Backward-compat shape: stdout stays the legacy top-level
+      // array of breaking changes (round 65 P2 — third-party CI
+      // scripts deserialize this as an array). Indeterminate
+      // components are surfaced via a SEPARATE stderr JSON line so
+      // round 56's "indeterminate not silently dropped" requirement
+      // is still met without breaking existing array consumers.
+      // The github-action reads both via runCli which captures
+      // stderr, and the CI exit code is still 2 when indeterminate
+      // is non-empty.
+      output(allBreaking, 'json');
+      if (indeterminate.length > 0) {
+        process.stderr.write(
+          JSON.stringify({
+            indeterminate: indeterminate.map((r) => ({
+              tag: r.tag,
+              baseUnavailableReason: r.diff.baseUnavailableReason ?? null,
+            })),
+          }) + '\n',
+        );
+      }
     } else if (allBreaking.length === 0 && indeterminate.length === 0) {
       process.stdout.write('No breaking changes detected.\n');
     } else if (allBreaking.length === 0 && indeterminate.length > 0) {

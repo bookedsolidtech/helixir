@@ -57,7 +57,7 @@ function getBooleanInput(name: string, fallback = false): boolean {
 async function runCli(
   args: string[],
   silent = false,
-): Promise<{ stdout: string; exitCode: number }> {
+): Promise<{ stdout: string; stderr: string; exitCode: number }> {
   let stdout = '';
   let stderr = '';
 
@@ -78,7 +78,7 @@ async function runCli(
     core.debug(`helixir stderr: ${stderr}`);
   }
 
-  return { stdout, exitCode };
+  return { stdout, stderr, exitCode };
 }
 
 function parseJsonSafe<T>(raw: string): T | null {
@@ -258,7 +258,7 @@ async function run(): Promise<void> {
       if (!baseRef) {
         core.warning('GITHUB_BASE_REF not set — skipping breaking-changes check');
       } else {
-        const { stdout, exitCode } = await runCli(
+        const { stdout, stderr, exitCode } = await runCli(
           ['diff', '--base', baseRef, '--ci', '--format', 'json', ...baseArgs],
           true,
         );
@@ -266,7 +266,24 @@ async function run(): Promise<void> {
         // Parse JSON regardless of exit code. The CLI emits structured
         // JSON on both code 0 (clean) AND code 2 (breaking changes OR
         // indeterminate diffs). Codex round-58 P1.
+        // Per round-65 P2 the CLI stdout is a TOP-LEVEL ARRAY of
+        // breaking changes (legacy shape, preserved for third-party
+        // CI scripts). Indeterminate components arrive as a separate
+        // JSON line on stderr: `{"indeterminate":[{tag,baseUnavailableReason}]}`.
         diffParseFailed = false;
+        let parsedIndeterminate: Array<{ tag: string; baseUnavailableReason: string | null }> = [];
+        // Pull indeterminate from stderr if present (one JSON line).
+        if (stderr) {
+          for (const line of stderr.split(/\r?\n/)) {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith('{')) continue;
+            const meta = parseJsonSafe<{ indeterminate?: typeof parsedIndeterminate }>(trimmed);
+            if (meta?.indeterminate) {
+              parsedIndeterminate = meta.indeterminate;
+              break;
+            }
+          }
+        }
         if (stdout) {
           const parsed = parseJsonSafe<unknown>(stdout);
           if (parsed === null) {
@@ -275,20 +292,25 @@ async function run(): Promise<void> {
               `Could not parse diff output as JSON (exit code ${exitCode}). Treating as failure to avoid silent pass.`,
             );
           } else if (Array.isArray(parsed)) {
-            // Legacy CLI shape (helixir-version pinned to older
-            // releases): top-level array of breaking changes. Normalize
-            // into the current { breaking, indeterminate } object so
-            // downstream pass/fail logic doesn't read it as "no
-            // breaking changes". Codex round-63 P1.
+            // Current CLI shape AND legacy shape: top-level array of
+            // breaking changes. Normalize into the action's DiffOutput
+            // (round 63 P1 / round 65 P2).
             diffData = {
               breaking: parsed as BreakingChange[],
               minor: [],
               added: [],
               removed: [],
-              indeterminate: [],
+              indeterminate: parsedIndeterminate,
             };
           } else if (typeof parsed === 'object') {
-            diffData = parsed as DiffOutput;
+            // Forward-compat: a future CLI version that emits the
+            // object shape on stdout. Merge stderr-side indeterminate
+            // if stdout didn't include it.
+            const obj = parsed as DiffOutput;
+            diffData = {
+              ...obj,
+              indeterminate: obj.indeterminate ?? parsedIndeterminate,
+            };
           } else {
             diffParseFailed = true;
             core.warning(

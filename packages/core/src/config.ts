@@ -172,17 +172,15 @@ function rebaseRelativePaths(
         dropped.add(field);
       } else {
         rebased[field] = absolute;
-        // Mark provenance: this absolute cemPath came from the
-        // external-config opt-in path. The MCP server's startup
-        // containment check uses this to decide whether to allow
-        // the out-of-tree path. Without this flag, the startup
-        // check could be tricked by a relative MCP_WC_CEM_PATH
-        // override or a fallback-to-in-repo discovery path that
-        // happened to be evaluated while the opt-in env was set.
-        // Codex round-14 P1.
-        if (field === 'cemPath') {
-          rebased['cemPathFromExternalConfig'] = true;
-        }
+        // Provenance flag (cemPathFromExternalConfig) is NOT stamped
+        // here — the surrounding JSON object gets stripped of unknown
+        // keys downstream in loadConfig (round-15 anti-forgery fix),
+        // so anything we set here would be wiped before reaching the
+        // MCP server. The flag is stamped on the final config object
+        // in loadConfig after the JSON strip + Object.assign, where
+        // we can reliably detect the same conditions and the value
+        // is no longer at risk of forgery from user JSON.
+        // Codex round-18 P1.
       }
       continue;
     }
@@ -302,6 +300,30 @@ export function loadConfig(): Readonly<McpWcConfig> {
   // bypass the startup containment check. Codex round-15 P1.
   delete (safeFileConfig as Record<string, unknown>)['cemPathFromExternalConfig'];
   Object.assign(config, safeFileConfig);
+
+  // Stamp the external-config provenance flag now that the JSON has
+  // been merged + stripped. We re-derive the conditions here from
+  // ground truth (env vars and resolved cemPath), so:
+  //   - User-supplied JSON cannot forge it (the strip above).
+  //   - The flag reflects the actual loader path that ran.
+  // Pre-condition: the file config came from an external
+  // MCP_WC_CONFIG_PATH (configSourceDir is outside projectRoot), the
+  // user opted in, AND the file config supplied an absolute cemPath
+  // that was preserved out-of-tree. Codex round-18 P1.
+  if (
+    fileCemPath !== undefined &&
+    process.env['MCP_WC_CONFIG_PATH'] !== undefined &&
+    process.env['MCP_WC_CONFIG_PATH'] !== '' &&
+    process.env['MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS'] === '1' &&
+    typeof config.cemPath === 'string' &&
+    isAbsolute(config.cemPath)
+  ) {
+    const projectRootResolved = resolve(effectiveRoot);
+    const rel = relative(projectRootResolved, config.cemPath);
+    if (rel.startsWith('..') || isAbsolute(rel)) {
+      (config as Record<string, unknown>)['cemPathFromExternalConfig'] = true;
+    }
+  }
 
   // Apply validated scoring config (weights must be positive numbers)
   if (rawScoringFromFile !== undefined) {

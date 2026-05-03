@@ -466,6 +466,29 @@ function checkTouchTarget(
       ['onclick', 'onkeydown', 'onkeyup', 'onfocus', 'onblur'].includes(m.name.toLowerCase()),
     );
 
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🛑 PINNED PER RUNBOOK §6 STEP 3 — GATE ON PARENT-INTERACTIVITY
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Round flip log on touch-target gating:
+  //   R34: bare :host on icons too broad
+  //   R37: tightened to interactive selectors only
+  //   R40: bare :host IS the click target
+  //   R45: re-gated on parent interactivity
+  //   R48: split into tiered selectors with strong-tier always-fired
+  //   R49: :host promoted to strong (always fires)
+  //   R53: false positives on decorative subclasses; demote
+  //   R55: even strong-interactive selectors should be gated —
+  //         "no parent touch-target contract to preserve" when
+  //         parent isn't interactive
+  //
+  // Final pin: this audit's PURPOSE is verifying subclass
+  // preservation of PARENT contract. If parent has no touch-target
+  // contract (non-interactive), there's nothing to preserve — gate
+  // the entire check on parentIsInteractive. Round 49's "sparse
+  // CEM" concern is an upstream CEM-completeness gap, not this
+  // audit's problem.
+  if (!parentIsInteractive) return [];
+
   const RULE_PATTERN = /([^{}]+)\{([^{}]*)\}/g;
   // Selector heuristic: accept literal interactive elements,
   // role/tabindex attribute selectors, :host, AND class-name

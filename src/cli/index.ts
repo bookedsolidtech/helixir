@@ -240,11 +240,24 @@ async function cmdDiff(args: string[], opts: CliOptions): Promise<void> {
     const allBreaking = results.flatMap((r, i) =>
       r.breaking.map((b) => ({ tag: tags[i] as string, change: b })),
     );
+    const indeterminate = results
+      .map((r, i) => ({ tag: tags[i] as string, diff: r }))
+      .filter((r) => r.diff.baseUnavailable === true);
 
     if (opts.format === 'json') {
       output(allBreaking, 'json');
-    } else if (allBreaking.length === 0) {
+    } else if (allBreaking.length === 0 && indeterminate.length === 0) {
       process.stdout.write('No breaking changes detected.\n');
+    } else if (allBreaking.length === 0 && indeterminate.length > 0) {
+      // Surface the indeterminate state — the diff couldn't be
+      // computed for these components, so silence is NOT safety.
+      // Codex round-55 P2.
+      process.stdout.write(
+        `Diff INDETERMINATE for ${indeterminate.length} component(s) — base CEM unavailable. Treat as not-yet-checked, not as clean.\n`,
+      );
+      for (const { tag: t, diff } of indeterminate) {
+        process.stdout.write(`  • ${t}: ${diff.baseUnavailableReason ?? '<no reason>'}\n`);
+      }
     } else {
       output(
         null,
@@ -254,9 +267,16 @@ async function cmdDiff(args: string[], opts: CliOptions): Promise<void> {
           allBreaking.map((r) => [r.tag, r.change]),
         ),
       );
+      if (indeterminate.length > 0) {
+        process.stdout.write(
+          `\nAdditionally, ${indeterminate.length} component(s) returned INDETERMINATE diffs (base CEM unavailable).\n`,
+        );
+      }
     }
 
-    if (opts.ci && allBreaking.length > 0) {
+    // CI-fail when ANY breaking change OR any indeterminate diff —
+    // an indeterminate state is not safe to merge through.
+    if (opts.ci && (allBreaking.length > 0 || indeterminate.length > 0)) {
       process.exit(2);
     }
     return;
@@ -266,6 +286,14 @@ async function cmdDiff(args: string[], opts: CliOptions): Promise<void> {
 
   if (opts.format === 'json') {
     output(diff, 'json');
+  } else if (diff.baseUnavailable === true) {
+    // Codex round-55 P2: indeterminate is distinct from clean.
+    process.stdout.write(
+      `Diff INDETERMINATE for <${tag}> vs ${opts.base} — base CEM unavailable.\n`,
+    );
+    if (diff.baseUnavailableReason !== undefined && diff.baseUnavailableReason !== '') {
+      process.stdout.write(`Reason: ${diff.baseUnavailableReason}\n`);
+    }
   } else if (diff.breaking.length === 0 && diff.additions.length === 0) {
     process.stdout.write(`No changes detected for <${tag}> vs ${opts.base}.\n`);
   } else {
@@ -276,7 +304,8 @@ async function cmdDiff(args: string[], opts: CliOptions): Promise<void> {
     output(null, opts.format, formatTable(['Type', 'Change'], rows));
   }
 
-  if (opts.ci && diff.breaking.length > 0) {
+  // CI-fail on breaking changes OR an indeterminate diff.
+  if (opts.ci && (diff.breaking.length > 0 || diff.baseUnavailable === true)) {
     process.exit(2);
   }
 }

@@ -527,20 +527,44 @@ export async function diffCem(
   //     and continue with baseMeta = null (component looks new in base)
   // Consumers that need stronger semantics should switch to the
   // M2-strict-mode follow-up flag.
+  // Relativize cemPath for gitShow. Two layers:
+  //   1. Repo root (git rev-parse --show-toplevel) is the canonical
+  //      base. In monorepo setups projectRoot is a subpackage and
+  //      relativizing against it produces the wrong path. Codex
+  //      round-23 P2.
+  //   2. Fall back to projectRoot if not in a git repo.
+  // Genuinely out-of-tree (relative to repo root) → best-effort + warn.
   let cemPathForGit = config.cemPath;
-  if (isAbsolute(config.cemPath)) {
-    const projectRootResolved = resolve(config.projectRoot);
-    const rel = relative(projectRootResolved, config.cemPath);
-    if (rel === '' || rel.startsWith('..') || isAbsolute(rel)) {
-      // Genuinely out-of-tree.
-      const redactedPath = config.cemPath.split(/[\\/]/).pop() ?? '<absolute>';
-      process.stderr.write(
-        `[helixir] Warning: diffCem cannot read base-branch CEM at out-of-tree absolute path (basename: ${redactedPath}); gitShow requires repo-relative paths. Diff will treat ${tagName} as new in base. (To restore diff: unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.)\n`,
-      );
-      cemPathForGit = '';
-    } else {
-      cemPathForGit = rel.split(sep).join('/');
+  // Wrap in try/catch so older injected mocks without getRepoRoot still
+  // work — they fall through to the projectRoot fallback. Real
+  // GitOperations always provides the method.
+  let repoRoot: string | null = null;
+  try {
+    if (typeof gitOps.getRepoRoot === 'function') {
+      repoRoot = await gitOps.getRepoRoot();
     }
+  } catch {
+    repoRoot = null;
+  }
+  const relativizationBase = repoRoot ?? resolve(config.projectRoot);
+  const cemAbsForRel = isAbsolute(config.cemPath)
+    ? config.cemPath
+    : resolve(config.projectRoot, config.cemPath);
+  const relFromRepo = relative(relativizationBase, cemAbsForRel);
+  if (relFromRepo === '' || relFromRepo.startsWith('..') || isAbsolute(relFromRepo)) {
+    // Genuinely out-of-tree relative to the repo root.
+    const redactedPath = cemAbsForRel.split(/[\\/]/).pop() ?? '<absolute>';
+    process.stderr.write(
+      `[helixir] Warning: diffCem cannot read base-branch CEM at out-of-tree absolute path (basename: ${redactedPath}); gitShow requires repo-relative paths. Diff will treat ${tagName} as new in base. (To restore diff: unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.)\n`,
+    );
+    cemPathForGit = '';
+  } else if (isAbsolute(config.cemPath)) {
+    // Absolute in-repo: convert to repo-root-relative POSIX form.
+    cemPathForGit = relFromRepo.split(sep).join('/');
+  } else {
+    // Relative path from config — also rebase against repo root in case
+    // projectRoot is a subpackage of the repo.
+    cemPathForGit = relFromRepo.split(sep).join('/');
   }
 
   if (cemPathForGit !== '') {

@@ -540,16 +540,31 @@ export async function getHealthDiff(
   //   2. Out-of-tree (MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS opt-in): degrade
   //      with warning + synthetic 0/F base.
   // Codex round-10 P1 (initial guard), round-16 P1 (in-repo case).
+  // Relativize cemPath against the GIT REPO ROOT (gitShow's expected
+  // base), not projectRoot — they differ in monorepo workspace setups.
+  // Codex round-23 P2.
   let cemPathForGit = config.cemPath;
   let outOfTree = false;
-  if (isAbsolute(config.cemPath)) {
-    const projectRootResolved = resolve(config.projectRoot);
-    const rel = relative(projectRootResolved, config.cemPath);
-    if (rel === '' || rel.startsWith('..') || isAbsolute(rel)) {
-      outOfTree = true;
-    } else {
-      cemPathForGit = rel.split(sep).join('/');
+  // Wrap in try/catch so older injected mocks without getRepoRoot still
+  // work — they fall through to the projectRoot fallback. Real
+  // GitOperations always provides the method.
+  let repoRoot: string | null = null;
+  try {
+    if (typeof git.getRepoRoot === 'function') {
+      repoRoot = await git.getRepoRoot();
     }
+  } catch {
+    repoRoot = null;
+  }
+  const relativizationBase = repoRoot ?? resolve(config.projectRoot);
+  const cemAbsForRel = isAbsolute(config.cemPath)
+    ? config.cemPath
+    : resolve(config.projectRoot, config.cemPath);
+  const relFromRepo = relative(relativizationBase, cemAbsForRel);
+  if (relFromRepo === '' || relFromRepo.startsWith('..') || isAbsolute(relFromRepo)) {
+    outOfTree = true;
+  } else {
+    cemPathForGit = relFromRepo.split(sep).join('/');
   }
   if (outOfTree) {
     // Pinned position per runbook §6 step 3 (see diffCem in cem.ts for

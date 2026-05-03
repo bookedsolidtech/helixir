@@ -642,17 +642,46 @@ function checkTouchTarget(
   }
   if (undersized.length === 0) return [];
 
+  // Two finding shapes depending on whether parent has a touch-target
+  // contract: claim the contract is being violated when parent IS
+  // interactive; claim only the WCAG minimum is violated otherwise.
+  // Codex round-70 P1 — round 62's strong-tier-always-fires fix
+  // produced false-positive language ("parent guarantees 44px") on
+  // non-interactive parents that have no such guarantee.
+  if (parentIsInteractive) {
+    return [
+      {
+        severity: 'P1',
+        classId: '07-touch-target-undersized',
+        title: `Subclass shrinks touch target below 44 px`,
+        body: [
+          `Parent \`${parent.tagName}\` likely guarantees a 44 px touch target via \`--hx-touch-target-min\` (commit acc56e6a7). Subclass styles include sub-44 px size rules: ${undersized.join('; ')}.`,
+          '',
+          `WCAG 2.5.8 (Level AA) requires interactive targets to be at least 44×44 px. Shrinking with \`width: 1.5rem\` or similar overrides the parent's min-size guarantee and fails the audit.`,
+          '',
+          `Fix: keep the visual element at any size you like, but expand the click/touch surface to 44 px via padding or an absolutely-positioned ::before pseudo-element. Or use \`min-width: var(--hx-touch-target-min, 2.75rem)\` to inherit the parent's floor.`,
+        ].join('\n'),
+        file: null,
+        line: null,
+      },
+    ];
+  }
+  // Non-interactive parent — strong-tier intrinsic-interactivity hits
+  // (literal `button` / `[role=button]`). Demote to P2 advisory and
+  // describe accurately: there's no parent contract to violate, but
+  // the rendered element IS sub-44px and fails WCAG 2.5.8 in its
+  // own right.
   return [
     {
-      severity: 'P1',
+      severity: 'P2',
       classId: '07-touch-target-undersized',
-      title: `Subclass shrinks touch target below 44 px`,
+      title: `Subclass styles include sub-44 px interactive element`,
       body: [
-        `Parent \`${parent.tagName}\` likely guarantees a 44 px touch target via \`--hx-touch-target-min\` (commit acc56e6a7). Subclass styles include sub-44 px size rules: ${undersized.join('; ')}.`,
+        `Parent \`${parent.tagName}\` does not expose touch-target metadata in its CEM (no events / role / tabindex / form-association), but the subclass styles intrinsically-interactive elements at sub-44 px sizes: ${undersized.join('; ')}.`,
         '',
-        `WCAG 2.5.8 (Level AA) requires interactive targets to be at least 44×44 px. Shrinking with \`width: 1.5rem\` or similar overrides the parent's min-size guarantee and fails the audit.`,
+        `WCAG 2.5.8 (Level AA) requires interactive targets ≥ 44×44 px regardless of parent contract. The element is intrinsically interactive (button / input / [role=...] / [tabindex]) so the floor applies.`,
         '',
-        `Fix: keep the visual element at any size you like, but expand the click/touch surface to 44 px via padding or an absolutely-positioned ::before pseudo-element. Or use \`min-width: var(--hx-touch-target-min, 2.75rem)\` to inherit the parent's floor.`,
+        `Fix: expand the click/touch surface to 44 px via padding, an ::before pseudo-element, or \`min-width: 2.75rem\`. If the element should NOT be interactive, use a different tag.`,
       ].join('\n'),
       file: null,
       line: null,
@@ -724,20 +753,39 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
         // for parentSel before recursing into any further nested rules.
         // Codex round-66 P2 / round-67 P2.
         if (childSel.startsWith('@')) {
-          // At-rules are CONDITIONAL. ALL contents — direct
-          // declarations AND nested rules — only apply when the
-          // condition matches (`@media print`, `@media (pointer:
-          // coarse)`, `@container`, `@supports`). Treating them as
-          // unconditional produces false-positive audit findings on
-          // print-only / pointer-only / container-scoped styles.
-          // Codex round-67/68/69 P2 — prior attempts emitted contents
-          // unconditionally; the safe choice is to skip the whole
-          // at-rule block. Cost: false negatives on
-          // shrinking-only-under-coarse-pointer cases (genuine touch
-          // regressions). Trade favors false-negative over false-
-          // positive — surface the unconditional cases first; address
-          // conditional touch-target scoping in a separate pass when
-          // we can interpret the at-rule predicate.
+          // At-rules split into conditional vs unconditional buckets.
+          //   - Conditional (skip contents — applies only when
+          //     condition matches; flagging would false-positive):
+          //       @media, @supports, @container
+          //   - Unconditional (recurse with same parent — contents
+          //     always apply):
+          //       @layer, @scope, @starting-style, @page
+          //   - Special-case (skip — contents aren't selectors):
+          //       @keyframes, @font-face, @counter-style, @property
+          // Codex round-66/67/68/69/70 P2 — round 70 specifically
+          // called out @layer because skipping it hid real
+          // touch-target regressions inside cascade-layer wrappers.
+          const atName = childSel.match(/@([a-zA-Z-]+)/)?.[1]?.toLowerCase() ?? '';
+          const isConditional =
+            atName === 'media' ||
+            atName === 'supports' ||
+            atName === 'container' ||
+            atName === 'document';
+          const isSelectorless =
+            atName === 'keyframes' ||
+            atName === 'font-face' ||
+            atName === 'counter-style' ||
+            atName === 'property' ||
+            atName === 'font-feature-values' ||
+            atName === 'font-palette-values';
+          if (isConditional || isSelectorless) {
+            i = k + 1;
+            continue;
+          }
+          // Unconditional wrapper (@layer, @scope, etc.) — recurse
+          // into contents with the SAME parent selector so inner
+          // rules still surface their real selectors.
+          parseBlock(inner, parentSel);
           i = k + 1;
           continue;
         }

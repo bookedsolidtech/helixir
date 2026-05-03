@@ -87,6 +87,12 @@ const CemDeclarationSchema = z.object({
   references: z.array(CemReferenceSchema).optional(),
   packageName: z.string().optional(),
   jsdocTags: z.array(CemJsdocTagSchema).optional(),
+  // Form-associated custom element flag. Standard CEM extension field —
+  // tools that emit this carry the `static formAssociated = true` from
+  // source, which defect-corpus class 10 uses to detect inheritance
+  // regressions. Codex round-27 P2 (M3-M6 local preview): without
+  // schema entry, Zod was stripping the field from real CEM input.
+  formAssociated: z.boolean().optional(),
 });
 
 const CemModuleSchema = z.object({

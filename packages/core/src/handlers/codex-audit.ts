@@ -125,6 +125,16 @@ export async function auditComponentWithCodex(
   const runner = options.runCodex ?? defaultCodexRunner;
   const codexResult = await runner({ tagName, surface, prompt });
 
+  // Detect fallback runs (codex CLI missing or output unparseable).
+  // The fallback emits a single P3 finding with `classId: null` and
+  // `title` starting with "Codex audit unavailable". Skip the cache
+  // write for these so a later real codex run isn't blocked by the
+  // poisoned-cache hit. Codex round-27 P2.
+  const isFallback =
+    codexResult.findings.length === 1 &&
+    codexResult.findings[0]?.classId === null &&
+    /^Codex audit unavailable/.test(codexResult.findings[0]?.title ?? '');
+
   const entry: AuditEntry = {
     schemaVersion: 1,
     tagName,
@@ -132,11 +142,17 @@ export async function auditComponentWithCodex(
     generatedAt: new Date().toISOString(),
     verdict: codexResult.verdict,
     findings: codexResult.findings,
-    source: 'codex',
+    source: isFallback ? 'manual' : 'codex',
     ...(codexResult.reviewText !== undefined ? { reviewText: codexResult.reviewText } : {}),
   };
 
-  writeAudit(auditsRoot, entry);
+  // Only write to the cache for real audits — fallbacks return the
+  // result inline so consumers see the warning, but the next call
+  // (after codex install) gets a fresh attempt instead of hitting
+  // the poisoned cache.
+  if (!isFallback) {
+    writeAudit(auditsRoot, entry);
+  }
 
   return { entry, cacheHit: false };
 }

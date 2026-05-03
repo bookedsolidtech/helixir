@@ -197,13 +197,16 @@ export function extractContractSurface(decl: CemDeclaration): ContractSurface {
       .map((m) => m.name)
       .filter((n): n is string => Boolean(n))
       .sort(),
-    // formAssociated lives in jsdocTags or as a top-level flag; we
-    // surface whichever the CEM tool emits. Null = not declared.
+    // formAssociated: explicit CemSchema field (codex round-27 P2 added
+    // it to the schema so Zod stops stripping it) OR jsdocTag fallback.
+    // Use !== undefined (not ??) so a deliberate `false` is preserved
+    // instead of being overwritten by the JSDoc fallback.
     formAssociated:
-      (decl as { formAssociated?: boolean }).formAssociated ??
-      ((decl.jsdocTags ?? []).some((t) => (t.name ?? '').toLowerCase() === 'formassociated')
-        ? true
-        : null),
+      decl.formAssociated !== undefined
+        ? decl.formAssociated
+        : (decl.jsdocTags ?? []).some((t) => (t.name ?? '').toLowerCase() === 'formassociated')
+          ? true
+          : null,
     attributes,
     slots,
     cssParts,

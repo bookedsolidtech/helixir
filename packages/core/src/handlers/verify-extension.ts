@@ -112,13 +112,20 @@ function checkAriaWiring(parent: ContractSurface, subclass: ContractSurface): Au
     (a) => a.name === 'role' || a.name.startsWith('aria-'),
   );
   // Delta-only CEM: subclass declares no ARIA attrs of its own → assume
-  // it inherits the parent's. Only flag drops when the subclass has
-  // its own ARIA surface and is missing one the parent declared.
-  // Codex round-26 (M3-M6 local preview) P1.
+  // it inherits the parent's. Codex round-26 (M3-M6 local preview) P1.
   if (subclassAriaAttrs.length === 0) return [];
   const subclassAriaNames = new Set(subclassAriaAttrs.map((a) => a.name));
   const missing = parentAriaAttrs.filter((a) => !subclassAriaNames.has(a.name));
   if (missing.length === 0) return [];
+  // Codex round-27 P2: a partial ARIA delta (subclass adds ONE attr
+  // like aria-expanded while inheriting role/aria-controls) shouldn't
+  // be flagged as a drop. Only flag when the subclass declares MOST
+  // of the parent's ARIA surface (heuristic: ≥ half of parent attrs
+  // present in subclass), which signals "I intended to redeclare the
+  // ARIA contract but missed this one." A subclass with 1 ARIA attr
+  // out of parent's 4 is clearly extending, not redeclaring.
+  const declaredFromParent = parentAriaAttrs.filter((a) => subclassAriaNames.has(a.name)).length;
+  if (declaredFromParent < parentAriaAttrs.length / 2) return [];
   return [
     {
       severity: 'P1',
@@ -196,20 +203,29 @@ function checkEventContract(
     line: null,
   }));
 
-  // Source-level deepening: if we have the subclass code AND the
-  // subclass overrides a method that looks like a parent dispatch
-  // path, escalate to P1.
+  // Source-level deepening: escalate to P1 ONLY when the subclass
+  // actually overrides a method (which would shadow the parent's
+  // dispatch path) AND has no super call / dispatchEvent in the
+  // override. A subclass that adds unrelated methods or only changes
+  // styling shouldn't be flagged as suppressing inherited events —
+  // the parent's dispatch path runs unchanged. Codex round-27 P2.
   if (sources?.code !== undefined && missing.length > 0) {
     const code = sources.code;
+    // Override detection: any method definition that's not the
+    // constructor. Heuristic — class-syntax method (`name(...) {`)
+    // OR explicit class member with `=` arrow assignment.
+    const overridesMethod =
+      /(^|[\n;{}])\s*(?!constructor\b)[a-zA-Z_$][\w$]*\s*\([^)]*\)\s*\{/.test(code) ||
+      /(^|[\n;{}])\s*(?!constructor\b)[a-zA-Z_$][\w$]*\s*=\s*\(?[^)]*\)?\s*=>/.test(code);
     const hasSuperCall = /\bsuper\s*\.\s*[a-zA-Z_$][\w$]*\s*\(/.test(code);
     const dispatchesEvent = /\bdispatchEvent\s*\(/.test(code);
-    if (!hasSuperCall && !dispatchesEvent) {
+    if (overridesMethod && !hasSuperCall && !dispatchesEvent) {
       findings.push({
         severity: 'P1',
         classId: '11-event-contract-suppressed',
-        title: `Subclass overrides without super-call or dispatchEvent`,
+        title: `Subclass overrides method without super-call or dispatchEvent`,
         body: [
-          `Subclass \`${subclass.tagName}\` source contains no \`super.foo()\` calls and no \`dispatchEvent\`. Combined with missing event redeclaration in the CEM, this is the suppression pattern: subclass inherits the parent's reactive surface but silently never re-emits the events consumers depend on.`,
+          `Subclass \`${subclass.tagName}\` source overrides a method (shadowing the parent's dispatch path) but contains no \`super.foo()\` calls and no \`dispatchEvent\`. Combined with missing event redeclaration in the CEM, this is the suppression pattern: subclass inherits the parent's reactive surface but silently never re-emits the events consumers depend on.`,
           '',
           "Fix: in any subclass override that runs in the parent's dispatch path, either call `super.<method>(...)` to delegate, OR re-dispatch the event explicitly with `this.dispatchEvent(new CustomEvent('<event-name>', { detail }))`.",
         ].join('\n'),
@@ -281,7 +297,13 @@ function checkForcedColors(
 
   const styles = sources.styles;
   // Subclass overrides paint properties? (color, background, border-color, outline-color)
-  const overridesPaint = /\b(color|background|background-color|border|outline)\s*:/.test(styles);
+  // Codex round-27 P3: include border-color and outline-color
+  // explicitly. The shorthand-only check missed subclasses that
+  // override only the color component of border / outline.
+  const overridesPaint =
+    /\b(color|background|background-color|border|border-color|outline|outline-color)\s*:/.test(
+      styles,
+    );
   if (!overridesPaint) return [];
 
   const hasForcedColorsBlock = /@media\s*\(\s*forced-colors\s*:\s*active\s*\)/.test(styles);

@@ -773,16 +773,23 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
             atName === 'property' ||
             atName === 'font-feature-values' ||
             atName === 'font-palette-values';
-          if (isSelectorless) {
-            // @keyframes / @font-face / etc. — contents aren't selectors.
+          // @scope is predicate-bearing in a way @media isn't —
+          // `@scope (.toolbar) { button { ... } }` only applies when
+          // the button is inside .toolbar, which is structural rather
+          // than environmental. Flagging unconditionally would
+          // false-positive components never rendered under that
+          // scope. Treat as opaque (skip entirely). Codex round-78 P2.
+          const isStructurallyScoped = atName === 'scope';
+          if (isSelectorless || isStructurallyScoped) {
             i = k + 1;
             continue;
           }
           // ALL other at-rules (conditional @media/@supports/@container
-          // AND unconditional @layer/@scope/@page) are flattened
-          // symmetrically: extract direct decls back to parentSel and
-          // recurse into nested selector blocks. The at-rule predicate
-          // is dropped from the resolved selector chain.
+          // AND unconditional @layer/@page/@starting-style) are
+          // flattened symmetrically: extract direct decls back to
+          // parentSel and recurse into nested selector blocks. The
+          // at-rule predicate is dropped from the resolved selector
+          // chain.
           //
           // Round 76 P1: previously skipped conditional at-rule decls
           // dropped real responsive regressions like

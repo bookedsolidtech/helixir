@@ -282,10 +282,12 @@ export async function main(): Promise<void> {
     ...tsTools,
   ];
 
-  // Tell the catalog handler which tools exist (drives list_helixir_tools).
-  setCatalogedTools(coreTools);
-
   const allTools = [...coreTools, ...TOKEN_TOOL_DEFINITIONS];
+
+  // Tell the catalog handler about EVERY registered tool, not just
+  // coreTools — list_helixir_tools must agree with what ListTools
+  // advertises. Codex round-26 (M3-M6 local preview) P2.
+  setCatalogedTools(allTools);
 
   server.setRequestHandler(ListToolsRequestSchema, async () => {
     return { tools: allTools };

@@ -71,6 +71,12 @@ export function verifyExtension(input: VerifyExtensionInput): VerifyExtensionRes
 
 function checkSlotContract(parent: ContractSurface, subclass: ContractSurface): AuditFinding[] {
   if (parent.slots.length === 0) return [];
+  // CEM tools commonly emit only the subclass DELTA — when the subclass
+  // declares zero slots of its own, treat as "inherits everything"
+  // rather than "drops everything." Without this guard, every
+  // delta-only CEM triggers bogus P1s. Codex round-26 (M3-M6 local
+  // preview) P1: preserve absent-vs-inherited.
+  if (subclass.slots.length === 0) return [];
   const subclassSlotNames = new Set(subclass.slots.map((s) => s.name));
   const missing: string[] = [];
   for (const slot of parent.slots) {
@@ -102,11 +108,15 @@ function checkAriaWiring(parent: ContractSurface, subclass: ContractSurface): Au
     (a) => a.name === 'role' || a.name.startsWith('aria-'),
   );
   if (parentAriaAttrs.length === 0) return [];
-  const subclassAriaNames = new Set(
-    subclass.attributes
-      .filter((a) => a.name === 'role' || a.name.startsWith('aria-'))
-      .map((a) => a.name),
+  const subclassAriaAttrs = subclass.attributes.filter(
+    (a) => a.name === 'role' || a.name.startsWith('aria-'),
   );
+  // Delta-only CEM: subclass declares no ARIA attrs of its own → assume
+  // it inherits the parent's. Only flag drops when the subclass has
+  // its own ARIA surface and is missing one the parent declared.
+  // Codex round-26 (M3-M6 local preview) P1.
+  if (subclassAriaAttrs.length === 0) return [];
+  const subclassAriaNames = new Set(subclassAriaAttrs.map((a) => a.name));
   const missing = parentAriaAttrs.filter((a) => !subclassAriaNames.has(a.name));
   if (missing.length === 0) return [];
   return [
@@ -160,12 +170,18 @@ function checkEventContract(
   sources: VerifyExtensionInput['subclassSources'],
 ): AuditFinding[] {
   if (parent.events.length === 0) return [];
+  // Delta-only CEM: subclass declares no events of its own → assume
+  // it inherits the parent's surface. Don't flag P2 noise just for
+  // CEM emission style. The source-level escalation check still
+  // runs against the missing events when source is supplied.
+  // Codex round-26 (M3-M6 local preview) P1.
   const subclassEventNames = new Set(subclass.events.map((e) => e.name));
   const missing = parent.events.filter((e) => !subclassEventNames.has(e.name));
+  if (subclass.events.length === 0 && sources?.code === undefined) return [];
 
-  // CEM-level finding: subclass CEM doesn't redeclare parent event.
-  // Always P2 — could be intentional override.
-  const findings: AuditFinding[] = missing.map((e) => ({
+  // CEM-level finding: subclass CEM has its OWN events but doesn't
+  // redeclare a parent event. Always P2 — could be intentional override.
+  const findings: AuditFinding[] = (subclass.events.length === 0 ? [] : missing).map((e) => ({
     severity: 'P2',
     classId: '11-event-contract-suppressed',
     title: `Subclass does not redeclare parent event \`${e.name}\``,

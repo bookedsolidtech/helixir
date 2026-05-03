@@ -152,17 +152,29 @@ describe('verify_extension — 09-slot-contract-drift', () => {
 // ─── Defect class 05 — ARIA regression ─────────────────────────────────────
 
 describe('verify_extension — 05-aria-regression', () => {
-  it('flags subclass that drops parent ARIA attributes', () => {
+  it('flags subclass that declares its own ARIA but is missing one parent has', () => {
     const parent = listboxParent();
     const subclass = emptyDecl('my-select', {
-      // Drops both role and aria-selected
+      members: [
+        // Declares role but DROPS aria-selected.
+        { kind: 'field', name: 'role', type: { text: 'string' }, attribute: 'role' },
+      ],
     });
     const { findings } = verifyExtension({ parent, subclass });
     const aria = findings.find((f) => f.classId === '05-aria-regression');
     expect(aria).toBeDefined();
     expect(aria?.severity).toBe('P1');
-    expect(aria?.title).toContain('role');
     expect(aria?.title).toContain('aria-selected');
+  });
+
+  it('does not flag subclass that declares zero ARIA (delta-only CEM = inherits)', () => {
+    // Codex round-26 (M3-M6 local preview) P1 — pinned: subclass with
+    // ZERO ARIA attrs of its own is INHERITING parent's, not dropping
+    // them. CEM tools commonly emit only the subclass delta.
+    const parent = listboxParent();
+    const subclass = emptyDecl('my-select');
+    const { findings } = verifyExtension({ parent, subclass });
+    expect(findings.filter((f) => f.classId === '05-aria-regression')).toEqual([]);
   });
 
   it('passes when subclass preserves parent ARIA attributes', () => {
@@ -216,16 +228,29 @@ describe('verify_extension — 10-element-internals-dropped', () => {
 // ─── Defect class 11 — event contract suppressed ───────────────────────────
 
 describe('verify_extension — 11-event-contract-suppressed', () => {
-  it('flags P2 when subclass CEM omits parent event', () => {
+  it('flags P2 when subclass CEM declares its own events but omits parent event', () => {
     const parent = textInputFormParent();
     const subclass = emptyDecl('my-text-input', {
       formAssociated: true,
+      // Declares its own event surface — but doesn't redeclare hx-change.
+      events: [{ name: 'my-custom', type: { text: 'CustomEvent' }, description: '' }],
     } as unknown as Partial<CemDeclaration>);
     const { findings } = verifyExtension({ parent, subclass });
     const evt = findings.find((f) => f.classId === '11-event-contract-suppressed');
     expect(evt).toBeDefined();
     expect(evt?.severity).toBe('P2');
     expect(evt?.title).toContain('hx-change');
+  });
+
+  it('does not flag P2 when subclass declares zero events (delta-only CEM = inherits)', () => {
+    // Codex round-26 (M3-M6 local preview) P1 — pinned: subclass with
+    // zero events of its own is inheriting parent's, not suppressing.
+    const parent = textInputFormParent();
+    const subclass = emptyDecl('my-text-input', {
+      formAssociated: true,
+    } as unknown as Partial<CemDeclaration>);
+    const { findings } = verifyExtension({ parent, subclass });
+    expect(findings.filter((f) => f.classId === '11-event-contract-suppressed')).toEqual([]);
   });
 
   it('escalates to P1 when subclass source has no super or dispatchEvent', () => {

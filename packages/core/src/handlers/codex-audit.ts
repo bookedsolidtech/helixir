@@ -202,22 +202,70 @@ export function renderAuditPrompt(surface: ContractSurface): string {
 // ─── Default codex runner (shell-out) ───────────────────────────────────────
 
 /**
- * Default codex runner — shells out to `codex exec review --json`
- * (same invocation shape rea uses). Falls back to a clear error if
- * codex isn't available; consumers in non-codex environments should
- * inject their own runner.
+ * Default codex runner — shells out to `codex exec review --json` and
+ * pipes the prompt over stdin. Same invocation shape rea uses for the
+ * push-gate. When the codex CLI isn't on PATH or returns a non-zero
+ * exit, falls back to a `concerns`-verdict result with a single
+ * self-flagging finding so consumers get a usable cache entry instead
+ * of the entire MCP call erroring out.
  */
-const defaultCodexRunner: CodexRunner = async () => {
-  // Implementation note: shelling out to codex from a library handler
-  // requires careful argv handling and process management. Until rea's
-  // codex bridge is exported as a reusable module, callers in the M3
-  // surface MUST inject a runner. The default exists so the handler
-  // type-checks and so future wiring can land without API churn.
-  throw new MCPError(
-    'No codex runner provided. Pass `runCodex` in options or wait for the upcoming rea codex-bridge integration. See `audits/README.md` for setup.',
-    ErrorCategory.VALIDATION,
-  );
+const defaultCodexRunner: CodexRunner = async (input) => {
+  const { spawn } = await import('node:child_process');
+  return new Promise((resolveRun) => {
+    let stdout = '';
+    let stderr = '';
+    let proc: ReturnType<typeof spawn>;
+    try {
+      proc = spawn('codex', ['exec', 'review', '--json'], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        timeout: 30 * 60 * 1000,
+      });
+    } catch (err) {
+      resolveRun(fallbackResult(`codex CLI not available: ${String(err)}`));
+      return;
+    }
+    proc.on('error', (err) => {
+      resolveRun(fallbackResult(`codex CLI not available: ${String(err)}`));
+    });
+    proc.stdout?.on('data', (chunk: Buffer) => {
+      stdout += chunk.toString('utf-8');
+    });
+    proc.stderr?.on('data', (chunk: Buffer) => {
+      stderr += chunk.toString('utf-8');
+    });
+    proc.on('close', (code) => {
+      if (code !== 0) {
+        resolveRun(fallbackResult(`codex exit ${String(code)}: ${stderr.slice(0, 200)}`));
+        return;
+      }
+      try {
+        const parsed: unknown = JSON.parse(stdout);
+        resolveRun(parseCodexFindings(parsed));
+      } catch (err) {
+        resolveRun(fallbackResult(`codex output unparseable: ${String(err)}`));
+      }
+    });
+    proc.stdin?.write(input.prompt);
+    proc.stdin?.end();
+  });
 };
+
+function fallbackResult(reason: string): CodexRunnerOutput {
+  return {
+    verdict: 'concerns',
+    findings: [
+      {
+        severity: 'P3',
+        classId: null,
+        title: 'Codex audit unavailable — fallback result emitted',
+        body: `The default codex runner could not produce a verdict. Reason: ${reason}\n\nInstall the codex CLI (\`npm i -g @openai/codex\`) or inject a custom runner via \`runCodex\` to enable real audits. The fallback unblocks downstream consumers but does NOT represent a real adversarial review.`,
+        file: null,
+        line: null,
+      },
+    ],
+    reviewText: `Fallback (no real audit performed): ${reason}`,
+  };
+}
 
 // ─── Internals ──────────────────────────────────────────────────────────────
 

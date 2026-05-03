@@ -12,7 +12,7 @@ Stop AI hallucinations. Ground every component suggestion in your actual Custom 
 [![npm version](https://img.shields.io/npm/v/helixir)](https://www.npmjs.com/package/helixir)
 [![npm downloads](https://img.shields.io/npm/dw/helixir)](https://www.npmjs.com/package/helixir)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node 20+](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
+[![Node 22+](https://img.shields.io/badge/node-%3E%3D22-brightgreen)](https://nodejs.org)
 [![Build](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/helixir/build.yml?branch=main&label=build)](https://github.com/bookedsolidtech/helixir/actions/workflows/build.yml)
 [![Tests](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/helixir/test.yml?branch=main&label=tests)](https://github.com/bookedsolidtech/helixir/actions/workflows/test.yml)
 [![MCP Protocol](https://img.shields.io/badge/MCP-protocol-purple)](https://modelcontextprotocol.io)
@@ -727,8 +727,8 @@ Every pull request must pass all five CI checks before merge:
 
 | Workflow     | What it checks                                      |
 | ------------ | --------------------------------------------------- |
-| **build**    | TypeScript type-check + `tsc` compile on Node 20/22 |
-| **test**     | Full vitest suite with coverage on Node 20/22       |
+| **build**    | TypeScript type-check + `tsc` compile on Node 22/24 |
+| **test**     | Full vitest suite with coverage on Node 22/24       |
 | **lint**     | ESLint (TypeScript + Prettier compatibility rules)  |
 | **format**   | Prettier formatting check                           |
 | **security** | `pnpm audit --audit-level=high`                     |

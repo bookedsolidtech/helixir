@@ -523,13 +523,12 @@ function checkTouchTarget(
   // Plus the `:host { pointer-events: none / cursor: default }`
   // explicit-non-interactive escape hatch.
   // STRONG tier: intrinsic interactive controls AND attribute selectors
-  // that prove operability. Dropped `label` and `summary` per round-84
-  // P1 — `label { width: 16px }` on a non-interactive parent is
-  // ambiguous (a label can be tiny without violating WCAG if it's
-  // referencing a separately-sized control). The remaining elements
-  // (button/a/input/select/textarea) ARE the click target themselves.
+  // that prove operability. `label` removed (round-84 P1: a label can
+  // reference a separately-sized control). `summary` retained
+  // (round-85 P2: <summary> IS the click target for <details>;
+  // shrinking it always violates WCAG).
   const STRONG_INTERACTIVE =
-    /(?:^|[\s,>+~])(?:button|a|input|select|textarea|\[role\s*=\s*["']?(?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|option|switch|checkbox|radio|combobox|listbox|slider|spinbutton|treeitem|gridcell)["']?\]|\[tabindex(?:=|\]))(?:[\s,.:[{(]|$)/i;
+    /(?:^|[\s,>+~])(?:button|a|input|select|textarea|summary|\[role\s*=\s*["']?(?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|option|switch|checkbox|radio|combobox|listbox|slider|spinbutton|treeitem|gridcell)["']?\]|\[tabindex(?:=|\]))(?:[\s,.:[{(]|$)/i;
   const HOST_SELECTOR = /(?:^|[\s,>+~]):host(?:[\s,.:[{(]|$)/i;
   // Subclass styles contain a strong-interactive selector somewhere?
   // If yes, the subclass IS an interactive component (regardless of

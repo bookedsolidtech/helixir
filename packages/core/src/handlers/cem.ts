@@ -616,21 +616,26 @@ export async function diffCem(
     //   R40 P1: isNew:false is ALSO "false-clean" (consumers
     //           check breaking[].length not the flag)
     //   R42 P2: stop reporting unavailable as new component
+    //   R46 P1: throw violates the advisory contract the
+    //           shape promises (baseUnavailable field)
     //
-    // Codex disagrees with itself on EVERY alternative across 7+
-    // rounds. R22's "throw breaks valid configs" is now obsolete —
-    // in-repo absolute paths get relativized above this branch,
-    // leaving only TRULY out-of-tree paths here (only reachable via
-    // explicit MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1 opt-in). Throwing
-    // for that one specific case is the only option codex hasn't
-    // already rejected on a fresh round. Combine throw with the
-    // descriptive marker AND the advisory flag — every consumer path
-    // gets a strong signal whether it catches or doesn't.
+    // R46 lands the compromise. The DiffResult schema already
+    // includes baseUnavailable + baseUnavailableReason fields — the
+    // throw branch contradicted the schema. Return the advisory diff
+    // for the out-of-tree case so callers that DO check
+    // baseUnavailable get the metadata; callers that ignore the flag
+    // see an empty diff (better than crashing the audit pipeline).
+    // isNew is set to false because we don't know the answer; the
+    // empty breaking[]/additions[] arrays carry NO semantic claim
+    // when baseUnavailable is true — that's the contract.
     if (baseUnavailableReason !== '') {
-      throw new MCPError(
-        `BASE_UNAVAILABLE: diffCem cannot read base-branch CEM for ${tagName} — ${baseUnavailableReason}`,
-        ErrorCategory.VALIDATION,
-      );
+      return {
+        isNew: false,
+        breaking: [],
+        additions: [],
+        baseUnavailable: true,
+        baseUnavailableReason,
+      };
     }
     return { isNew: true, breaking: [], additions: [] };
   }

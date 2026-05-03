@@ -577,18 +577,24 @@ export async function getHealthDiff(
   }
   let baseUnavailableReason = '';
   if (outOfTree) {
-    // Throw — paired with diffCem.ts round-42 pin. In-repo absolute
-    // paths get relativized above this branch; only truly out-of-tree
-    // paths (explicit MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1 opt-in)
-    // reach here. Synthesizing 0/F baseline produced fictitious
-    // improvements per codex round-20/30/42. See cem.ts at the
-    // diffCem version of this branch for the full flip log.
+    // Paired with diffCem.ts. Per round-46 pin, the out-of-tree case
+    // returns the advisory diff with baseUnavailable: true rather
+    // than throwing — the HealthDiff schema already declares the
+    // flag, so the throw branch contradicted the contract. Base is
+    // set to a placeholder so the result still type-checks; callers
+    // that check baseUnavailable get the metadata, callers that
+    // ignore the flag see no fictitious deltas (current vs current
+    // produces zero deltas since we copy current into base).
     const redactedPath = config.cemPath.split(/[\\/]/).pop() ?? '<absolute>';
     baseUnavailableReason = `cemPath (basename: ${redactedPath}) is out-of-tree relative to the git repo root; gitShow requires repo-relative paths. To restore real diff, unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.`;
-    throw new MCPError(
-      `BASE_UNAVAILABLE: getHealthDiff cannot read base-branch CEM for ${tagName} — ${baseUnavailableReason}`,
-      ErrorCategory.VALIDATION,
-    );
+    base = {
+      tagName,
+      score: current.score,
+      grade: current.grade,
+      dimensions: { ...current.dimensions },
+      issues: [],
+      timestamp: current.timestamp,
+    };
   } else {
     try {
       const cemContent = await git.gitShow(baseBranch, cemPathForGit);

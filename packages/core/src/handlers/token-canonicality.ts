@@ -202,7 +202,11 @@ function walkDtcgForDeprecations(
   if ('$value' in node) {
     const dep = node['$deprecated'];
     if (dep === true || typeof dep === 'string' || (typeof dep === 'object' && dep !== null)) {
-      const cssVar = '--' + path.join('-');
+      // Normalize: each segment may itself contain dots when authors
+      // use flat dotted keys (`"dark.color.foo": { ... }`); replace
+      // those with dashes too so the result matches the CSS-variable
+      // form used elsewhere (`--dark-color-foo`). Codex round-38 P2.
+      const cssVar = '--' + path.map((seg) => seg.replace(/\./g, '-')).join('-');
       let replacedBy = '';
       let sinceVersion: string | null = null;
       let rationale: string | null = null;

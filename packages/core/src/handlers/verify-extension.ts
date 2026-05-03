@@ -290,18 +290,23 @@ function checkAccessibleLabelPattern(
   // Allow optional TS modifiers (private / protected / public /
   // readonly / override / declare / static / async) before the name.
   // Codex round-34 P2 + round-37 P2 (TS modifiers).
-  const TS_MODIFIERS = '(?:public|private|protected|readonly|override|declare|static|async|\\s)*';
+  // Codex round-38 P1: rewrote regexes for clarity. Each definition
+  // form gets its own pattern with optional TS modifiers, optional
+  // return-type annotation (`: string`), and explicit getter/setter
+  // syntax. The previous TS_MODIFIERS used `(?:words|\\s)*` which was
+  // confusing; this version uses `(?:word\\s+)*` so every modifier
+  // mandatorily ends with whitespace and the pattern reads cleanly.
+  const MOD = '(?:(?:public|private|protected|readonly|override|declare|static|async)\\s+)*';
+  const TYPE_ANNO = '(?:\\s*:\\s*[^={]+)?'; // optional `: ReturnType`
   const overridesEffectiveLabel =
-    new RegExp(`(^|[\\n;{}])\\s*${TS_MODIFIERS}_effectiveLabel\\s*\\([^)]*\\)\\s*\\{`).test(code) ||
-    new RegExp(`(^|[\\n;{}])\\s*${TS_MODIFIERS}get\\s+_effectiveLabel\\s*\\([^)]*\\)\\s*\\{`).test(
+    new RegExp(`(^|[\\n;{}])\\s*${MOD}_effectiveLabel\\s*\\([^)]*\\)${TYPE_ANNO}\\s*\\{`).test(
       code,
     ) ||
-    new RegExp(`(^|[\\n;{}])\\s*${TS_MODIFIERS}set\\s+_effectiveLabel\\s*\\([^)]*\\)\\s*\\{`).test(
-      code,
-    ) ||
-    new RegExp(`(^|[\\n;{}])\\s*${TS_MODIFIERS}_effectiveLabel\\s*=\\s*\\(?[^)]*\\)?\\s*=>`).test(
-      code,
-    );
+    new RegExp(
+      `(^|[\\n;{}])\\s*${MOD}get\\s+_effectiveLabel\\s*\\(\\s*\\)${TYPE_ANNO}\\s*\\{`,
+    ).test(code) ||
+    new RegExp(`(^|[\\n;{}])\\s*${MOD}set\\s+_effectiveLabel\\s*\\([^)]*\\)\\s*\\{`).test(code) ||
+    new RegExp(`(^|[\\n;{}])\\s*${MOD}_effectiveLabel\\s*=\\s*\\(?[^)]*\\)?\\s*=>`).test(code);
   if (!overridesEffectiveLabel) return [];
 
   const hasTrim = /\.\s*trim\s*\(\)/.test(code);

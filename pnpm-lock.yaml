@@ -23,8 +23,8 @@ importers:
         version: 3.25.76
     devDependencies:
       '@bookedsolid/rea':
-        specifier: ^0.16.0
-        version: 0.16.0
+        specifier: ^0.16.1
+        version: 0.16.1
       '@changesets/cli':
         specifier: ^2.29.4
         version: 2.30.0(@types/node@22.19.13)
@@ -259,8 +259,8 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
-  '@bookedsolid/rea@0.16.0':
-    resolution: {integrity: sha512-bYEq/aPZLBliWbD7WnCgMkppzHQ377T4wdWy7Y7j7n23P4/K1OiG4gSRRUxJvL3BGeySLcvocerdZm8g4ubPgg==}
+  '@bookedsolid/rea@0.16.1':
+    resolution: {integrity: sha512-IUFHBiGe40wIfx5HJaXWYW2Lcm+6CtuBZbg3mYGCRcV7bcfrdSbVF715DqfVumfqg7ZLa8UcJodcWp5s7M6NXA==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -3897,7 +3897,7 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@bookedsolid/rea@0.16.0':
+  '@bookedsolid/rea@0.16.1':
     dependencies:
       '@anthropic-ai/sdk': 0.90.0(zod@3.25.76)
       '@clack/prompts': 1.3.0
@@ -7198,7 +7198,7 @@ snapshots:
 
   table@6.9.0:
     dependencies:
-      ajv: 8.18.0
+      ajv: 8.20.0
       lodash.truncate: 4.4.2
       slice-ansi: 4.0.0
       string-width: 4.2.3

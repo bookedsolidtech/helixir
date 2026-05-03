@@ -317,7 +317,12 @@ async function cmdDiff(args: string[], opts: CliOptions): Promise<void> {
 
   const diff = await diffCem(tag, opts.base, config, cem);
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
+    // Single-component diff: same DiffResult object regardless of
+    // json vs json-array since this isn't a multi-component aggregation
+    // (the legacy array shape only existed for multi-tag scans).
+    // Codex round-75 P2: pinning --format json-array globally
+    // shouldn't break per-tag jobs.
     output(diff, 'json');
   } else if (diff.baseUnavailable === true) {
     // Codex round-55 P2: indeterminate is distinct from clean.

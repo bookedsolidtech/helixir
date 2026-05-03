@@ -1,12 +1,12 @@
 {
-  "version": "0.16.0",
+  "version": "0.16.1",
   "profile": "bst-internal",
   "installed_at": "2026-04-19T16:42:10.152Z",
-  "upgraded_at": "2026-05-03T21:24:01.588Z",
+  "upgraded_at": "2026-05-03T22:13:33.287Z",
   "files": [
     {
       "path": ".claude/hooks/_lib/cmd-segments.sh",
-      "sha256": "2fc78037bbb03f3753f2f0a46effa28e9924c86a6fb952e3c171a2da5112e3c7",
+      "sha256": "f1d562e1a61b0359650dd3408f0d8680fd81b3fb730069f8dbfe05387b6969d0",
       "source": "hook"
     },
     {
@@ -61,12 +61,12 @@
     },
     {
       "path": ".claude/hooks/dangerous-bash-interceptor.sh",
-      "sha256": "c21084febb2c292c6166967a00894e1453adcefda4b82f9318493f212a689a16",
+      "sha256": "18dad278d6bdddd0336d15347dd29c2a70edf3161cdc75e06207761c60fec8b5",
       "source": "hook"
     },
     {
       "path": ".claude/hooks/dependency-audit-gate.sh",
-      "sha256": "2b734e850e324679dc6e26479220b58972cf4ef6bb6a07eb8451b0cd9e99ba34",
+      "sha256": "3cb0f130e98f730a633ba8e6f4db106b02387a9771a48f1e1c3543494b9f4184",
       "source": "hook"
     },
     {
@@ -116,7 +116,7 @@
     },
     {
       "path": ".claude/agents/codex-adversarial.md",
-      "sha256": "21c2610a4260cd661e8aab3eba78ba7ea99e5848e036ee3885625c1fd0e369e3",
+      "sha256": "c27f642fc2955c38a8175105d3e882ab03f7a47e2e340ad08a803884be0d4ae9",
       "source": "agent"
     },
     {

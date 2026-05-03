@@ -803,14 +803,10 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
           // false-positive over false-negative for responsive cases.
           // Trade-off documented in runbook §6.
           if (!isConditional && parentSel !== '') {
-            let atDecl = '';
-            let dd = 0;
-            for (let p = 0; p < inner.length; p++) {
-              const c = inner[p];
-              if (c === '{') dd++;
-              else if (c === '}') dd--;
-              else if (dd === 0) atDecl += c;
-            }
+            // Same prelude-stripping decl extractor as the regular
+            // selector branch (round 75 P2). Without this, nested
+            // at-rule preludes leak into the parent's decl body.
+            const atDecl = extractDirectDeclarations(inner);
             if (atDecl.trim() !== '') out.push({ selector: parentSel, body: atDecl });
           }
           parseBlock(inner, parentSel);
@@ -818,16 +814,9 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
           continue;
         }
         const resolved = resolveNestedSelector(parentSel, childSel);
-        // Extract THIS level's declarations (non-nested portion of inner).
-        // Walk inner, collecting only depth-0 chars.
-        let declOnly = '';
-        let d = 0;
-        for (let p = 0; p < inner.length; p++) {
-          const c = inner[p];
-          if (c === '{') d++;
-          else if (c === '}') d--;
-          else if (d === 0) declOnly += c;
-        }
+        // Extract THIS level's DECLARATIONS only — skip nested-block
+        // preludes via shared helper. Codex round-75 P2.
+        const declOnly = extractDirectDeclarations(inner);
         if (declOnly.trim() !== '') out.push({ selector: resolved, body: declOnly });
         // Recurse into nested children with the resolved selector as new parent.
         parseBlock(inner, resolved);
@@ -889,5 +878,44 @@ function splitTopLevelCommas(text: string): string[] {
     }
   }
   out.push(text.slice(segStart));
+  return out;
+}
+
+/**
+ * Extract direct (depth-0) declarations from a CSS block body,
+ * skipping any nested-block preludes. For input like
+ *   `color: red; @container (max-width: 2.5rem) { width: 1rem }`
+ * returns `color: red;` (the at-rule prelude AND its body are
+ * skipped — they're handled separately by parseBlock recursion).
+ *
+ * Codex round-75 P2: the prior depth-0 char-collector leaked
+ * at-rule preludes (`@container (max-width: 2.5rem)`) into the
+ * declaration text, where SIZE_RULE then matched `2.5rem` as a
+ * width and produced bogus touch-target findings.
+ */
+function extractDirectDeclarations(input: string): string {
+  let out = '';
+  let depth = 0;
+  let segStart = 0;
+  for (let p = 0; p < input.length; p++) {
+    const c = input[p];
+    if (c === '{') {
+      if (depth === 0) {
+        // entering a nested block — segStart..p is the prelude;
+        // discard it.
+        segStart = p + 1;
+      }
+      depth++;
+    } else if (c === '}') {
+      depth--;
+      if (depth === 0) segStart = p + 1;
+    } else if (depth === 0 && c === ';') {
+      out += input.slice(segStart, p + 1);
+      segStart = p + 1;
+    }
+  }
+  if (depth === 0 && segStart < input.length) {
+    out += input.slice(segStart);
+  }
   return out;
 }

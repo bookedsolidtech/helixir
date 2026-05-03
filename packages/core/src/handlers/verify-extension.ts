@@ -522,8 +522,14 @@ function checkTouchTarget(
   //     but could be styling — only honor them with CEM confirmation.
   // Plus the `:host { pointer-events: none / cursor: default }`
   // explicit-non-interactive escape hatch.
+  // STRONG tier: intrinsic interactive controls AND attribute selectors
+  // that prove operability. Dropped `label` and `summary` per round-84
+  // P1 — `label { width: 16px }` on a non-interactive parent is
+  // ambiguous (a label can be tiny without violating WCAG if it's
+  // referencing a separately-sized control). The remaining elements
+  // (button/a/input/select/textarea) ARE the click target themselves.
   const STRONG_INTERACTIVE =
-    /(?:^|[\s,>+~])(?:button|a|input|select|textarea|summary|label|\[role\s*=\s*["']?(?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|option|switch|checkbox|radio|combobox|listbox|slider|spinbutton|treeitem|gridcell)["']?\]|\[tabindex(?:=|\]))(?:[\s,.:[{(]|$)/i;
+    /(?:^|[\s,>+~])(?:button|a|input|select|textarea|\[role\s*=\s*["']?(?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|option|switch|checkbox|radio|combobox|listbox|slider|spinbutton|treeitem|gridcell)["']?\]|\[tabindex(?:=|\]))(?:[\s,.:[{(]|$)/i;
   const HOST_SELECTOR = /(?:^|[\s,>+~]):host(?:[\s,.:[{(]|$)/i;
   // Subclass styles contain a strong-interactive selector somewhere?
   // If yes, the subclass IS an interactive component (regardless of
@@ -1025,16 +1031,27 @@ function extractBalancedScopeRoot(childSel: string): string {
   // If first non-whitespace token is `to`, it's a limit-only scope
   // — no start selector to incorporate.
   if (/^to\s*\(/i.test(afterAt)) return '';
-  // Find the first `(` of the START clause and balance-walk.
+  // Find the first `(` of the START clause and balance-walk with
+  // quote awareness. Codex round-84 P2: `@scope ([data-tooltip=")"])`
+  // has a `)` inside a quoted attribute value that must NOT close
+  // the predicate.
   const idx = afterAt.indexOf('(');
   if (idx === -1) return '';
   let depth = 1;
+  let quote: '"' | "'" | null = null;
   let j = idx + 1;
   while (j < afterAt.length && depth > 0) {
     const ch = afterAt[j];
-    if (ch === '(') depth++;
-    else if (ch === ')') depth--;
-    if (depth === 0) break;
+    if (quote !== null) {
+      if (ch === quote && afterAt[j - 1] !== '\\') quote = null;
+    } else if (ch === '"' || ch === "'") {
+      quote = ch;
+    } else if (ch === '(') {
+      depth++;
+    } else if (ch === ')') {
+      depth--;
+      if (depth === 0) break;
+    }
     j++;
   }
   if (depth !== 0) return '';

@@ -287,12 +287,21 @@ function checkAccessibleLabelPattern(
   // Subclass OVERRIDES _effectiveLabel? Match only definition forms
   // (method, getter, setter, arrow assignment), not bare references
   // like `super._effectiveLabel` or `this._effectiveLabel` reads.
-  // Codex round-34 P2.
+  // Allow optional TS modifiers (private / protected / public /
+  // readonly / override / declare / static / async) before the name.
+  // Codex round-34 P2 + round-37 P2 (TS modifiers).
+  const TS_MODIFIERS = '(?:public|private|protected|readonly|override|declare|static|async|\\s)*';
   const overridesEffectiveLabel =
-    /(^|[\n;{}])\s*_effectiveLabel\s*\([^)]*\)\s*\{/.test(code) ||
-    /(^|[\n;{}])\s*get\s+_effectiveLabel\s*\([^)]*\)\s*\{/.test(code) ||
-    /(^|[\n;{}])\s*set\s+_effectiveLabel\s*\([^)]*\)\s*\{/.test(code) ||
-    /(^|[\n;{}])\s*_effectiveLabel\s*=\s*\(?[^)]*\)?\s*=>/.test(code);
+    new RegExp(`(^|[\\n;{}])\\s*${TS_MODIFIERS}_effectiveLabel\\s*\\([^)]*\\)\\s*\\{`).test(code) ||
+    new RegExp(`(^|[\\n;{}])\\s*${TS_MODIFIERS}get\\s+_effectiveLabel\\s*\\([^)]*\\)\\s*\\{`).test(
+      code,
+    ) ||
+    new RegExp(`(^|[\\n;{}])\\s*${TS_MODIFIERS}set\\s+_effectiveLabel\\s*\\([^)]*\\)\\s*\\{`).test(
+      code,
+    ) ||
+    new RegExp(`(^|[\\n;{}])\\s*${TS_MODIFIERS}_effectiveLabel\\s*=\\s*\\(?[^)]*\\)?\\s*=>`).test(
+      code,
+    );
   if (!overridesEffectiveLabel) return [];
 
   const hasTrim = /\.\s*trim\s*\(\)/.test(code);
@@ -383,8 +392,14 @@ function checkTouchTarget(
   // Match selector-block pairs `selector { body }` (no nesting). The
   // body capture is the content between { and the next }.
   const RULE_PATTERN = /([^{}]+)\{([^{}]*)\}/g;
+  // Narrow `:host` matching to forms that imply interactivity:
+  //   `:host([role=button])` etc., or `:host(:not(...))` patterns
+  // commonly used to scope interactive-state styles. Bare `:host`
+  // selectors (which apply to ALL component instances regardless of
+  // role) shouldn't promote every size rule to a touch-target
+  // failure. Codex round-37 P2.
   const INTERACTIVE_SELECTOR =
-    /(?:^|[\s,>+~])(button|a|input|select|textarea|summary|label|\[role\s*=\s*["']?(button|link|menuitem|tab|option|switch|checkbox|radio)["']?\]|\[tabindex(?:=|\])|:host\b)/i;
+    /(?:^|[\s,>+~])(button|a|input|select|textarea|summary|label|\[role\s*=\s*["']?(button|link|menuitem|tab|option|switch|checkbox|radio)["']?\]|\[tabindex(?:=|\])|:host\(\s*\[role|:host\(\s*:not)/i;
   const SIZE_RULE = /\b(min-width|min-height|width|height)\s*:\s*([\d.]+)(px|rem)\b/g;
 
   const undersized: string[] = [];

@@ -112,22 +112,18 @@ export async function auditComponentWithCodex(
 
   const surface = extractContractSurface(decl);
   const surfaceHash = hashContractSurface(surface);
-  // Path containment on auditsRoot: caller-supplied override must
-  // resolve inside projectRoot. Without this, an absolute or ../-
-  // traversing override could write audit files anywhere on disk.
-  // Codex round-32 P1.
+  // Path containment on auditsRoot: the resolved final path must
+  // stay inside projectRoot. Absolute paths are accepted ONLY when
+  // they resolve inside projectRoot — useful for monorepo setups
+  // where callers pass an explicit absolute path to a per-package
+  // audits dir. Codex round-32 P1 (initial guard) + round-37 P2
+  // (in-repo absolute should work).
   const projectAbs = resolve(config.projectRoot);
   const auditsRootRaw = options.auditsRoot ?? 'audits';
-  if (isAbsolute(auditsRootRaw)) {
-    throw new MCPError(
-      `auditsRoot must be project-relative: "${auditsRootRaw}"`,
-      ErrorCategory.VALIDATION,
-    );
-  }
-  const auditsRoot = resolve(projectAbs, auditsRootRaw);
+  const auditsRoot = isAbsolute(auditsRootRaw) ? auditsRootRaw : resolve(projectAbs, auditsRootRaw);
   if (auditsRoot !== projectAbs && !auditsRoot.startsWith(projectAbs + sep)) {
     throw new MCPError(
-      `auditsRoot escapes projectRoot via ../: "${auditsRootRaw}"`,
+      `auditsRoot escapes projectRoot: "${auditsRootRaw}" resolves to "${auditsRoot}"`,
       ErrorCategory.VALIDATION,
     );
   }

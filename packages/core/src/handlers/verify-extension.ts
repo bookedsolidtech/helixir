@@ -482,25 +482,30 @@ function checkTouchTarget(
   // `.container`/`.row` are not. Matches the runbook §6 pin pattern
   // — pin the structure, not the regex.
   //
-  // Round-48 P2 / round-49 P2: don't gate the whole check on parent
-  // CEM signaling interactivity — the CEM is often sparse on internal
-  // click surfaces. Two selector tiers:
+  // Three selector tiers (round 48 / 49 / 53 compromise):
   //   - Strong tier (always-fired): literal interactive elements
-  //     (`button`, `input`, `[role=...]`, `[tabindex]`) AND :host.
-  //     :host moved to strong per round-49 — for an extending custom
-  //     element the host IS the click target by default, and gating
-  //     it on CEM signals reintroduced false negatives whenever the
-  //     CEM was sparse.
+  //     (`button`, `input`, `[role=...]`, `[tabindex]`) — these are
+  //     intrinsically interactive, no contextual signals needed.
+  //   - Host tier (parent-interactive OR subclass-has-strong-selector):
+  //     `:host`. Round 49 promoted :host to strong because CEMs are
+  //     sparse on host interactivity; round 53 demoted because
+  //     decorative subclasses with bare :host { width: 24px } got
+  //     false-positive findings. Compromise: fire :host when EITHER
+  //     parent CEM signals interactivity OR the subclass styles
+  //     contain another strong-interactive selector (which means the
+  //     subclass is itself interactive, so :host probably is too).
   //   - Weak tier (parent-interactive only): non-:host class-name
-  //     vocabulary (`.button`, `.control`, ...). These look
-  //     interactive but could also be just-styling — only honor them
-  //     when parent CEM confirms interactivity to keep noise down.
-  // Round 34's "bare :host on icons produces noise" concern is
-  // mitigated by the explicit decoration-by-styles guard below
-  // (`pointer-events: none`, `cursor: default` on :host signal a
-  // non-interactive host even when the host itself is referenced).
+  //     vocabulary (`.button`, `.control`, ...). Look interactive
+  //     but could be styling — only honor them with CEM confirmation.
+  // Plus the `:host { pointer-events: none / cursor: default }`
+  // explicit-non-interactive escape hatch.
   const STRONG_INTERACTIVE =
-    /(?:^|[\s,>+~])(?:button|a|input|select|textarea|summary|label|:host|\[role\s*=\s*["']?(?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|option|switch|checkbox|radio|combobox|listbox|slider|spinbutton|treeitem|gridcell)["']?\]|\[tabindex(?:=|\]))(?:[\s,.:[{(]|$)/i;
+    /(?:^|[\s,>+~])(?:button|a|input|select|textarea|summary|label|\[role\s*=\s*["']?(?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|option|switch|checkbox|radio|combobox|listbox|slider|spinbutton|treeitem|gridcell)["']?\]|\[tabindex(?:=|\]))(?:[\s,.:[{(]|$)/i;
+  const HOST_SELECTOR = /(?:^|[\s,>+~]):host(?:[\s,.:[{(]|$)/i;
+  // Subclass styles contain a strong-interactive selector somewhere?
+  // If yes, the subclass IS an interactive component (regardless of
+  // CEM signals on the parent), so bare :host fires too.
+  const subclassHasStrongInteractive = STRONG_INTERACTIVE.test(styles);
   const WEAK_INTERACTIVE_CLASS =
     /(?:^|[\s,>+~.])\.(?:button|btn|control|trigger|action|tab|menuitem|menu-item|option|chip|toggle|switch|checkbox|radio|link|clickable|interactive|target|thumb|handle|nav-item|tile|card-action|cta|hit-area|pressable|swatch-button)(?:[\s,.:[{]|$)/i;
   // Decoration-by-styles guard: when :host has explicit non-interactive
@@ -538,8 +543,13 @@ function checkTouchTarget(
         .every((s) => /^:host(\([^)]*\))?(\s*::?[a-zA-Z-]+(?:\([^)]*\))?)*\s*$/.test(s.trim()));
     if (hostExplicitlyNonInteractive && isBareHostRule) continue;
     const matchesStrong = STRONG_INTERACTIVE.test(selector);
+    // :host fires when parent CEM signals interactivity OR the
+    // subclass styles contain another strong-interactive selector
+    // (which means the subclass is itself interactive).
+    const matchesHost =
+      HOST_SELECTOR.test(selector) && (parentIsInteractive || subclassHasStrongInteractive);
     const matchesClass = parentIsInteractive && WEAK_INTERACTIVE_CLASS.test(selector);
-    if (!matchesStrong && !matchesClass) continue;
+    if (!matchesStrong && !matchesHost && !matchesClass) continue;
     let s: RegExpExecArray | null;
     while ((s = SIZE_RULE.exec(body)) !== null) {
       const value = parseFloat(s[2] ?? '0');

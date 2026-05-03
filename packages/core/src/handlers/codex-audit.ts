@@ -188,16 +188,48 @@ export async function auditComponentWithCodex(
       ErrorCategory.VALIDATION,
     );
   }
-  // Safe to create now.
+  // TOCTOU-safe step-by-step mkdir. The full-recursive mkdir +
+  // post-realpath check would let an attacker swap a missing tail
+  // segment for a symlink between the projection check and the
+  // mkdir, creating directories outside projectRoot before the
+  // post-check throws. Walk the tail segments one at a time:
+  // mkdir each, immediately realpath the new directory, abort and
+  // rmdir if it escapes. Damage is bounded to the single boundary
+  // dir at the moment of the race. Codex round-53 P1.
   if (!existsSyncFs(requestedAuditsRoot)) {
-    mkdirSync(requestedAuditsRoot, { recursive: true });
+    let cursor = ancestor;
+    for (const seg of tailSegments) {
+      cursor = cursor + sep + seg;
+      if (!existsSyncFs(cursor)) {
+        mkdirSync(cursor);
+        const cursorReal = realpathSync(cursor);
+        if (cursorReal !== projectAbs && !cursorReal.startsWith(projectAbs + sep)) {
+          // The dir we just created escapes projectRoot — almost
+          // certainly because an attacker swapped a parent for a
+          // symlink between validation and mkdir. Try to clean up
+          // the stray empty dir but propagate the violation.
+          try {
+            const { rmdirSync } = await import('node:fs');
+            rmdirSync(cursor);
+          } catch {
+            // Best-effort cleanup; the violation is the real signal.
+          }
+          throw new MCPError(
+            `auditsRoot mkdir escaped projectRoot at segment "${seg}": canonicalizes to "${cursorReal}" (TOCTOU)`,
+            ErrorCategory.VALIDATION,
+          );
+        }
+      }
+    }
   }
   const auditsRoot = realpathSync(requestedAuditsRoot);
   if (auditsRoot !== projectAbs && !auditsRoot.startsWith(projectAbs + sep)) {
-    // Final defense: post-mkdir realpath in case a TOCTOU symlink
-    // appeared between validation and mkdir.
+    // Belt-and-braces: the per-segment loop already validated, but
+    // re-check the final canonical path in case a pre-existing tail
+    // (existsSyncFs(cursor) === true at every step) was created
+    // earlier as a symlink chain pointing out.
     throw new MCPError(
-      `auditsRoot escapes projectRoot post-mkdir: canonicalizes to "${auditsRoot}"`,
+      `auditsRoot escapes projectRoot: final canonicalizes to "${auditsRoot}"`,
       ErrorCategory.VALIDATION,
     );
   }

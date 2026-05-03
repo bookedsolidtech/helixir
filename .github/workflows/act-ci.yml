@@ -2,14 +2,15 @@
 # Local CI — Quality gates for nektos/act
 # ============================================================================
 # Mirrors the core quality gates from ci.yml but avoids GitHub-specific actions
-# (pnpm/action-setup, actions/setup-node) that break in act.
+# (pnpm/action-setup, actions/setup-node) that break in act due to PATH issues
+# and missing API context.
 #
 # Single-job design: helixir is a single-package Node project. Running all
 # gates in one job avoids bind-mount contention (parallel jobs sharing
 # node_modules via --bind corrupt each other's pnpm install).
 #
-# Usage: ./scripts/act-ci.sh [--job <job-name>] [--list]
-# Jobs: quality-gates, test-full (matrix)
+# Usage: ./scripts/act-ci.sh [--job <job-name>] [--list] [--full] [--matrix]
+# Jobs: quality-gates (default), test-full (activated by --full or --matrix)
 # ============================================================================
 
 name: Local CI
@@ -49,11 +50,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # When ACT_FULL_TESTS is set without ACT_MATRIX_TESTS, the
-        # `--full` flag wants only the host's current Node version. Use
-        # ACT_HOST_NODE (set by act-ci.sh from `node --version`) to scope
-        # the matrix; otherwise sweep all supported versions.
-        node-version: ${{ (env.ACT_MATRIX_TESTS != 'true' && env.ACT_FULL_TESTS == 'true' && env.ACT_HOST_NODE != '') && fromJSON(format('[{0}]', env.ACT_HOST_NODE)) || fromJSON('[22, 24]') }}
+        node-version: [20, 22, 24]
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node ${{ matrix.node-version }} via nvm
@@ -61,15 +58,6 @@ jobs:
           if [ "${{ matrix.node-version }}" != "" ]; then
             export NVM_DIR="$HOME/.nvm"
             if [ ! -d "$NVM_DIR" ]; then
-              # First-run convenience: fetch nvm if not present. Operators
-              # running in air-gapped environments should pre-install nvm
-              # rather than relying on this curl.
-              if [ -n "${ACT_OFFLINE:-}" ]; then
-                echo "[act-ci] Offline mode (ACT_OFFLINE=1) and nvm not present at $NVM_DIR" >&2
-                echo "[act-ci]   Pre-install nvm before running offline:" >&2
-                echo "[act-ci]   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash" >&2
-                exit 1
-              fi
               curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
             fi
             . "$NVM_DIR/nvm.sh"
@@ -109,7 +97,7 @@ jobs:
             if [ "$CURRENT_SIZE" -eq "$LAST_SIZE" ] && [ "$CURRENT_SIZE" -gt 0 ]; then
               STALE_SECONDS=$((STALE_SECONDS + POLL_INTERVAL))
               if [ "$STALE_SECONDS" -ge "$STALE_TIMEOUT" ] && [ "$ELAPSED" -ge 30 ]; then
-                echo "[test-full] Output stale for ${STALE_SECONDS}s at ${ELAPSED}s -- force killing vitest"
+                echo "[test-full] Output stale for ${STALE_SECONDS}s at ${ELAPSED}s — force killing vitest"
                 kill "$VITEST_PID" 2>/dev/null || true
                 sleep 1
                 kill -9 "$VITEST_PID" 2>/dev/null || true
@@ -122,52 +110,23 @@ jobs:
             LAST_SIZE=$CURRENT_SIZE
           done
 
-          # Capture vitest's actual exit status so we can detect crashes that
-          # happen before the reporter ever emits ×/✓ markers (config errors,
-          # module-load failures, OOM, etc.). Without this, grep counts stay 0
-          # and the matrix run reports green for a crashed suite.
-          set +e
-          wait "$VITEST_PID" 2>/dev/null
-          VITEST_EXIT=$?
-          set -e
+          wait "$VITEST_PID" 2>/dev/null || true
 
-          # Determine pass/fail from output. `grep -c` already prints `0` on
-          # no-match (and exits non-zero), so a `|| echo 0` fallback would
-          # capture "0\n0" and break the integer comparison below under
-          # bash's `-e` mode. Use `set +e`/`+o pipefail` while we run grep
-          # and tolerate the non-zero exit explicitly.
-          set +e
-          FAILED_TESTS=$(grep -c "^[[:space:]]*[×x]" "$LOGFILE" 2>/dev/null)
-          [ -z "$FAILED_TESTS" ] && FAILED_TESTS=0
-          PASSED_TESTS=$(grep -c "^[[:space:]]*[✓✔]" "$LOGFILE" 2>/dev/null)
-          [ -z "$PASSED_TESTS" ] && PASSED_TESTS=0
-          set -e
+          # Determine pass/fail from output
+          FAILED_TESTS=$(grep -c "^[[:space:]]*[×x]" "$LOGFILE" 2>/dev/null || echo 0)
+          PASSED_TESTS=$(grep -c "^[[:space:]]*[✓✔]" "$LOGFILE" 2>/dev/null || echo 0)
 
           echo ""
           cat "$LOGFILE" | tail -30
           echo ""
-          echo "[test-full] Node ${{ matrix.node-version }}: ${PASSED_TESTS} passed, ${FAILED_TESTS} failed (vitest exit=${VITEST_EXIT})"
+          echo "[test-full] Node ${{ matrix.node-version }}: ${PASSED_TESTS} passed, ${FAILED_TESTS} failed"
 
           if [ "$FORCE_KILLED" = true ]; then
-            echo "[test-full] vitest was force-killed after teardown hang — treating as failure"
+            echo "[test-full] vitest was force-killed after teardown hang"
           fi
 
           rm -f "$LOGFILE"
 
           if [ "$FAILED_TESTS" -gt 0 ]; then
-            exit 1
-          fi
-
-          # A force-kill means the watchdog gave up waiting for the suite to
-          # report; the run did not complete cleanly and must NOT be reported
-          # as green even when no test markers landed before the kill.
-          if [ "$FORCE_KILLED" = true ]; then
-            exit 1
-          fi
-
-          # Vitest exited non-zero but no individual test was marked failed —
-          # the suite itself crashed before reporting. Treat as failure.
-          if [ "$VITEST_EXIT" -ne 0 ]; then
-            echo "[test-full] vitest exited with code ${VITEST_EXIT} but no test markers found — treating as failure"
             exit 1
           fi

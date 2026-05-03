@@ -1,9 +1,8 @@
 # ============================================================================
 # Matrix CI Pipeline — HELiXiR MCP Server
 # ============================================================================
-# Tests across multiple Node.js versions to ensure compatibility and
-# reliability across different environments. HELiXiR is a pure Node.js
-# MCP server — no browser tests, no Playwright, no turbo.
+# Tests across Node.js 20, 22, and 24 to ensure forward-compatibility
+# and catch version-specific ESM / native module regressions.
 # ============================================================================
 
 name: CI Matrix
@@ -42,7 +41,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [22, 24]
+        node-version: [20, 22, 24]
         os: [ubuntu-latest]
 
     steps:
@@ -83,9 +82,9 @@ jobs:
 
       - name: Test
         run: |
-          # Promotion PRs (staging->main): tests already verified on staging — skip
+          # Promotion PRs (staging→main): tests already verified on staging — skip
           if [[ "${{ github.head_ref }}" == "staging" && "${{ github.base_ref }}" == "main" ]]; then
-            echo "Promotion PR (staging -> main) -- skipping matrix tests"
+            echo "Promotion PR (staging → main) — skipping matrix tests"
             exit 0
           fi
           pnpm run test
@@ -100,8 +99,8 @@ jobs:
       - name: Check matrix results
         run: |
           if [ "${{ needs.matrix-test.result }}" == "failure" ]; then
-            echo "Matrix tests failed"
+            echo "❌ Matrix tests failed"
             exit 1
           else
-            echo "All matrix tests passed"
+            echo "✅ All matrix tests passed"
           fi

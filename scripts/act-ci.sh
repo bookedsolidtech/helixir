@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # scripts/act-ci.sh — Run CI locally via nektos/act
-# Usage: ./scripts/act-ci.sh [--job <job-name>] [--list] [--native] [--full] [--matrix] [--clean] [--help]
+# Usage: ./scripts/act-ci.sh [--job <job-name>] [--list] [--native] [--clean] [--full] [--matrix] [--help]
 #
 # Runs .github/workflows/act-ci.yml — a lightweight mirror of ci.yml that
 # avoids GitHub-specific actions (pnpm/action-setup, actions/setup-node)
 # which break in act due to PATH issues and missing API context.
 #
-# Available jobs: quality-gates, test-full
+# Available jobs: quality-gates (default), test-full (activated by --full or --matrix)
 # Flags:
 #   --job <name>  Run a specific job only
 #   --list        List available jobs
@@ -19,11 +19,12 @@
 # Performance notes:
 #   .actrc configures --bind (zero-copy mount), --reuse (keep containers),
 #   --pull=false (skip image check), --no-cache-server, --action-offline-mode.
+#   With warm containers: lint ~12s, format ~10s, type-check ~15s, build ~90s.
 #
 # Docker OOM on Apple Silicon:
 #   Default mode runs linux/amd64 via Rosetta 2, which uses 2-3x more memory.
 #   Use --native for linux/arm64 containers (no emulation overhead).
-#   Use --full to run the complete test suite (default is quality gates only).
+#   Use --full to run the complete test suite (default is quality-gates only).
 #   Use --matrix for full CI Matrix parity (Node 20/22/24).
 #   Best combo: ./scripts/act-ci.sh --native --matrix
 set -euo pipefail
@@ -63,10 +64,10 @@ USE_FULL=false
 USE_MATRIX=false
 
 show_help() {
-  sed -n '3,27p' "${BASH_SOURCE[0]}" | sed 's/^# //' | sed 's/^#//'
+  sed -n '3,29p' "${BASH_SOURCE[0]}" | sed 's/^# //' | sed 's/^#//'
   echo ""
   echo "Examples:"
-  echo "  ./scripts/act-ci.sh                    # Quality gates only"
+  echo "  ./scripts/act-ci.sh                    # Quality gates, current Node"
   echo "  ./scripts/act-ci.sh --full             # Full test suite, current Node"
   echo "  ./scripts/act-ci.sh --matrix           # Full test suite, Node 20/22/24"
   echo "  ./scripts/act-ci.sh --native --matrix  # Matrix tests, ARM64 (no Rosetta)"
@@ -109,16 +110,10 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Always clean stale containers, or do a full clean if requested.
-# BSD xargs (macOS) does not support `-r` — guard against the empty-input
-# case explicitly so the script works on both BSD and GNU userlands.
+# Always clean stale containers, or do a full clean if requested
 if [[ "$DO_CLEAN" == true ]]; then
   echo "Cleaning ALL act containers..."
-  ACT_CONTAINERS=$(docker ps -aq --filter "name=act-" 2>/dev/null || true)
-  if [[ -n "$ACT_CONTAINERS" ]]; then
-    # shellcheck disable=SC2086  # intentional word-splitting on container IDs
-    docker rm -f $ACT_CONTAINERS >/dev/null 2>&1 || true
-  fi
+  docker ps -aq --filter "name=act-" 2>/dev/null | xargs -r docker rm -f >/dev/null 2>&1 || true
 else
   cleanup_stale_containers
 fi
@@ -135,19 +130,14 @@ else
   ARCH_MODE="amd64 (Rosetta)"
 fi
 
-# ── Test mode selection ──────────────────────────────────────────────────────
 if [[ "$USE_MATRIX" == true ]]; then
   ENV_ARGS="$ENV_ARGS --env ACT_MATRIX_TESTS=true --env ACT_FULL_TESTS=true"
   TEST_MODE="full suite + Node 20/22/24 matrix (CI Matrix parity)"
 elif [[ "$USE_FULL" == true ]]; then
-  # --full runs the full test suite on the current host's Node version only.
-  # Use --matrix for the multi-version Node 20/22/24 sweep. The workflow's
-  # test-full job filters its matrix to a single host-Node entry when
-  # ACT_FULL_TESTS=true but ACT_MATRIX_TESTS is unset.
-  ENV_ARGS="$ENV_ARGS --env ACT_FULL_TESTS=true --env ACT_HOST_NODE=$(node --version 2>/dev/null | tr -d 'v' | cut -d. -f1)"
-  TEST_MODE="full suite (current Node only)"
+  ENV_ARGS="$ENV_ARGS --env ACT_FULL_TESTS=true"
+  TEST_MODE="full suite (current Node)"
 else
-  TEST_MODE="quality gates only"
+  TEST_MODE="standard (quality-gates)"
 fi
 
 echo "=== Running CI locally via act ==="
@@ -179,7 +169,6 @@ cat > .act-results.json << EOF
   "status": "$STATUS",
   "workflow": "act-ci.yml",
   "job": "${JOB_ARGS:-all}",
-  "test_mode": "$TEST_MODE",
   "duration_seconds": $DURATION,
   "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 }

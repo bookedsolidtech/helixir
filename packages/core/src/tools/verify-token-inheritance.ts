@@ -139,6 +139,14 @@ export async function handleTokenVerificationTool(
           ? await loadCssSources(config.projectRoot, parsed.cssSourcePaths)
           : undefined;
 
+      // Derive overlay sets from the loaded tokens when the caller
+      // doesn't pass them explicitly. Helix's DTCG flat naming makes
+      // overlay membership inferable: tokens whose flat name starts
+      // with `dark-` or `dark.` belong to the dark overlay; `hc-` /
+      // `high-contrast-` belong to the high-contrast overlay.
+      // Without this derivation, the cascade-gap check (defect class
+      // 02) is dead code unless a caller hand-passes the sets — which
+      // contradicts the tool description. Codex round-28 P2.
       const overlays = parsed.overlays
         ? {
             ...(parsed.overlays.dark ? { dark: new Set(parsed.overlays.dark) } : {}),
@@ -146,7 +154,7 @@ export async function handleTokenVerificationTool(
               ? { highContrast: new Set(parsed.overlays.highContrast) }
               : {}),
           }
-        : undefined;
+        : deriveOverlaysFromTokens(tokens);
 
       const result = verifyTokenInheritance({
         decl,
@@ -200,6 +208,53 @@ function findDecl(cem: Cem, tagName: string) {
     }
   }
   return null;
+}
+
+/**
+ * Derive overlay coverage sets from a flat token list. Heuristic on
+ * the W3C DTCG flat-name convention helix uses:
+ *   - Tokens whose name starts with `dark-` or contains `.dark.` are
+ *     dark-overlay coverage.
+ *   - Tokens starting with `hc-` / `high-contrast-` / containing
+ *     `.high-contrast.` are HC coverage.
+ * The CSS variable name is `--<token.name>` so we map each overlay
+ * member to its `--`-prefixed form for the cascade-gap check.
+ */
+function deriveOverlaysFromTokens(
+  tokens: { name: string }[],
+): { dark?: Set<string>; highContrast?: Set<string> } | undefined {
+  const dark = new Set<string>();
+  const highContrast = new Set<string>();
+  for (const t of tokens) {
+    const cssVar = '--' + t.name;
+    const lower = t.name.toLowerCase();
+    if (lower.startsWith('dark-') || lower.includes('.dark.')) {
+      // Strip the overlay prefix to get the canonical CSS-prop name
+      // the cascade-gap check compares against.
+      const canonical = '--' + t.name.replace(/^dark[-.]/i, '').replace(/\.dark\./gi, '.');
+      dark.add(canonical);
+      dark.add(cssVar);
+    }
+    if (
+      lower.startsWith('hc-') ||
+      lower.startsWith('high-contrast-') ||
+      lower.includes('.high-contrast.')
+    ) {
+      const canonical =
+        '--' +
+        t.name
+          .replace(/^hc[-.]/i, '')
+          .replace(/^high-contrast[-.]/i, '')
+          .replace(/\.high-contrast\./gi, '.');
+      highContrast.add(canonical);
+      highContrast.add(cssVar);
+    }
+  }
+  if (dark.size === 0 && highContrast.size === 0) return undefined;
+  const out: { dark?: Set<string>; highContrast?: Set<string> } = {};
+  if (dark.size > 0) out.dark = dark;
+  if (highContrast.size > 0) out.highContrast = highContrast;
+  return out;
 }
 
 async function loadCssSources(projectRoot: string, paths: string[]): Promise<string[]> {

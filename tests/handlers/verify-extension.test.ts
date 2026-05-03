@@ -198,9 +198,22 @@ describe('verify_extension — 05-aria-regression', () => {
 // ─── Defect class 10 — ElementInternals dropped ────────────────────────────
 
 describe('verify_extension — 10-element-internals-dropped', () => {
-  it('flags subclass that omits formAssociated when parent declares it', () => {
+  it('does NOT flag subclass that omits formAssociated (inherits via prototype)', () => {
+    // Codex round-28 P1: in custom elements, constructor.formAssociated
+    // is read via normal prototype lookup, so subclasses inherit the
+    // parent's static flag. A delta-only CEM that omits the field is
+    // still form-associated at runtime — flagging it is a false P1.
     const parent = textInputFormParent();
     const subclass = emptyDecl('my-text-input');
+    const { findings } = verifyExtension({ parent, subclass });
+    expect(findings.filter((f) => f.classId === '10-element-internals-dropped')).toEqual([]);
+  });
+
+  it('flags subclass that explicitly opts out (formAssociated: false)', () => {
+    const parent = textInputFormParent();
+    const subclass = emptyDecl('my-text-input', {
+      formAssociated: false,
+    } as unknown as Partial<CemDeclaration>);
     const { findings } = verifyExtension({ parent, subclass });
     const fa = findings.find((f) => f.classId === '10-element-internals-dropped');
     expect(fa).toBeDefined();
@@ -208,7 +221,7 @@ describe('verify_extension — 10-element-internals-dropped', () => {
     expect(fa?.body).toContain('FS-021');
   });
 
-  it('passes when subclass also declares formAssociated', () => {
+  it('passes when subclass also declares formAssociated: true', () => {
     const parent = textInputFormParent();
     const subclass = emptyDecl('my-text-input', {
       formAssociated: true,

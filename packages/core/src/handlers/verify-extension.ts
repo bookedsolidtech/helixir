@@ -148,7 +148,13 @@ function checkAriaWiring(parent: ContractSurface, subclass: ContractSurface): Au
 
 function checkFormAssociation(parent: ContractSurface, subclass: ContractSurface): AuditFinding[] {
   if (parent.formAssociated !== true) return [];
-  if (subclass.formAssociated === true) return [];
+  // Codex round-28 P1: in custom elements, `constructor.formAssociated`
+  // is read via normal prototype lookup, so subclasses INHERIT the
+  // parent's static flag. A delta-only CEM that omits the field is
+  // still form-associated at runtime. Only flag when the subclass
+  // explicitly OPTS OUT (formAssociated: false) — that's a real
+  // intentional drop. Null / undefined = inheriting, no finding.
+  if (subclass.formAssociated !== false) return [];
   return [
     {
       severity: 'P1',
@@ -204,22 +210,23 @@ function checkEventContract(
   }));
 
   // Source-level deepening: escalate to P1 ONLY when the subclass
-  // actually overrides a method (which would shadow the parent's
-  // dispatch path) AND has no super call / dispatchEvent in the
-  // override. A subclass that adds unrelated methods or only changes
-  // styling shouldn't be flagged as suppressing inherited events —
-  // the parent's dispatch path runs unchanged. Codex round-27 P2.
+  // overrides a method that LOOKS like a dispatch path AND has no
+  // super call / dispatchEvent in the override. Pure render() /
+  // firstUpdated() / styles() overrides don't touch event dispatch
+  // and shouldn't escalate. Codex round-27 P2 + round-28 P1.
   if (sources?.code !== undefined && missing.length > 0) {
     const code = sources.code;
-    // Override detection: any method definition that's not the
-    // constructor. Heuristic — class-syntax method (`name(...) {`)
-    // OR explicit class member with `=` arrow assignment.
-    const overridesMethod =
-      /(^|[\n;{}])\s*(?!constructor\b)[a-zA-Z_$][\w$]*\s*\([^)]*\)\s*\{/.test(code) ||
-      /(^|[\n;{}])\s*(?!constructor\b)[a-zA-Z_$][\w$]*\s*=\s*\(?[^)]*\)?\s*=>/.test(code);
+    // Heuristic for "this method might be the dispatch path":
+    // names like handleX, onX, emitX, dispatchX, fireX, _emitX, or
+    // explicit setters that the parent emits change events from
+    // (set value(), set checked(), etc.).
+    const overridesDispatchSite =
+      /\b(handle|on|emit|dispatch|fire)[A-Z][\w$]*\s*\([^)]*\)\s*\{/.test(code) ||
+      /\b_(handle|emit|dispatch|fire)[A-Z]?[\w$]*\s*\([^)]*\)\s*\{/.test(code) ||
+      /\bset\s+(value|checked|selected|expanded|open|disabled)\s*\([^)]*\)\s*\{/.test(code);
     const hasSuperCall = /\bsuper\s*\.\s*[a-zA-Z_$][\w$]*\s*\(/.test(code);
     const dispatchesEvent = /\bdispatchEvent\s*\(/.test(code);
-    if (overridesMethod && !hasSuperCall && !dispatchesEvent) {
+    if (overridesDispatchSite && !hasSuperCall && !dispatchesEvent) {
       findings.push({
         severity: 'P1',
         classId: '11-event-contract-suppressed',

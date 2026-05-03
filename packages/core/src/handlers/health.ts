@@ -533,25 +533,39 @@ export async function getHealthDiff(
   const git = gitOps ?? new GitOperations();
 
   let base: ComponentHealth;
-  // Guard: gitShow rejects absolute paths. When the user opted into
-  // MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1, config.cemPath is absolute and
-  // the diff would silently treat every component as "not found in base."
-  // Surface the limitation explicitly. Codex round-10 P1.
+  // Guard: gitShow rejects absolute paths. Two sub-cases for absolute
+  // config.cemPath:
+  //   1. In-repo (supported MCP_WC_CEM_PATH=/repo/custom-elements.json):
+  //      relativize for gitShow.
+  //   2. Out-of-tree (MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS opt-in): degrade
+  //      with warning + synthetic 0/F base.
+  // Codex round-10 P1 (initial guard), round-16 P1 (in-repo case).
+  let cemPathForGit = config.cemPath;
+  let outOfTree = false;
   if (isAbsolute(config.cemPath)) {
+    const projectRootResolved = resolve(config.projectRoot);
+    const rel = relative(projectRootResolved, config.cemPath);
+    if (rel === '' || rel.startsWith('..') || isAbsolute(rel)) {
+      outOfTree = true;
+    } else {
+      cemPathForGit = rel.split(sep).join('/');
+    }
+  }
+  if (outOfTree) {
     process.stderr.write(
-      `[helixir] Warning: getHealthDiff cannot read base-branch CEM at absolute path ${config.cemPath} — gitShow requires repo-relative paths. Returning 0/F base for ${tagName}. (To restore diff: unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.)\n`,
+      `[helixir] Warning: getHealthDiff cannot read base-branch CEM at out-of-tree absolute path ${config.cemPath} — gitShow requires repo-relative paths. Returning 0/F base for ${tagName}. (To restore diff: unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.)\n`,
     );
     base = {
       tagName,
       score: 0,
       grade: 'F' as const,
       dimensions: {},
-      issues: ['Base CEM unavailable — cemPath is absolute (external opt-in active)'],
+      issues: ['Base CEM unavailable — cemPath is absolute and out-of-tree'],
       timestamp: new Date().toISOString(),
     };
   } else {
     try {
-      const cemContent = await git.gitShow(baseBranch, config.cemPath);
+      const cemContent = await git.gitShow(baseBranch, cemPathForGit);
       const cem = CemSchema.parse(JSON.parse(cemContent));
       const baseDecl = cem.modules
         .flatMap((m) => m.declarations ?? [])

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { isAbsolute } from 'node:path';
+import { isAbsolute, relative, resolve, sep } from 'node:path';
 import type { McpWcConfig } from '../config.js';
 import { GitOperations } from '../shared/git.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
@@ -503,23 +503,38 @@ export async function diffCem(
 
   // Read base branch's CEM via git show — no stash, no checkout, no working-tree mutation.
   //
-  // Guard: gitShow's allowlist rejects absolute paths. When a user opted
-  // into MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1, config.cemPath is absolute
-  // and downstream diff would silently fall back to "component is new" for
-  // every component. Surface that explicitly to stderr so the user knows
-  // the diff is degraded, then continue with baseMeta = null. Codex
-  // round-10 P1.
+  // Guard: gitShow's allowlist rejects absolute paths. Two sub-cases for
+  // an absolute config.cemPath:
+  //   1. Path is INSIDE projectRoot (supported MCP_WC_CEM_PATH setup
+  //      pointing at e.g. /repo/custom-elements.json): relativize and
+  //      use gitShow normally.
+  //   2. Path is OUTSIDE projectRoot (the MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS
+  //      opt-in case): gitShow can't help — degrade with a warning.
+  // Codex round-10 P1 (initial guard), round-16 P1 (in-repo absolute
+  // path case).
   const gitOps = new GitOperations();
 
   let baseMeta: ComponentMetadata | null = null;
 
+  let cemPathForGit = config.cemPath;
   if (isAbsolute(config.cemPath)) {
-    process.stderr.write(
-      `[helixir] Warning: diffCem cannot read base-branch CEM at absolute path ${config.cemPath} — gitShow requires repo-relative paths. Diff falls back to treating ${tagName} as new in base. (To restore diff: unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.)\n`,
-    );
-  } else {
+    const projectRootResolved = resolve(config.projectRoot);
+    const rel = relative(projectRootResolved, config.cemPath);
+    if (rel === '' || rel.startsWith('..') || isAbsolute(rel)) {
+      // Genuinely out-of-tree — gitShow can't read it.
+      process.stderr.write(
+        `[helixir] Warning: diffCem cannot read base-branch CEM at out-of-tree absolute path ${config.cemPath} — gitShow requires repo-relative paths. Diff falls back to treating ${tagName} as new in base. (To restore diff: unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.)\n`,
+      );
+      cemPathForGit = '';
+    } else {
+      // In-repo absolute path — relativize for gitShow.
+      cemPathForGit = rel.split(sep).join('/');
+    }
+  }
+
+  if (cemPathForGit !== '') {
     try {
-      const cemContent = await gitOps.gitShow(baseBranch, config.cemPath);
+      const cemContent = await gitOps.gitShow(baseBranch, cemPathForGit);
       const rawJson: unknown = JSON.parse(cemContent);
       const baseCem = CemSchema.parse(rawJson);
       const baseDecl = findDeclaration(baseCem, tagName);

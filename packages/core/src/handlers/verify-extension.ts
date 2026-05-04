@@ -619,10 +619,25 @@ function checkTouchTarget(
     // the actual element being styled. Extract the rightmost
     // compound selector (after the last descendant combinator).
     const armFinalElement = (arm: string): string => {
-      // Split on whitespace combinators (descendant `, child `>`,
-      // sibling `+` / `~`) at top level. Take the last segment.
-      const parts = arm.split(/\s*[\s>+~]\s*/).filter(Boolean);
-      return parts[parts.length - 1] ?? arm;
+      // Walk the arm with bracket/paren depth tracking so combinators
+      // inside attribute selectors ([attr~="x"]) or functional
+      // pseudos (:is(.a, .b)) don't trigger a split. Codex round-92 P2.
+      let bDepth = 0;
+      let pDepth = 0;
+      let lastCombinator = -1;
+      for (let p = 0; p < arm.length; p++) {
+        const c = arm[p];
+        if (c === '[') bDepth++;
+        else if (c === ']') bDepth--;
+        else if (c === '(') pDepth++;
+        else if (c === ')') pDepth--;
+        else if (bDepth === 0 && pDepth === 0) {
+          if (c === '>' || c === '+' || c === '~' || /\s/.test(c ?? '')) {
+            lastCombinator = p;
+          }
+        }
+      }
+      return arm.slice(lastCombinator + 1).trim() || arm;
     };
     if (
       selectorArms.length > 0 &&

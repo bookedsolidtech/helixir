@@ -525,18 +525,19 @@ function checkTouchTarget(
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 🛑 PINNED PER RUNBOOK §6 — DO NOT FLIP label/summary AGAIN
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // STRONG tier: intrinsic interactive controls. Round-by-round
-  // flip log on label/summary:
-  //   R84: drop both (false-positive on referencing labels)
-  //   R85: restore summary (always click target for <details>)
-  //   R86: restore label (label-as-wrapper IS the click target)
-  // Compromise pin: keep BOTH in STRONG. The default behavior of
-  // <label> is to be the click target (wrapping or `for=` association
-  // both make the label clickable). The label-referencing-separate-
-  // control case is the minority and the false-positive cost is
-  // acceptable.
+  // STRONG tier: intrinsic interactive controls. R84-R86 flip log:
+  //   R84: drop both (referencing labels false-positive)
+  //   R85: restore summary
+  //   R86: restore label
+  // Compromise pin: BOTH in STRONG for size-rule matching.
   const STRONG_INTERACTIVE =
     /(?:^|[\s,>+~])(?:button|a|input|select|textarea|summary|label|\[role\s*=\s*["']?(?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|option|switch|checkbox|radio|combobox|listbox|slider|spinbutton|treeitem|gridcell)["']?\]|\[tabindex(?:=|\]))(?:[\s,.:[{(]|$)/i;
+  // STRONG_HOST_PROMOTER: tighter set used ONLY to decide whether to
+  // promote bare :host into the audit. label/summary excluded —
+  // an internal <label> or <summary> doesn't make the host itself
+  // clickable. Codex round-90 P2 #1.
+  const STRONG_HOST_PROMOTER =
+    /(?:^|[\s,>+~])(?:button|a|input|select|textarea|\[role\s*=\s*["']?(?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|option|switch|checkbox|radio|combobox|listbox|slider|spinbutton|treeitem|gridcell)["']?\]|\[tabindex(?:=|\]))(?:[\s,.:[{(]|$)/i;
   const HOST_SELECTOR = /(?:^|[\s,>+~]):host(?:[\s,.:[{(]|$)/i;
   // Subclass styles contain a strong-interactive selector somewhere?
   // If yes, the subclass IS an interactive component (regardless of
@@ -578,7 +579,10 @@ function checkTouchTarget(
     }
     return selOnly.join('\n');
   })();
-  const subclassHasStrongInteractive = STRONG_INTERACTIVE.test(stylesSelectorsOnly);
+  // Use the tighter HOST_PROMOTER regex here — internal label /
+  // summary in the subclass shouldn't make bare :host get audited.
+  // Codex round-90 P2 #1.
+  const subclassHasStrongInteractive = STRONG_HOST_PROMOTER.test(stylesSelectorsOnly);
   const WEAK_INTERACTIVE_CLASS =
     /(?:^|[\s,>+~.])\.(?:button|btn|control|trigger|action|tab|menuitem|menu-item|option|chip|toggle|switch|checkbox|radio|link|clickable|interactive|target|thumb|handle|nav-item|tile|card-action|cta|hit-area|pressable|swatch-button)(?:[\s,.:[{]|$)/i;
   // Decoration-by-styles guard, evaluated PER RULE (not stylesheet-wide).
@@ -608,7 +612,22 @@ function checkTouchTarget(
     const selectorArms = splitTopLevelCommas(selector)
       .map((s) => s.trim())
       .filter(Boolean);
-    if (selectorArms.length > 0 && selectorArms.every((arm) => DECORATIVE_SELECTOR.test(arm))) {
+    // Decorative check applies to the FINAL simple selector of each
+    // arm (the actual styled element), not to ancestor combinators.
+    // Codex round-90 P2 #2: '.icon button' was being skipped because
+    // '.icon' matched DECORATIVE_SELECTOR even though 'button' is
+    // the actual element being styled. Extract the rightmost
+    // compound selector (after the last descendant combinator).
+    const armFinalElement = (arm: string): string => {
+      // Split on whitespace combinators (descendant `, child `>`,
+      // sibling `+` / `~`) at top level. Take the last segment.
+      const parts = arm.split(/\s*[\s>+~]\s*/).filter(Boolean);
+      return parts[parts.length - 1] ?? arm;
+    };
+    if (
+      selectorArms.length > 0 &&
+      selectorArms.every((arm) => DECORATIVE_SELECTOR.test(armFinalElement(arm)))
+    ) {
       continue;
     }
     // Strong tier (incl. :host) always counts; class vocabulary
@@ -824,11 +843,14 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
               const scopeArmsForAmp = splitTopLevelCommas(scopeRoot)
                 .map((s) => s.trim())
                 .filter(Boolean);
-              // Pure & expansion: every scope arm contains `&` and
-              // resolves entirely from parent expansion (no extra
-              // selectors mixed in). In that case scopeRoot already
-              // IS the resolved selector — skip cartesian.
-              scopeRootIsPureAmpExpansion = scopeArmsForAmp.every((sa) => sa.trim() === '&');
+              // Pure & expansion: ANY scope arm that contains `&`
+              // already encodes its parent relation, so the
+              // post-substitution scopeRoot must NOT be re-multiplied
+              // against parent in the cartesian step. Round-90 P2 #3
+              // generalized from "every arm is exactly `&`" to "any
+              // arm contains `&`" — `@scope (& + .icon)` and
+              // `@scope (&, .toolbar)` both flag now.
+              scopeRootIsPureAmpExpansion = scopeArmsForAmp.some((sa) => /&/.test(sa));
               if (parentArmsForAmp.length === 1) {
                 const onlyArm = parentArmsForAmp[0] ?? '';
                 scopeRoot = scopeRoot.replace(/&/g, onlyArm);

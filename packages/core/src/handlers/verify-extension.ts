@@ -532,12 +532,12 @@ function checkTouchTarget(
   // Compromise pin: BOTH in STRONG for size-rule matching.
   const STRONG_INTERACTIVE =
     /(?:^|[\s,>+~])(?:button|a|input|select|textarea|summary|label|\[role\s*=\s*["']?(?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|option|switch|checkbox|radio|combobox|listbox|slider|spinbutton|treeitem|gridcell)["']?\]|\[tabindex(?:=|\]))(?:[\s,.:[{(]|$)/i;
-  // STRONG_HOST_PROMOTER: tighter set used ONLY to decide whether to
-  // promote bare :host into the audit. label/summary excluded —
-  // an internal <label> or <summary> doesn't make the host itself
-  // clickable. Codex round-90 P2 #1.
-  const STRONG_HOST_PROMOTER =
-    /(?:^|[\s,>+~])(?:button|a|input|select|textarea|\[role\s*=\s*["']?(?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|option|switch|checkbox|radio|combobox|listbox|slider|spinbutton|treeitem|gridcell)["']?\]|\[tabindex(?:=|\]))(?:[\s,.:[{(]|$)/i;
+  // STRONG_HOST_PROMOTER: round 90 P2 #1 split this off (excluding
+  // label/summary). Round 91 P2 said summary-only or label-only
+  // components still need :host promotion when the only intrinsic
+  // control is a summary/label and :host is the undersized element.
+  // Reverted to use the same set as STRONG_INTERACTIVE.
+  const STRONG_HOST_PROMOTER = STRONG_INTERACTIVE;
   const HOST_SELECTOR = /(?:^|[\s,>+~]):host(?:[\s,.:[{(]|$)/i;
   // Subclass styles contain a strong-interactive selector somewhere?
   // If yes, the subclass IS an interactive component (regardless of
@@ -829,13 +829,18 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
             // `button + .icon, a + .icon`, NOT
             // `button, a + .icon` (precedence bug). Codex round-87/88 P2.
             //
-            // Track whether `&` was expanded so the downstream
-            // cartesian product knows NOT to re-multiply against
-            // parent — round-89 P2: `button, a { @scope (&) { ... } }`
-            // produced `button button, button a, a button, a a`
-            // because cartesian re-crossed parent arms after & had
-            // already substituted them.
-            let scopeRootIsPureAmpExpansion = false;
+            // CSS nesting `&` + selector-list handling — per-arm
+            // tracking so mixed `@scope (&, .toolbar)` resolves
+            // correctly. Each scope arm is classified:
+            //   - `&`-bearing arms get parent-substituted, then used
+            //     AS-IS (skipping the cartesian re-cross since they
+            //     already encode parent-relation).
+            //   - literal arms get cartesian-multiplied with parent
+            //     in the standard composition step.
+            // Round 91 P2: previous `some()`-based pure-amp shortcut
+            // discarded literal arms that DID need composition.
+            const ampExpandedArms: string[] = [];
+            const literalScopeArms: string[] = [];
             if (parentSel !== '' && /&/.test(scopeRoot)) {
               const parentArmsForAmp = splitTopLevelCommas(parentSel)
                 .map((s) => s.trim())
@@ -843,30 +848,23 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
               const scopeArmsForAmp = splitTopLevelCommas(scopeRoot)
                 .map((s) => s.trim())
                 .filter(Boolean);
-              // Pure & expansion: ANY scope arm that contains `&`
-              // already encodes its parent relation, so the
-              // post-substitution scopeRoot must NOT be re-multiplied
-              // against parent in the cartesian step. Round-90 P2 #3
-              // generalized from "every arm is exactly `&`" to "any
-              // arm contains `&`" — `@scope (& + .icon)` and
-              // `@scope (&, .toolbar)` both flag now.
-              scopeRootIsPureAmpExpansion = scopeArmsForAmp.some((sa) => /&/.test(sa));
-              if (parentArmsForAmp.length === 1) {
-                const onlyArm = parentArmsForAmp[0] ?? '';
-                scopeRoot = scopeRoot.replace(/&/g, onlyArm);
-              } else {
-                const expanded: string[] = [];
-                for (const sa of scopeArmsForAmp) {
-                  if (/&/.test(sa)) {
-                    for (const pa of parentArmsForAmp) {
-                      expanded.push(sa.replace(/&/g, pa));
-                    }
+              for (const sa of scopeArmsForAmp) {
+                if (/&/.test(sa)) {
+                  if (parentArmsForAmp.length === 1) {
+                    const onlyArm = parentArmsForAmp[0] ?? '';
+                    ampExpandedArms.push(sa.replace(/&/g, onlyArm));
                   } else {
-                    expanded.push(sa);
+                    for (const pa of parentArmsForAmp) {
+                      ampExpandedArms.push(sa.replace(/&/g, pa));
+                    }
                   }
+                } else {
+                  literalScopeArms.push(sa);
                 }
-                scopeRoot = expanded.join(', ');
               }
+              // Re-form scopeRoot from literal arms only — the &-arms
+              // are already-resolved and bypass cartesian below.
+              scopeRoot = literalScopeArms.join(', ');
             }
             // Cartesian-product expansion. @scope semantics: the
             // scope root is the OUTER container, so resolved selector
@@ -875,13 +873,15 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
             // "when this button is inside .toolbar, ..." resolving
             // to `.toolbar button`. Codex round-82 P1.
             let newParent: string;
-            if (scopeRoot === '' || scopeRoot === parentSel || scopeRootIsPureAmpExpansion) {
-              // Empty scope OR scope-root equals parent OR scopeRoot
-              // was fully derived from `&` substitution — no further
-              // composition; scopeRoot already represents the right
-              // selector chain. Round-89 P2 added the pure-amp check.
-              newParent = scopeRoot === '' ? parentSel : scopeRoot;
-              if (scopeRootIsPureAmpExpansion) newParent = scopeRoot;
+            // Compose literal-scope arms × parent arms (cartesian)
+            // and merge with the already-resolved &-derived arms.
+            // Round 91 P2 final: per-arm tracking prevents the
+            // earlier "skip whole cartesian" shortcut from
+            // dropping literal arms.
+            if (scopeRoot === '' && ampExpandedArms.length === 0) {
+              newParent = parentSel;
+            } else if (scopeRoot === parentSel && ampExpandedArms.length === 0) {
+              newParent = parentSel;
             } else if (parentSel === '') {
               newParent = scopeRoot;
             } else {
@@ -898,6 +898,14 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
                 }
               }
               newParent = products.join(', ');
+            }
+            // Merge in any &-derived arms (already pre-resolved
+            // against parent during the per-arm expansion above).
+            if (ampExpandedArms.length > 0) {
+              newParent =
+                newParent === ''
+                  ? ampExpandedArms.join(', ')
+                  : `${newParent}, ${ampExpandedArms.join(', ')}`;
             }
             // Extract direct decls so `button { @scope (.toolbar) {
             // width: 1rem } }` doesn't drop the width rule. Round 81 P1.

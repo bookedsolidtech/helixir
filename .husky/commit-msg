@@ -99,9 +99,15 @@ if grep -qiE '^\s*(Generated|Created|Built|Powered|Authored|Written|Produced)\s+
 fi
 
 # Pattern 4: Markdown-linked attribution
-if grep -qiE '\[Claude Code\]|\[GitHub Copilot\]|\[ChatGPT\]|\[Gemini\]|\[Cursor\]' "$COMMIT_MSG_FILE" 2>/dev/null; then
+# 0.16.2 helix-017 P3 #4: anchor on the markdown link shape `[Text](url)`
+# rather than bare `[Text]`. Pre-fix the regex matched ANY bracketed
+# mention — `feat: support [Claude Code] hook output format` would block
+# a perfectly legitimate commit. The markdown-link form requires the `(`
+# immediately after the closing bracket, which is the actual structural
+# attribution we want to catch.
+if grep -qiE '\[Claude Code\]\(|\[GitHub Copilot\]\(|\[ChatGPT\]\(|\[Gemini\]\(|\[Cursor\]\(' "$COMMIT_MSG_FILE" 2>/dev/null; then
   BLOCKED=1
-  MATCHES="${MATCHES}$(grep -niE '\[Claude Code\]|\[GitHub Copilot\]|\[ChatGPT\]|\[Gemini\]|\[Cursor\]' "$COMMIT_MSG_FILE" 2>/dev/null)
+  MATCHES="${MATCHES}$(grep -niE '\[Claude Code\]\(|\[GitHub Copilot\]\(|\[ChatGPT\]\(|\[Gemini\]\(|\[Cursor\]\(' "$COMMIT_MSG_FILE" 2>/dev/null)
 "
 fi
 

@@ -639,6 +639,14 @@ function checkTouchTarget(
       }
       return arm.slice(lastCombinator + 1).trim() || arm;
     };
+    // [aria-hidden] is an ANCESTOR suppressor — anywhere in the
+    // selector chain, it short-circuits regardless of the final
+    // element. Round 94 P2: armFinalElement narrowing dropped this
+    // suppression for selectors like '[aria-hidden] button { ... }'.
+    const ARIA_HIDDEN_ANCESTOR = /\[aria-hidden\b/i;
+    if (selectorArms.length > 0 && selectorArms.every((arm) => ARIA_HIDDEN_ANCESTOR.test(arm))) {
+      continue;
+    }
     if (
       selectorArms.length > 0 &&
       selectorArms.every((arm) => DECORATIVE_SELECTOR.test(armFinalElement(arm)))
@@ -910,8 +918,12 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
             // dropping literal arms.
             if (scopeRoot === '' && ampExpandedArms.length === 0) {
               newParent = parentSel;
-            } else if (scopeRoot === parentSel && ampExpandedArms.length === 0) {
-              newParent = parentSel;
+              // NOTE: removed `scopeRoot === parentSel` collapse
+              // shortcut per round-94 P2. `.item { @scope (.item) {
+              // ... } }` should resolve to `.item .item` (descendant
+              // .item-inside-.item) not `.item` — the scope IS a
+              // real selector constraint that happens to match the
+              // parent. Cartesian compose handles it correctly.
             } else if (parentSel === '') {
               newParent = scopeRoot;
             } else {

@@ -864,13 +864,28 @@ function flattenNestedCss(css: string): Array<{ selector: string; body: string }
                 .map((s) => s.trim())
                 .filter(Boolean);
               for (const sa of scopeArmsForAmp) {
-                if (/&/.test(sa)) {
+                if (sa.trim() === '&') {
+                  // Bare `&` arm: substitution produces parent
+                  // exactly, no further composition needed.
                   if (parentArmsForAmp.length === 1) {
                     const onlyArm = parentArmsForAmp[0] ?? '';
-                    ampExpandedArms.push(sa.replace(/&/g, onlyArm));
+                    ampExpandedArms.push(onlyArm);
                   } else {
                     for (const pa of parentArmsForAmp) {
-                      ampExpandedArms.push(sa.replace(/&/g, pa));
+                      ampExpandedArms.push(pa);
+                    }
+                  }
+                } else if (/&/.test(sa)) {
+                  // `&` wrapped or combined: still a transformed
+                  // scope, treat as a literal arm for cartesian
+                  // composition. Substitute first so the arm is
+                  // ready for cartesian. Codex round-93 P2.
+                  if (parentArmsForAmp.length === 1) {
+                    const onlyArm = parentArmsForAmp[0] ?? '';
+                    literalScopeArms.push(sa.replace(/&/g, onlyArm));
+                  } else {
+                    for (const pa of parentArmsForAmp) {
+                      literalScopeArms.push(sa.replace(/&/g, pa));
                     }
                   }
                 } else {

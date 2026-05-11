@@ -45,7 +45,13 @@ jobs:
 
       - name: Scan publish payload for secrets
         run: |
-          PAYLOAD=$(pnpm pack --dry-run 2>&1)
+          # pnpm 9 dropped the `pack --dry-run` flag — use `publish --dry-run`
+          # which prints the same `Tarball Contents` listing and DOES NOT push
+          # to npm. The previous `pack --dry-run` died with `Unknown option`
+          # and set -e collapsed the assignment. (Fix lands 2026-05-11.)
+          set +e
+          PAYLOAD=$(pnpm publish --dry-run --no-git-checks 2>&1)
+          set -e
           if echo "$PAYLOAD" | grep -qE '(^|\s)\.env'; then
             echo "ERROR: .env files detected in publish payload"
             echo "$PAYLOAD"

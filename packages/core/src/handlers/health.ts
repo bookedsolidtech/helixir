@@ -6,14 +6,23 @@ import type { McpWcConfig } from '../config.js';
 import { CemSchema, cemHas } from './cem.js';
 import type { Cem, CemDeclaration, CemPresenceKey } from './cem.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
-import { analyzeAccessibility } from './accessibility.js';
 import { analyzeTypeCoverage } from './analyzers/type-coverage.js';
 import { analyzeApiSurface } from './analyzers/api-surface.js';
 import { analyzeCssArchitecture } from './analyzers/css-architecture.js';
 import { analyzeEventArchitecture } from './analyzers/event-architecture.js';
-import { analyzeSourceAccessibility } from './analyzers/source-accessibility.js';
 import { analyzeCemSourceFidelity } from './analyzers/cem-source-fidelity.js';
 import { analyzeSlotArchitecture } from './analyzers/slot-architecture.js';
+import { detectHelixAaaEvidence } from './evidence/helix-aaa-evidence.js';
+import type { HelixAaaEvidence } from './evidence/helix-aaa-evidence.js';
+import { scoreWcagConformance } from './dimensions/wcag-conformance.js';
+import { scoreApgKeyboard } from './dimensions/apg-keyboard.js';
+import { scoreFocusIndicator } from './dimensions/focus-indicator.js';
+import { scoreFormAssociation } from './dimensions/form-association.js';
+import { scoreAccessibleLabel } from './dimensions/accessible-label.js';
+import { scoreForcedColors } from './dimensions/forced-colors.js';
+import { scoreFormValidityReporting } from './dimensions/form-validity-reporting.js';
+import { scoreAaaAuditSelfCertification } from './dimensions/aaa-audit-cert.js';
+import type { DimScoreResult } from './dimensions/types.js';
 import {
   analyzeNamingConsistency,
   detectLibraryConventions,
@@ -872,6 +881,26 @@ function scoreCemCompleteness(decl: CemDeclaration): { score: number; subMetrics
  * @param weights - Optional scoring weights from config
  * @returns The base weight multiplied by the configured multiplier (defaults to 1.0)
  */
+// Phase 3 back-compat: dim names that previously rolled up into the
+// single legacy `accessibility` weight key. When a downstream config
+// still sets `weights.accessibility` but has NOT set the new
+// per-sub-dim key, fan that legacy multiplier out to these 5 dims.
+// The 3 net-new a11y dims (`Forced Colors Mode`, `Form Validity
+// Reporting`, `AAA Audit Self-Certification`) have no legacy mapping
+// — they only honor their own weight keys.
+const LEGACY_ACCESSIBILITY_FANOUT: readonly string[] = [
+  'WCAG Conformance',
+  'APG Keyboard Contract',
+  'Focus Indicator',
+  'Form Association',
+  'Accessible Label Pattern',
+];
+
+// One-shot deprecation warning gate. Module-scoped so we only warn
+// once per process even if many components score against the legacy
+// key. Reset is not provided — this is intentional.
+let accessibilityDeprecationWarned = false;
+
 function getEffectiveWeight(
   baseWeight: number,
   dimensionName: string,
@@ -882,7 +911,25 @@ function getEffectiveWeight(
   for (const [key, name] of Object.entries(DIMENSION_WEIGHT_KEYS)) {
     if (name === dimensionName) {
       const multiplier = (weights as Record<string, number | undefined>)[key];
-      return multiplier !== undefined ? baseWeight * multiplier : baseWeight;
+      if (multiplier !== undefined) return baseWeight * multiplier;
+      // Specific key not set — fall through to legacy fan-out if applicable.
+      break;
+    }
+  }
+  // Back-compat fan-out: legacy `accessibility` multiplier applies to the
+  // 5 dims that were split out of the old Accessibility dimension.
+  if (LEGACY_ACCESSIBILITY_FANOUT.includes(dimensionName)) {
+    const legacy = (weights as Record<string, number | undefined>)['accessibility'];
+    if (legacy !== undefined) {
+      if (!accessibilityDeprecationWarned) {
+        accessibilityDeprecationWarned = true;
+        console.warn(
+          '[helixir] scoring.weights.accessibility is deprecated — use per-sub-dim weights ' +
+            '(wcagConformance, apgKeyboard, focusIndicator, formAssociation, accessibleLabel). ' +
+            'The legacy multiplier currently fans out to all five and will be removed in 0.8.0.',
+        );
+      }
+      return baseWeight * legacy;
     }
   }
   return baseWeight;
@@ -899,6 +946,7 @@ export async function scoreComponentMultiDimensional(
   cem?: Cem,
   libraryId = 'default',
   namingConventions?: LibraryNamingConventions,
+  libraryRoot?: string,
 ): Promise<MultiDimensionalHealth> {
   const tagName = decl.tagName ?? '';
   const issues: string[] = [];
@@ -918,6 +966,12 @@ export async function scoreComponentMultiDimensional(
 
   const scoringWeights = config.scoring?.weights;
 
+  // Phase 3: compute the helix-AAA evidence ONCE per component, then
+  // thread it through every dim-arm call. The detector caches per
+  // libraryRoot, but lifting also makes the cross-dim contract explicit
+  // — every a11y arm scores against the same evidence object.
+  const evidence: HelixAaaEvidence = detectHelixAaaEvidence(decl, libraryRoot);
+
   for (const def of DIMENSION_REGISTRY) {
     const effectiveWeight = getEffectiveWeight(def.weight, def.name, scoringWeights);
 
@@ -929,6 +983,7 @@ export async function scoreComponentMultiDimensional(
         config,
         cem,
         namingConventions,
+        evidence,
       );
       const notApplicable = 'notApplicable' in result && result.notApplicable === true;
       dimensions.push({
@@ -1048,12 +1103,54 @@ async function scoreCemNativeDimension(
   config?: McpWcConfig,
   cem?: Cem,
   namingConventions?: LibraryNamingConventions,
+  evidence?: HelixAaaEvidence,
 ): Promise<{
   score: number;
   confidence: ConfidenceLevel;
   subMetrics?: SubMetric[];
   notApplicable?: boolean;
 }> {
+  // Lazily ensure the evidence object exists for the 8 a11y arms below.
+  // The shared `evidence` is normally computed once per
+  // scoreComponentMultiDimensional call and threaded in; the fallback
+  // here keeps the dispatcher safe when an older direct caller forgets.
+  const ensureEvidence = (): HelixAaaEvidence => evidence ?? detectHelixAaaEvidence(decl);
+
+  // Translate a Phase-2 DimScoreResult into the dispatcher's return shape.
+  // notApplicable mirrors the analyzer null path — `unknown`/`untested`
+  // with measured=false flows through as a non-measured dim downstream.
+  const fromDim = (
+    r: DimScoreResult,
+  ): {
+    score: number;
+    confidence: ConfidenceLevel;
+    subMetrics?: SubMetric[];
+    notApplicable?: boolean;
+  } => {
+    if (r.notes && r.notes.length > 0) {
+      for (const n of r.notes) issues.push(n);
+    }
+    const out: {
+      score: number;
+      confidence: ConfidenceLevel;
+      subMetrics?: SubMetric[];
+      notApplicable?: boolean;
+    } = {
+      score: r.score,
+      confidence: r.confidence,
+    };
+    if (r.subMetrics) {
+      out.subMetrics = r.subMetrics.map((s) => ({
+        name: s.name,
+        score: s.score,
+        maxScore: s.maxScore,
+        ...(s.note !== undefined ? { note: s.note } : {}),
+      }));
+    }
+    if (!r.measured) out.notApplicable = true;
+    return out;
+  };
+
   switch (name) {
     case 'CEM Completeness': {
       const { score, subMetrics } = scoreCemCompleteness(decl);
@@ -1063,33 +1160,41 @@ async function scoreCemNativeDimension(
       return { score, confidence: 'verified', subMetrics };
     }
 
-    case 'Accessibility': {
-      const a11y = analyzeAccessibility(decl);
-      const cemSubMetrics: SubMetric[] = Object.entries(a11y.dimensions).map(([key, dim]) => ({
-        name: key,
-        score: dim.points,
-        maxScore: dim.maxPoints,
-        note: dim.note,
-      }));
+    // ── Phase 3 dimensional upgrade — 8 a11y dim arms ─────────────────────
+    // Each arm pulls the shared HelixAaaEvidence (lifted once per call in
+    // scoreComponentMultiDimensional) and delegates to the matching Phase-2
+    // scorer. The DimScoreResult is reshaped into the dispatcher's return
+    // contract via the fromDim() helper above.
+    case 'WCAG Conformance': {
+      return fromDim(scoreWcagConformance(decl, ensureEvidence()));
+    }
 
-      // Source-based scoring — if source file is available, blend 30% CEM + 70% source
-      if (config && cem) {
-        const sourceA11y = await analyzeSourceAccessibility(config, cem, decl);
-        if (sourceA11y) {
-          const blendedScore = Math.round(a11y.score * 0.3 + sourceA11y.score * 0.7);
-          const subMetrics = [...cemSubMetrics, ...sourceA11y.subMetrics];
-          if (blendedScore < 50) {
-            issues.push(`Accessibility score is low (${blendedScore}%)`);
-          }
-          return { score: blendedScore, confidence: 'heuristic', subMetrics };
-        }
-      }
+    case 'APG Keyboard Contract': {
+      return fromDim(scoreApgKeyboard(decl, ensureEvidence()));
+    }
 
-      // Fallback: CEM-only
-      if (a11y.score < 50) {
-        issues.push(`Accessibility score is low (${a11y.score}%)`);
-      }
-      return { score: a11y.score, confidence: 'heuristic', subMetrics: cemSubMetrics };
+    case 'Focus Indicator': {
+      return fromDim(scoreFocusIndicator(decl, ensureEvidence()));
+    }
+
+    case 'Form Association': {
+      return fromDim(scoreFormAssociation(decl, ensureEvidence()));
+    }
+
+    case 'Accessible Label Pattern': {
+      return fromDim(scoreAccessibleLabel(decl, ensureEvidence()));
+    }
+
+    case 'Forced Colors Mode': {
+      return fromDim(scoreForcedColors(decl, ensureEvidence()));
+    }
+
+    case 'Form Validity Reporting': {
+      return fromDim(scoreFormValidityReporting(decl, ensureEvidence()));
+    }
+
+    case 'AAA Audit Self-Certification': {
+      return fromDim(scoreAaaAuditSelfCertification(decl, ensureEvidence()));
     }
 
     case 'Type Coverage': {
@@ -1207,6 +1312,7 @@ export async function scoreAllComponentsMultiDimensional(
   cemDeclarations: CemDeclaration[],
   cem?: Cem,
   libraryId = 'default',
+  libraryRoot?: string,
 ): Promise<MultiDimensionalHealth[]> {
   const withTag = cemDeclarations.filter((decl) => decl.tagName !== undefined);
 
@@ -1215,7 +1321,7 @@ export async function scoreAllComponentsMultiDimensional(
 
   return Promise.all(
     withTag.map((decl) =>
-      scoreComponentMultiDimensional(config, decl, cem, libraryId, namingConventions),
+      scoreComponentMultiDimensional(config, decl, cem, libraryId, namingConventions, libraryRoot),
     ),
   );
 }

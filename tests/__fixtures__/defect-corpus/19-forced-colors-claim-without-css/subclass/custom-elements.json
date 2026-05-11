@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "2.1.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "subclass/hx-forced-colors-overclaim.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Subclass claims forced-colors support but replaces parent styles with a forced-colors-free block.",
+          "name": "HxForcedColorsOverclaim",
+          "tagName": "hx-forced-colors-overclaim",
+          "superclass": {
+            "name": "HxParentBanner",
+            "module": "parent/hx-parent-banner.ts"
+          },
+          "members": [],
+          "attributes": [],
+          "slots": [{ "name": "", "description": "Banner content." }],
+          "helixMeta": {
+            "forcedColorsSupported": true
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-forced-colors-overclaim",
+          "declaration": {
+            "name": "HxForcedColorsOverclaim",
+            "module": "subclass/hx-forced-colors-overclaim.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

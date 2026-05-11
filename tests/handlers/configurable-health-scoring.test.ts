@@ -79,8 +79,45 @@ describe('DIMENSION_WEIGHT_KEYS', () => {
     expect(DIMENSION_WEIGHT_KEYS['documentation']).toBe('CEM Completeness');
   });
 
-  it('maps accessibility → Accessibility', () => {
-    expect(DIMENSION_WEIGHT_KEYS['accessibility']).toBe('Accessibility');
+  // Phase 3 dimensional upgrade: the legacy `accessibility` key has been
+  // removed from DIMENSION_WEIGHT_KEYS (the `Accessibility` dim was split
+  // into 8 new dims). `weights.accessibility` is still ACCEPTED on the
+  // Config interface as `@deprecated` and fans out across the 5 split
+  // sub-dims via getEffectiveWeight — see the back-compat tests below.
+  it('does NOT map `accessibility` directly (legacy key removed from registry)', () => {
+    expect(DIMENSION_WEIGHT_KEYS['accessibility']).toBeUndefined();
+  });
+
+  it('maps wcagConformance → WCAG Conformance', () => {
+    expect(DIMENSION_WEIGHT_KEYS['wcagConformance']).toBe('WCAG Conformance');
+  });
+
+  it('maps apgKeyboard → APG Keyboard Contract', () => {
+    expect(DIMENSION_WEIGHT_KEYS['apgKeyboard']).toBe('APG Keyboard Contract');
+  });
+
+  it('maps focusIndicator → Focus Indicator', () => {
+    expect(DIMENSION_WEIGHT_KEYS['focusIndicator']).toBe('Focus Indicator');
+  });
+
+  it('maps formAssociation → Form Association', () => {
+    expect(DIMENSION_WEIGHT_KEYS['formAssociation']).toBe('Form Association');
+  });
+
+  it('maps accessibleLabel → Accessible Label Pattern', () => {
+    expect(DIMENSION_WEIGHT_KEYS['accessibleLabel']).toBe('Accessible Label Pattern');
+  });
+
+  it('maps forcedColors → Forced Colors Mode', () => {
+    expect(DIMENSION_WEIGHT_KEYS['forcedColors']).toBe('Forced Colors Mode');
+  });
+
+  it('maps formValidityReporting → Form Validity Reporting', () => {
+    expect(DIMENSION_WEIGHT_KEYS['formValidityReporting']).toBe('Form Validity Reporting');
+  });
+
+  it('maps aaaAuditSelfCertification → AAA Audit Self-Certification', () => {
+    expect(DIMENSION_WEIGHT_KEYS['aaaAuditSelfCertification']).toBe('AAA Audit Self-Certification');
   });
 
   it('maps naming → Naming Consistency', () => {
@@ -131,7 +168,7 @@ describe('DIMENSION_WEIGHT_KEYS', () => {
     expect(DIMENSION_WEIGHT_KEYS['slotArchitecture']).toBe('Slot Architecture');
   });
 
-  it('covers all 14 dimensions in the DIMENSION_REGISTRY', () => {
+  it('covers all 21 dimensions in the DIMENSION_REGISTRY', () => {
     const mappedDimensions = new Set(Object.values(DIMENSION_WEIGHT_KEYS));
     const registryDimensions = new Set(DIMENSION_REGISTRY.map((d) => d.name));
     // Every dimension in the registry should have a config key
@@ -175,15 +212,141 @@ describe('scoreComponentMultiDimensional — custom weights', () => {
     }
   });
 
-  it('applies accessibility multiplier to Accessibility dimension weight', async () => {
-    const config = makeConfig({ scoring: { weights: { accessibility: 2.0 } } });
+  it('applies wcagConformance multiplier to WCAG Conformance dimension weight', async () => {
+    const config = makeConfig({ scoring: { weights: { wcagConformance: 2.0 } } });
     const result = await scoreComponentMultiDimensional(config, SIMPLE_DECL);
 
-    const accessibilityDim = result.dimensions.find((d) => d.name === 'Accessibility');
-    const baseWeight = DIMENSION_REGISTRY.find((d) => d.name === 'Accessibility')!.weight;
+    const dim = result.dimensions.find((d) => d.name === 'WCAG Conformance');
+    const baseWeight = DIMENSION_REGISTRY.find((d) => d.name === 'WCAG Conformance')!.weight;
 
-    expect(accessibilityDim).toBeDefined();
-    expect(accessibilityDim!.weight).toBe(baseWeight * 2.0);
+    expect(dim).toBeDefined();
+    expect(dim!.weight).toBe(baseWeight * 2.0);
+  });
+
+  it('applies apgKeyboard multiplier to APG Keyboard Contract dimension weight', async () => {
+    const config = makeConfig({ scoring: { weights: { apgKeyboard: 1.5 } } });
+    const result = await scoreComponentMultiDimensional(config, SIMPLE_DECL);
+
+    const dim = result.dimensions.find((d) => d.name === 'APG Keyboard Contract');
+    const baseWeight = DIMENSION_REGISTRY.find((d) => d.name === 'APG Keyboard Contract')!.weight;
+
+    expect(dim).toBeDefined();
+    expect(dim!.weight).toBeCloseTo(baseWeight * 1.5);
+  });
+
+  it('applies focusIndicator / formAssociation / accessibleLabel multipliers to their dims', async () => {
+    const config = makeConfig({
+      scoring: {
+        weights: {
+          focusIndicator: 2.0,
+          formAssociation: 3.0,
+          accessibleLabel: 0.5,
+        },
+      },
+    });
+    const result = await scoreComponentMultiDimensional(config, SIMPLE_DECL);
+
+    const focusDim = result.dimensions.find((d) => d.name === 'Focus Indicator');
+    const formDim = result.dimensions.find((d) => d.name === 'Form Association');
+    const labelDim = result.dimensions.find((d) => d.name === 'Accessible Label Pattern');
+
+    const focusBase = DIMENSION_REGISTRY.find((d) => d.name === 'Focus Indicator')!.weight;
+    const formBase = DIMENSION_REGISTRY.find((d) => d.name === 'Form Association')!.weight;
+    const labelBase = DIMENSION_REGISTRY.find((d) => d.name === 'Accessible Label Pattern')!.weight;
+
+    expect(focusDim!.weight).toBeCloseTo(focusBase * 2.0);
+    expect(formDim!.weight).toBeCloseTo(formBase * 3.0);
+    expect(labelDim!.weight).toBeCloseTo(labelBase * 0.5);
+  });
+
+  it('applies forcedColors / formValidityReporting / aaaAuditSelfCertification multipliers', async () => {
+    const config = makeConfig({
+      scoring: {
+        weights: {
+          forcedColors: 4.0,
+          formValidityReporting: 2.0,
+          // aaaAuditSelfCertification has base weight 0 — multiplier leaves it 0
+          // (still useful to verify the key is wired without crashing).
+          aaaAuditSelfCertification: 5.0,
+        },
+      },
+    });
+    const result = await scoreComponentMultiDimensional(config, SIMPLE_DECL);
+
+    const fcDim = result.dimensions.find((d) => d.name === 'Forced Colors Mode');
+    const fvDim = result.dimensions.find((d) => d.name === 'Form Validity Reporting');
+    const aaaDim = result.dimensions.find((d) => d.name === 'AAA Audit Self-Certification');
+
+    const fcBase = DIMENSION_REGISTRY.find((d) => d.name === 'Forced Colors Mode')!.weight;
+    const fvBase = DIMENSION_REGISTRY.find((d) => d.name === 'Form Validity Reporting')!.weight;
+    const aaaBase = DIMENSION_REGISTRY.find(
+      (d) => d.name === 'AAA Audit Self-Certification',
+    )!.weight;
+
+    expect(fcDim!.weight).toBeCloseTo(fcBase * 4.0);
+    expect(fvDim!.weight).toBeCloseTo(fvBase * 2.0);
+    expect(aaaDim!.weight).toBeCloseTo(aaaBase * 5.0);
+    expect(aaaBase).toBe(0);
+  });
+
+  // ── Phase 3 back-compat: legacy `accessibility` fan-out ────────────────
+  it('legacy `weights.accessibility` fans out across the 5 split a11y dims', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    try {
+      const config = makeConfig({ scoring: { weights: { accessibility: 2.0 } } });
+      const result = await scoreComponentMultiDimensional(config, SIMPLE_DECL);
+
+      // The 5 dims the legacy `accessibility` key fans out to.
+      const FANOUT = [
+        'WCAG Conformance',
+        'APG Keyboard Contract',
+        'Focus Indicator',
+        'Form Association',
+        'Accessible Label Pattern',
+      ];
+      for (const name of FANOUT) {
+        const dim = result.dimensions.find((d) => d.name === name)!;
+        const base = DIMENSION_REGISTRY.find((d) => d.name === name)!.weight;
+        expect(dim.weight).toBeCloseTo(base * 2.0);
+      }
+
+      // The 3 net-new a11y dims do NOT receive the legacy multiplier —
+      // they only honor their own per-sub-dim keys.
+      const NOT_FANOUT = [
+        'Forced Colors Mode',
+        'Form Validity Reporting',
+        'AAA Audit Self-Certification',
+      ];
+      for (const name of NOT_FANOUT) {
+        const dim = result.dimensions.find((d) => d.name === name)!;
+        const base = DIMENSION_REGISTRY.find((d) => d.name === name)!.weight;
+        expect(dim.weight).toBe(base);
+      }
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it('specific per-sub-dim key wins when both `accessibility` and the sub-dim key are set', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    try {
+      const config = makeConfig({
+        scoring: { weights: { accessibility: 2.0, wcagConformance: 5.0 } },
+      });
+      const result = await scoreComponentMultiDimensional(config, SIMPLE_DECL);
+
+      // WCAG Conformance honors the specific override (5x), not the legacy 2x.
+      const wcagDim = result.dimensions.find((d) => d.name === 'WCAG Conformance')!;
+      const wcagBase = DIMENSION_REGISTRY.find((d) => d.name === 'WCAG Conformance')!.weight;
+      expect(wcagDim.weight).toBeCloseTo(wcagBase * 5.0);
+
+      // The other 4 fan-out dims still get the legacy multiplier.
+      const apgDim = result.dimensions.find((d) => d.name === 'APG Keyboard Contract')!;
+      const apgBase = DIMENSION_REGISTRY.find((d) => d.name === 'APG Keyboard Contract')!.weight;
+      expect(apgDim.weight).toBeCloseTo(apgBase * 2.0);
+    } finally {
+      warnSpy.mockRestore();
+    }
   });
 
   it('applies documentation multiplier to CEM Completeness dimension weight', async () => {
@@ -209,51 +372,76 @@ describe('scoreComponentMultiDimensional — custom weights', () => {
   });
 
   it('only modifies specified dimensions; other dimensions keep base weights', async () => {
-    const config = makeConfig({ scoring: { weights: { accessibility: 3.0 } } });
-    const result = await scoreComponentMultiDimensional(config, SIMPLE_DECL);
+    // Phase 3: target a single specific sub-dim key (the canonical
+    // single-dim case). Legacy `accessibility` is exercised by the
+    // fan-out test above.
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    try {
+      const config = makeConfig({ scoring: { weights: { wcagConformance: 3.0 } } });
+      const result = await scoreComponentMultiDimensional(config, SIMPLE_DECL);
 
-    // Accessibility gets the multiplier
-    const accessibilityDim = result.dimensions.find((d) => d.name === 'Accessibility');
-    const accessibilityBase = DIMENSION_REGISTRY.find((d) => d.name === 'Accessibility')!.weight;
-    expect(accessibilityDim!.weight).toBe(accessibilityBase * 3.0);
+      // WCAG Conformance gets the multiplier
+      const wcagDim = result.dimensions.find((d) => d.name === 'WCAG Conformance')!;
+      const wcagBase = DIMENSION_REGISTRY.find((d) => d.name === 'WCAG Conformance')!.weight;
+      expect(wcagDim.weight).toBe(wcagBase * 3.0);
 
-    // All other dimensions keep base weight
-    const otherDims = result.dimensions.filter((d) => d.name !== 'Accessibility');
-    for (const dim of otherDims) {
-      const registryEntry = DIMENSION_REGISTRY.find((d) => d.name === dim.name);
-      expect(dim.weight).toBe(registryEntry!.weight);
+      // All other dimensions keep base weight
+      const otherDims = result.dimensions.filter((d) => d.name !== 'WCAG Conformance');
+      for (const dim of otherDims) {
+        const registryEntry = DIMENSION_REGISTRY.find((d) => d.name === dim.name);
+        expect(dim.weight).toBe(registryEntry!.weight);
+      }
+    } finally {
+      warnSpy.mockRestore();
     }
   });
 
   it('multiplier of 1.0 produces same result as no weight configured', async () => {
-    const baseConfig = makeConfig();
-    const explicitOneConfig = makeConfig({
-      scoring: { weights: { documentation: 1.0, accessibility: 1.0 } },
-    });
+    // Phase 3: keep `accessibility: 1.0` in the input to verify the legacy
+    // fan-out path is a no-op at 1.0× (the warning still fires but the
+    // weights are unchanged). Suppress the deprecation noise during the test.
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    try {
+      const baseConfig = makeConfig();
+      const explicitOneConfig = makeConfig({
+        scoring: { weights: { documentation: 1.0, accessibility: 1.0 } },
+      });
 
-    const baseResult = await scoreComponentMultiDimensional(baseConfig, SIMPLE_DECL);
-    const explicitOneResult = await scoreComponentMultiDimensional(explicitOneConfig, SIMPLE_DECL);
+      const baseResult = await scoreComponentMultiDimensional(baseConfig, SIMPLE_DECL);
+      const explicitOneResult = await scoreComponentMultiDimensional(
+        explicitOneConfig,
+        SIMPLE_DECL,
+      );
 
-    expect(explicitOneResult.score).toBe(baseResult.score);
+      expect(explicitOneResult.score).toBe(baseResult.score);
+    } finally {
+      warnSpy.mockRestore();
+    }
   });
 
   it('higher weight on low-scoring dimension lowers the final score', async () => {
+    // Phase 3: target WCAG Conformance directly — LOW_A11Y_DECL has no
+    // aria-* members so the dim falls into Branch 5 (unknown / measured:false)
+    // pre-multiplier. To exercise the weight-on-score interaction we
+    // pick a dim that DOES score and DOES score low. CSS Architecture
+    // is a stable choice — it scores from cssProperties/cssParts, both
+    // absent on LOW_A11Y_DECL, so the dim is measured-but-low.
     const baseConfig = makeConfig();
-    const highA11yConfig = makeConfig({ scoring: { weights: { accessibility: 5.0 } } });
+    const heavyConfig = makeConfig({ scoring: { weights: { cssArchitecture: 5.0 } } });
 
     const baseResult = await scoreComponentMultiDimensional(baseConfig, LOW_A11Y_DECL);
-    const highA11yResult = await scoreComponentMultiDimensional(highA11yConfig, LOW_A11Y_DECL);
+    const heavyResult = await scoreComponentMultiDimensional(heavyConfig, LOW_A11Y_DECL);
 
-    const baseA11yDim = baseResult.dimensions.find((d) => d.name === 'Accessibility');
-    const highA11yDim = highA11yResult.dimensions.find((d) => d.name === 'Accessibility');
+    const baseDim = baseResult.dimensions.find((d) => d.name === 'CSS Architecture');
+    const heavyDim = heavyResult.dimensions.find((d) => d.name === 'CSS Architecture');
 
-    // Both have the same accessibility score
-    expect(baseA11yDim!.score).toBe(highA11yDim!.score);
+    // Both have the same dimension score; only the weight differs.
+    expect(baseDim!.score).toBe(heavyDim!.score);
 
-    // When accessibility scores poorly, increasing its weight should lower the final score
-    // (or at minimum not raise it)
-    if (baseA11yDim!.score < 50) {
-      expect(highA11yResult.score).toBeLessThanOrEqual(baseResult.score);
+    // When the dim scores poorly AND is measured, increasing its weight
+    // pulls the weighted average down (or at minimum, not up).
+    if (baseDim!.measured && baseDim!.score < 50) {
+      expect(heavyResult.score).toBeLessThanOrEqual(baseResult.score);
     }
   });
 
@@ -277,11 +465,13 @@ describe('scoreComponentMultiDimensional — custom weights', () => {
   });
 
   it('multiple weight overrides all apply simultaneously', async () => {
+    // Phase 3: legacy `accessibility` is replaced by `wcagConformance`
+    // (the single dim with the same role in the new shape).
     const config = makeConfig({
       scoring: {
         weights: {
           documentation: 2.0,
-          accessibility: 0.5,
+          wcagConformance: 0.5,
           naming: 3.0,
         },
       },
@@ -289,15 +479,15 @@ describe('scoreComponentMultiDimensional — custom weights', () => {
     const result = await scoreComponentMultiDimensional(config, SIMPLE_DECL);
 
     const docDim = result.dimensions.find((d) => d.name === 'CEM Completeness');
-    const a11yDim = result.dimensions.find((d) => d.name === 'Accessibility');
+    const wcagDim = result.dimensions.find((d) => d.name === 'WCAG Conformance');
     const namingDim = result.dimensions.find((d) => d.name === 'Naming Consistency');
 
     const docBase = DIMENSION_REGISTRY.find((d) => d.name === 'CEM Completeness')!.weight;
-    const a11yBase = DIMENSION_REGISTRY.find((d) => d.name === 'Accessibility')!.weight;
+    const wcagBase = DIMENSION_REGISTRY.find((d) => d.name === 'WCAG Conformance')!.weight;
     const namingBase = DIMENSION_REGISTRY.find((d) => d.name === 'Naming Consistency')!.weight;
 
     expect(docDim!.weight).toBeCloseTo(docBase * 2.0);
-    expect(a11yDim!.weight).toBeCloseTo(a11yBase * 0.5);
+    expect(wcagDim!.weight).toBeCloseTo(wcagBase * 0.5);
     expect(namingDim!.weight).toBeCloseTo(namingBase * 3.0);
   });
 });

@@ -10,7 +10,12 @@ import { discoverCemPath, FRIENDLY_CEM_ERROR } from './shared/discovery.js';
 export interface ScoringWeights {
   /** CEM Completeness dimension */
   readonly documentation?: number;
-  /** Accessibility dimension */
+  /**
+   * Legacy single-axis accessibility multiplier.
+   * @deprecated use per-sub-dim weights; multiplier applies to all five
+   * split a11y dims (wcagConformance, apgKeyboard, focusIndicator,
+   * formAssociation, accessibleLabel) when set; removed in 0.8.0.
+   */
   readonly accessibility?: number;
   /** Type Coverage dimension */
   readonly typeCoverage?: number;
@@ -36,6 +41,23 @@ export interface ScoringWeights {
   readonly slotArchitecture?: number;
   /** Naming Consistency dimension */
   readonly naming?: number;
+  // ── Phase 3 dimensional upgrade: per-sub-dim a11y weights ─────────────
+  /** WCAG Conformance dimension */
+  readonly wcagConformance?: number;
+  /** APG Keyboard Contract dimension */
+  readonly apgKeyboard?: number;
+  /** Focus Indicator dimension */
+  readonly focusIndicator?: number;
+  /** Form Association dimension */
+  readonly formAssociation?: number;
+  /** Accessible Label Pattern dimension */
+  readonly accessibleLabel?: number;
+  /** Forced Colors Mode dimension */
+  readonly forcedColors?: number;
+  /** Form Validity Reporting dimension */
+  readonly formValidityReporting?: number;
+  /** AAA Audit Self-Certification dimension */
+  readonly aaaAuditSelfCertification?: number;
 }
 
 /**

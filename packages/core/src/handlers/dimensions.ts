@@ -61,13 +61,6 @@ export const DIMENSION_REGISTRY: DimensionDefinition[] = [
     phase: 'cem-analysis',
   },
   {
-    name: 'Accessibility',
-    weight: 10,
-    tier: 'critical',
-    source: 'cem-native',
-    phase: 'cem-analysis',
-  },
-  {
     name: 'Type Coverage',
     weight: 10,
     tier: 'critical',
@@ -143,15 +136,75 @@ export const DIMENSION_REGISTRY: DimensionDefinition[] = [
     source: 'cem-native',
     phase: 'cem-analysis',
   },
+  // Phase 3 dimensional upgrade — 8 dims replacing legacy 'Accessibility' (was weight 10).
+  // Total weight delta: -10 + 12 = +2 → TOTAL_WEIGHT goes 105 → 107.
+  // Names are load-bearing: dispatcher arms and tests key on these exact strings.
+  {
+    name: 'WCAG Conformance',
+    weight: 4,
+    tier: 'critical',
+    source: 'cem-native',
+    phase: 'cem-analysis',
+  },
+  {
+    name: 'APG Keyboard Contract',
+    weight: 2,
+    tier: 'critical',
+    source: 'cem-native',
+    phase: 'cem-analysis',
+  },
+  {
+    name: 'Focus Indicator',
+    weight: 1,
+    tier: 'important',
+    source: 'cem-native',
+    phase: 'cem-analysis',
+  },
+  {
+    name: 'Form Association',
+    weight: 1,
+    tier: 'important',
+    source: 'cem-native',
+    phase: 'cem-analysis',
+  },
+  {
+    name: 'Accessible Label Pattern',
+    weight: 2,
+    tier: 'important',
+    source: 'cem-native',
+    phase: 'cem-analysis',
+  },
+  {
+    name: 'Forced Colors Mode',
+    weight: 1,
+    tier: 'important',
+    source: 'cem-native',
+    phase: 'cem-analysis',
+  },
+  {
+    name: 'Form Validity Reporting',
+    weight: 1,
+    tier: 'advanced',
+    source: 'cem-native',
+    phase: 'cem-analysis',
+  },
+  {
+    name: 'AAA Audit Self-Certification',
+    weight: 0,
+    tier: 'advanced',
+    source: 'cem-native',
+    phase: 'cem-analysis',
+  },
 ];
 
 export const DIMENSION_CLASSIFICATION = {
   critical: [
     'CEM Completeness',
-    'Accessibility',
     'Type Coverage',
     'Test Coverage',
     'CEM-Source Fidelity',
+    'WCAG Conformance',
+    'APG Keyboard Contract',
   ],
   important: [
     'API Surface Quality',
@@ -161,8 +214,17 @@ export const DIMENSION_CLASSIFICATION = {
     'Bundle Size',
     'Story Coverage',
     'Naming Consistency',
+    'Focus Indicator',
+    'Form Association',
+    'Accessible Label Pattern',
+    'Forced Colors Mode',
   ],
-  advanced: ['Performance', 'Drupal Readiness'],
+  advanced: [
+    'Performance',
+    'Drupal Readiness',
+    'Form Validity Reporting',
+    'AAA Audit Self-Certification',
+  ],
 } as const;
 
 export const TOTAL_WEIGHT = DIMENSION_REGISTRY.reduce((sum, d) => sum + d.weight, 0);
@@ -175,7 +237,6 @@ export const TOTAL_WEIGHT = DIMENSION_REGISTRY.reduce((sum, d) => sum + d.weight
  */
 export const DIMENSION_WEIGHT_KEYS: Readonly<Record<string, string>> = {
   documentation: 'CEM Completeness',
-  accessibility: 'Accessibility',
   typeCoverage: 'Type Coverage',
   apiConsistency: 'API Surface Quality',
   cssArchitecture: 'CSS Architecture',
@@ -188,6 +249,18 @@ export const DIMENSION_WEIGHT_KEYS: Readonly<Record<string, string>> = {
   cemSourceFidelity: 'CEM-Source Fidelity',
   slotArchitecture: 'Slot Architecture',
   naming: 'Naming Consistency',
+  // Phase 3 dimensional upgrade — replaces legacy `accessibility` key.
+  // Back-compat fan-out for the 5 split-from-Accessibility dims is
+  // handled in health.ts:getEffectiveWeight (only fires when the
+  // specific key below is NOT set in config).
+  wcagConformance: 'WCAG Conformance',
+  apgKeyboard: 'APG Keyboard Contract',
+  focusIndicator: 'Focus Indicator',
+  formAssociation: 'Form Association',
+  accessibleLabel: 'Accessible Label Pattern',
+  forcedColors: 'Forced Colors Mode',
+  formValidityReporting: 'Form Validity Reporting',
+  aaaAuditSelfCertification: 'AAA Audit Self-Certification',
 } as const;
 
 // ─── Grade Thresholds ────────────────────────────────────────────────────────
@@ -224,6 +297,10 @@ export const GRADE_THRESHOLDS: Record<'A' | 'B' | 'C' | 'D', GradeThreshold> = {
 export function calculateGrade(weightedScore: number, dimensions: DimensionResult[]): GradeResult {
   const notes: string[] = [];
 
+  // Phase 3: critical-dim count increased 5 → 6 (legacy 'Accessibility'
+  // split into 'WCAG Conformance' + 'APG Keyboard Contract' as critical
+  // dims). With GRADE_THRESHOLDS.A.maxUntestedCritical=0 unchanged this
+  // naturally tightens grade A — one more critical dim must be measured.
   const criticalNames: readonly string[] = DIMENSION_CLASSIFICATION.critical;
   const criticalDims = dimensions.filter((d) => criticalNames.includes(d.name));
 

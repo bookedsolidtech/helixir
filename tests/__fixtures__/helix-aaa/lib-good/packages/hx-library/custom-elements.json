@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-button/hx-button.ts",
+      "declarations": [{ "kind": "class", "name": "HxButton", "tagName": "hx-button" }]
+    }
+  ]
+}

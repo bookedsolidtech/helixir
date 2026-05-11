@@ -93,6 +93,15 @@ const CemDeclarationSchema = z.object({
   // regressions. Codex round-27 P2 (M3-M6 local preview): without
   // schema entry, Zod was stripping the field from real CEM input.
   formAssociated: z.boolean().optional(),
+  // Helix-specific CEM extension carrying APG pattern, keyboard contract,
+  // AAA certification metadata, and priority tier. Kept as `unknown` here
+  // so the public CemDeclaration type stays library-agnostic — the
+  // helix-aaa evidence detector runtime-narrows it via its own Zod parser.
+  // Phase 1 (dimensional upgrade): the evidence detector at
+  // packages/core/src/handlers/evidence/helix-aaa-evidence.ts owns the
+  // typed view; downstream dim scorers consume HelixAaaEvidence, not the
+  // raw field.
+  helixMeta: z.unknown().optional(),
 });
 
 const CemModuleSchema = z.object({

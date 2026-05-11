@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "2.1.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "parent/hx-parent-banner.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Banner that supports Windows high-contrast (forced-colors) mode.",
+          "name": "HxParentBanner",
+          "tagName": "hx-parent-banner",
+          "members": [],
+          "attributes": [],
+          "slots": [{ "name": "", "description": "Banner content." }],
+          "helixMeta": {
+            "forcedColorsSupported": true
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-parent-banner",
+          "declaration": { "name": "HxParentBanner", "module": "parent/hx-parent-banner.ts" }
+        }
+      ]
+    }
+  ]
+}

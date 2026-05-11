@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "2.1.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "subclass/hx-form-half.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Subclass that declares formAssociated but never calls attachInternals() or setValidity().",
+          "name": "HxFormHalf",
+          "tagName": "hx-form-half",
+          "superclass": {
+            "name": "HxParentField",
+            "module": "parent/hx-parent-field.ts"
+          },
+          "members": [
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": { "text": "boolean" },
+              "default": "true",
+              "static": true,
+              "inheritedFrom": { "name": "HxParentField", "module": "parent/hx-parent-field.ts" }
+            },
+            {
+              "kind": "method",
+              "name": "_updateValidity",
+              "privacy": "protected",
+              "description": "Overridden as a no-op."
+            }
+          ],
+          "attributes": [],
+          "helixMeta": {
+            "formAssociated": true
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-form-half",
+          "declaration": { "name": "HxFormHalf", "module": "subclass/hx-form-half.ts" }
+        }
+      ]
+    }
+  ]
+}

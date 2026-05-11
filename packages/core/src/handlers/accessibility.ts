@@ -1,4 +1,5 @@
 import type { CemDeclaration } from './cem.js';
+import type { HelixAaaEvidence, KeyboardContract } from './evidence/helix-aaa-evidence.js';
 
 // ─── Return types ─────────────────────────────────────────────────────────────
 
@@ -233,4 +234,91 @@ export function analyzeAccessibility(decl: CemDeclaration): AccessibilityProfile
  */
 export function analyzeAllAccessibility(decls: CemDeclaration[]): AccessibilityProfile[] {
   return decls.filter((d) => d.tagName !== undefined).map((d) => analyzeAccessibility(d));
+}
+
+// ─── Phase 3: Helix-AAA-enriched report ────────────────────────────────────────
+
+/**
+ * Compact summary of helix-AAA evidence — flattens the structured
+ * {@link HelixAaaEvidence} into a flat shape suited to the
+ * `analyze_accessibility` MCP response (Storybook a11y card, readiness
+ * pipeline). The full structured object remains available via the
+ * `detect_helix_evidence` MCP tool when callers want every detail.
+ */
+export interface HelixEvidenceSummary {
+  aaaCertified: boolean;
+  criteriaCount: number;
+  ariaPattern?: string;
+  keyboardContract?: KeyboardContract;
+  formAssociated?: boolean;
+  forcedColorsSupported?: boolean;
+  hasFocusVisibleRule?: boolean;
+  has2pxOutlineRule?: boolean;
+  auditMdFresh?: boolean;
+}
+
+/**
+ * AccessibilityProfile + optional helix-AAA evidence summary. Returned by
+ * {@link buildHelixAccessibilityReport} when the consuming library is a
+ * helix-shaped project (provides helixMeta or aaa-verdicts.json).
+ */
+export interface HelixAccessibilityReport extends AccessibilityProfile {
+  helixEvidence?: HelixEvidenceSummary;
+}
+
+function summarizeHelixEvidence(evidence: HelixAaaEvidence): HelixEvidenceSummary {
+  const helixMeta = evidence.helixMeta;
+  const snapshot = evidence.verdictSnapshot;
+  const source = evidence.sourceChecks;
+
+  const aaaCertified = helixMeta?.aaa?.certified === true || snapshot?.certified === true;
+  const criteriaCount = snapshot?.criteria?.length ?? helixMeta?.aaa?.criteria?.length ?? 0;
+
+  const summary: HelixEvidenceSummary = {
+    aaaCertified,
+    criteriaCount,
+  };
+
+  if (helixMeta?.ariaPattern !== undefined) {
+    summary.ariaPattern = helixMeta.ariaPattern;
+  }
+  if (helixMeta?.keyboardContract !== undefined) {
+    summary.keyboardContract = helixMeta.keyboardContract;
+  }
+  if (helixMeta?.formAssociated !== undefined) {
+    summary.formAssociated = helixMeta.formAssociated;
+  }
+  if (helixMeta?.forcedColorsSupported !== undefined) {
+    summary.forcedColorsSupported = helixMeta.forcedColorsSupported;
+  }
+  if (source?.hasFocusVisibleRule !== undefined) {
+    summary.hasFocusVisibleRule = source.hasFocusVisibleRule;
+  }
+  if (source?.has2pxOutlineRule !== undefined) {
+    summary.has2pxOutlineRule = source.has2pxOutlineRule;
+  }
+  if (evidence.auditMdFresh !== undefined) {
+    summary.auditMdFresh = evidence.auditMdFresh;
+  }
+
+  return summary;
+}
+
+/**
+ * Builds a HelixAccessibilityReport: the legacy AccessibilityProfile
+ * plus an optional helixEvidence summary. The summary is attached only
+ * when at least one helix-native source is present (helixMeta or the
+ * verdict snapshot derived from aaa-verdicts.json). Falls back to a
+ * plain profile when the library is not helix-shaped — back-compat with
+ * the original `analyze_accessibility` response.
+ */
+export function buildHelixAccessibilityReport(
+  decl: CemDeclaration,
+  evidence: HelixAaaEvidence,
+): HelixAccessibilityReport {
+  const profile = analyzeAccessibility(decl);
+  if (evidence.helixMeta !== undefined || evidence.verdictSnapshot !== undefined) {
+    return { ...profile, helixEvidence: summarizeHelixEvidence(evidence) };
+  }
+  return profile;
 }

@@ -250,6 +250,24 @@ export function detectHelixAaaEvidence(
     evidence.helixMeta = helixMeta;
   }
 
+  // ── Legacy JSDoc `@keyboard-contract` fallback ────────────────────────
+  // When the CEM doesn't carry a structured helixMeta.keyboardContract
+  // (older helix releases used a JSDoc tag alone), parse the description
+  // text and surface the contract on the evidence object so every
+  // consumer (detect_helix_evidence, analyze_accessibility, score_*)
+  // sees the same data. The scorer used to do this in-line, which made
+  // score_component award keyboard credit that detect_helix_evidence
+  // couldn't see (codex push-gate P3 round 11, 2026-05-11).
+  if (!evidence.helixMeta?.keyboardContract) {
+    const parsed = parseJsdocKeyboardContract(decl.description);
+    if (parsed) {
+      evidence.helixMeta = {
+        ...(evidence.helixMeta ?? {}),
+        keyboardContract: parsed,
+      };
+    }
+  }
+
   // ── Below here: everything depends on a resolvable libraryRoot ────────
   if (!libraryRoot || !decl.tagName) {
     return evidence;
@@ -322,6 +340,61 @@ function parseHelixMeta(raw: unknown): HelixAaaMeta | undefined {
   if (parsed.priorityTier !== undefined) shaped.priorityTier = parsed.priorityTier;
   if (parsed.stability !== undefined) shaped.stability = parsed.stability;
   return shaped;
+}
+
+// ---------------------------------------------------------------------------
+// JSDoc fallback for legacy @keyboard-contract tag
+// ---------------------------------------------------------------------------
+
+/**
+ * Parse the legacy `@keyboard-contract ...` JSDoc tag from a declaration's
+ * description. Returns a KeyboardContract when at least one bucket parses,
+ * else null. Kept in lockstep with apg-keyboard.ts:parseKeyboardContract;
+ * they intentionally have identical grammars so callers see consistent
+ * results no matter which entry point parses.
+ */
+function parseJsdocKeyboardContract(input: string | undefined | null): KeyboardContract | null {
+  if (!input || typeof input !== 'string') return null;
+  const trimmed = input.trim();
+  if (trimmed.length === 0) return null;
+  const tagMatch = /@?keyboard[-_ ]?contract\s*[:=-]?\s*/i.exec(trimmed);
+  if (!tagMatch) return null;
+  const stripped = trimmed.slice((tagMatch.index ?? 0) + tagMatch[0].length);
+  const buckets = stripped
+    .split(/[;\n|]/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+  if (buckets.length === 0) return null;
+  const result: KeyboardContract = { disabledSuppresses: false };
+  let anyParsed = false;
+  for (const clause of buckets) {
+    const m = /^([a-z][a-zA-Z]*)\s*[:=]\s*(.+)$/.exec(clause);
+    if (!m) continue;
+    const bucketName = (m[1] ?? '').toLowerCase();
+    const rhs = (m[2] ?? '').trim();
+    if (!bucketName || rhs.length === 0) continue;
+    if (bucketName === 'disabledsuppresses') {
+      result.disabledSuppresses = /^(true|yes|on|1)$/i.test(rhs);
+      anyParsed = true;
+      continue;
+    }
+    const keys = rhs
+      .split(/[,\s]+/)
+      .map((k) => k.trim())
+      .filter((k) => k.length > 0);
+    if (keys.length === 0) continue;
+    if (bucketName === 'activate') {
+      result.activate = keys;
+      anyParsed = true;
+    } else if (bucketName === 'navigate') {
+      result.navigate = keys;
+      anyParsed = true;
+    } else if (bucketName === 'dismiss') {
+      result.dismiss = keys;
+      anyParsed = true;
+    }
+  }
+  return anyParsed ? result : null;
 }
 
 // ---------------------------------------------------------------------------

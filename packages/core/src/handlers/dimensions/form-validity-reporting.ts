@@ -87,6 +87,23 @@ export function scoreFormValidityReporting(
     };
   }
 
-  // ── Branch 5: silent on form association, no signals ────────────────
+  // ── Branch 5: source confirms no FACE signals → N/A (non-form component)
+  // Mirrors scoreFormAssociation's same-evidence-shape collapse to N/A.
+  // Without this, non-form components (buttons, cards, banners) lose the
+  // Form Validity Reporting dimension entirely (codex push-gate P2 round
+  // 11, 2026-05-11).
+  const noFaceSignals =
+    !checks.hasStaticFormAssociated && !checks.hasAttachInternals && !checks.hasSetValidityCall;
+  if (noFaceSignals) {
+    return {
+      score: 100,
+      confidence: 'verified',
+      measured: true,
+      notes: ['form-validity-not-applicable'],
+    };
+  }
+
+  // ── Branch 6: source signals present without a claim — defer to
+  // form-association for the drift report; here we just say unknown.
   return { score: 0, confidence: 'unknown', measured: false };
 }

@@ -1127,7 +1127,13 @@ async function scoreCemNativeDimension(
     subMetrics?: SubMetric[];
     notApplicable?: boolean;
   } => {
-    if (r.notes && r.notes.length > 0) {
+    // Only forward FAILURE-mode notes into the visible issues array.
+    // Scorers also emit informational notes on successful paths
+    // (e.g. `aaa-cert-fresh-and-supported`,
+    // `not-form-associated-correctly-declared`) that should NOT show up
+    // as audit issues for healthy components (codex push-gate P2 round 11,
+    // 2026-05-11). Heuristic: score < 100 OR confidence === 'unknown'.
+    if (r.notes && r.notes.length > 0 && (r.score < 100 || r.confidence === 'unknown')) {
       for (const n of r.notes) issues.push(n);
     }
     const out: {

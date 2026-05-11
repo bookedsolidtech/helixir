@@ -62,13 +62,17 @@ describe('scoreFormValidityReporting', () => {
     expect(result.notes).toContain('form-associated-without-validity-reporting');
   });
 
-  it('returns 0/unknown when sourceChecks present but neither form-associated nor setValidity', () => {
+  it('returns 100/verified N/A when sourceChecks confirm no FACE signals at all', () => {
+    // Post-codex-fix (round 11): when source confirms no FACE signals AND
+    // no claim, the dimension collapses to N/A — symmetric with
+    // scoreFormAssociation. Otherwise non-form components (buttons, cards)
+    // lose this dimension entirely under the new dispatcher.
     const decl = bareDecl('x-silent');
     const ev = buildEvidence(decl, { sourceChecks: checks() });
     const result = scoreFormValidityReporting(decl, ev);
-    expect(result.score).toBe(0);
-    expect(result.confidence).toBe('unknown');
-    expect(result.measured).toBe(false);
+    expect(result.score).toBe(100);
+    expect(result.confidence).toBe('verified');
+    expect(result.notes).toContain('form-validity-not-applicable');
   });
 
   it('uses sourceChecks.hasStaticFormAssociated as a form-associated trigger', () => {

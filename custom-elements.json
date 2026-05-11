@@ -111,6 +111,38 @@
             }
           ],
           "description": "Analyzes accessibility for all components in a list of CEM declarations.\nSkips declarations without a tagName."
+        },
+        {
+          "kind": "variable",
+          "name": "aaaCertified"
+        },
+        {
+          "kind": "variable",
+          "name": "criteriaCount"
+        },
+        {
+          "kind": "function",
+          "name": "buildHelixAccessibilityReport",
+          "return": {
+            "type": {
+              "text": "HelixAccessibilityReport"
+            }
+          },
+          "parameters": [
+            {
+              "name": "decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            },
+            {
+              "name": "evidence",
+              "type": {
+                "text": "HelixAaaEvidence"
+              }
+            }
+          ],
+          "description": "Builds a HelixAccessibilityReport: the legacy AccessibilityProfile\nplus an optional helixEvidence summary. The summary is attached only\nwhen at least one helix-native source is present (helixMeta or the\nverdict snapshot derived from aaa-verdicts.json). Falls back to a\nplain profile when the library is not helix-shaped — back-compat with\nthe original `analyze_accessibility` response."
         }
       ],
       "exports": [
@@ -127,6 +159,14 @@
           "name": "analyzeAllAccessibility",
           "declaration": {
             "name": "analyzeAllAccessibility",
+            "module": "packages/core/src/handlers/accessibility.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "buildHelixAccessibilityReport",
+          "declaration": {
+            "name": "buildHelixAccessibilityReport",
             "module": "packages/core/src/handlers/accessibility.ts"
           }
         }
@@ -1381,6 +1421,142 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/core/src/handlers/audit-cache.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "readCachedAudit",
+          "return": {
+            "type": {
+              "text": "AuditEntry | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "auditsRoot",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "surfaceHash",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Attempt to read a cached audit for `(tagName, surfaceHash)`. Returns\nnull on miss. The cache is content-addressed: if a stored audit's\nrecorded surfaceHash doesn't match the requested one, that's a miss\n(someone hand-edited a .json file, etc)."
+        },
+        {
+          "kind": "function",
+          "name": "writeAudit",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "auditsRoot",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "entry",
+              "type": {
+                "text": "AuditEntry"
+              }
+            }
+          ],
+          "description": "Write an audit entry to the cache. Creates the component directory\nif it doesn't exist, writes both the .md and .json files for this\naudit, and updates the index. Returns the basename used (an ISO\ntimestamp safe for filesystem use)."
+        },
+        {
+          "kind": "function",
+          "name": "listAuditedSurfaces",
+          "return": {
+            "type": {
+              "text": "string[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "auditsRoot",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "List the surface-hashes audited for a component. Useful for tooling\nthat wants to enumerate audit history."
+        },
+        {
+          "kind": "function",
+          "name": "listAuditedComponents",
+          "return": {
+            "type": {
+              "text": "string[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "auditsRoot",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "List every audited tag name under auditsRoot. Returns [] when the\ndirectory doesn't exist."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "readCachedAudit",
+          "declaration": {
+            "name": "readCachedAudit",
+            "module": "packages/core/src/handlers/audit-cache.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "writeAudit",
+          "declaration": {
+            "name": "writeAudit",
+            "module": "packages/core/src/handlers/audit-cache.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "listAuditedSurfaces",
+          "declaration": {
+            "name": "listAuditedSurfaces",
+            "module": "packages/core/src/handlers/audit-cache.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "listAuditedComponents",
+          "declaration": {
+            "name": "listAuditedComponents",
+            "module": "packages/core/src/handlers/audit-cache.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/core/src/handlers/audit-report.ts",
       "declarations": [
         {
@@ -1408,7 +1584,7 @@
               "name": "options",
               "optional": true,
               "type": {
-                "text": "{ outputPath?: string; libraryId?: string; cem?: Cem }"
+                "text": "{ outputPath?: string; libraryId?: string; cem?: Cem; libraryRoot?: string }"
               }
             }
           ],
@@ -1806,6 +1982,30 @@
         {
           "kind": "variable",
           "name": "CemSchema"
+        },
+        {
+          "kind": "function",
+          "name": "cemHas",
+          "return": {
+            "type": {
+              "text": "'present' | 'absent'"
+            }
+          },
+          "parameters": [
+            {
+              "name": "decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            },
+            {
+              "name": "key",
+              "type": {
+                "text": "CemPresenceKey"
+              }
+            }
+          ],
+          "description": "Returns whether the CEM declaration explicitly carries the named key.\n\n- `'present'`: the key exists on the declaration (array length may be 0\n  — that's still \"present and empty,\" meaning the component has authoritatively\n  declared \"no slots / no events / no css parts\").\n- `'absent'`: the key is undefined. The declaration says nothing — the\n  analyzer cannot tell whether the component truly has none, or whether\n  the CEM regen dropped the data. This is the case M2 surfaces as\n  `confidence: 'unknown'`.\n\nUse this from analyzers that consume CEM data to anchor the\nabsent-vs-empty distinction explicitly. Without it, analyzers that\nread `decl.slots ?? []` cannot tell the two cases apart and silently\naward the dimension full credit when data is missing."
         },
         {
           "kind": "function",
@@ -2265,6 +2465,14 @@
         },
         {
           "kind": "js",
+          "name": "cemHas",
+          "declaration": {
+            "name": "cemHas",
+            "module": "packages/core/src/handlers/cem.ts"
+          }
+        },
+        {
+          "kind": "js",
           "name": "getDeclarationSourcePath",
           "declaration": {
             "name": "getDeclarationSourcePath",
@@ -2476,6 +2684,115 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/core/src/handlers/codex-audit.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "auditComponentWithCodex",
+          "return": {
+            "type": {
+              "text": "Promise<AuditComponentResult>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "cemOrPath",
+              "type": {
+                "text": "Cem | undefined"
+              }
+            },
+            {
+              "name": "options",
+              "default": "{}",
+              "type": {
+                "text": "AuditComponentOptions"
+              }
+            }
+          ],
+          "description": "Run (or cache-hit) a per-component codex audit.\n\nReturns `cacheHit: true` when the prior audit was reused. Cached\naudits return in milliseconds; fresh codex runs take seconds."
+        },
+        {
+          "kind": "variable",
+          "name": "surfaceHash"
+        },
+        {
+          "kind": "function",
+          "name": "renderAuditPrompt",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "surface",
+              "type": {
+                "text": "ContractSurface"
+              }
+            }
+          ],
+          "description": "Render the structured codex prompt for one component. Pinned format\nso codex sees a consistent prompt across runs (reduces flip risk —\nsee the rea push-gate runbook on codex non-determinism)."
+        },
+        {
+          "kind": "function",
+          "name": "parseCodexFindings",
+          "return": {
+            "type": {
+              "text": "{\n  verdict: AuditVerdict;\n  findings: AuditFinding[];\n  reviewText?: string;\n}"
+            }
+          },
+          "parameters": [
+            {
+              "name": "raw",
+              "type": {
+                "text": "unknown"
+              }
+            }
+          ],
+          "description": "Parses codex JSON output into AuditFinding[] with severity normalization.\nExposed so injected runners can re-use the parser instead of\nre-implementing it."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "auditComponentWithCodex",
+          "declaration": {
+            "name": "auditComponentWithCodex",
+            "module": "packages/core/src/handlers/codex-audit.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "renderAuditPrompt",
+          "declaration": {
+            "name": "renderAuditPrompt",
+            "module": "packages/core/src/handlers/codex-audit.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "parseCodexFindings",
+          "declaration": {
+            "name": "parseCodexFindings",
+            "module": "packages/core/src/handlers/codex-audit.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/core/src/handlers/color-contrast-checker.ts",
       "declarations": [
         {
@@ -2674,6 +2991,66 @@
           "declaration": {
             "name": "getCompositionExample",
             "module": "packages/core/src/handlers/composition.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/contract-surface.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "extractContractSurface",
+          "return": {
+            "type": {
+              "text": "ContractSurface"
+            }
+          },
+          "parameters": [
+            {
+              "name": "decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            }
+          ],
+          "description": "Extract the public contract surface from a CEM declaration. The\nresult is normalized (alphabetical ordering, trimmed strings) so the\nstable JSON of the surface is identical across cosmetic regenerations."
+        },
+        {
+          "kind": "function",
+          "name": "hashContractSurface",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "surface",
+              "type": {
+                "text": "ContractSurface"
+              }
+            }
+          ],
+          "description": "Returns a stable sha256 hash of a contract surface. Two surfaces that\nare structurally equal produce the same hash regardless of property\nordering. Used as the per-component cache key for codex audits."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "extractContractSurface",
+          "declaration": {
+            "name": "extractContractSurface",
+            "module": "packages/core/src/handlers/contract-surface.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "hashContractSurface",
+          "declaration": {
+            "name": "hashContractSurface",
+            "module": "packages/core/src/handlers/contract-surface.ts"
           }
         }
       ]
@@ -2898,19 +3275,28 @@
           "type": {
             "text": "DimensionDefinition[]"
           },
-          "default": "[ // CEM-native dimensions (helixir can score these) { name: 'CEM Completeness', weight: 15, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Accessibility', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Type Coverage', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'API Surface Quality', weight: 10, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'CSS Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Event Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, // External-data dimensions (reported as untested unless history provides scores) { name: 'Test Coverage', weight: 10, tier: 'critical', source: 'external', phase: 'external-data', }, { name: 'Bundle Size', weight: 5, tier: 'important', source: 'external', phase: 'external-data' }, { name: 'Story Coverage', weight: 5, tier: 'important', source: 'external', phase: 'external-data', }, { name: 'Performance', weight: 5, tier: 'advanced', source: 'external', phase: 'external-data' }, { name: 'Drupal Readiness', weight: 5, tier: 'advanced', source: 'external', phase: 'external-data', }, // Dimension 12: CEM-Source Fidelity — catches CEM vs source divergence { name: 'CEM-Source Fidelity', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, // Dimension 13: Slot Architecture — slot documentation, type constraints, coherence { name: 'Slot Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, // Dimension 14: Naming Consistency — library-wide naming convention adherence { name: 'Naming Consistency', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, ]"
+          "default": "[ // CEM-native dimensions (helixir can score these) { name: 'CEM Completeness', weight: 15, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Type Coverage', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'API Surface Quality', weight: 10, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'CSS Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Event Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, // External-data dimensions (reported as untested unless history provides scores) { name: 'Test Coverage', weight: 10, tier: 'critical', source: 'external', phase: 'external-data', }, { name: 'Bundle Size', weight: 5, tier: 'important', source: 'external', phase: 'external-data' }, { name: 'Story Coverage', weight: 5, tier: 'important', source: 'external', phase: 'external-data', }, { name: 'Performance', weight: 5, tier: 'advanced', source: 'external', phase: 'external-data' }, { name: 'Drupal Readiness', weight: 5, tier: 'advanced', source: 'external', phase: 'external-data', }, // Dimension 12: CEM-Source Fidelity — catches CEM vs source divergence { name: 'CEM-Source Fidelity', weight: 10, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, // Dimension 13: Slot Architecture — slot documentation, type constraints, coherence { name: 'Slot Architecture', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, // Dimension 14: Naming Consistency — library-wide naming convention adherence { name: 'Naming Consistency', weight: 5, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, // Phase 3 dimensional upgrade — 8 dims replacing legacy 'Accessibility' (was weight 10). // Total weight delta: -10 + 12 = +2 → TOTAL_WEIGHT goes 105 → 107. // Names are load-bearing: dispatcher arms and tests key on these exact strings. { name: 'WCAG Conformance', weight: 4, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'APG Keyboard Contract', weight: 2, tier: 'critical', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Focus Indicator', weight: 1, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Form Association', weight: 1, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Accessible Label Pattern', weight: 2, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Forced Colors Mode', weight: 1, tier: 'important', source: 'cem-native', phase: 'cem-analysis', }, { name: 'Form Validity Reporting', weight: 1, tier: 'advanced', source: 'cem-native', phase: 'cem-analysis', }, { name: 'AAA Audit Self-Certification', weight: 0, tier: 'advanced', source: 'cem-native', phase: 'cem-analysis', }, ]"
         },
         {
           "kind": "variable",
           "name": "DIMENSION_CLASSIFICATION",
           "type": {
-            "text": "{\n  critical: [\n    'CEM Completeness',\n    'Accessibility',\n    'Type Coverage',\n    'Test Coverage',\n    'CEM-Source Fidelity',\n  ],\n  important: [\n    'API Surface Quality',\n    'CSS Architecture',\n    'Event Architecture',\n    'Slot Architecture',\n    'Bundle Size',\n    'Story Coverage',\n    'Naming Consistency',\n  ],\n  advanced: ['Performance', 'Drupal Readiness'],\n}"
+            "text": "{\n  critical: [\n    'CEM Completeness',\n    'Type Coverage',\n    'Test Coverage',\n    'CEM-Source Fidelity',\n    'WCAG Conformance',\n    'APG Keyboard Contract',\n  ],\n  important: [\n    'API Surface Quality',\n    'CSS Architecture',\n    'Event Architecture',\n    'Slot Architecture',\n    'Bundle Size',\n    'Story Coverage',\n    'Naming Consistency',\n    'Focus Indicator',\n    'Form Association',\n    'Accessible Label Pattern',\n    'Forced Colors Mode',\n  ],\n  advanced: [\n    'Performance',\n    'Drupal Readiness',\n    'Form Validity Reporting',\n    'AAA Audit Self-Certification',\n  ],\n}"
           },
-          "default": "{ critical: [ 'CEM Completeness', 'Accessibility', 'Type Coverage', 'Test Coverage', 'CEM-Source Fidelity', ], important: [ 'API Surface Quality', 'CSS Architecture', 'Event Architecture', 'Slot Architecture', 'Bundle Size', 'Story Coverage', 'Naming Consistency', ], advanced: ['Performance', 'Drupal Readiness'], }"
+          "default": "{ critical: [ 'CEM Completeness', 'Type Coverage', 'Test Coverage', 'CEM-Source Fidelity', 'WCAG Conformance', 'APG Keyboard Contract', ], important: [ 'API Surface Quality', 'CSS Architecture', 'Event Architecture', 'Slot Architecture', 'Bundle Size', 'Story Coverage', 'Naming Consistency', 'Focus Indicator', 'Form Association', 'Accessible Label Pattern', 'Forced Colors Mode', ], advanced: [ 'Performance', 'Drupal Readiness', 'Form Validity Reporting', 'AAA Audit Self-Certification', ], }"
         },
         {
           "kind": "variable",
           "name": "TOTAL_WEIGHT"
+        },
+        {
+          "kind": "variable",
+          "name": "DIMENSION_WEIGHT_KEYS",
+          "type": {
+            "text": "{\n  documentation: 'CEM Completeness',\n  typeCoverage: 'Type Coverage',\n  apiConsistency: 'API Surface Quality',\n  cssArchitecture: 'CSS Architecture',\n  eventArchitecture: 'Event Architecture',\n  testCoverage: 'Test Coverage',\n  bundleSize: 'Bundle Size',\n  storyCoverage: 'Story Coverage',\n  performance: 'Performance',\n  drupalReadiness: 'Drupal Readiness',\n  cemSourceFidelity: 'CEM-Source Fidelity',\n  slotArchitecture: 'Slot Architecture',\n  naming: 'Naming Consistency',\n  // Phase 3 dimensional upgrade — replaces legacy `accessibility` key.\n  // Back-compat fan-out for the 5 split-from-Accessibility dims is\n  // handled in health.ts:getEffectiveWeight (only fires when the\n  // specific key below is NOT set in config).\n  wcagConformance: 'WCAG Conformance',\n  apgKeyboard: 'APG Keyboard Contract',\n  focusIndicator: 'Focus Indicator',\n  formAssociation: 'Form Association',\n  accessibleLabel: 'Accessible Label Pattern',\n  forcedColors: 'Forced Colors Mode',\n  formValidityReporting: 'Form Validity Reporting',\n  aaaAuditSelfCertification: 'AAA Audit Self-Certification',\n}"
+          },
+          "default": "{ documentation: 'CEM Completeness', typeCoverage: 'Type Coverage', apiConsistency: 'API Surface Quality', cssArchitecture: 'CSS Architecture', eventArchitecture: 'Event Architecture', testCoverage: 'Test Coverage', bundleSize: 'Bundle Size', storyCoverage: 'Story Coverage', performance: 'Performance', drupalReadiness: 'Drupal Readiness', cemSourceFidelity: 'CEM-Source Fidelity', slotArchitecture: 'Slot Architecture', naming: 'Naming Consistency', // Phase 3 dimensional upgrade — replaces legacy `accessibility` key. // Back-compat fan-out for the 5 split-from-Accessibility dims is // handled in health.ts:getEffectiveWeight (only fires when the // specific key below is NOT set in config). wcagConformance: 'WCAG Conformance', apgKeyboard: 'APG Keyboard Contract', focusIndicator: 'Focus Indicator', formAssociation: 'Form Association', accessibleLabel: 'Accessible Label Pattern', forcedColors: 'Forced Colors Mode', formValidityReporting: 'Form Validity Reporting', aaaAuditSelfCertification: 'AAA Audit Self-Certification', }",
+          "description": "Maps scoring config keys (from helixir.mcp.json `scoring.weights`)\nto their corresponding dimension names in the DIMENSION_REGISTRY.\n\nUsed to apply per-enterprise weight multipliers to health scoring."
         },
         {
           "kind": "variable",
@@ -2990,6 +3376,14 @@
         },
         {
           "kind": "js",
+          "name": "DIMENSION_WEIGHT_KEYS",
+          "declaration": {
+            "name": "DIMENSION_WEIGHT_KEYS",
+            "module": "packages/core/src/handlers/dimensions.ts"
+          }
+        },
+        {
+          "kind": "js",
           "name": "GRADE_THRESHOLDS",
           "declaration": {
             "name": "GRADE_THRESHOLDS",
@@ -3010,6 +3404,455 @@
           "declaration": {
             "name": "computeWeightedScore",
             "module": "packages/core/src/handlers/dimensions.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/dimensions/aaa-audit-cert.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "scoreAaaAuditSelfCertification",
+          "return": {
+            "type": {
+              "text": "DimScoreResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "_decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            },
+            {
+              "name": "evidence",
+              "type": {
+                "text": "HelixAaaEvidence"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "scoreAaaAuditSelfCertification",
+          "declaration": {
+            "name": "scoreAaaAuditSelfCertification",
+            "module": "packages/core/src/handlers/dimensions/aaa-audit-cert.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/dimensions/accessible-label.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "scoreAccessibleLabel",
+          "return": {
+            "type": {
+              "text": "DimScoreResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            },
+            {
+              "name": "evidence",
+              "type": {
+                "text": "HelixAaaEvidence"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "scoreAccessibleLabel",
+          "declaration": {
+            "name": "scoreAccessibleLabel",
+            "module": "packages/core/src/handlers/dimensions/accessible-label.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/dimensions/apg-keyboard.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "parseKeyboardContract",
+          "default": "parseFromShared"
+        },
+        {
+          "kind": "function",
+          "name": "scoreApgKeyboard",
+          "return": {
+            "type": {
+              "text": "DimScoreResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            },
+            {
+              "name": "evidence",
+              "type": {
+                "text": "HelixAaaEvidence"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "parseKeyboardContract",
+          "declaration": {
+            "name": "parseKeyboardContract",
+            "module": "packages/core/src/handlers/dimensions/apg-keyboard.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "scoreApgKeyboard",
+          "declaration": {
+            "name": "scoreApgKeyboard",
+            "module": "packages/core/src/handlers/dimensions/apg-keyboard.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/dimensions/apg-patterns-loader.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "loadApgPatterns",
+          "return": {
+            "type": {
+              "text": "ApgPatterns"
+            }
+          }
+        },
+        {
+          "kind": "function",
+          "name": "_resetApgPatternsCache",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "description": "Test hook — kept as a no-op so existing tests that call this between\ncases continue to work. The catalogue is now a frozen const so there\nis no module-scoped cache state to clear."
+        },
+        {
+          "kind": "function",
+          "name": "isPassiveApgPattern",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "patterns",
+              "optional": true,
+              "type": {
+                "text": "ApgPatterns"
+              }
+            }
+          ],
+          "description": "True when the named APG pattern is a passive role (no required\nactivate/navigate/dismiss keys). Tabpanel and group are the canonical\nexamples — they appear in APG but the keyboard contract belongs to\ntheir parents (tablist, the form, etc.), not to themselves. Consumers\nMUST NOT score a passive pattern as \"missing keyboard contract\" when\nno contract is declared on the component."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "loadApgPatterns",
+          "declaration": {
+            "name": "loadApgPatterns",
+            "module": "packages/core/src/handlers/dimensions/apg-patterns-loader.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "_resetApgPatternsCache",
+          "declaration": {
+            "name": "_resetApgPatternsCache",
+            "module": "packages/core/src/handlers/dimensions/apg-patterns-loader.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isPassiveApgPattern",
+          "declaration": {
+            "name": "isPassiveApgPattern",
+            "module": "packages/core/src/handlers/dimensions/apg-patterns-loader.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/dimensions/focus-indicator.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "scoreFocusIndicator",
+          "return": {
+            "type": {
+              "text": "DimScoreResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "_decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            },
+            {
+              "name": "evidence",
+              "type": {
+                "text": "HelixAaaEvidence"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "scoreFocusIndicator",
+          "declaration": {
+            "name": "scoreFocusIndicator",
+            "module": "packages/core/src/handlers/dimensions/focus-indicator.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/dimensions/forced-colors.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "scoreForcedColors",
+          "return": {
+            "type": {
+              "text": "DimScoreResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "_decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            },
+            {
+              "name": "evidence",
+              "type": {
+                "text": "HelixAaaEvidence"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "scoreForcedColors",
+          "declaration": {
+            "name": "scoreForcedColors",
+            "module": "packages/core/src/handlers/dimensions/forced-colors.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/dimensions/form-association.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "scoreFormAssociation",
+          "return": {
+            "type": {
+              "text": "DimScoreResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            },
+            {
+              "name": "evidence",
+              "type": {
+                "text": "HelixAaaEvidence"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "scoreFormAssociation",
+          "declaration": {
+            "name": "scoreFormAssociation",
+            "module": "packages/core/src/handlers/dimensions/form-association.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/dimensions/form-validity-reporting.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "scoreFormValidityReporting",
+          "return": {
+            "type": {
+              "text": "DimScoreResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            },
+            {
+              "name": "evidence",
+              "type": {
+                "text": "HelixAaaEvidence"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "scoreFormValidityReporting",
+          "declaration": {
+            "name": "scoreFormValidityReporting",
+            "module": "packages/core/src/handlers/dimensions/form-validity-reporting.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/dimensions/keyboard-contract-parser.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "parseKeyboardContract",
+          "return": {
+            "type": {
+              "text": "KeyboardContract | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "input",
+              "type": {
+                "text": "string | undefined | null"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "parseKeyboardContract",
+          "declaration": {
+            "name": "parseKeyboardContract",
+            "module": "packages/core/src/handlers/dimensions/keyboard-contract-parser.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/dimensions/types.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "ConfidenceLevel",
+          "declaration": {
+            "name": "ConfidenceLevel",
+            "module": "packages/core/src/handlers/dimensions/types.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/dimensions/wcag-conformance.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "scoreWcagConformance",
+          "return": {
+            "type": {
+              "text": "DimScoreResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            },
+            {
+              "name": "evidence",
+              "type": {
+                "text": "HelixAaaEvidence"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "scoreWcagConformance",
+          "declaration": {
+            "name": "scoreWcagConformance",
+            "module": "packages/core/src/handlers/dimensions/wcag-conformance.ts"
           }
         }
       ]
@@ -3056,6 +3899,74 @@
           "declaration": {
             "name": "checkEventUsage",
             "module": "packages/core/src/handlers/event-usage-checker.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/evidence/helix-aaa-evidence.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "_resetHelixAaaEvidenceCache",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "description": "Clears all module-scoped caches. Intended for tests."
+        },
+        {
+          "kind": "function",
+          "name": "detectHelixAaaEvidence",
+          "return": {
+            "type": {
+              "text": "HelixAaaEvidence"
+            }
+          },
+          "parameters": [
+            {
+              "name": "decl",
+              "type": {
+                "text": "CemDeclaration"
+              }
+            },
+            {
+              "name": "libraryRoot",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Collect every piece of AAA evidence available for a CEM declaration.\nPure: same inputs → same output (modulo cache fill)."
+        },
+        {
+          "kind": "variable",
+          "name": "perCriterion",
+          "default": "perTag?.[tagName]"
+        },
+        {
+          "kind": "variable",
+          "name": "criteria"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "_resetHelixAaaEvidenceCache",
+          "declaration": {
+            "name": "_resetHelixAaaEvidenceCache",
+            "module": "packages/core/src/handlers/evidence/helix-aaa-evidence.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "detectHelixAaaEvidence",
+          "declaration": {
+            "name": "detectHelixAaaEvidence",
+            "module": "packages/core/src/handlers/evidence/helix-aaa-evidence.ts"
           }
         }
       ]
@@ -3452,6 +4363,13 @@
               "type": {
                 "text": "LibraryNamingConventions"
               }
+            },
+            {
+              "name": "libraryRoot",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
             }
           ],
           "description": "Scores a component across all 11 dimensions using the enterprise grade algorithm.\nCEM-native dimensions are computed from the declaration.\nExternal dimensions are checked via history files (reported as untested if unavailable)."
@@ -3487,6 +4405,13 @@
             {
               "name": "libraryId",
               "default": "'default'"
+            },
+            {
+              "name": "libraryRoot",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
             }
           ],
           "description": "Scores all components using multi-dimensional scoring."
@@ -5293,6 +6218,98 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/core/src/handlers/token-canonicality.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "loadDeprecatedAliases",
+          "return": {
+            "type": {
+              "text": "Promise<DeprecatedAlias[]>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            }
+          ],
+          "description": "Load the deprecated-aliases map. Lookup order:\n  1. `MCP_WC_TOKENS_DEPRECATED_PATH` env var (absolute or\n     tokens-relative).\n  2. `tokens.deprecated.json` next to the configured tokensPath.\n  3. Empty map (token tools work, just without the canonicality layer).\n\nThe file format is documented in the schema above. Returns the array\nof aliases — empty when no map is configured."
+        },
+        {
+          "kind": "function",
+          "name": "resolveCanonicality",
+          "return": {
+            "type": {
+              "text": "CanonicalityResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "tokenName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "aliases",
+              "type": {
+                "text": "DeprecatedAlias[]"
+              }
+            }
+          ],
+          "description": "Resolve a single token name against an alias map. Pure function —\nthe caller supplies the loaded map (so tests / batch operations\ndon't re-read the file each call)."
+        },
+        {
+          "kind": "function",
+          "name": "buildCanonicalityIndex",
+          "return": {
+            "type": {
+              "text": "Map<string, CanonicalityResult>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "aliases",
+              "type": {
+                "text": "DeprecatedAlias[]"
+              }
+            }
+          ],
+          "description": "Convenience — build a canonical-lookup `Map<alias, CanonicalityResult>`\nup front, then resolve in O(1). For batch token-usage scans."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "loadDeprecatedAliases",
+          "declaration": {
+            "name": "loadDeprecatedAliases",
+            "module": "packages/core/src/handlers/token-canonicality.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "resolveCanonicality",
+          "declaration": {
+            "name": "resolveCanonicality",
+            "module": "packages/core/src/handlers/token-canonicality.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "buildCanonicalityIndex",
+          "declaration": {
+            "name": "buildCanonicalityIndex",
+            "module": "packages/core/src/handlers/token-canonicality.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/core/src/handlers/token-fallback-checker.ts",
       "declarations": [
         {
@@ -5509,6 +6526,40 @@
           "declaration": {
             "name": "findComponentsUsingToken",
             "module": "packages/core/src/handlers/tokens.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/tool-catalog.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "buildToolCatalog",
+          "return": {
+            "type": {
+              "text": "ToolCatalog"
+            }
+          },
+          "parameters": [
+            {
+              "name": "definitions",
+              "type": {
+                "text": "ToolCatalogEntryInput[]"
+              }
+            }
+          ],
+          "description": "Build the machine-readable catalog from a flat list of tool\ndefinitions. Pure function — pass in the union of all\n`*_TOOL_DEFINITIONS` arrays from the dispatcher."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "buildToolCatalog",
+          "declaration": {
+            "name": "buildToolCatalog",
+            "module": "packages/core/src/handlers/tool-catalog.ts"
           }
         }
       ]
@@ -5748,6 +6799,73 @@
           "declaration": {
             "name": "summarizeValidation",
             "module": "packages/core/src/handlers/validation-summary.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/verify-extension.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "verifyExtension",
+          "return": {
+            "type": {
+              "text": "VerifyExtensionResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "input",
+              "type": {
+                "text": "VerifyExtensionInput"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "verifyExtension",
+          "declaration": {
+            "name": "verifyExtension",
+            "module": "packages/core/src/handlers/verify-extension.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/handlers/verify-token-inheritance.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "verifyTokenInheritance",
+          "return": {
+            "type": {
+              "text": "VerifyTokenInheritanceResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "input",
+              "type": {
+                "text": "VerifyTokenInheritanceInput"
+              }
+            }
+          ],
+          "description": "Run M4's token-extension verification. Pure function — no I/O.\nCaller loads the aliases, tokens, and (optionally) CSS sources up\nfront so the same data can be reused across components."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "verifyTokenInheritance",
+          "declaration": {
+            "name": "verifyTokenInheritance",
+            "module": "packages/core/src/handlers/verify-token-inheritance.ts"
           }
         }
       ]
@@ -6070,6 +7188,30 @@
         },
         {
           "kind": "function",
+          "name": "sanitizeErrorMessage",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "message",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "projectRoot",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Sanitizes an error message to prevent information disclosure:\n- Absolute paths that start with projectRoot are replaced with relative paths.\n- All other absolute paths (Unix or Windows) are replaced with \"[path redacted]\".\n- Regex pattern details in Zod/validation messages are stripped."
+        },
+        {
+          "kind": "function",
           "name": "handleToolError",
           "return": {
             "type": {
@@ -6082,9 +7224,16 @@
               "type": {
                 "text": "unknown"
               }
+            },
+            {
+              "name": "projectRoot",
+              "default": "''",
+              "type": {
+                "text": "string"
+              }
             }
           ],
-          "description": "Wraps an unknown thrown value into an MCPError with an appropriate category.\nInference rules (applied before falling back to UNKNOWN):\n  - SyntaxError / TypeError  → VALIDATION\n  - Error with .code ENOENT  → FILESYSTEM\n  - Error with .code EACCES  → FILESYSTEM"
+          "description": "Wraps an unknown thrown value into an MCPError with an appropriate category.\nInference rules (applied before falling back to UNKNOWN):\n  - SyntaxError / TypeError  → VALIDATION\n  - Error with .code ENOENT  → FILESYSTEM\n  - Error with .code EACCES  → FILESYSTEM\n\nWhen projectRoot is provided, absolute paths in error messages are sanitized:\n  - Paths under projectRoot become relative paths\n  - All other absolute paths are replaced with \"[path redacted]\"\nZod/regex pattern details in VALIDATION errors are also stripped."
         }
       ],
       "exports": [
@@ -6093,6 +7242,14 @@
           "name": "MCPError",
           "declaration": {
             "name": "MCPError",
+            "module": "packages/core/src/shared/error-handling.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "sanitizeErrorMessage",
+          "declaration": {
+            "name": "sanitizeErrorMessage",
             "module": "packages/core/src/shared/error-handling.ts"
           }
         },
@@ -6232,6 +7389,16 @@
                 }
               ],
               "description": "Reads file content at a specific git ref without modifying the working tree.\nUses `git show <ref>:<filePath>` to read content from another branch/commit.\nThe filePath must be relative to the git repository root.\n\nThe `ref` parameter is validated against a strict allowlist before use to\nprevent flag injection (e.g., refs starting with \"--\")."
+            },
+            {
+              "kind": "method",
+              "name": "getRepoRoot",
+              "return": {
+                "type": {
+                  "text": "Promise<string | null>"
+                }
+              },
+              "description": "Returns the absolute path of the git repository's top-level directory.\nCallers that need to convert a path relative to a sub-directory\n(projectRoot in a monorepo workspace) into a path relative to the\nrepo root — which is what `gitShow` requires — call this first.\nReturns null if the current working tree isn't a git repository."
             }
           ]
         }
@@ -6694,6 +7861,98 @@
           "declaration": {
             "name": "isCdnTool",
             "module": "packages/core/src/tools/cdn.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/tools/codex-audit.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "CODEX_AUDIT_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'audit_component_with_codex', description: 'Run a structured codex adversarial audit against one component. Caches results by contract-surface hash so unchanged surfaces hit cache instantly; surface changes force a fresh review. Findings reference the helix defect-class corpus (01–14). Use this BEFORE shipping an extending component or migrating between helix versions.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'Custom element tag name (e.g. \"hx-button\"). Must match a declaration in the loaded CEM.', }, force: { type: 'boolean', description: 'Skip the cache and force a fresh codex run. Default false. Use when you suspect a stale audit or want a deterministic re-evaluation.', }, auditsRoot: { type: 'string', description: 'Override the audits output directory. Defaults to <projectRoot>/audits/. Use for monorepo setups that prefer per-package audit dirs.', }, libraryId: { type: 'string', description: 'Optional library ID for multi-library workspaces (resolved by the dispatcher).', }, }, required: ['tagName'], additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleCodexAuditTool",
+          "return": {
+            "type": {
+              "text": "Promise<MCPToolResult>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "unknown"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "isCodexAuditTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CODEX_AUDIT_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "CODEX_AUDIT_TOOL_DEFINITIONS",
+            "module": "packages/core/src/tools/codex-audit.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleCodexAuditTool",
+          "declaration": {
+            "name": "handleCodexAuditTool",
+            "module": "packages/core/src/tools/codex-audit.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isCodexAuditTool",
+          "declaration": {
+            "name": "isCodexAuditTool",
+            "module": "packages/core/src/tools/codex-audit.ts"
           }
         }
       ]
@@ -7320,7 +8579,7 @@
           "type": {
             "text": "array"
           },
-          "default": "[ { name: 'score_component', description: 'Returns the latest health score for a single web component, including grade, dimension scores, and issues. Set multiDimensional=true for the full 11-dimension enterprise scoring with tier gates.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'The tag name of the component to score (e.g. \"my-button\").', }, libraryId: { type: 'string', description: 'The library ID to scope the health history lookup (default: \"default\").', }, multiDimensional: { type: 'boolean', description: 'When true, returns the full multi-dimensional health score with 11 dimensions, enterprise grade algorithm, and confidence levels. Default: false for backward compatibility.', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'score_all_components', description: 'Returns health scores for all components in the library. Set multiDimensional=true for full 11-dimension enterprise scoring.', inputSchema: { type: 'object' as const, properties: { multiDimensional: { type: 'boolean', description: 'When true, returns multi-dimensional scores with 11 dimensions per component. Default: false.', }, }, additionalProperties: false, }, }, { name: 'get_health_trend', description: 'Returns the health trend for a component over the last N days, including data points, trend direction, and change percent.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'The tag name of the component (e.g. \"my-button\").', }, days: { type: 'number', description: 'Number of days to look back (default: 7).', }, libraryId: { type: 'string', description: 'The library ID to scope the health history lookup (default: \"default\").', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'get_health_diff', description: 'Compares health between the current branch and a base branch, returning before/after scores with improvement or regression verdict.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'The tag name of the component (e.g. \"my-button\").', }, baseBranch: { type: 'string', description: 'The base branch to compare against (default: \"main\").', }, libraryId: { type: 'string', description: 'The library ID to scope the health history lookup (default: \"default\").', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'get_health_summary', description: 'Returns aggregate health statistics for all components: average score, grade distribution, total count, library-wide trend, per-dimension averages, and components needing attention (score below 70).', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, }, additionalProperties: false, }, }, { name: 'analyze_accessibility', description: 'Analyzes the accessibility profile of one or all web components from CEM data. Checks for ARIA roles, aria-* attributes, form association, keyboard events, focus management, disabled state, label support, and accessibility documentation.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'The tag name of the component to analyze (e.g. \"my-button\"). Omit to analyze all components.', }, }, additionalProperties: false, }, }, { name: 'audit_library', description: 'Generates a JSONL audit report scoring every component across 11 dimensions. Returns file path (if outputPath given) and summary stats. Each line is valid JSON for one component.', inputSchema: { type: 'object' as const, properties: { outputPath: { type: 'string', description: 'Optional file path (relative to project root) to write the JSONL report to. e.g. \"audit/health.jsonl\"', }, libraryId: { type: 'string', description: 'The library ID to audit (default: \"default\").', }, }, additionalProperties: false, }, }, ]"
+          "default": "[ { name: 'score_component', description: 'Returns the latest health score for a single web component, including grade, dimension scores, and issues. Set multiDimensional=true for the full 11-dimension enterprise scoring with tier gates.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'The tag name of the component to score (e.g. \"my-button\").', }, libraryId: { type: 'string', description: 'The library ID to scope the health history lookup (default: \"default\").', }, multiDimensional: { type: 'boolean', description: 'When true, returns the full multi-dimensional health score with 11 dimensions, enterprise grade algorithm, and confidence levels. Default: false for backward compatibility.', }, libraryRoot: { type: 'string', description: 'Optional absolute path to the consuming library root (e.g. /path/to/helix). When provided alongside multiDimensional=true, enables helix-AAA evidence collection (helixMeta, aaa-verdicts.json, AAA-AUDIT.md sidecar, source-level checks) that the 8 split a11y dims score against. Omit to skip source-level checks and fall back to CEM-only evidence.', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'score_all_components', description: 'Returns health scores for all components in the library. Set multiDimensional=true for full 11-dimension enterprise scoring.', inputSchema: { type: 'object' as const, properties: { multiDimensional: { type: 'boolean', description: 'When true, returns multi-dimensional scores with 11 dimensions per component. Default: false.', }, libraryRoot: { type: 'string', description: 'Optional absolute path to the consuming library root. Threaded into helix-AAA evidence detection for the 8 split a11y dims when multiDimensional=true.', }, }, additionalProperties: false, }, }, { name: 'get_health_trend', description: 'Returns the health trend for a component over the last N days, including data points, trend direction, and change percent.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'The tag name of the component (e.g. \"my-button\").', }, days: { type: 'number', description: 'Number of days to look back (default: 7).', }, libraryId: { type: 'string', description: 'The library ID to scope the health history lookup (default: \"default\").', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'get_health_diff', description: 'Compares health between the current branch and a base branch, returning before/after scores with improvement or regression verdict.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'The tag name of the component (e.g. \"my-button\").', }, baseBranch: { type: 'string', description: 'The base branch to compare against (default: \"main\").', }, libraryId: { type: 'string', description: 'The library ID to scope the health history lookup (default: \"default\").', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'get_health_summary', description: 'Returns aggregate health statistics for all components: average score, grade distribution, total count, library-wide trend, per-dimension averages, and components needing attention (score below 70).', inputSchema: { type: 'object' as const, properties: { libraryId: { type: 'string', description: 'Optional library ID to target a specific loaded library instead of the default.', }, libraryRoot: { type: 'string', description: 'Optional absolute path to the consuming library root. When provided, source-level evidence (focus-visible, attachInternals, forced-colors) feeds the multi-dim scoring. Omit for CDN-loaded libraries — source-dependent dims return unknown rather than being contaminated by unrelated workspace files.', }, }, additionalProperties: false, }, }, { name: 'analyze_accessibility', description: 'Analyzes the accessibility profile of one or all web components from CEM data. Checks for ARIA roles, aria-* attributes, form association, keyboard events, focus management, disabled state, label support, and accessibility documentation. When libraryRoot is provided alongside tagName, the report is enriched with helix-native AAA evidence (helixMeta, AAA verdict snapshot, source-level signals).', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'The tag name of the component to analyze (e.g. \"my-button\"). Omit to analyze all components.', }, libraryRoot: { type: 'string', description: 'Optional absolute path to the consuming library root. When provided alongside tagName, the response is a HelixAccessibilityReport with the helix-native AAA evidence summary attached. Ignored when tagName is omitted (back-compat).', }, }, additionalProperties: false, }, }, { name: 'detect_helix_evidence', description: 'Detect helix-native AAA evidence (helixMeta in CEM, aaa-verdicts.json snapshot, AAA-AUDIT.md sidecar, source-level signals) for a single tagName. Returns the raw HelixAaaEvidence object — useful for surfacing the same evidence helixir scores against (Storybook a11y card, readiness pipeline).', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'The tag name of the component to inspect (e.g. \"hx-button\").', }, libraryRoot: { type: 'string', description: 'Absolute path to library root; if omitted, source-level checks are skipped (verdict snapshot from helixMeta only).', }, libraryId: { type: 'string', description: 'The library ID to scope CEM lookups (default: \"default\").', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'audit_library', description: 'Generates a JSONL audit report scoring every component across all dimensions of the registered scoring system. Returns file path (if outputPath given) and summary stats. Each line is valid JSON for one component.', inputSchema: { type: 'object' as const, properties: { outputPath: { type: 'string', description: 'Optional file path (relative to project root) to write the JSONL report to. e.g. \"audit/health.jsonl\"', }, libraryId: { type: 'string', description: 'The library ID to audit (default: \"default\").', }, libraryRoot: { type: 'string', description: 'Optional absolute path to the library root. When provided, source-level a11y evidence is collected for every component. Omit for CDN-loaded libraries — source-dependent dims return unknown rather than being scored against unrelated workspace files.', }, }, additionalProperties: false, }, }, ]"
         },
         {
           "kind": "function",
@@ -7893,7 +9152,7 @@
           "type": {
             "text": "array"
           },
-          "default": "[ { name: 'create_theme', description: \"Scaffold a complete enterprise CSS theme from the component library's design tokens. \" + 'Analyzes the CEM to detect the token prefix and categories, then generates a ready-to-customize ' + 'CSS file with light mode variables, dark mode overrides (via prefers-color-scheme and explicit class), ' + 'and color-scheme declarations. Returns the full CSS content and per-category token counts.', inputSchema: { type: 'object' as const, properties: { themeName: { type: 'string', description: 'Name for the theme (used in CSS class selectors). ' + 'E.g. \"brand\" generates \".brand-light\" and \".brand-dark\". Defaults to \"theme\".', }, prefix: { type: 'string', description: 'Override the CSS custom property prefix detected from the CEM. ' + 'E.g. \"--hx-\". When omitted, the prefix is detected automatically.', }, }, additionalProperties: false, }, }, { name: 'apply_theme_tokens', description: 'Map a theme token definition to specific components, showing how to apply it with correct ' + 'CSS custom property overrides. Accepts a map of CSS variable names to values, then generates ' + 'per-component CSS blocks and a global :root block. Use this after create_theme to wire ' + 'your theme tokens to individual component CSS properties.', inputSchema: { type: 'object' as const, properties: { themeTokens: { type: 'object', description: 'Map of CSS custom property names to their values. ' + 'E.g. { \"--hx-color-primary\": \"#0066cc\", \"--hx-spacing-md\": \"1rem\" }. ' + 'Property names that match component CSS properties generate per-component CSS blocks.', additionalProperties: { type: 'string' }, }, tagNames: { type: 'array', items: { type: 'string' }, description: 'Optional list of component tag names to filter results. ' + 'When omitted, all components with CSS properties are included.', }, }, required: ['themeTokens'], additionalProperties: false, }, }, ]"
+          "default": "[ { name: 'create_theme', description: \"Scaffold a complete enterprise CSS theme from the component library's design tokens. \" + 'Analyzes the CEM to detect the token prefix and categories, then generates a ready-to-customize ' + 'CSS file with light mode variables, dark mode overrides (via prefers-color-scheme and explicit class), ' + 'and color-scheme declarations. Returns the full CSS content and per-category token counts.', inputSchema: { type: 'object' as const, properties: { themeName: { type: 'string', description: 'Name for the theme (used in CSS class selectors). ' + 'E.g. \"brand\" generates \".brand-light\" and \".brand-dark\". Defaults to \"theme\".', }, prefix: { type: 'string', description: 'Override the CSS custom property prefix detected from the CEM. ' + 'E.g. \"--hx-\". When omitted, the prefix is detected automatically.', }, libraryId: { type: 'string', description: 'Optional multi-library dispatch hint. When set, src/mcp/index.ts ' + 'uses it to pick the correct CEM before invoking this tool. ' + 'Schema-aware MCP clients must allow it through to support ' + 'multi-library projects.', }, }, additionalProperties: false, }, }, { name: 'apply_theme_tokens', description: 'Map a theme token definition to specific components, showing how to apply it with correct ' + 'CSS custom property overrides. Accepts a map of CSS variable names to values, then generates ' + 'per-component CSS blocks and a global :root block. Use this after create_theme to wire ' + 'your theme tokens to individual component CSS properties.', inputSchema: { type: 'object' as const, properties: { themeTokens: { type: 'object', description: 'Map of CSS custom property names to their values. ' + 'E.g. { \"--hx-color-primary\": \"#0066cc\", \"--hx-spacing-md\": \"1rem\" }. ' + 'Property names that match component CSS properties generate per-component CSS blocks.', additionalProperties: { type: 'string' }, }, tagNames: { type: 'array', items: { type: 'string' }, description: 'Optional list of component tag names to filter results. ' + 'When omitted, all components with CSS properties are included.', }, libraryId: { type: 'string', description: 'Optional multi-library dispatch hint. When set, src/mcp/index.ts ' + 'uses it to pick the correct CEM before invoking this tool.', }, }, required: ['themeTokens'], additionalProperties: false, }, }, ]"
         },
         {
           "kind": "function",
@@ -8055,6 +9314,117 @@
           "declaration": {
             "name": "isTokenTool",
             "module": "packages/core/src/tools/tokens.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/tools/tool-catalog.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "TOOL_CATALOG_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'list_helixir_tools', description: 'Discover the helixir MCP tool catalog: every registered tool with its summary, when-to-call triggers, input shape, and tags. Filter by tag or substring. Use this FIRST when you are unsure which helixir tool fits a task — install ≠ adoption.', inputSchema: { type: 'object' as const, properties: { tags: { type: 'array', items: { type: 'string' }, description: 'Restrict to tools matching ALL supplied tags (audit, verify, scaffold, validation, tokens, extension, scoring, discovery, read, analyze).', }, search: { type: 'string', description: 'Substring match on tool name.', }, }, additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "setCatalogedTools",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "tools",
+              "type": {
+                "text": "ToolCatalogEntryInput[]"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "handleToolCatalogCall",
+          "return": {
+            "type": {
+              "text": "Promise<MCPToolResult>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "unknown"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "isToolCatalogTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TOOL_CATALOG_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "TOOL_CATALOG_TOOL_DEFINITIONS",
+            "module": "packages/core/src/tools/tool-catalog.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "setCatalogedTools",
+          "declaration": {
+            "name": "setCatalogedTools",
+            "module": "packages/core/src/tools/tool-catalog.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleToolCatalogCall",
+          "declaration": {
+            "name": "handleToolCatalogCall",
+            "module": "packages/core/src/tools/tool-catalog.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isToolCatalogTool",
+          "declaration": {
+            "name": "isToolCatalogTool",
+            "module": "packages/core/src/tools/tool-catalog.ts"
           }
         }
       ]
@@ -8331,6 +9701,190 @@
           "declaration": {
             "name": "isValidateTool",
             "module": "packages/core/src/tools/validate.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/tools/verify-extension.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "VERIFY_EXTENSION_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'verify_extension', description: \"Audit an extending component against its parent's contract surface. Catches slot drift, ARIA regressions, lost form-association, suppressed events, missing forced-colors blocks, sub-44px touch targets, and broken accessible-label devWarn patterns. Findings reference defect-corpus classes 05-11. Use this BEFORE shipping any helix-pattern subclass.\", inputSchema: { type: 'object' as const, properties: { parentTagName: { type: 'string', description: 'Tag name of the parent component (e.g. \"hx-button\").', }, subclassTagName: { type: 'string', description: 'Tag name of the extending subclass (e.g. \"figgy-button\").', }, subclassSourcePaths: { type: 'object', properties: { code: { type: 'string', description: 'Path to subclass component source (.ts / .js).', }, styles: { type: 'string', description: 'Path to subclass styles (.css / .styles.ts).', }, }, additionalProperties: false, description: 'Optional subclass source paths for deeper checks. Without these, the audit only inspects the CEM surface.', }, libraryId: { type: 'string', description: 'Optional library ID for multi-library workspaces (resolved by the dispatcher).', }, }, required: ['parentTagName', 'subclassTagName'], additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleVerifyExtensionTool",
+          "return": {
+            "type": {
+              "text": "Promise<MCPToolResult>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "unknown"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "isVerifyExtensionTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "VERIFY_EXTENSION_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "VERIFY_EXTENSION_TOOL_DEFINITIONS",
+            "module": "packages/core/src/tools/verify-extension.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleVerifyExtensionTool",
+          "declaration": {
+            "name": "handleVerifyExtensionTool",
+            "module": "packages/core/src/tools/verify-extension.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isVerifyExtensionTool",
+          "declaration": {
+            "name": "isVerifyExtensionTool",
+            "module": "packages/core/src/tools/verify-extension.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/core/src/tools/verify-token-inheritance.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "TOKEN_VERIFICATION_TOOL_DEFINITIONS",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ { name: 'verify_token_inheritance', description: 'Audit a component for token-related defects across helix R8/R11/R14/R32 alias renames, cascade gaps under dark / high-contrast overlays, and raw color literals where tokens exist. Findings reference defect-corpus classes 01, 02, 03, 14. Use this BEFORE shipping an extending component or migrating across helix major versions.', inputSchema: { type: 'object' as const, properties: { tagName: { type: 'string', description: 'Custom element tag name (e.g. \"hx-button\").', }, cssSourcePaths: { type: 'array', items: { type: 'string' }, description: 'Optional CSS source paths (relative to projectRoot). When provided, the color-literal scan runs across them. Without this, only the CEM-declared cssProperties surface is checked.', }, overlays: { type: 'object', properties: { dark: { type: 'array', items: { type: 'string' } }, highContrast: { type: 'array', items: { type: 'string' } }, }, additionalProperties: false, description: 'Optional pre-computed CSS-prop key sets per theme overlay. Used by the cascade-gap check.', }, libraryId: { type: 'string', description: 'Optional library ID for multi-library workspaces (resolved by the dispatcher).', }, }, required: ['tagName'], additionalProperties: false, }, }, { name: 'analyze_token_canonicality', description: 'Look up a single token (or every alias in the loaded map) against the helix R-round deprecation history. Returns whether the name is canonical, the canonical replacement, and provenance metadata (R-round, commit, removal version). Backbone of M4 finding generation; expose for ad-hoc consumer queries.', inputSchema: { type: 'object' as const, properties: { tokenName: { type: 'string', description: 'CSS variable name (e.g. \"--hx-color-border-on-dark-default\"). Omit to dump every alias in the map.', }, libraryId: { type: 'string', description: 'Optional library ID for multi-library workspaces (resolved by the dispatcher).', }, }, additionalProperties: false, }, }, ]"
+        },
+        {
+          "kind": "function",
+          "name": "handleTokenVerificationTool",
+          "return": {
+            "type": {
+              "text": "Promise<MCPToolResult>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "args",
+              "type": {
+                "text": "unknown"
+              }
+            },
+            {
+              "name": "config",
+              "type": {
+                "text": "McpWcConfig"
+              }
+            },
+            {
+              "name": "cem",
+              "type": {
+                "text": "Cem"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "isTokenVerificationTool",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TOKEN_VERIFICATION_TOOL_DEFINITIONS",
+          "declaration": {
+            "name": "TOKEN_VERIFICATION_TOOL_DEFINITIONS",
+            "module": "packages/core/src/tools/verify-token-inheritance.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "handleTokenVerificationTool",
+          "declaration": {
+            "name": "handleTokenVerificationTool",
+            "module": "packages/core/src/tools/verify-token-inheritance.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isTokenVerificationTool",
+          "declaration": {
+            "name": "isTokenVerificationTool",
+            "module": "packages/core/src/tools/verify-token-inheritance.ts"
           }
         }
       ]

@@ -45,7 +45,7 @@
   },
   "homepage": "https://github.com/bookedsolidtech/helixir/tree/main/packages/mcp#readme",
   "peerDependencies": {
-    "helixir": ">=0.5.0",
+    "helixir": ">=0.6.0",
     "@modelcontextprotocol/sdk": "^1.27.1",
     "zod": "^3.22.0"
   },

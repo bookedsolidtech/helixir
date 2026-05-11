@@ -149,6 +149,8 @@ const VerdictsFileSchema = z.object({
 interface VerdictsCacheEntry {
   /** Map of tagName → per-SC verdict block. `null` means file unreadable. */
   byTag: Record<string, Record<string, { verdict: VerdictValue; evidence?: string }>> | null;
+  /** mtime fingerprint of the verdicts files at parse time. */
+  fingerprint: string;
 }
 
 const verdictsCache = new Map<string, VerdictsCacheEntry>();
@@ -159,13 +161,40 @@ const verdictsCache = new Map<string, VerdictsCacheEntry>();
  * `<root>/packages/<pkg>/custom-elements.json`.
  * Empty array means the scan ran but found no manifests; `null` means
  * the scan errored (e.g. unreadable packages dir).
+ *
+ * Each cache slot carries a fingerprint of the source files'
+ * mtime — long-lived MCP servers (watch mode) would otherwise miss
+ * regenerated artifacts for the process lifetime (codex push-gate P2
+ * round 8, 2026-05-10).
  */
 interface ManifestIndex {
   packageRoot: string;
   /** map of tagName → absolute source path (resolved against packageRoot) */
   tagToSourcePath: Map<string, string>;
 }
-const manifestIndexCache = new Map<string, ManifestIndex[] | null>();
+interface ManifestIndexCacheEntry {
+  indices: ManifestIndex[] | null;
+  fingerprint: string;
+}
+const manifestIndexCache = new Map<string, ManifestIndexCacheEntry>();
+
+/**
+ * Compute a stable fingerprint from candidate file paths' mtimes.
+ * Missing files contribute "missing"; readable files contribute their
+ * mtime in ms. The fingerprint stays stable across runs until any
+ * watched artifact changes, at which point the cache slot is rebuilt.
+ */
+function fingerprintFiles(paths: readonly string[]): string {
+  const parts: string[] = [];
+  for (const p of paths) {
+    try {
+      parts.push(`${p}:${statSync(p).mtime.getTime()}`);
+    } catch {
+      parts.push(`${p}:missing`);
+    }
+  }
+  return parts.join('|');
+}
 
 /**
  * Clears all module-scoped caches. Intended for tests.
@@ -347,15 +376,10 @@ function buildVerdictSnapshot(
 function loadVerdictsForRoot(
   libraryRoot: string,
 ): Record<string, Record<string, { verdict: VerdictValue; evidence?: string }>> | null {
-  const cached = verdictsCache.get(libraryRoot);
-  if (cached !== undefined) return cached.byTag;
-
   // Verdicts can live either under packages/<pkg>/aaa-verdicts.json
   // (monorepo, helix shape) OR at libraryRoot/aaa-verdicts.json
   // (single-package consumer). Both layouts are accepted per the
   // detector contract (codex push-gate P2 round 4, 2026-05-10).
-  const merged: Record<string, Record<string, { verdict: VerdictValue; evidence?: string }>> = {};
-  let foundAny = false;
   const candidatePaths: string[] = [];
   const packagesDir = resolve(libraryRoot, 'packages');
   try {
@@ -370,6 +394,17 @@ function loadVerdictsForRoot(
   }
   candidatePaths.push(resolve(libraryRoot, 'aaa-verdicts.json'));
 
+  // Fingerprint includes mtimes of every candidate path. Regenerating
+  // aaa-verdicts.json in watch mode now correctly invalidates the cache
+  // (codex push-gate P2 round 8, 2026-05-10).
+  const fingerprint = fingerprintFiles(candidatePaths);
+  const cached = verdictsCache.get(libraryRoot);
+  if (cached !== undefined && cached.fingerprint === fingerprint) {
+    return cached.byTag;
+  }
+
+  const merged: Record<string, Record<string, { verdict: VerdictValue; evidence?: string }>> = {};
+  let foundAny = false;
   for (const verdictsPath of candidatePaths) {
     try {
       const raw = readFileSync(verdictsPath, 'utf-8');
@@ -385,7 +420,7 @@ function loadVerdictsForRoot(
   }
 
   const result = foundAny ? merged : null;
-  verdictsCache.set(libraryRoot, { byTag: result });
+  verdictsCache.set(libraryRoot, { byTag: result, fingerprint });
   return result;
 }
 
@@ -404,9 +439,6 @@ function resolveComponentSourcePath(libraryRoot: string, tagName: string): strin
 }
 
 function loadManifestIndex(libraryRoot: string): ManifestIndex[] | null {
-  const cached = manifestIndexCache.get(libraryRoot);
-  if (cached !== undefined) return cached;
-
   // Discovery covers two layouts: (a) monorepo with packages/<pkg>/
   // custom-elements.json, AND (b) single-package repos with the manifest
   // directly at the libraryRoot. The plan documented libraryRoot as "the
@@ -426,6 +458,16 @@ function loadManifestIndex(libraryRoot: string): ManifestIndex[] | null {
   }
   // Always consider libraryRoot itself; it's harmless if absent.
   candidatePackageRoots.push(libraryRoot);
+
+  // Fingerprint over every candidate manifest path so watch-mode picks
+  // up new components without restart (codex push-gate P2 round 8,
+  // 2026-05-10).
+  const candidateManifests = candidatePackageRoots.map((p) => resolve(p, 'custom-elements.json'));
+  const fingerprint = fingerprintFiles(candidateManifests);
+  const cached = manifestIndexCache.get(libraryRoot);
+  if (cached !== undefined && cached.fingerprint === fingerprint) {
+    return cached.indices;
+  }
 
   const indices: ManifestIndex[] = [];
   for (const packageRoot of candidatePackageRoots) {
@@ -464,7 +506,7 @@ function loadManifestIndex(libraryRoot: string): ManifestIndex[] | null {
     }
   }
 
-  manifestIndexCache.set(libraryRoot, indices);
+  manifestIndexCache.set(libraryRoot, { indices, fingerprint });
   return indices;
 }
 

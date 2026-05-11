@@ -22,7 +22,7 @@
 
 import type { CemDeclaration } from '../cem.js';
 import type { HelixAaaEvidence, KeyboardContract } from '../evidence/helix-aaa-evidence.js';
-import { loadApgPatterns, type ApgPattern } from './apg-patterns-loader.js';
+import { loadApgPatterns, isPassiveApgPattern, type ApgPattern } from './apg-patterns-loader.js';
 import type { DimScoreResult } from './types.js';
 
 // ───────────────────────────────────────────────────────────────────────
@@ -118,6 +118,20 @@ export function scoreApgKeyboard(decl: CemDeclaration, evidence: HelixAaaEvidenc
     patternKey && Object.prototype.hasOwnProperty.call(patternBook, patternKey)
       ? patternBook[patternKey]
       : undefined;
+
+  // Passive APG patterns (tabpanel, group, etc.) carry no required
+  // keys — their keyboard contract belongs to a parent (tablist, form,
+  // etc.). A component with a recognized passive pattern is satisfied
+  // by definition; flagging it as missing-contract would gaslight every
+  // correct tabpanel/group component (codex push-gate P2, 2026-05-10).
+  if (patternKey && pattern && isPassiveApgPattern(patternKey, patternBook)) {
+    return {
+      score: 100,
+      confidence: 'verified',
+      measured: true,
+      notes: [`apg-passive-pattern:${patternKey}`],
+    };
+  }
 
   if (contract && pattern) {
     const expected = collectExpectedKeys(pattern);

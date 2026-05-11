@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-11T02:45:25.334Z",
+  "timestamp": "2026-05-11T02:54:33.064Z",
   "scorecards": {
     "material": {
       "library": "material",
@@ -243,7 +243,7 @@
         "heuristic": 357,
         "untested": 598
       },
-      "timestamp": "2026-05-11T02:45:25.329Z"
+      "timestamp": "2026-05-11T02:54:33.060Z"
     },
     "spectrum": {
       "library": "spectrum",
@@ -487,7 +487,7 @@
         "heuristic": 347,
         "untested": 534
       },
-      "timestamp": "2026-05-11T02:45:25.329Z"
+      "timestamp": "2026-05-11T02:54:33.061Z"
     },
     "vaadin": {
       "library": "vaadin",
@@ -731,7 +731,7 @@
         "heuristic": 348,
         "untested": 619
       },
-      "timestamp": "2026-05-11T02:45:25.330Z"
+      "timestamp": "2026-05-11T02:54:33.061Z"
     },
     "fluentui": {
       "library": "fluentui",
@@ -975,7 +975,7 @@
         "heuristic": 99,
         "untested": 246
       },
-      "timestamp": "2026-05-11T02:45:25.330Z"
+      "timestamp": "2026-05-11T02:54:33.061Z"
     },
     "carbon": {
       "library": "carbon",
@@ -1219,7 +1219,7 @@
         "heuristic": 289,
         "untested": 660
       },
-      "timestamp": "2026-05-11T02:45:25.330Z"
+      "timestamp": "2026-05-11T02:54:33.062Z"
     },
     "ui5": {
       "library": "ui5",
@@ -1463,7 +1463,7 @@
         "heuristic": 413,
         "untested": 1020
       },
-      "timestamp": "2026-05-11T02:45:25.331Z"
+      "timestamp": "2026-05-11T02:54:33.062Z"
     },
     "calcite": {
       "library": "calcite",
@@ -1707,7 +1707,7 @@
         "heuristic": 267,
         "untested": 636
       },
-      "timestamp": "2026-05-11T02:45:25.331Z"
+      "timestamp": "2026-05-11T02:54:33.062Z"
     },
     "porsche": {
       "library": "porsche",
@@ -1951,7 +1951,7 @@
         "heuristic": 213,
         "untested": 546
       },
-      "timestamp": "2026-05-11T02:45:25.331Z"
+      "timestamp": "2026-05-11T02:54:33.062Z"
     },
     "ionic": {
       "library": "ionic",
@@ -2195,7 +2195,7 @@
         "heuristic": 238,
         "untested": 582
       },
-      "timestamp": "2026-05-11T02:45:25.331Z"
+      "timestamp": "2026-05-11T02:54:33.063Z"
     },
     "wired": {
       "library": "wired",
@@ -2439,7 +2439,7 @@
         "heuristic": 53,
         "untested": 156
       },
-      "timestamp": "2026-05-11T02:45:25.331Z"
+      "timestamp": "2026-05-11T02:54:33.063Z"
     },
     "elix": {
       "library": "elix",
@@ -2683,7 +2683,7 @@
         "heuristic": 74,
         "untested": 444
       },
-      "timestamp": "2026-05-11T02:45:25.331Z"
+      "timestamp": "2026-05-11T02:54:33.063Z"
     },
     "helix": {
       "library": "helix",
@@ -2717,7 +2717,7 @@
         "Accessible Label Pattern": 37.25,
         "Forced Colors Mode": 0,
         "Form Validity Reporting": 11.76,
-        "AAA Audit Self-Certification": 0
+        "AAA Audit Self-Certification": 14.22
       },
       "top5": [
         {
@@ -2779,84 +2779,84 @@
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (38). Major drag on scores."
+          "note": "Significantly below average (39). Major drag on scores."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (38). Major drag on scores."
+          "note": "Significantly below average (39). Major drag on scores."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (38). Major drag on scores."
+          "note": "Significantly below average (39). Major drag on scores."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (38). Major drag on scores."
+          "note": "Significantly below average (39). Major drag on scores."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (38). Major drag on scores."
+          "note": "Significantly below average (39). Major drag on scores."
         },
         {
           "dimension": "Focus Indicator",
           "average": 0,
           "tier": "important",
           "confidence": "unknown",
-          "note": "Significantly below average (38). Major drag on scores."
+          "note": "Significantly below average (39). Major drag on scores."
         },
         {
           "dimension": "Forced Colors Mode",
           "average": 0,
           "tier": "important",
           "confidence": "unknown",
-          "note": "Significantly below average (38). Major drag on scores."
-        },
-        {
-          "dimension": "AAA Audit Self-Certification",
-          "average": 0,
-          "tier": "advanced",
-          "confidence": "untested",
-          "note": "Significantly below average (38). Major drag on scores."
+          "note": "Significantly below average (39). Major drag on scores."
         },
         {
           "dimension": "Form Validity Reporting",
           "average": 11.76,
           "tier": "advanced",
           "confidence": "unknown",
-          "note": "Significantly below average (38). Major drag on scores."
+          "note": "Significantly below average (39). Major drag on scores."
+        },
+        {
+          "dimension": "AAA Audit Self-Certification",
+          "average": 14.22,
+          "tier": "advanced",
+          "confidence": "untested",
+          "note": "Significantly below average (39). Major drag on scores."
         },
         {
           "dimension": "APG Keyboard Contract",
           "average": 14.9,
           "tier": "critical",
           "confidence": "unknown",
-          "note": "Significantly below average (38). Major drag on scores."
+          "note": "Significantly below average (39). Major drag on scores."
         },
         {
           "dimension": "Form Association",
           "average": 16.94,
           "tier": "important",
           "confidence": "unknown",
-          "note": "Significantly below average (38). Major drag on scores."
+          "note": "Significantly below average (39). Major drag on scores."
         },
         {
           "dimension": "WCAG Conformance",
           "average": 22.97,
           "tier": "critical",
           "confidence": "unknown",
-          "note": "Below average (38). Room for improvement."
+          "note": "Below average (39). Room for improvement."
         },
         {
           "dimension": "Accessible Label Pattern",
@@ -2924,10 +2924,10 @@
       ],
       "confidenceBreakdown": {
         "verified": 465,
-        "heuristic": 435,
-        "untested": 622
+        "heuristic": 464,
+        "untested": 593
       },
-      "timestamp": "2026-05-11T02:45:25.333Z"
+      "timestamp": "2026-05-11T02:54:33.063Z"
     }
   },
   "comparisonTable": {
@@ -4342,67 +4342,67 @@
         "dimension": "AAA Audit Self-Certification",
         "rankings": [
           {
-            "library": "material",
-            "average": 0,
+            "library": "helix",
+            "average": 14.22,
             "rank": 1
           },
           {
-            "library": "spectrum",
+            "library": "material",
             "average": 0,
             "rank": 2
           },
           {
-            "library": "vaadin",
+            "library": "spectrum",
             "average": 0,
             "rank": 3
           },
           {
-            "library": "fluentui",
+            "library": "vaadin",
             "average": 0,
             "rank": 4
           },
           {
-            "library": "carbon",
+            "library": "fluentui",
             "average": 0,
             "rank": 5
           },
           {
-            "library": "ui5",
+            "library": "carbon",
             "average": 0,
             "rank": 6
           },
           {
-            "library": "calcite",
+            "library": "ui5",
             "average": 0,
             "rank": 7
           },
           {
-            "library": "porsche",
+            "library": "calcite",
             "average": 0,
             "rank": 8
           },
           {
-            "library": "ionic",
+            "library": "porsche",
             "average": 0,
             "rank": 9
           },
           {
-            "library": "wired",
+            "library": "ionic",
             "average": 0,
             "rank": 10
           },
           {
-            "library": "elix",
+            "library": "wired",
             "average": 0,
             "rank": 11
           },
           {
-            "library": "helix",
+            "library": "elix",
             "average": 0,
             "rank": 12
           }
         ],
-        "spread": 0
+        "spread": 14.22
       }
     ],
     "differentiatingDimensions": [
@@ -4412,70 +4412,70 @@
       "Slot Architecture",
       "Event Architecture"
     ],
-    "timestamp": "2026-05-11T02:45:25.334Z"
+    "timestamp": "2026-05-11T02:54:33.064Z"
   },
   "performance": {
-    "totalMs": 2706,
+    "totalMs": 3146,
     "phases": [
       {
         "name": "load-libraries",
-        "durationMs": 214
+        "durationMs": 184
       },
       {
         "name": "score-all-libraries",
-        "durationMs": 2486
+        "durationMs": 2958
       },
       {
         "name": "score-material",
-        "durationMs": 199
+        "durationMs": 260
       },
       {
         "name": "score-spectrum",
-        "durationMs": 140
+        "durationMs": 145
       },
       {
         "name": "score-vaadin",
-        "durationMs": 921
+        "durationMs": 920
       },
       {
         "name": "score-fluentui",
-        "durationMs": 32
+        "durationMs": 52
       },
       {
         "name": "score-carbon",
-        "durationMs": 76
+        "durationMs": 119
       },
       {
         "name": "score-ui5",
-        "durationMs": 85
+        "durationMs": 186
       },
       {
         "name": "score-calcite",
-        "durationMs": 228
+        "durationMs": 196
       },
       {
         "name": "score-porsche",
-        "durationMs": 122
+        "durationMs": 150
       },
       {
         "name": "score-ionic",
-        "durationMs": 88
+        "durationMs": 103
       },
       {
         "name": "score-wired",
-        "durationMs": 11
+        "durationMs": 20
       },
       {
         "name": "score-elix",
-        "durationMs": 376
+        "durationMs": 410
       },
       {
         "name": "score-helix",
-        "durationMs": 208
+        "durationMs": 397
       },
       {
         "name": "generate-scorecards",
-        "durationMs": 5
+        "durationMs": 3
       },
       {
         "name": "generate-comparison",

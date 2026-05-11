@@ -1983,14 +1983,6 @@
           "tier": "advanced",
           "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
           "severity": "warning"
-        },
-        {
-          "tagName": "hx-icon",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-          "severity": "warning"
         }
       ]
     },
@@ -5932,14 +5924,6 @@
           "tier": "advanced",
           "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
           "severity": "warning"
-        },
-        {
-          "tagName": "hx-select",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-          "severity": "warning"
         }
       ]
     },
@@ -6129,14 +6113,6 @@
           "score": 0,
           "tier": "important",
           "description": "Important dimension \"Forced Colors Mode\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-button-group",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
           "severity": "warning"
         }
       ]
@@ -6344,14 +6320,6 @@
           "tier": "important",
           "description": "Important dimension \"Forced Colors Mode\" scores 0/100",
           "severity": "warning"
-        },
-        {
-          "tagName": "hx-field-label",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-          "severity": "warning"
         }
       ]
     },
@@ -6438,14 +6406,6 @@
           "score": 0,
           "tier": "important",
           "description": "Important dimension \"Forced Colors Mode\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-field",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
           "severity": "warning"
         }
       ]
@@ -6541,14 +6501,6 @@
           "score": 0,
           "tier": "important",
           "description": "Important dimension \"Forced Colors Mode\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-help-text",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
           "severity": "warning"
         }
       ]
@@ -8381,14 +8333,6 @@
           "tier": "advanced",
           "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
           "severity": "warning"
-        },
-        {
-          "tagName": "hx-text-input",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-          "severity": "warning"
         }
       ]
     },
@@ -8570,14 +8514,6 @@
           "score": 0,
           "tier": "advanced",
           "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-rating",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
           "severity": "warning"
         }
       ]
@@ -8967,14 +8903,6 @@
           "tier": "important",
           "description": "Important dimension \"Forced Colors Mode\" scores 0/100",
           "severity": "warning"
-        },
-        {
-          "tagName": "hx-action-bar",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-          "severity": "warning"
         }
       ]
     },
@@ -9260,14 +9188,6 @@
           "tier": "advanced",
           "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
           "severity": "warning"
-        },
-        {
-          "tagName": "hx-checkbox",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-          "severity": "warning"
         }
       ]
     },
@@ -9346,14 +9266,6 @@
           "score": 0,
           "tier": "advanced",
           "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-button",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
           "severity": "warning"
         }
       ]
@@ -9434,14 +9346,6 @@
           "tier": "advanced",
           "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
           "severity": "warning"
-        },
-        {
-          "tagName": "hx-combobox",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-          "severity": "warning"
         }
       ]
     },
@@ -9520,14 +9424,6 @@
           "score": 0,
           "tier": "important",
           "description": "Important dimension \"Forced Colors Mode\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-popup",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
           "severity": "warning"
         }
       ]
@@ -9616,14 +9512,6 @@
           "tier": "advanced",
           "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
           "severity": "warning"
-        },
-        {
-          "tagName": "hx-slider",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-          "severity": "warning"
         }
       ]
     },
@@ -9702,14 +9590,6 @@
           "score": 0,
           "tier": "advanced",
           "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-switch",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
           "severity": "warning"
         }
       ]
@@ -9790,14 +9670,6 @@
           "tier": "advanced",
           "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
           "severity": "warning"
-        },
-        {
-          "tagName": "hx-toggle-button",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-          "severity": "warning"
         }
       ]
     },
@@ -9876,14 +9748,6 @@
           "score": 0,
           "tier": "advanced",
           "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-textarea",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
           "severity": "warning"
         }
       ]
@@ -9972,14 +9836,6 @@
           "tier": "advanced",
           "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
           "severity": "warning"
-        },
-        {
-          "tagName": "hx-number-input",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-          "severity": "warning"
         }
       ]
     },
@@ -10059,14 +9915,6 @@
           "tier": "advanced",
           "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
           "severity": "warning"
-        },
-        {
-          "tagName": "hx-icon-button",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-          "severity": "warning"
         }
       ]
     },
@@ -10129,14 +9977,6 @@
           "score": 0,
           "tier": "important",
           "description": "Important dimension \"Forced Colors Mode\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-tabs",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
           "severity": "warning"
         }
       ]
@@ -10225,14 +10065,6 @@
           "tier": "advanced",
           "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
           "severity": "warning"
-        },
-        {
-          "tagName": "hx-checkbox-group",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-          "severity": "warning"
         }
       ]
     },
@@ -10311,14 +10143,6 @@
           "score": 0,
           "tier": "advanced",
           "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-radio-group",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
           "severity": "warning"
         }
       ]
@@ -10399,14 +10223,6 @@
           "tier": "advanced",
           "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
           "severity": "warning"
-        },
-        {
-          "tagName": "hx-color-picker",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-          "severity": "warning"
         }
       ]
     },
@@ -10486,14 +10302,6 @@
           "tier": "advanced",
           "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
           "severity": "warning"
-        },
-        {
-          "tagName": "hx-file-upload",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-          "severity": "warning"
         }
       ]
     },
@@ -10556,14 +10364,6 @@
           "score": 0,
           "tier": "important",
           "description": "Important dimension \"Forced Colors Mode\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-split-button",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
           "severity": "warning"
         }
       ]
@@ -10636,14 +10436,6 @@
           "tier": "important",
           "description": "Important dimension \"Forced Colors Mode\" scores 0/100",
           "severity": "warning"
-        },
-        {
-          "tagName": "hx-dropdown",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-          "severity": "warning"
         }
       ]
     },
@@ -10706,14 +10498,6 @@
           "score": 0,
           "tier": "important",
           "description": "Important dimension \"Forced Colors Mode\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-copy-button",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
           "severity": "warning"
         }
       ]
@@ -10786,14 +10570,6 @@
           "tier": "important",
           "description": "Important dimension \"Forced Colors Mode\" scores 0/100",
           "severity": "warning"
-        },
-        {
-          "tagName": "hx-overflow-menu",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-          "severity": "warning"
         }
       ]
     },
@@ -10864,14 +10640,6 @@
           "score": 0,
           "tier": "important",
           "description": "Important dimension \"Forced Colors Mode\" scores 0/100",
-          "severity": "warning"
-        },
-        {
-          "tagName": "hx-menu",
-          "dimension": "AAA Audit Self-Certification",
-          "score": 0,
-          "tier": "advanced",
-          "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
           "severity": "warning"
         }
       ]
@@ -11040,11 +10808,11 @@
     },
     {
       "dimension": "AAA Audit Self-Certification",
-      "helixAverage": 0,
+      "helixAverage": 14.22,
       "materialAverage": 0,
       "carbonAverage": 0,
-      "gap": 0,
-      "status": "competitive"
+      "gap": 14.22,
+      "status": "ahead"
     }
   ],
   "actionableIssues": [
@@ -13425,14 +13193,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-action-bar",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-badge",
       "dimension": "Bundle Size",
       "score": 0,
@@ -13913,14 +13673,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-button",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-card",
       "dimension": "Bundle Size",
       "score": 0,
@@ -14209,14 +13961,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-button-group",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-banner",
       "dimension": "Bundle Size",
       "score": 0,
@@ -14361,14 +14105,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-checkbox",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-color-picker",
       "dimension": "Bundle Size",
       "score": 0,
@@ -14430,14 +14166,6 @@
       "score": 0,
       "tier": "advanced",
       "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-color-picker",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
       "severity": "warning"
     },
     {
@@ -14737,14 +14465,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-copy-button",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-checkbox-group",
       "dimension": "Bundle Size",
       "score": 0,
@@ -14809,14 +14529,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-checkbox-group",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-combobox",
       "dimension": "Bundle Size",
       "score": 0,
@@ -14878,14 +14590,6 @@
       "score": 0,
       "tier": "advanced",
       "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-combobox",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
       "severity": "warning"
     },
     {
@@ -15313,14 +15017,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-dropdown",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-field-label",
       "dimension": "Event Architecture",
       "score": 0,
@@ -15385,14 +15081,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-field-label",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-file-upload",
       "dimension": "Bundle Size",
       "score": 0,
@@ -15454,14 +15142,6 @@
       "score": 0,
       "tier": "advanced",
       "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-file-upload",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
       "severity": "warning"
     },
     {
@@ -15606,14 +15286,6 @@
       "score": 0,
       "tier": "important",
       "description": "Important dimension \"Forced Colors Mode\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-field",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
       "severity": "warning"
     },
     {
@@ -15945,14 +15617,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-help-text",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-format-date",
       "dimension": "Event Architecture",
       "score": 0,
@@ -16358,14 +16022,6 @@
       "score": 0,
       "tier": "advanced",
       "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-icon",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
       "severity": "warning"
     },
     {
@@ -16601,14 +16257,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-menu",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-nav",
       "dimension": "Bundle Size",
       "score": 0,
@@ -16913,14 +16561,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-number-input",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-pagination",
       "dimension": "Bundle Size",
       "score": 0,
@@ -17046,14 +16686,6 @@
       "score": 0,
       "tier": "important",
       "description": "Important dimension \"Forced Colors Mode\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-overflow-menu",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
       "severity": "warning"
     },
     {
@@ -17497,14 +17129,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-popup",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-icon-button",
       "dimension": "Bundle Size",
       "score": 0,
@@ -17566,14 +17190,6 @@
       "score": 0,
       "tier": "advanced",
       "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-icon-button",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
       "severity": "warning"
     },
     {
@@ -17729,14 +17345,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-rating",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-radio-group",
       "dimension": "Bundle Size",
       "score": 0,
@@ -17798,14 +17406,6 @@
       "score": 0,
       "tier": "advanced",
       "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-radio-group",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
       "severity": "warning"
     },
     {
@@ -17953,14 +17553,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-select",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-slider",
       "dimension": "Bundle Size",
       "score": 0,
@@ -18022,14 +17614,6 @@
       "score": 0,
       "tier": "advanced",
       "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-slider",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
       "severity": "warning"
     },
     {
@@ -18326,14 +17910,6 @@
       "score": 0,
       "tier": "important",
       "description": "Important dimension \"Forced Colors Mode\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-split-button",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
       "severity": "warning"
     },
     {
@@ -19145,14 +18721,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-switch",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-style-scope",
       "dimension": "CSS Architecture",
       "score": 0,
@@ -19481,14 +19049,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-textarea",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-text-input",
       "dimension": "Bundle Size",
       "score": 0,
@@ -19550,14 +19110,6 @@
       "score": 0,
       "tier": "advanced",
       "description": "Dimension \"Form Validity Reporting\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-text-input",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
       "severity": "warning"
     },
     {
@@ -19881,14 +19433,6 @@
       "severity": "warning"
     },
     {
-      "tagName": "hx-toggle-button",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
-      "severity": "warning"
-    },
-    {
       "tagName": "hx-time-picker",
       "dimension": "Bundle Size",
       "score": 0,
@@ -20182,14 +19726,6 @@
       "score": 0,
       "tier": "important",
       "description": "Important dimension \"Forced Colors Mode\" scores 0/100",
-      "severity": "warning"
-    },
-    {
-      "tagName": "hx-tabs",
-      "dimension": "AAA Audit Self-Certification",
-      "score": 0,
-      "tier": "advanced",
-      "description": "Dimension \"AAA Audit Self-Certification\" scores very low at 0/100",
       "severity": "warning"
     },
     {

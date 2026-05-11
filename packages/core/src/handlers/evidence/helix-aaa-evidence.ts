@@ -419,6 +419,12 @@ function loadVerdictsForRoot(
     return cached.byTag;
   }
 
+  // First valid verdicts file wins — combining root and package files
+  // for the same tag merges SC rows across snapshots and can produce
+  // contradictory verdicts on the same criterion (codex push-gate P2
+  // round-2, 2026-05-11). Within ONE file, every tag's SC map is
+  // self-consistent; across files the same tag may have been audited
+  // against different criteria sets and merging is unsafe.
   const merged: Record<string, Record<string, { verdict: VerdictValue; evidence?: string }>> = {};
   let foundAny = false;
   for (const verdictsPath of candidatePaths) {
@@ -428,7 +434,12 @@ function loadVerdictsForRoot(
       if (!parsed.success) continue;
       foundAny = true;
       for (const [tag, scMap] of Object.entries(parsed.data.components)) {
-        merged[tag] = { ...(merged[tag] ?? {}), ...scMap };
+        // Skip if this tag was already populated by an earlier file —
+        // the candidate path order is packages-first, root-fallback last,
+        // so package-specific verdicts take precedence over root-level
+        // catch-all.
+        if (merged[tag] !== undefined) continue;
+        merged[tag] = scMap;
       }
     } catch {
       // ignore — file may not exist at every candidate

@@ -91,14 +91,16 @@ export function scoreFormValidityReporting(
     };
   }
 
-  // ── Branch 5: source confirms no FACE signals → N/A (non-form component)
-  // Mirrors scoreFormAssociation's same-evidence-shape collapse to N/A.
-  // Without this, non-form components (buttons, cards, banners) lose the
-  // Form Validity Reporting dimension entirely (codex push-gate P2 round
-  // 11, 2026-05-11).
+  // ── Branch 5: source confirms no FACE signals AND helixMeta is present
+  // → N/A. Requiring helixMeta as the second condition prevents declaring
+  // N/A on components whose form-association is genuinely unknown (no
+  // claim, no local signals — could be an inherited FACE subclass whose
+  // FACE contract lives on the parent's source file the detector doesn't
+  // walk). Form Validity Reporting can only be N/A when Form Association
+  // itself is known to be N/A (codex push-gate P2 round-2, 2026-05-11).
   const noFaceSignals =
     !checks.hasStaticFormAssociated && !checks.hasAttachInternals && !checks.hasSetValidityCall;
-  if (noFaceSignals) {
+  if (noFaceSignals && helixMeta !== undefined) {
     return {
       score: 100,
       confidence: 'verified',

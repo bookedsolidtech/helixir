@@ -62,17 +62,29 @@ describe('scoreFormValidityReporting', () => {
     expect(result.notes).toContain('form-associated-without-validity-reporting');
   });
 
-  it('returns 100/verified N/A when sourceChecks confirm no FACE signals at all', () => {
-    // Post-codex-fix (round 11): when source confirms no FACE signals AND
-    // no claim, the dimension collapses to N/A — symmetric with
-    // scoreFormAssociation. Otherwise non-form components (buttons, cards)
-    // lose this dimension entirely under the new dispatcher.
-    const decl = bareDecl('x-silent');
+  it('returns 100/verified N/A when helixMeta present + sourceChecks confirm no FACE signals', () => {
+    // Push-gate round-2 tightening: N/A requires BOTH no FACE signals AND
+    // a helixMeta block. Without helixMeta, an inherited FACE subclass
+    // might have its FACE contract on a parent we don't walk — so we
+    // can't claim N/A confidently.
+    const decl = { ...bareDecl('x-silent-helix'), helixMeta: { ariaPattern: 'banner' } };
     const ev = buildEvidence(decl, { sourceChecks: checks() });
     const result = scoreFormValidityReporting(decl, ev);
     expect(result.score).toBe(100);
     expect(result.confidence).toBe('verified');
     expect(result.notes).toContain('form-validity-not-applicable');
+  });
+
+  it('returns 0/unknown when sourceChecks confirm no FACE signals but no helixMeta', () => {
+    // Push-gate round-2: without helixMeta the form-association status
+    // is genuinely unknown (potential inherited FACE subclass), so
+    // Form Validity Reporting must stay unknown rather than claim N/A.
+    const decl = bareDecl('x-silent');
+    const ev = buildEvidence(decl, { sourceChecks: checks() });
+    const result = scoreFormValidityReporting(decl, ev);
+    expect(result.score).toBe(0);
+    expect(result.confidence).toBe('unknown');
+    expect(result.measured).toBe(false);
   });
 
   it('uses sourceChecks.hasStaticFormAssociated as a form-associated trigger', () => {

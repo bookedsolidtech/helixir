@@ -1,5 +1,71 @@
 # Changelog
 
+## 0.6.0
+
+### Minor Changes
+
+- 0467d4a: feat: add check_token_fallbacks and check_composition MCP tools for var() chain validation and cross-component pattern validation
+- 93283a5: Add create_theme and apply_theme_tokens MCP tools for enterprise theming workflow
+- 9b96f43: Add `resolve_css_api` MCP tool — resolves every `::part()`, CSS custom property, and slot reference against actual component CEM data. Catches hallucinated part names, invalid token names, and unknown slot names with fuzzy match suggestions.
+- ca024a9: Add check_dark_mode_patterns tool — detects dark mode styling anti-patterns specific to Shadow DOM: theme-scoped selectors setting standard CSS properties on web component hosts (won't reach internals), @media prefers-color-scheme blocks with shadow DOM piercing, and descendant selectors inside theme scopes. Integrated into validate_component_code, styling_preflight, and validate_css_file.
+- 9c73a62: Decompose Accessibility dimension into evidence-backed sub-dimensions.
+  - Split the single weight-10 Accessibility dim into 5 new dims: WCAG
+    Conformance, APG Keyboard Contract, Focus Indicator, Form Association,
+    Accessible Label Pattern.
+  - Add 3 orthogonal dims: Forced Colors Mode, Form Validity Reporting,
+    AAA Audit Self-Certification (informational, weight 0).
+  - New shared evidence detector reads helixMeta blocks from CEM,
+    aaa-verdicts.json snapshots, AAA-AUDIT.md sidecars, and source-level
+    signals (static formAssociated, attachInternals(), :focus-visible
+    rules) when available.
+  - New MCP tool: detect_helix_evidence. score_component,
+    score_all_components, and analyze_accessibility accept an optional
+    libraryRoot argument.
+  - Deprecates the scoring.weights.accessibility config key; applies the
+    multiplier across the 5 split dims for one minor-version window.
+    Removed in 0.8.0.
+  - 5 new defect-corpus classes (15-19) with fixtures + falsifiability
+    cases in bst-cto-kb.
+  - 3426 vitest tests passing.
+
+  Backward compatibility: analyze_accessibility tool output preserved,
+  new helixEvidence block appended when libraryRoot is provided.
+
+  Closes M6 task #19 (telemetry surfacing — readiness pipeline exercises
+  the new tool surface).
+
+- 5470972: Enhanced theme checker with dark mode detection: mixed token/hardcoded color pair warnings and low-opacity shadow visibility alerts. Fixed integration test tool count for resolve_css_api.
+- 729b8e9: Add extend_component MCP tool for subclassing existing components with proper inheritance
+- 99c65ca: feat: make suggest_fix token suggestions library-agnostic with optional tokenPrefix parameter
+- c5f03e1: Add :root scope token detection to shadow DOM checker and suggest-fix pipeline
+
+  Detects component CSS custom properties set on :root (which have no effect through Shadow DOM)
+  and suggests moving them to the host element. Wired into both styling_preflight and
+  css-file-validator inline fix generation.
+
+- 685eee2: Add `styling_preflight` MCP tool — single-call styling validation that combines component API discovery, CSS reference resolution, Shadow DOM anti-pattern detection, theme compatibility checking, and a pass/fail verdict. Eliminates the "forgot to check the API first" failure mode.
+- 7c3bb34: feat: add 24 anti-hallucination MCP tools for web component validation. Includes Shadow DOM diagnostics, HTML/CSS/event validators, slot/attribute/a11y checkers, token fallback validation, composition patterns, method call verification, theme compatibility, CSS specificity checker, layout pattern checker, fix suggestion generator, code type recommender, and an all-in-one aggregator running 14 sub-validators. Added attribute field to ComponentMetadata members.
+- 6119be2: Add validate_css_file MCP tool — validates entire CSS files targeting multiple web components in one call with auto-detection
+- 36abde2: feat: add auto-fix suggestions to validation summary — agents get corrected code alongside each issue
+
+### Patch Changes
+
+- 02cee44: Add antiPatterns and inline fix suggestions to validate_css_file output — each component now includes component-specific "don't do this" examples and issues include corrected code when a fix can be auto-generated
+- 026f673: Add dark mode CSS example to buildCssSnippet — agents see correct theme-scoped custom property pattern with explicit WRONG example showing that standard properties on host can't reach shadow DOM.
+- 87a1c86: fix: quick-ref CSS snippet uses meaningful values instead of misleading 'initial', adds slot styling guidance
+- afca135: fix(cem-source-fidelity): handle TypeScript generic types in dispatchEvent regex
+- bd07aff: fix: buildCssSnippet self-referential var() bug, add slot styling guidance and font inheritance warnings
+- 60efbf1: docs: make styling cookbook library-agnostic and add validation workflow references
+- ce9ed84: Add component-specific "common mistakes" section to narrative output with valid part names, no-CSS-API warnings, React event guidance, and styling_preflight reminder
+- c81adf2: Add antiPatterns array to styling_preflight output — agents get component-specific "don't do this" examples alongside validation results in a single call
+- 6a57098: Enhance styling_preflight to run all 7 CSS validators in a single call — adds token fallback, scope, shorthand, color contrast, and specificity checks alongside existing shadow DOM and theme compatibility checks
+- c80ea33: Add inline fix suggestions to styling_preflight issues — each issue now includes a `fix` object with corrected code and explanation when a fix can be auto-generated, eliminating the need for a separate suggest_fix call
+- 82dc600: Add antiPatterns array to get_component_quick_ref output — returns component-specific "don't do this" examples (shadow DOM piercing, ::part() chaining, :root scope, hardcoded colors, invalid slots) using the component's actual tag name, part names, and token names
+- 9cb536a: Add styling_preflight and check_dark_mode_patterns to recommend_checks output. CSS code now gets styling_preflight recommended first, and dark mode checker is recommended when theme/dark/light patterns are detected.
+- 2b3c382: Regenerate custom-elements.json from source to fix stale CEM data causing cem-validate CI failures
+- 1655209: Add dark-mode fix category to suggest_fix — generates concrete CSS custom property replacements for theme-scoped standard properties and shadow DOM piercing issues detected by check_dark_mode_patterns.
+- 0de21b1: Update tool descriptions for styling_preflight, validate_css_file, and get_component_quick_ref to mention antiPatterns and inline fix capabilities — agents now know these tools return negative examples and corrected code without needing separate suggest_fix calls
+
 ## 0.5.1
 
 ### Patch Changes

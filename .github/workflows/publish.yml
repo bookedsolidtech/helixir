@@ -68,7 +68,7 @@ jobs:
         run: gitleaks detect --config .gitleaks.toml --source ./build --no-git --verbose --redact
 
       - name: Generate SBOM
-        run: npx @cyclonedx/cyclonedx-npm --output-file sbom.json --output-format json
+        run: npx @cyclonedx/cyclonedx-npm --ignore-npm-errors --output-file sbom.json --output-format json
 
       - name: Upload SBOM as release artifact
         uses: actions/upload-artifact@v4

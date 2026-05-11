@@ -78,9 +78,17 @@ BLOCKED=0
 MATCHES=""
 
 # Pattern 1: Co-Authored-By with noreply@ email
-if grep -qiE 'Co-Authored-By:.*noreply@' "$COMMIT_MSG_FILE" 2>/dev/null; then
+# 0.18.0 helix-020 / discord-ops Round 10 #3 fix (G4.B):
+# the pre-fix pattern `Co-Authored-By:.*noreply@` matched both AI-tool
+# noreply addresses AND legitimate `<user>@users.noreply.github.com`
+# collaborator credits — blocking honest co-author footers from human
+# contributors. Refined to enumerate AI-tool noreply domains explicitly;
+# Pattern 2 below catches Co-Authored-By with named tools regardless of
+# email, so dropping users.noreply.github.com from this branch only
+# relaxes the check for human collaborators — never for AI.
+if grep -qiE 'Co-Authored-By:.*noreply@(anthropic\.com|openai\.com|github-copilot|github\.com|claude\.ai|chatgpt\.com|googlemail\.com|google\.com|cursor\.com|codeium\.com|tabnine\.com|amazon\.com|amazonaws\.com|amazon-q\.amazonaws\.com|cody\.dev|sourcegraph\.com|mistral\.ai|xai-org|x\.ai|inflection\.ai|perplexity\.ai|replit\.com|jetbrains\.com|bito\.ai|pieces\.app|phind\.com|you\.com)' "$COMMIT_MSG_FILE" 2>/dev/null; then
   BLOCKED=1
-  MATCHES="${MATCHES}$(grep -niE 'Co-Authored-By:.*noreply@' "$COMMIT_MSG_FILE" 2>/dev/null)
+  MATCHES="${MATCHES}$(grep -niE 'Co-Authored-By:.*noreply@(anthropic\.com|openai\.com|github-copilot|github\.com|claude\.ai|chatgpt\.com|googlemail\.com|google\.com|cursor\.com|codeium\.com|tabnine\.com|amazon\.com|amazonaws\.com|amazon-q\.amazonaws\.com|cody\.dev|sourcegraph\.com|mistral\.ai|xai-org|x\.ai|inflection\.ai|perplexity\.ai|replit\.com|jetbrains\.com|bito\.ai|pieces\.app|phind\.com|you\.com)' "$COMMIT_MSG_FILE" 2>/dev/null)
 "
 fi
 

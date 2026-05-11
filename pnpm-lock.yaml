@@ -23,8 +23,8 @@ importers:
         version: 3.25.76
     devDependencies:
       '@bookedsolid/rea':
-        specifier: ^0.17.0
-        version: 0.17.0
+        specifier: ^0.28.1
+        version: 0.28.1
       '@changesets/cli':
         specifier: ^2.29.4
         version: 2.30.0(@types/node@22.19.13)
@@ -259,8 +259,8 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
-  '@bookedsolid/rea@0.17.0':
-    resolution: {integrity: sha512-6ab1nATExdvRC4P+b8K6EcXgKrXhB3mqdvXJfbee/siNKlLZGSpC104vVl5JSsqtcAFv4lsYH38uC4agsdKrEQ==}
+  '@bookedsolid/rea@0.28.1':
+    resolution: {integrity: sha512-9Cc9v8++An30pLqNpcWKO+7ZiGrJM8J28L5l/fzh98a9j8TEauVHAcaJJNmZHSLnzed+4O1jZgzUbS5Xy4Mzmg==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -2815,6 +2815,10 @@ packages:
   mute-stream@0.0.8:
     resolution: {integrity: sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==}
 
+  mvdan-sh@0.10.1:
+    resolution: {integrity: sha512-kMbrH0EObaKmK3nVRKUIIya1dpASHIEusM13S4V1ViHFuxuNxCo+arxoa6j/dbV22YBGjl7UKJm9QQKJ2Crzhg==}
+    deprecated: See https://github.com/mvdan/sh/issues/1145
+
   nano-spawn@2.0.0:
     resolution: {integrity: sha512-tacvGzUY5o2D8CBh2rrwxyNojUsZNU2zjNTzKQrkgGJQTbGAfArVWXSKMBokBeeg6C7OLRGUEyoFlYbfeWQIqw==}
     engines: {node: '>=20.17'}
@@ -3560,6 +3564,7 @@ packages:
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   validate-npm-package-license@3.0.4:
@@ -3897,12 +3902,13 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@bookedsolid/rea@0.17.0':
+  '@bookedsolid/rea@0.28.1':
     dependencies:
       '@anthropic-ai/sdk': 0.90.0(zod@3.25.76)
       '@clack/prompts': 1.3.0
       '@modelcontextprotocol/sdk': 1.29.0(zod@3.25.76)
       commander: 14.0.3
+      mvdan-sh: 0.10.1
       proper-lockfile: 4.1.2
       safe-regex: 2.1.1
       yaml: 2.8.4
@@ -6551,6 +6557,8 @@ snapshots:
   ms@2.1.3: {}
 
   mute-stream@0.0.8: {}
+
+  mvdan-sh@0.10.1: {}
 
   nano-spawn@2.0.0: {}
 

@@ -28,12 +28,12 @@ export function scoreForcedColors(
   const checks = evidence.sourceChecks;
   const claim = evidence.helixMeta?.forcedColorsSupported;
 
-  // ── Branch 1: nothing measured ───────────────────────────────────────
-  if (!checks) {
-    return { score: 0, confidence: 'unknown', measured: false };
-  }
-
-  // ── Branch 2: explicit opt-out is a verified pass ───────────────────
+  // ── Branch 1: explicit opt-out is a verified pass (CEM-decided) ─────
+  // Opt-out must be evaluated BEFORE the sourceChecks guard — otherwise a
+  // CEM-only / CDN consumer (no libraryRoot) with an explicit
+  // forcedColorsSupported=false claim returns unknown, turning a clear
+  // declaration into a measurement gap (codex push-gate P2 round 9,
+  // 2026-05-10).
   if (claim === false) {
     return {
       score: 100,
@@ -41,6 +41,11 @@ export function scoreForcedColors(
       measured: true,
       notes: ['forced-colors-not-supported-by-design'],
     };
+  }
+
+  // ── Branch 2: nothing measured ───────────────────────────────────────
+  if (!checks) {
+    return { score: 0, confidence: 'unknown', measured: false };
   }
 
   // ── Branches 3 + 4: explicit claim of support ───────────────────────

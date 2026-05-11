@@ -271,7 +271,13 @@ function summarizeHelixEvidence(evidence: HelixAaaEvidence): HelixEvidenceSummar
   const snapshot = evidence.verdictSnapshot;
   const source = evidence.sourceChecks;
 
-  const aaaCertified = helixMeta?.aaa?.certified === true || snapshot?.certified === true;
+  // Snapshot is post-audit (derived from aaa-verdicts.json) and authoritative
+  // when present — overrides any stale helixMeta.aaa.certified that the CEM
+  // hasn't been regenerated against. `||` previously kept a stale cert claim
+  // alive even when the snapshot disagreed (codex push-gate P2 round 9,
+  // 2026-05-10).
+  const aaaCertified =
+    snapshot !== undefined ? snapshot.certified === true : helixMeta?.aaa?.certified === true;
   const criteriaCount = snapshot?.criteria?.length ?? helixMeta?.aaa?.criteria?.length ?? 0;
 
   const summary: HelixEvidenceSummary = {

@@ -277,18 +277,23 @@ export function detectHelixAaaEvidence(
       : null;
 
   // ── verdictSnapshot ───────────────────────────────────────────────────
-  // Try package-scoped first; fall back to library-wide search.
-  const verdictSnapshot =
-    (scopedRoot && buildVerdictSnapshot(scopedRoot, bareTagName, helixMeta)) ??
-    buildVerdictSnapshot(absRoot, bareTagName, helixMeta);
+  // Once a package scope is requested (declaration carries packageName),
+  // ONLY consult that package. Falling back to a library-wide search
+  // when the scoped package has no verdict file leaks evidence across
+  // packages — `pkg-b:x-foo` would silently resolve to `pkg-a:x-foo`'s
+  // verdicts if pkg-b had none of its own (codex push-gate P1 round 9,
+  // 2026-05-10).
+  const verdictSnapshot = scopedRoot
+    ? buildVerdictSnapshot(scopedRoot, bareTagName, helixMeta)
+    : buildVerdictSnapshot(absRoot, bareTagName, helixMeta);
   if (verdictSnapshot) {
     evidence.verdictSnapshot = verdictSnapshot;
   }
 
   // ── Locate component source file via package-manifest index ──────────
-  const sourcePath =
-    (scopedRoot && resolveComponentSourcePath(scopedRoot, bareTagName)) ??
-    resolveComponentSourcePath(absRoot, bareTagName);
+  const sourcePath = scopedRoot
+    ? resolveComponentSourcePath(scopedRoot, bareTagName)
+    : resolveComponentSourcePath(absRoot, bareTagName);
   if (!sourcePath) {
     return evidence;
   }

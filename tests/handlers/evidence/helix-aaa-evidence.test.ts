@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, beforeAll, afterAll } from 'vitest';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { utimesSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { utimesSync, writeFileSync, readFileSync, mkdirSync, existsSync } from 'node:fs';
 import {
   detectHelixAaaEvidence,
   _resetHelixAaaEvidenceCache,
@@ -26,6 +26,20 @@ function makeDecl(
 }
 
 describe('detectHelixAaaEvidence', () => {
+  // Snapshot lib-bare's verdicts file so tests that mutate it can restore the
+  // committed state — otherwise the fixture churns between runs (the file is
+  // tracked in git).
+  const LIB_BARE_VERDICTS = resolve(LIB_BARE, 'packages/hx-library/aaa-verdicts.json');
+  let libBareVerdictsOriginal: string;
+
+  beforeAll(() => {
+    libBareVerdictsOriginal = readFileSync(LIB_BARE_VERDICTS, 'utf-8');
+  });
+
+  afterAll(() => {
+    writeFileSync(LIB_BARE_VERDICTS, libBareVerdictsOriginal, 'utf-8');
+  });
+
   beforeEach(() => {
     _resetHelixAaaEvidenceCache();
   });
@@ -91,23 +105,27 @@ describe('detectHelixAaaEvidence', () => {
     const verdictsPath = resolve(LIB_BARE, 'packages/hx-library/aaa-verdicts.json');
     writeFileSync(
       verdictsPath,
-      JSON.stringify({
-        components: {
-          'hx-bare': {
-            '1.4.9': { verdict: 'Supports' },
-            '2.1.3': { verdict: 'Supports' },
-            '2.3.3': { verdict: 'Not Applicable' },
-            '3.2.5': { verdict: 'Not Applicable' },
-            '3.3.6': { verdict: 'Not Applicable' },
-            'forced-colors': { verdict: 'Not Applicable' },
-            'apg-keyboard': { verdict: 'Partially Supports' },
-            '1.4.6': { verdict: 'Partially Supports' },
-            '2.4.12': { verdict: 'Partially Supports' },
-            '2.4.13': { verdict: 'Does Not Support' },
-            '2.5.5': { verdict: 'Supports' },
+      JSON.stringify(
+        {
+          components: {
+            'hx-bare': {
+              '1.4.9': { verdict: 'Supports' },
+              '2.1.3': { verdict: 'Supports' },
+              '2.3.3': { verdict: 'Not Applicable' },
+              '3.2.5': { verdict: 'Not Applicable' },
+              '3.3.6': { verdict: 'Not Applicable' },
+              'forced-colors': { verdict: 'Not Applicable' },
+              'apg-keyboard': { verdict: 'Partially Supports' },
+              '1.4.6': { verdict: 'Partially Supports' },
+              '2.4.12': { verdict: 'Partially Supports' },
+              '2.4.13': { verdict: 'Does Not Support' },
+              '2.5.5': { verdict: 'Supports' },
+            },
           },
         },
-      }),
+        null,
+        2,
+      ) + '\n',
       'utf-8',
     );
     _resetHelixAaaEvidenceCache();

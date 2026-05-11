@@ -594,13 +594,14 @@ function runSourceChecks(componentSourcePath: string): SourceChecks | undefined 
  * doesn't fuse with neighbour tokens after stripping).
  */
 function stripComments(src: string): string {
-  // String-aware: walk the source once, replacing comment bodies with
-  // spaces while leaving string literals (single, double, template) and
-  // their contents intact. A naive .replace would strip `//` and `/*`
-  // sequences that legitimately appear inside string literals
-  // (e.g. `const url = "https://...";`, `const note = '/* ... */'`),
-  // producing false negatives on real source signals (codex push-gate
-  // P2 round 12, 2026-05-11).
+  // Mixed-mode walker: strips JS/TS line + block comments outside strings,
+  // strips CSS block comments INSIDE template-literal strings (tagged
+  // template styles such as css`...` carry CSS that may itself contain
+  // /* */ comments — those must be stripped so focus-visible / forced-
+  // colors regexes don't match commented-out CSS — codex push-gate P1
+  // round-3, 2026-05-11), and preserves the contents of single/double-
+  // quoted strings (codex push-gate P2 round-1, 2026-05-11 — naive
+  // stripping was eating `//` sequences inside string URLs).
   let out = '';
   let i = 0;
   const n = src.length;
@@ -632,6 +633,7 @@ function stripComments(src: string): string {
     // string literal
     if (c === '"' || c === "'" || c === '`') {
       const quote = c;
+      const isTemplate = quote === '`';
       out += c;
       i++;
       while (i < n && src[i] !== quote) {
@@ -639,6 +641,23 @@ function stripComments(src: string): string {
           out += src[i] ?? '';
           out += src[i + 1] ?? '';
           i += 2;
+          continue;
+        }
+        // Inside template literals, strip CSS block comments (/* ... */)
+        // — tagged-template CSS authors put real comments in their style
+        // sheets, and our regexes for :focus-visible / forced-colors must
+        // not match commented-out rules.
+        if (isTemplate && src[i] === '/' && src[i + 1] === '*') {
+          out += '  ';
+          i += 2;
+          while (i < n && !(src[i] === '*' && src[i + 1] === '/')) {
+            out += src[i] === '\n' ? '\n' : ' ';
+            i++;
+          }
+          if (i < n) {
+            out += '  ';
+            i += 2;
+          }
           continue;
         }
         out += src[i] ?? '';

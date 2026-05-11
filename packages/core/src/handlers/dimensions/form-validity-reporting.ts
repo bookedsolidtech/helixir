@@ -91,16 +91,39 @@ export function scoreFormValidityReporting(
     };
   }
 
-  // ── Branch 5: source confirms no FACE signals AND helixMeta is present
-  // → N/A. Requiring helixMeta as the second condition prevents declaring
-  // N/A on components whose form-association is genuinely unknown (no
-  // claim, no local signals — could be an inherited FACE subclass whose
-  // FACE contract lives on the parent's source file the detector doesn't
-  // walk). Form Validity Reporting can only be N/A when Form Association
-  // itself is known to be N/A (codex push-gate P2 round-2, 2026-05-11).
+  // ── Branch 5: declaration affirmatively NON-FACE → N/A.
+  // Requires the source-checks AND an affirmative non-FACE signal —
+  // either an explicit helixMeta.formAssociated:false (already handled
+  // at branch 1 with source verification), an aria-pattern that's
+  // categorically non-form (button-trigger / banner / link / dialog /
+  // alertdialog / dialog / tooltip / etc.), OR a CEM declaration that
+  // explicitly sets formAssociated:false. Silent helixMeta is NOT
+  // sufficient evidence — an inherited FACE subclass might just be
+  // annotation-light (codex push-gate P2 round-3, 2026-05-11).
+  const NON_FACE_PATTERNS = new Set<string>([
+    'link',
+    'button',
+    'dialog',
+    'alertdialog',
+    'tooltip',
+    'menu',
+    'menubar',
+    'menuitem',
+    'tab',
+    'tablist',
+    'tabpanel',
+    'tree',
+    'treeitem',
+    'banner',
+    'navigation',
+    'group',
+  ]);
   const noFaceSignals =
     !checks.hasStaticFormAssociated && !checks.hasAttachInternals && !checks.hasSetValidityCall;
-  if (noFaceSignals && helixMeta !== undefined) {
+  const ariaPattern = helixMeta?.ariaPattern;
+  const declaredNonFormPattern =
+    typeof ariaPattern === 'string' && NON_FACE_PATTERNS.has(ariaPattern.toLowerCase());
+  if (noFaceSignals && declaredNonFormPattern) {
     return {
       score: 100,
       confidence: 'verified',

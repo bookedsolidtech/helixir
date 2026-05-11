@@ -14,7 +14,12 @@ import {
   scoreComponentMultiDimensional,
   scoreAllComponentsMultiDimensional,
 } from '../handlers/health.js';
-import { analyzeAccessibility, analyzeAllAccessibility } from '../handlers/accessibility.js';
+import {
+  analyzeAccessibility,
+  analyzeAllAccessibility,
+  buildHelixAccessibilityReport,
+} from '../handlers/accessibility.js';
+import { detectHelixAaaEvidence } from '../handlers/evidence/helix-aaa-evidence.js';
 import { generateAuditReport } from '../handlers/audit-report.js';
 import { DIMENSION_REGISTRY } from '../handlers/dimensions.js';
 import { createErrorResponse, createSuccessResponse } from '../shared/mcp-helpers.js';
@@ -28,10 +33,12 @@ const ScoreComponentArgsSchema = z.object({
   tagName: z.string(),
   libraryId: z.string().optional(),
   multiDimensional: z.boolean().optional(),
+  libraryRoot: z.string().optional(),
 });
 
 const ScoreAllComponentsArgsSchema = z.object({
   multiDimensional: z.boolean().optional(),
+  libraryRoot: z.string().optional(),
 });
 
 const GetHealthTrendArgsSchema = z.object({
@@ -48,15 +55,24 @@ const GetHealthDiffArgsSchema = z.object({
 
 const GetHealthSummaryArgsSchema = z.object({
   libraryId: z.string().optional(),
+  libraryRoot: z.string().optional(),
 });
 
 const AnalyzeAccessibilityArgsSchema = z.object({
   tagName: z.string().optional(),
+  libraryRoot: z.string().optional(),
+});
+
+const DetectHelixEvidenceArgsSchema = z.object({
+  tagName: z.string(),
+  libraryRoot: z.string().optional(),
+  libraryId: z.string().optional(),
 });
 
 const AuditLibraryArgsSchema = z.object({
   outputPath: FilePathSchema.optional(),
   libraryId: z.string().optional(),
+  libraryRoot: z.string().optional(),
 });
 
 // ─── Tool definitions ─────────────────────────────────────────────────────────
@@ -82,6 +98,11 @@ export const HEALTH_TOOL_DEFINITIONS = [
           description:
             'When true, returns the full multi-dimensional health score with 11 dimensions, enterprise grade algorithm, and confidence levels. Default: false for backward compatibility.',
         },
+        libraryRoot: {
+          type: 'string',
+          description:
+            'Optional absolute path to the consuming library root (e.g. /path/to/helix). When provided alongside multiDimensional=true, enables helix-AAA evidence collection (helixMeta, aaa-verdicts.json, AAA-AUDIT.md sidecar, source-level checks) that the 8 split a11y dims score against. Omit to skip source-level checks and fall back to CEM-only evidence.',
+        },
       },
       required: ['tagName'],
       additionalProperties: false,
@@ -98,6 +119,11 @@ export const HEALTH_TOOL_DEFINITIONS = [
           type: 'boolean',
           description:
             'When true, returns multi-dimensional scores with 11 dimensions per component. Default: false.',
+        },
+        libraryRoot: {
+          type: 'string',
+          description:
+            'Optional absolute path to the consuming library root. Threaded into helix-AAA evidence detection for the 8 split a11y dims when multiDimensional=true.',
         },
       },
       additionalProperties: false,
@@ -163,6 +189,11 @@ export const HEALTH_TOOL_DEFINITIONS = [
           description:
             'Optional library ID to target a specific loaded library instead of the default.',
         },
+        libraryRoot: {
+          type: 'string',
+          description:
+            'Optional absolute path to the consuming library root. When provided, source-level evidence (focus-visible, attachInternals, forced-colors) feeds the multi-dim scoring. Omit for CDN-loaded libraries — source-dependent dims return unknown rather than being contaminated by unrelated workspace files.',
+        },
       },
       additionalProperties: false,
     },
@@ -170,7 +201,7 @@ export const HEALTH_TOOL_DEFINITIONS = [
   {
     name: 'analyze_accessibility',
     description:
-      'Analyzes the accessibility profile of one or all web components from CEM data. Checks for ARIA roles, aria-* attributes, form association, keyboard events, focus management, disabled state, label support, and accessibility documentation.',
+      'Analyzes the accessibility profile of one or all web components from CEM data. Checks for ARIA roles, aria-* attributes, form association, keyboard events, focus management, disabled state, label support, and accessibility documentation. When libraryRoot is provided alongside tagName, the report is enriched with helix-native AAA evidence (helixMeta, AAA verdict snapshot, source-level signals).',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -179,14 +210,44 @@ export const HEALTH_TOOL_DEFINITIONS = [
           description:
             'The tag name of the component to analyze (e.g. "my-button"). Omit to analyze all components.',
         },
+        libraryRoot: {
+          type: 'string',
+          description:
+            'Optional absolute path to the consuming library root. When provided alongside tagName, the response is a HelixAccessibilityReport with the helix-native AAA evidence summary attached. Ignored when tagName is omitted (back-compat).',
+        },
       },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'detect_helix_evidence',
+    description:
+      'Detect helix-native AAA evidence (helixMeta in CEM, aaa-verdicts.json snapshot, AAA-AUDIT.md sidecar, source-level signals) for a single tagName. Returns the raw HelixAaaEvidence object — useful for surfacing the same evidence helixir scores against (Storybook a11y card, readiness pipeline).',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        tagName: {
+          type: 'string',
+          description: 'The tag name of the component to inspect (e.g. "hx-button").',
+        },
+        libraryRoot: {
+          type: 'string',
+          description:
+            'Absolute path to library root; if omitted, source-level checks are skipped (verdict snapshot from helixMeta only).',
+        },
+        libraryId: {
+          type: 'string',
+          description: 'The library ID to scope CEM lookups (default: "default").',
+        },
+      },
+      required: ['tagName'],
       additionalProperties: false,
     },
   },
   {
     name: 'audit_library',
     description:
-      'Generates a JSONL audit report scoring every component across 11 dimensions. Returns file path (if outputPath given) and summary stats. Each line is valid JSON for one component.',
+      'Generates a JSONL audit report scoring every component across all dimensions of the registered scoring system. Returns file path (if outputPath given) and summary stats. Each line is valid JSON for one component.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -198,6 +259,11 @@ export const HEALTH_TOOL_DEFINITIONS = [
         libraryId: {
           type: 'string',
           description: 'The library ID to audit (default: "default").',
+        },
+        libraryRoot: {
+          type: 'string',
+          description:
+            'Optional absolute path to the library root. When provided, source-level a11y evidence is collected for every component. Omit for CDN-loaded libraries — source-dependent dims return unknown rather than being scored against unrelated workspace files.',
         },
       },
       additionalProperties: false,
@@ -234,11 +300,19 @@ export async function handleHealthCall(
 ): Promise<MCPToolResult> {
   try {
     if (name === 'score_component') {
-      const { tagName, libraryId, multiDimensional } = ScoreComponentArgsSchema.parse(args);
+      const { tagName, libraryId, multiDimensional, libraryRoot } =
+        ScoreComponentArgsSchema.parse(args);
       const cemDecl = cem ? getAllDeclarations(cem).find((d) => d.tagName === tagName) : undefined;
 
       if (multiDimensional && cemDecl) {
-        const result = await scoreComponentMultiDimensional(config, cemDecl, cem, libraryId);
+        const result = await scoreComponentMultiDimensional(
+          config,
+          cemDecl,
+          cem,
+          libraryId,
+          undefined,
+          libraryRoot,
+        );
         return createSuccessResponse(JSON.stringify(result, null, 2));
       }
 
@@ -247,12 +321,18 @@ export async function handleHealthCall(
     }
 
     if (name === 'score_all_components') {
-      const { multiDimensional } = ScoreAllComponentsArgsSchema.parse(args);
+      const { multiDimensional, libraryRoot } = ScoreAllComponentsArgsSchema.parse(args);
       const cemData = await loadCemData(config, cem);
       const declarations = getAllDeclarations(cemData);
 
       if (multiDimensional) {
-        const results = await scoreAllComponentsMultiDimensional(config, declarations);
+        const results = await scoreAllComponentsMultiDimensional(
+          config,
+          declarations,
+          cemData,
+          'default',
+          libraryRoot,
+        );
         return createSuccessResponse(JSON.stringify(results, null, 2));
       }
 
@@ -280,16 +360,19 @@ export async function handleHealthCall(
     }
 
     if (name === 'get_health_summary') {
-      const { libraryId } = GetHealthSummaryArgsSchema.parse(args);
+      const { libraryId, libraryRoot } = GetHealthSummaryArgsSchema.parse(args);
       const cemData = await loadCemData(config, cem);
       const declarations = getAllDeclarations(cemData);
 
-      // Use multi-dimensional scoring for enriched summary
+      // Thread libraryRoot opt-in only — CDN-loaded libraries don't have
+      // source on disk and a workspace fallback contaminates evidence
+      // (codex push-gate P2 round 6, 2026-05-10).
       const allScores = await scoreAllComponentsMultiDimensional(
         config,
         declarations,
         cem,
         libraryId,
+        libraryRoot,
       );
 
       const totalComponents = allScores.length;
@@ -337,26 +420,51 @@ export async function handleHealthCall(
     }
 
     if (name === 'analyze_accessibility') {
-      const { tagName } = AnalyzeAccessibilityArgsSchema.parse(args);
+      const { tagName, libraryRoot } = AnalyzeAccessibilityArgsSchema.parse(args);
       const declarations = cem ? getAllDeclarations(cem) : [];
       if (tagName !== undefined) {
         const decl = declarations.find((d) => d.tagName === tagName);
         if (!decl) {
           return createErrorResponse(`Component '${tagName}' not found in CEM`);
         }
+        // libraryRoot opt-in: enrich the legacy AccessibilityProfile with
+        // the helix-AAA evidence summary. Without libraryRoot, fall back
+        // to the original analyzer (back-compat — same shape as before
+        // Phase 3).
+        if (libraryRoot !== undefined && libraryRoot !== '') {
+          const evidence = detectHelixAaaEvidence(decl, libraryRoot);
+          return createSuccessResponse(
+            JSON.stringify(buildHelixAccessibilityReport(decl, evidence), null, 2),
+          );
+        }
         return createSuccessResponse(JSON.stringify(analyzeAccessibility(decl), null, 2));
       }
       return createSuccessResponse(JSON.stringify(analyzeAllAccessibility(declarations), null, 2));
     }
 
+    if (name === 'detect_helix_evidence') {
+      // libraryId is accepted for forward-compat with multi-CEM hosts
+      // (matches sibling tools); current evidence detector only needs
+      // the resolved decl + libraryRoot.
+      const { tagName, libraryRoot } = DetectHelixEvidenceArgsSchema.parse(args);
+      const declarations = cem ? getAllDeclarations(cem) : [];
+      const decl = declarations.find((d) => d.tagName === tagName);
+      if (!decl) {
+        return createErrorResponse(`Component '${tagName}' not found in CEM`);
+      }
+      const evidence = detectHelixAaaEvidence(decl, libraryRoot);
+      return createSuccessResponse(JSON.stringify(evidence, null, 2));
+    }
+
     if (name === 'audit_library') {
-      const { outputPath, libraryId } = AuditLibraryArgsSchema.parse(args);
+      const { outputPath, libraryId, libraryRoot } = AuditLibraryArgsSchema.parse(args);
       const cemData = await loadCemData(config, cem);
       const declarations = getAllDeclarations(cemData);
       const { lines, summary } = await generateAuditReport(config, declarations, {
         outputPath,
         libraryId,
         cem: cemData,
+        libraryRoot,
       });
       const response: Record<string, unknown> = { summary };
       if (outputPath) {
@@ -368,7 +476,7 @@ export async function handleHealthCall(
 
     return createErrorResponse(`Unknown health tool: ${name}`);
   } catch (err) {
-    const mcpErr = handleToolError(err);
+    const mcpErr = handleToolError(err, config.projectRoot);
     return createErrorResponse(`[${mcpErr.category}] ${mcpErr.message}`);
   }
 }

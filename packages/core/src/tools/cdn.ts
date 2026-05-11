@@ -75,7 +75,7 @@ export async function handleCdnCall(
     }
     return createErrorResponse(`Unknown CDN tool: ${name}`);
   } catch (err) {
-    const mcpErr = handleToolError(err);
+    const mcpErr = handleToolError(err, config.projectRoot);
     return createErrorResponse(`[${mcpErr.category}] ${mcpErr.message}`);
   }
 }

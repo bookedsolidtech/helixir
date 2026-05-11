@@ -1,0 +1,104 @@
+{
+  "helixMeta": {
+    "aaa": {
+      "certified": true,
+      "certifiedDate": "2026-05-08",
+      "criteria": [
+        "1.4.9",
+        "2.1.3",
+        "2.3.3",
+        "3.2.5",
+        "forced-colors",
+        "apg-keyboard",
+        "1.4.6",
+        "2.4.12",
+        "2.4.13",
+        "2.5.5"
+      ],
+      "auditUrl": "src/components/hx-button/AAA-AUDIT.md"
+    },
+    "keyboardContract": {
+      "activate": ["Enter", "Space"],
+      "disabledSuppresses": true
+    },
+    "ariaPattern": "button",
+    "ariaPatternSource": "https://www.w3.org/WAI/ARIA/apg/patterns/button/",
+    "formAssociated": true,
+    "forcedColorsSupported": true,
+    "priorityTier": "P0",
+    "stability": "stable"
+  },
+  "verdictSnapshot": {
+    "certified": true,
+    "criteria": [
+      "1.4.9",
+      "2.1.3",
+      "2.3.3",
+      "3.2.5",
+      "forced-colors",
+      "apg-keyboard",
+      "1.4.6",
+      "2.4.12",
+      "2.4.13",
+      "2.5.5"
+    ],
+    "perCriterion": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 1 transition + 1 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Form-associated submission trigger (aria-pattern=button) with no user-entered data value."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"button\" — component renders a native element that provides the canonical keyboard contract via the user agent (no custom handler required)."
+      },
+      "1.4.6": {
+        "verdict": "Supports",
+        "evidence": "7.03:1 (fg rgb(255, 255, 255), bg rgb(15, 99, 99)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-button> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-button 226.8x44.0 px"
+      }
+    },
+    "certifiedDate": "2026-05-08",
+    "auditUrl": "src/components/hx-button/AAA-AUDIT.md"
+  },
+  "sourceChecks": {
+    "hasStaticFormAssociated": true,
+    "hasAttachInternals": false,
+    "hasSetValidityCall": false,
+    "hasFocusVisibleRule": true,
+    "has2pxOutlineRule": true,
+    "hasForcedColorsBlock": true
+  },
+  "auditMdPath": "/Volumes/Development/booked/helix/packages/hx-library/src/components/hx-button/AAA-AUDIT.md",
+  "auditMdFresh": true
+}

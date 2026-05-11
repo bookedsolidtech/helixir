@@ -606,7 +606,7 @@ export async function handleDiscoveryCall(
 
     return createErrorResponse(`Unknown discovery tool: ${name}`);
   } catch (err) {
-    const mcpErr = handleToolError(err);
+    const mcpErr = handleToolError(err, config.projectRoot);
     return createErrorResponse(`[${mcpErr.category}] ${mcpErr.message}`);
   }
 }

@@ -1,0 +1,19 @@
+{
+  "classId": "18-form-association-half-implemented",
+  "subclassTagName": "hx-form-half",
+  "parentTagName": "hx-parent-field",
+  "dimensions": {
+    "Form Association": {
+      "scoreMax": 30,
+      "confidenceIn": ["heuristic", "high"],
+      "issueIncludes": "attach-internals-missing"
+    },
+    "Form Validity": {
+      "scoreMax": 25,
+      "confidenceIn": ["heuristic"],
+      "issueIncludes": "set-validity-not-called"
+    }
+  },
+  "groundTruthCommit": "c669e16a9",
+  "notes": "Parent declares static formAssociated, attaches internals in constructor, and calls setValidity() in _updateValidity. Subclass re-declares static formAssociated but its constructor never calls attachInternals(), and _updateValidity is overridden to a no-op. Only the static flag remains — scorer should mark Form Association near 25/100."
+}

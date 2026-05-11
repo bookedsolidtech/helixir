@@ -1,4 +1,5 @@
 import type { Cem } from './cem.js';
+import { MCPError, ErrorCategory } from '../shared/error-handling.js';
 
 export interface ComponentDependencyResult {
   tagName: string;
@@ -105,7 +106,7 @@ export function getComponentDependencies(
   }
 
   if (!found) {
-    throw new Error(`Component "${tagName}" not found in CEM.`);
+    throw new MCPError(`Component "${tagName}" not found in CEM.`, ErrorCategory.NOT_FOUND);
   }
 
   const depMap = buildDependencyMap(cem);

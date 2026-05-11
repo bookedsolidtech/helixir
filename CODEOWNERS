@@ -7,3 +7,12 @@
 .github/workflows/      @himerus
 package.json            @himerus
 CODEOWNERS              @himerus
+
+# Security-sensitive tool handlers (user input, external URLs, filesystem access)
+packages/core/src/handlers/cdn.ts              @himerus
+packages/core/src/tools/library.ts            @himerus
+packages/core/src/shared/error-handling.ts    @himerus
+packages/core/src/shared/git.ts               @himerus
+
+# Configuration that affects security boundaries
+packages/core/src/config.ts                   @himerus

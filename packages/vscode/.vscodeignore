@@ -1,0 +1,30 @@
+# Source files — not needed in the packaged extension
+src/
+tsconfig.json
+esbuild.config.mjs
+
+# Development dependencies and lock files
+node_modules/
+.pnpm-store/
+pnpm-lock.yaml
+package-lock.json
+
+# Test artefacts
+coverage/
+*.test.ts
+*.spec.ts
+
+# Build intermediates (keep dist/)
+*.map
+
+# Editor and OS artefacts
+.vscode/
+.DS_Store
+*.log
+
+# Root-level workspace files that should not be bundled
+../../node_modules/
+../../src/
+../../build/
+../../packages/
+../../.github/

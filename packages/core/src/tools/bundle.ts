@@ -95,7 +95,7 @@ export async function handleBundleCall(
     }
     return createErrorResponse(`Unknown bundle tool: ${name}`);
   } catch (err) {
-    const mcpErr = handleToolError(err);
+    const mcpErr = handleToolError(err, config.projectRoot);
     return createErrorResponse(`[${mcpErr.category}] ${mcpErr.message}`);
   }
 }

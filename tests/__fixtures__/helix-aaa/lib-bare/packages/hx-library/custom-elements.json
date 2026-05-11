@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-bare/hx-bare.ts",
+      "declarations": [{ "kind": "class", "name": "HxBare", "tagName": "hx-bare" }]
+    }
+  ]
+}

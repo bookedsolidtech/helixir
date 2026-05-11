@@ -1,0 +1,400 @@
+{
+  "tagName": "hx-button",
+  "score": 82.8,
+  "grade": "C",
+  "dimensions": [
+    {
+      "name": "CEM Completeness",
+      "score": 98,
+      "weight": 15,
+      "tier": "critical",
+      "confidence": "verified",
+      "measured": true,
+      "subMetrics": [
+        {
+          "name": "Description present",
+          "score": 15,
+          "maxScore": 15
+        },
+        {
+          "name": "Property descriptions",
+          "score": 23,
+          "maxScore": 25,
+          "note": "12/13"
+        },
+        {
+          "name": "Event types",
+          "score": 20,
+          "maxScore": 20,
+          "note": "1/1"
+        },
+        {
+          "name": "Event descriptions",
+          "score": 15,
+          "maxScore": 15,
+          "note": "1/1"
+        },
+        {
+          "name": "CSS parts documented",
+          "score": 15,
+          "maxScore": 15,
+          "note": "5/5"
+        },
+        {
+          "name": "Slots documented",
+          "score": 10,
+          "maxScore": 10,
+          "note": "3/3"
+        }
+      ]
+    },
+    {
+      "name": "Type Coverage",
+      "score": 100,
+      "weight": 10,
+      "tier": "critical",
+      "confidence": "verified",
+      "measured": true,
+      "subMetrics": [
+        {
+          "name": "Property type annotations",
+          "score": 40,
+          "maxScore": 40,
+          "note": "13/13 properties have type annotations"
+        },
+        {
+          "name": "Event typed payloads",
+          "score": 35,
+          "maxScore": 35,
+          "note": "1/1 events have typed payloads (not bare Event)"
+        },
+        {
+          "name": "Method return types",
+          "score": 25,
+          "maxScore": 25,
+          "note": "1/1 methods have return type annotations"
+        }
+      ]
+    },
+    {
+      "name": "API Surface Quality",
+      "score": 66,
+      "weight": 10,
+      "tier": "important",
+      "confidence": "heuristic",
+      "measured": true,
+      "subMetrics": [
+        {
+          "name": "Method documentation",
+          "score": 0,
+          "maxScore": 30,
+          "note": "0/1 methods have descriptions"
+        },
+        {
+          "name": "Attribute reflection",
+          "score": 23,
+          "maxScore": 25,
+          "note": "12/13 fields have attribute bindings or reflect"
+        },
+        {
+          "name": "Default values documented",
+          "score": 25,
+          "maxScore": 25,
+          "note": "13/13 fields have documented defaults"
+        },
+        {
+          "name": "Property descriptions",
+          "score": 18,
+          "maxScore": 20,
+          "note": "12/13 fields have descriptions"
+        }
+      ]
+    },
+    {
+      "name": "CSS Architecture",
+      "score": 100,
+      "weight": 5,
+      "tier": "important",
+      "confidence": "heuristic",
+      "measured": true,
+      "subMetrics": [
+        {
+          "name": "CSS property descriptions",
+          "score": 35,
+          "maxScore": 35,
+          "note": "39/39 CSS properties have descriptions"
+        },
+        {
+          "name": "Design token naming",
+          "score": 30,
+          "maxScore": 30,
+          "note": "39/39 CSS properties follow --prefix-* naming"
+        },
+        {
+          "name": "CSS parts documentation",
+          "score": 35,
+          "maxScore": 35,
+          "note": "5/5 CSS parts have descriptions"
+        }
+      ]
+    },
+    {
+      "name": "Event Architecture",
+      "score": 100,
+      "weight": 5,
+      "tier": "important",
+      "confidence": "heuristic",
+      "measured": true,
+      "subMetrics": [
+        {
+          "name": "Kebab-case naming",
+          "score": 35,
+          "maxScore": 35,
+          "note": "1/1 events use kebab-case naming"
+        },
+        {
+          "name": "Typed event payloads",
+          "score": 35,
+          "maxScore": 35,
+          "note": "1/1 events have typed payloads"
+        },
+        {
+          "name": "Event descriptions",
+          "score": 30,
+          "maxScore": 30,
+          "note": "1/1 events have descriptions"
+        }
+      ]
+    },
+    {
+      "name": "Test Coverage",
+      "score": 0,
+      "weight": 10,
+      "tier": "critical",
+      "confidence": "untested",
+      "measured": false
+    },
+    {
+      "name": "Bundle Size",
+      "score": 0,
+      "weight": 5,
+      "tier": "important",
+      "confidence": "untested",
+      "measured": false
+    },
+    {
+      "name": "Story Coverage",
+      "score": 0,
+      "weight": 5,
+      "tier": "important",
+      "confidence": "untested",
+      "measured": false
+    },
+    {
+      "name": "Performance",
+      "score": 0,
+      "weight": 5,
+      "tier": "advanced",
+      "confidence": "untested",
+      "measured": false
+    },
+    {
+      "name": "Drupal Readiness",
+      "score": 0,
+      "weight": 5,
+      "tier": "advanced",
+      "confidence": "untested",
+      "measured": false
+    },
+    {
+      "name": "CEM-Source Fidelity",
+      "score": 0,
+      "weight": 10,
+      "tier": "critical",
+      "confidence": "untested",
+      "measured": false
+    },
+    {
+      "name": "Slot Architecture",
+      "score": 80,
+      "weight": 5,
+      "tier": "important",
+      "confidence": "verified",
+      "measured": true,
+      "subMetrics": [
+        {
+          "name": "Default slot documentation",
+          "score": 25,
+          "maxScore": 25,
+          "note": "declared with description"
+        },
+        {
+          "name": "Named slot documentation",
+          "score": 30,
+          "maxScore": 30,
+          "note": "2/2 documented"
+        },
+        {
+          "name": "Slot type constraints",
+          "score": 0,
+          "maxScore": 20,
+          "note": "0/3 slots specify content types"
+        },
+        {
+          "name": "Slot-property coherence",
+          "score": 25,
+          "maxScore": 25,
+          "note": "no coherence pairs detected"
+        }
+      ]
+    },
+    {
+      "name": "Naming Consistency",
+      "score": 0,
+      "weight": 5,
+      "tier": "important",
+      "confidence": "unknown",
+      "measured": true
+    },
+    {
+      "name": "WCAG Conformance",
+      "score": 100,
+      "weight": 4,
+      "tier": "critical",
+      "confidence": "verified",
+      "measured": true,
+      "subMetrics": [
+        {
+          "name": "criteria-supported",
+          "score": 10,
+          "maxScore": 9
+        }
+      ]
+    },
+    {
+      "name": "APG Keyboard Contract",
+      "score": 100,
+      "weight": 2,
+      "tier": "critical",
+      "confidence": "verified",
+      "measured": true,
+      "subMetrics": [
+        {
+          "name": "apg-keys-covered",
+          "score": 2,
+          "maxScore": 2
+        }
+      ]
+    },
+    {
+      "name": "Focus Indicator",
+      "score": 100,
+      "weight": 1,
+      "tier": "important",
+      "confidence": "verified",
+      "measured": true,
+      "subMetrics": [
+        {
+          "name": "focus-visible-2px-outline",
+          "score": 1,
+          "maxScore": 1,
+          "note": "meets helix 2px AAA focus-ring contract"
+        }
+      ]
+    },
+    {
+      "name": "Form Association",
+      "score": 20,
+      "weight": 1,
+      "tier": "important",
+      "confidence": "heuristic",
+      "measured": true,
+      "subMetrics": [
+        {
+          "name": "static-form-associated",
+          "score": 1,
+          "maxScore": 1
+        },
+        {
+          "name": "attach-internals",
+          "score": 0,
+          "maxScore": 1
+        },
+        {
+          "name": "set-validity-call",
+          "score": 0,
+          "maxScore": 1
+        }
+      ]
+    },
+    {
+      "name": "Accessible Label Pattern",
+      "score": 100,
+      "weight": 2,
+      "tier": "important",
+      "confidence": "verified",
+      "measured": true,
+      "subMetrics": [
+        {
+          "name": "apg-pattern-recognized",
+          "score": 1,
+          "maxScore": 1,
+          "note": "pattern: button"
+        }
+      ]
+    },
+    {
+      "name": "Forced Colors Mode",
+      "score": 100,
+      "weight": 1,
+      "tier": "important",
+      "confidence": "verified",
+      "measured": true,
+      "subMetrics": [
+        {
+          "name": "forced-colors-media-block",
+          "score": 1,
+          "maxScore": 1
+        }
+      ]
+    },
+    {
+      "name": "Form Validity Reporting",
+      "score": 0,
+      "weight": 1,
+      "tier": "advanced",
+      "confidence": "verified",
+      "measured": true,
+      "subMetrics": [
+        {
+          "name": "set-validity-call",
+          "score": 0,
+          "maxScore": 1
+        }
+      ]
+    },
+    {
+      "name": "AAA Audit Self-Certification",
+      "score": 100,
+      "weight": 0,
+      "tier": "advanced",
+      "confidence": "verified",
+      "measured": true
+    }
+  ],
+  "confidenceSummary": {
+    "verified": 10,
+    "heuristic": 4,
+    "untested": 6,
+    "unknown": 1
+  },
+  "gradingNotes": ["2 untested critical dimension(s) prevent grade B"],
+  "issues": [
+    "attach-internals-missing",
+    "set-validity-not-called",
+    "form-associated-without-validity-reporting",
+    "set-validity-not-called",
+    "aaa-cert-fresh-and-supported"
+  ],
+  "timestamp": "2026-05-11T01:51:36.045Z"
+}

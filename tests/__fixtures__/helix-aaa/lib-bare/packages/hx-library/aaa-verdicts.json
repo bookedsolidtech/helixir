@@ -1,0 +1,17 @@
+{
+  "components": {
+    "hx-bare": {
+      "1.4.9": { "verdict": "Supports" },
+      "2.1.3": { "verdict": "Supports" },
+      "2.3.3": { "verdict": "Not Applicable" },
+      "3.2.5": { "verdict": "Not Applicable" },
+      "3.3.6": { "verdict": "Not Applicable" },
+      "forced-colors": { "verdict": "Not Applicable" },
+      "apg-keyboard": { "verdict": "Partially Supports" },
+      "1.4.6": { "verdict": "Partially Supports" },
+      "2.4.12": { "verdict": "Partially Supports" },
+      "2.4.13": { "verdict": "Does Not Support" },
+      "2.5.5": { "verdict": "Supports" }
+    }
+  }
+}

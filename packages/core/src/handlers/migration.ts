@@ -104,6 +104,26 @@ export async function generateMigrationGuide(
 ): Promise<MigrationGuide> {
   const diff = await diffCem(tagName, baseBranch, config, cem);
 
+  // baseUnavailable: the diff couldn't be computed against the base
+  // branch (out-of-tree CEM path, etc.). Empty breaking[]/additions[]
+  // carry no semantic claim — emit an explicit "indeterminate" guide
+  // rather than rendering "No changes detected" which would silently
+  // suppress real regressions. Codex round-47 P1.
+  if (diff.baseUnavailable === true) {
+    const reasonLine =
+      diff.baseUnavailableReason !== undefined && diff.baseUnavailableReason !== ''
+        ? `\n\nReason: ${diff.baseUnavailableReason}`
+        : '';
+    const markdown = [
+      `# Migration Guide: \`${tagName}\``,
+      '',
+      `**INDETERMINATE** — the base-branch CEM for \`${baseBranch}\` could not be loaded, so changes between branches cannot be computed.${reasonLine}`,
+      '',
+      `Restore the base CEM (move it in-tree, or unset \`MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS\`) and re-run. Until then, treat this guide as not-yet-generated — do not interpret silence as "no migration needed."`,
+    ].join('\n');
+    return { tagName, baseBranch, isNew: false, markdown };
+  }
+
   if (diff.isNew) {
     const markdown = [
       `# Migration Guide: \`${tagName}\``,

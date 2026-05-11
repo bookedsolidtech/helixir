@@ -146,6 +146,39 @@ describe('generateTypes', () => {
       // Wrong detail that was in the original bug report
       expect(content).not.toContain('CustomEvent<{ active:');
     });
+
+    it('quotes kebab-case attribute names so the .d.ts parses', () => {
+      // Hyphenated attribute names like "open-delay" are not valid TypeScript
+      // identifiers; emitting them unquoted makes the generated .d.ts fail to
+      // parse for the many real-world custom elements that use kebab-case.
+      const KEBAB_CEM: Cem = {
+        schemaVersion: '1.0.0',
+        modules: [
+          {
+            kind: 'javascript-module',
+            path: 'src/hx-tooltip.js',
+            declarations: [
+              {
+                kind: 'class',
+                name: 'HxTooltip',
+                tagName: 'hx-tooltip',
+                members: [
+                  {
+                    kind: 'field',
+                    name: 'openDelay',
+                    attribute: 'open-delay',
+                    type: { text: 'number' },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+      const { content } = generateTypes(KEBAB_CEM);
+      expect(content).toContain('"open-delay"?: number;');
+      expect(content).not.toMatch(/^\s+open-delay\?:/m);
+    });
   });
 
   describe('interface generation', () => {

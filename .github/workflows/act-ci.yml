@@ -1,0 +1,197 @@
+# ============================================================================
+# Local CI — Quality gates for nektos/act
+# ============================================================================
+# Mirrors the core quality gates from ci.yml but avoids GitHub-specific actions
+# (pnpm/action-setup, actions/setup-node) that break in act due to PATH issues
+# and missing API context.
+#
+# Single-job design: helixir is a single-package Node project. Running all
+# gates in one job avoids bind-mount contention (parallel jobs sharing
+# node_modules via --bind corrupt each other's pnpm install).
+#
+# Usage: ./scripts/act-ci.sh [--job <job-name>] [--list] [--full] [--matrix]
+# Jobs: quality-gates (default), test-full (activated by --full or --matrix)
+# ============================================================================
+
+name: Local CI
+
+on:
+  pull_request:
+
+jobs:
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+          pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm run lint
+      - name: Format check
+        run: pnpm run format:check
+      - name: Type check
+        run: pnpm run type-check
+      - name: Build
+        run: pnpm run build
+      - name: Test
+        run: pnpm run test
+
+  # ── Full suite test with Node version matrix (mirrors ci-matrix.yml) ───
+  test-full:
+    name: Test Full (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: ${{ env.ACT_MATRIX_TESTS == 'true' || env.ACT_FULL_TESTS == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # ACT_MATRIX_TESTS=true → all three (parity with ci-matrix.yml).
+        # ACT_FULL_TESTS=true (without --matrix) → single entry derived
+        # from the host's Node version, forwarded by act-ci.sh as
+        # ACT_FULL_NODE_VERSION. Defaults to 22 (LTS, runner default).
+        # Codex round-5 P2 + round-6/7 P2 (host-Node selection).
+        node-version: ${{ (env.ACT_MATRIX_TESTS == 'true' && fromJSON('[22, 24]')) || fromJSON(format('[{0}]', env.ACT_FULL_NODE_VERSION || '22')) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node ${{ matrix.node-version }} via nvm
+        run: |
+          # Two failure modes to distinguish:
+          #
+          # 1. Matrix mode (--matrix → ACT_MATRIX_TESTS=true): we MUST
+          #    actually run on the requested Node version. If nvm
+          #    bootstrap fails (offline runner, restricted container,
+          #    github unreachable) the matrix row CANNOT silently fall
+          #    back to the runner's default Node — that would let the
+          #    20 / 24 rows go green without ever testing those
+          #    runtimes. Codex round-7 P1: hard-fail in this case.
+          #
+          # 2. --full mode (ACT_FULL_TESTS=true alone): the requested
+          #    Node version is the host's, which is *probably* close
+          #    enough to the runner default. Falling back to the
+          #    runner's preinstalled Node is acceptable — we still get
+          #    a meaningful local CI run.
+          REQUESTED="${{ matrix.node-version }}"
+          IS_MATRIX="${{ env.ACT_MATRIX_TESTS == 'true' }}"
+
+          # Try to use nvm if a non-default Node was requested. If
+          # the runner's Node already matches REQUESTED's major, no
+          # bootstrap needed.
+          CURRENT_MAJOR=$(node --version 2>/dev/null | sed -E 's/^v([0-9]+)\..*/\1/' || echo "")
+          if [ "$CURRENT_MAJOR" = "$REQUESTED" ]; then
+            echo "Runner already on Node $CURRENT_MAJOR; no bootstrap needed."
+            exit 0
+          fi
+
+          export NVM_DIR="$HOME/.nvm"
+          if [ ! -d "$NVM_DIR" ]; then
+            if curl -sf -o /dev/null --max-time 5 https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh; then
+              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+            else
+              if [ "$IS_MATRIX" = "true" ]; then
+                # Matrix mode CANNOT silently degrade — the whole
+                # point is Node-version coverage. Codex round-7 P1.
+                echo "ERROR: cannot bootstrap nvm (offline / github unreachable) and runner Node ($CURRENT_MAJOR) does not match requested ($REQUESTED). Refusing to silently use the wrong Node — that would defeat the matrix gate." >&2
+                exit 1
+              fi
+              echo "Offline or github unreachable; --full mode falls back to runner Node $CURRENT_MAJOR (requested $REQUESTED)."
+              exit 0
+            fi
+          fi
+          . "$NVM_DIR/nvm.sh"
+          if ! nvm install "$REQUESTED" || ! nvm use "$REQUESTED"; then
+            if [ "$IS_MATRIX" = "true" ]; then
+              echo "ERROR: nvm install/use failed for requested Node $REQUESTED in matrix mode." >&2
+              exit 1
+            fi
+            echo "nvm install/use failed for $REQUESTED; --full mode falls back to runner Node."
+            exit 0
+          fi
+          echo "Node version: $(node --version)"
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+          pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm run build
+      - name: Run full test suite with hang watchdog
+        run: |
+          # Vitest hang watchdog — kills stale processes after 15s of no output
+          LOGFILE=$(mktemp /tmp/helixir-test-full.XXXXXX)
+          STALE_TIMEOUT=15
+          POLL_INTERVAL=3
+          START_TIME=$(date +%s)
+
+          pnpm exec vitest run --reporter=verbose > "$LOGFILE" 2>&1 &
+          VITEST_PID=$!
+
+          echo "[test-full] vitest PID=$VITEST_PID, Node ${{ matrix.node-version }}"
+
+          LAST_SIZE=0
+          STALE_SECONDS=0
+          FORCE_KILLED=false
+
+          while kill -0 "$VITEST_PID" 2>/dev/null; do
+            sleep "$POLL_INTERVAL"
+            CURRENT_SIZE=$(stat -c "%s" "$LOGFILE" 2>/dev/null || stat -f "%z" "$LOGFILE" 2>/dev/null || echo 0)
+            ELAPSED=$(( $(date +%s) - START_TIME ))
+
+            if [ "$CURRENT_SIZE" -eq "$LAST_SIZE" ] && [ "$CURRENT_SIZE" -gt 0 ]; then
+              STALE_SECONDS=$((STALE_SECONDS + POLL_INTERVAL))
+              if [ "$STALE_SECONDS" -ge "$STALE_TIMEOUT" ] && [ "$ELAPSED" -ge 30 ]; then
+                echo "[test-full] Output stale for ${STALE_SECONDS}s at ${ELAPSED}s — force killing vitest"
+                kill "$VITEST_PID" 2>/dev/null || true
+                sleep 1
+                kill -9 "$VITEST_PID" 2>/dev/null || true
+                FORCE_KILLED=true
+                break
+              fi
+            else
+              STALE_SECONDS=0
+            fi
+            LAST_SIZE=$CURRENT_SIZE
+          done
+
+          # Capture vitest's actual exit code — `wait` returns the
+          # process exit, which is non-zero on crash / OOM / config
+          # error / signal kill BEFORE any output markers are emitted.
+          # Without this, a crashed vitest left FAILED_TESTS=0 and the
+          # gate reported green. Codex round-4 P1.
+          set +e
+          wait "$VITEST_PID"
+          VITEST_EXIT=$?
+          set -e
+
+          # Determine pass/fail from output. `grep -c` prints 0 AND
+          # exits 1 on no match — using `|| echo 0` then appended a
+          # SECOND zero, leaving the counter as "0\n0" which broke the
+          # numeric comparison below. Use `|| true` to swallow the
+          # exit without polluting the output. Codex round-4 P1.
+          FAILED_TESTS=$(grep -c "^[[:space:]]*[×x]" "$LOGFILE" 2>/dev/null || true)
+          PASSED_TESTS=$(grep -c "^[[:space:]]*[✓✔]" "$LOGFILE" 2>/dev/null || true)
+          FAILED_TESTS=${FAILED_TESTS:-0}
+          PASSED_TESTS=${PASSED_TESTS:-0}
+
+          echo ""
+          cat "$LOGFILE" | tail -30
+          echo ""
+          echo "[test-full] Node ${{ matrix.node-version }}: ${PASSED_TESTS} passed, ${FAILED_TESTS} failed (vitest exit=${VITEST_EXIT})"
+
+          if [ "$FORCE_KILLED" = true ]; then
+            echo "[test-full] vitest was force-killed after teardown hang"
+          fi
+
+          rm -f "$LOGFILE"
+
+          # Fail the gate when EITHER vitest exited non-zero OR we
+          # found explicit failure markers. Either signal alone is
+          # enough — a crash with zero markers AND zero failures still
+          # means the suite did not pass.
+          if [ "$VITEST_EXIT" -ne 0 ] || [ "$FAILED_TESTS" -gt 0 ] || [ "$FORCE_KILLED" = true ]; then
+            exit 1
+          fi

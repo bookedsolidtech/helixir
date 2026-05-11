@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "2.1.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "subclass/hx-keyboard-drift.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Subclass that adds an Escape handler without re-declaring the keyboard contract.",
+          "name": "HxKeyboardDrift",
+          "tagName": "hx-keyboard-drift",
+          "superclass": {
+            "name": "HxParentCheckbox",
+            "module": "parent/hx-parent-checkbox.ts"
+          },
+          "members": [],
+          "attributes": [],
+          "events": [{ "name": "dismiss", "description": "Fired when Escape is pressed." }],
+          "helixMeta": {
+            "ariaPattern": "checkbox",
+            "keyboardContract": {
+              "activate": ["Space", "Enter"],
+              "disabledSuppresses": true
+            }
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-keyboard-drift",
+          "declaration": { "name": "HxKeyboardDrift", "module": "subclass/hx-keyboard-drift.ts" }
+        }
+      ]
+    }
+  ]
+}

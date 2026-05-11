@@ -1,19 +1,28 @@
 import { readFile, readdir } from 'node:fs/promises';
-import { resolve, join, relative } from 'node:path';
+import { resolve, join, relative, isAbsolute, sep } from 'node:path';
 import { z } from 'zod';
 import { GitOperations } from '../shared/git.js';
 import type { McpWcConfig } from '../config.js';
-import { CemSchema } from './cem.js';
-import type { Cem, CemDeclaration } from './cem.js';
+import { CemSchema, cemHas } from './cem.js';
+import type { Cem, CemDeclaration, CemPresenceKey } from './cem.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
-import { analyzeAccessibility } from './accessibility.js';
 import { analyzeTypeCoverage } from './analyzers/type-coverage.js';
 import { analyzeApiSurface } from './analyzers/api-surface.js';
 import { analyzeCssArchitecture } from './analyzers/css-architecture.js';
 import { analyzeEventArchitecture } from './analyzers/event-architecture.js';
-import { analyzeSourceAccessibility } from './analyzers/source-accessibility.js';
 import { analyzeCemSourceFidelity } from './analyzers/cem-source-fidelity.js';
 import { analyzeSlotArchitecture } from './analyzers/slot-architecture.js';
+import { detectHelixAaaEvidence } from './evidence/helix-aaa-evidence.js';
+import type { HelixAaaEvidence } from './evidence/helix-aaa-evidence.js';
+import { scoreWcagConformance } from './dimensions/wcag-conformance.js';
+import { scoreApgKeyboard } from './dimensions/apg-keyboard.js';
+import { scoreFocusIndicator } from './dimensions/focus-indicator.js';
+import { scoreFormAssociation } from './dimensions/form-association.js';
+import { scoreAccessibleLabel } from './dimensions/accessible-label.js';
+import { scoreForcedColors } from './dimensions/forced-colors.js';
+import { scoreFormValidityReporting } from './dimensions/form-validity-reporting.js';
+import { scoreAaaAuditSelfCertification } from './dimensions/aaa-audit-cert.js';
+import type { DimScoreResult } from './dimensions/types.js';
 import {
   analyzeNamingConsistency,
   detectLibraryConventions,
@@ -21,12 +30,14 @@ import {
 } from './analyzers/naming-consistency.js';
 import {
   DIMENSION_REGISTRY,
+  DIMENSION_WEIGHT_KEYS,
   calculateGrade,
   computeWeightedScore,
   type ConfidenceLevel,
   type DimensionResult,
   type SubMetric,
 } from './dimensions.js';
+import type { ScoringWeights } from '../config.js';
 
 // ─── Return types ────────────────────────────────────────────────────────────
 
@@ -36,8 +47,8 @@ export interface ComponentHealth {
   grade: 'A' | 'B' | 'C' | 'D' | 'F';
   dimensions: Record<string, number>;
   dimensionWeights?: Record<string, number>;
-  dimensionConfidence?: Record<string, 'verified' | 'heuristic' | 'untested'>;
-  confidenceSummary?: { verified: number; heuristic: number; untested: number };
+  dimensionConfidence?: Record<string, ConfidenceLevel>;
+  confidenceSummary?: { verified: number; heuristic: number; untested: number; unknown: number };
   issues: string[];
   timestamp: string;
 }
@@ -65,17 +76,40 @@ export interface HealthSummary {
 
 export interface HealthDiff {
   tagName: string;
-  base: ComponentHealth;
+  /**
+   * Base-branch component health. `null` ONLY when `baseUnavailable`
+   * is true — the base CEM could not be loaded so no scoring was
+   * performed. Codex round-50 P2: previous attempts to populate base
+   * with sentinel NaN values broke the ComponentHealth.score numeric
+   * contract on JSON serialization. Explicit nullable is the
+   * correct shape for the indeterminate state.
+   */
+  base: ComponentHealth | null;
   current: ComponentHealth;
   improved: boolean;
   regressed: boolean;
-  scoreDelta: number;
+  /**
+   * Numeric score delta. `null` ONLY when `baseUnavailable` is true
+   * (the diff cannot be computed). Codex round-49 P2: NaN serializes
+   * to JSON null which violates the numeric contract; explicit
+   * nullable type is the correct shape.
+   */
+  scoreDelta: number | null;
   changedDimensions: Array<{
     dimension: string;
-    before: number;
-    after: number;
-    delta: number;
+    before: number | null;
+    after: number | null;
+    delta: number | null;
   }>;
+  /**
+   * True when the base-branch CEM could not be read (out-of-tree
+   * cemPath under the external-paths opt-in). Consumers should treat
+   * `improved` / `scoreDelta` as advisory rather than authoritative —
+   * the synthetic `0/F` baseline produces fictitious improvements.
+   * Codex round-36 P1 compromise on round-30's throw approach.
+   */
+  baseUnavailable?: boolean;
+  baseUnavailableReason?: string;
 }
 
 // ─── Zod schema for per-component history JSON files ─────────────────────────
@@ -89,7 +123,7 @@ const HistoryFileSchema = z.object({
       z.object({
         score: z.number(),
         weight: z.number().optional(),
-        confidence: z.enum(['verified', 'heuristic', 'untested']).optional(),
+        confidence: z.enum(['verified', 'heuristic', 'untested', 'unknown']).optional(),
         details: z.record(z.unknown()).optional(),
       }),
     )
@@ -100,6 +134,8 @@ const HistoryFileSchema = z.object({
       verified: z.number(),
       heuristic: z.number(),
       untested: z.number(),
+      // Backwards-compatible: older history files won't have `unknown`.
+      unknown: z.number().optional(),
     })
     .optional(),
 });
@@ -114,12 +150,17 @@ interface HistoryFileRaw {
     {
       score: number;
       weight?: number;
-      confidence?: 'verified' | 'heuristic' | 'untested';
+      confidence?: ConfidenceLevel;
       details?: Record<string, unknown>;
     }
   >;
   issues: Array<{ message: string }>;
-  overallConfidence?: { verified: number; heuristic: number; untested: number };
+  overallConfidence?: {
+    verified: number;
+    heuristic: number;
+    untested: number;
+    unknown?: number;
+  };
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -144,7 +185,7 @@ function proportional(count: number, total: number, maxPoints: number): number {
 function historyToHealth(file: HistoryFileRaw): ComponentHealth {
   const dimensions: Record<string, number> = {};
   const dimensionWeights: Record<string, number> = {};
-  const dimensionConfidence: Record<string, 'verified' | 'heuristic' | 'untested'> = {};
+  const dimensionConfidence: Record<string, ConfidenceLevel> = {};
 
   for (const [key, val] of Object.entries(file.breakdown ?? {})) {
     dimensions[key] = val.score;
@@ -170,7 +211,15 @@ function historyToHealth(file: HistoryFileRaw): ComponentHealth {
 
   if (hasWeights) result.dimensionWeights = dimensionWeights;
   if (hasConfidence) result.dimensionConfidence = dimensionConfidence;
-  if (file.overallConfidence) result.confidenceSummary = file.overallConfidence;
+  if (file.overallConfidence) {
+    // Older history files predate `unknown` — default to 0 for back-compat.
+    result.confidenceSummary = {
+      verified: file.overallConfidence.verified,
+      heuristic: file.overallConfidence.heuristic,
+      untested: file.overallConfidence.untested,
+      unknown: file.overallConfidence.unknown ?? 0,
+    };
+  }
 
   return result;
 }
@@ -516,15 +565,81 @@ export async function getHealthDiff(
   const git = gitOps ?? new GitOperations();
 
   let base: ComponentHealth;
+  // Guard: gitShow rejects absolute paths. Two sub-cases for absolute
+  // config.cemPath:
+  //   1. In-repo (supported MCP_WC_CEM_PATH=/repo/custom-elements.json):
+  //      relativize for gitShow.
+  //   2. Out-of-tree (MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS opt-in): degrade
+  //      with warning + synthetic 0/F base.
+  // Codex round-10 P1 (initial guard), round-16 P1 (in-repo case).
+  // Relativize cemPath against the GIT REPO ROOT (gitShow's expected
+  // base), not projectRoot — they differ in monorepo workspace setups.
+  // Codex round-23 P2.
+  let cemPathForGit = config.cemPath;
+  let outOfTree = false;
+  // Wrap in try/catch so older injected mocks without getRepoRoot still
+  // work — they fall through to the projectRoot fallback. Real
+  // GitOperations always provides the method.
+  let repoRoot: string | null = null;
   try {
-    const cemContent = await git.gitShow(baseBranch, config.cemPath);
-    const cem = CemSchema.parse(JSON.parse(cemContent));
-    const baseDecl = cem.modules
-      .flatMap((m) => m.declarations ?? [])
-      .find((d) => d.tagName === tagName);
-    if (baseDecl) {
-      base = scoreCemFallback(baseDecl);
-    } else {
+    if (typeof git.getRepoRoot === 'function') {
+      repoRoot = await git.getRepoRoot();
+    }
+  } catch {
+    repoRoot = null;
+  }
+  const relativizationBase = repoRoot ?? resolve(config.projectRoot);
+  const cemAbsForRel = isAbsolute(config.cemPath)
+    ? config.cemPath
+    : resolve(config.projectRoot, config.cemPath);
+  const relFromRepo = relative(relativizationBase, cemAbsForRel);
+  if (relFromRepo === '' || relFromRepo.startsWith('..') || isAbsolute(relFromRepo)) {
+    outOfTree = true;
+  } else {
+    cemPathForGit = relFromRepo.split(sep).join('/');
+  }
+  let baseUnavailableReason = '';
+  let baseUnavailable = false;
+  if (outOfTree) {
+    // Paired with diffCem.ts. Per round-46/47/48/49/50 pins, the
+    // out-of-tree case returns the advisory diff with
+    // baseUnavailable: true. Round 47 (base = current) leaked into
+    // legacy consumers as fake "no change". Round 48 (base.score =
+    // NaN) violated the numeric contract on JSON serialization.
+    // Round 50: base widened to nullable; we leave the local
+    // variable as a placeholder that's REPLACED with null in the
+    // short-circuit return below.
+    const redactedPath = config.cemPath.split(/[\\/]/).pop() ?? '<absolute>';
+    baseUnavailableReason = `cemPath (basename: ${redactedPath}) is out-of-tree relative to the git repo root; gitShow requires repo-relative paths. To restore real diff, unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.`;
+    baseUnavailable = true;
+    base = {
+      tagName,
+      score: 0,
+      grade: 'F',
+      dimensions: {},
+      issues: [`BASE_UNAVAILABLE: ${baseUnavailableReason}`],
+      timestamp: current.timestamp,
+    };
+  } else {
+    try {
+      const cemContent = await git.gitShow(baseBranch, cemPathForGit);
+      const cem = CemSchema.parse(JSON.parse(cemContent));
+      const baseDecl = cem.modules
+        .flatMap((m) => m.declarations ?? [])
+        .find((d) => d.tagName === tagName);
+      if (baseDecl) {
+        base = scoreCemFallback(baseDecl);
+      } else {
+        base = {
+          tagName,
+          score: 0,
+          grade: 'F',
+          dimensions: {},
+          issues: ['Component not found in base branch'],
+          timestamp: new Date().toISOString(),
+        };
+      }
+    } catch {
       base = {
         tagName,
         score: 0,
@@ -534,15 +649,31 @@ export async function getHealthDiff(
         timestamp: new Date().toISOString(),
       };
     }
-  } catch {
-    base = {
+  }
+
+  // baseUnavailable short-circuit: base is null, scoreDelta is null,
+  // single sentinel changedDimensions entry. Schema-correct
+  // representation of "diff cannot be computed". Codex round-50 P2.
+  if (baseUnavailable) {
+    const result: HealthDiff = {
       tagName,
-      score: 0,
-      grade: 'F',
-      dimensions: {},
-      issues: ['Component not found in base branch'],
-      timestamp: new Date().toISOString(),
+      base: null,
+      current,
+      improved: false,
+      regressed: false,
+      scoreDelta: null,
+      changedDimensions: [
+        {
+          dimension: 'BASE_UNAVAILABLE',
+          before: null,
+          after: null,
+          delta: null,
+        },
+      ],
+      baseUnavailable: true,
+      baseUnavailableReason,
     };
+    return result;
   }
 
   const scoreDelta = current.score - base.score;
@@ -575,7 +706,7 @@ export async function getHealthDiff(
     }
   }
 
-  return {
+  const result: HealthDiff = {
     tagName,
     base,
     current,
@@ -584,6 +715,7 @@ export async function getHealthDiff(
     scoreDelta: Math.round(scoreDelta * 10) / 10,
     changedDimensions,
   };
+  return result;
 }
 
 /**
@@ -666,7 +798,7 @@ export interface MultiDimensionalHealth {
   score: number;
   grade: 'A' | 'B' | 'C' | 'D' | 'F';
   dimensions: DimensionResult[];
-  confidenceSummary: { verified: number; heuristic: number; untested: number };
+  confidenceSummary: { verified: number; heuristic: number; untested: number; unknown: number };
   gradingNotes: string[];
   issues: string[];
   timestamp: string;
@@ -741,6 +873,69 @@ function scoreCemCompleteness(decl: CemDeclaration): { score: number; subMetrics
 }
 
 /**
+ * Returns the effective weight for a dimension, applying any multiplier
+ * from the config's `scoring.weights` section.
+ *
+ * @param baseWeight - The base weight from DIMENSION_REGISTRY
+ * @param dimensionName - The dimension name (e.g. 'CEM Completeness')
+ * @param weights - Optional scoring weights from config
+ * @returns The base weight multiplied by the configured multiplier (defaults to 1.0)
+ */
+// Phase 3 back-compat: dim names that previously rolled up into the
+// single legacy `accessibility` weight key. When a downstream config
+// still sets `weights.accessibility` but has NOT set the new
+// per-sub-dim key, fan that legacy multiplier out to these 5 dims.
+// The 3 net-new a11y dims (`Forced Colors Mode`, `Form Validity
+// Reporting`, `AAA Audit Self-Certification`) have no legacy mapping
+// — they only honor their own weight keys.
+const LEGACY_ACCESSIBILITY_FANOUT: readonly string[] = [
+  'WCAG Conformance',
+  'APG Keyboard Contract',
+  'Focus Indicator',
+  'Form Association',
+  'Accessible Label Pattern',
+];
+
+// One-shot deprecation warning gate. Module-scoped so we only warn
+// once per process even if many components score against the legacy
+// key. Reset is not provided — this is intentional.
+let accessibilityDeprecationWarned = false;
+
+function getEffectiveWeight(
+  baseWeight: number,
+  dimensionName: string,
+  weights: ScoringWeights | undefined,
+): number {
+  if (!weights) return baseWeight;
+  // Find the config key that maps to this dimension name
+  for (const [key, name] of Object.entries(DIMENSION_WEIGHT_KEYS)) {
+    if (name === dimensionName) {
+      const multiplier = (weights as Record<string, number | undefined>)[key];
+      if (multiplier !== undefined) return baseWeight * multiplier;
+      // Specific key not set — fall through to legacy fan-out if applicable.
+      break;
+    }
+  }
+  // Back-compat fan-out: legacy `accessibility` multiplier applies to the
+  // 5 dims that were split out of the old Accessibility dimension.
+  if (LEGACY_ACCESSIBILITY_FANOUT.includes(dimensionName)) {
+    const legacy = (weights as Record<string, number | undefined>)['accessibility'];
+    if (legacy !== undefined) {
+      if (!accessibilityDeprecationWarned) {
+        accessibilityDeprecationWarned = true;
+        console.warn(
+          '[helixir] scoring.weights.accessibility is deprecated — use per-sub-dim weights ' +
+            '(wcagConformance, apgKeyboard, focusIndicator, formAssociation, accessibleLabel). ' +
+            'The legacy multiplier currently fans out to all five and will be removed in 0.8.0.',
+        );
+      }
+      return baseWeight * legacy;
+    }
+  }
+  return baseWeight;
+}
+
+/**
  * Scores a component across all 11 dimensions using the enterprise grade algorithm.
  * CEM-native dimensions are computed from the declaration.
  * External dimensions are checked via history files (reported as untested if unavailable).
@@ -751,6 +946,7 @@ export async function scoreComponentMultiDimensional(
   cem?: Cem,
   libraryId = 'default',
   namingConventions?: LibraryNamingConventions,
+  libraryRoot?: string,
 ): Promise<MultiDimensionalHealth> {
   const tagName = decl.tagName ?? '';
   const issues: string[] = [];
@@ -768,7 +964,17 @@ export async function scoreComponentMultiDimensional(
     // No history available — external dimensions will be untested
   }
 
+  const scoringWeights = config.scoring?.weights;
+
+  // Phase 3: compute the helix-AAA evidence ONCE per component, then
+  // thread it through every dim-arm call. The detector caches per
+  // libraryRoot, but lifting also makes the cross-dim contract explicit
+  // — every a11y arm scores against the same evidence object.
+  const evidence: HelixAaaEvidence = detectHelixAaaEvidence(decl, libraryRoot);
+
   for (const def of DIMENSION_REGISTRY) {
+    const effectiveWeight = getEffectiveWeight(def.weight, def.name, scoringWeights);
+
     if (def.source === 'cem-native') {
       const result = await scoreCemNativeDimension(
         def.name,
@@ -777,12 +983,13 @@ export async function scoreComponentMultiDimensional(
         config,
         cem,
         namingConventions,
+        evidence,
       );
       const notApplicable = 'notApplicable' in result && result.notApplicable === true;
       dimensions.push({
         name: def.name,
         score: result.score,
-        weight: def.weight,
+        weight: effectiveWeight,
         tier: def.tier,
         confidence: result.confidence,
         measured: !notApplicable,
@@ -795,7 +1002,7 @@ export async function scoreComponentMultiDimensional(
         dimensions.push({
           name: def.name,
           score: historyEntry.score,
-          weight: def.weight,
+          weight: effectiveWeight,
           tier: def.tier,
           confidence: (historyEntry.confidence as 'verified' | 'heuristic') ?? 'verified',
           measured: true,
@@ -804,7 +1011,7 @@ export async function scoreComponentMultiDimensional(
         dimensions.push({
           name: def.name,
           score: 0,
-          weight: def.weight,
+          weight: effectiveWeight,
           tier: def.tier,
           confidence: 'untested',
           measured: false,
@@ -818,7 +1025,7 @@ export async function scoreComponentMultiDimensional(
   const { grade, gradingNotes } = calculateGrade(weightedScore, dimensions);
 
   // Confidence summary
-  const confidenceSummary = { verified: 0, heuristic: 0, untested: 0 };
+  const confidenceSummary = { verified: 0, heuristic: 0, untested: 0, unknown: 0 };
   for (const d of dimensions) {
     confidenceSummary[d.confidence]++;
   }
@@ -836,6 +1043,57 @@ export async function scoreComponentMultiDimensional(
 }
 
 /**
+ * When an analyzer returns `null` (no data to score), decide whether that
+ * means "this component genuinely has nothing here" (N/A) or "we cannot
+ * tell because the CEM data is missing" (unknown).
+ *
+ * Rule: only when EVERY required CEM key is absent does the dimension
+ * become `unknown`. When ANY required key is present (even an empty
+ * array, even if other keys are absent), treat as `notApplicable`.
+ *
+ * Rationale for "all absent" not "any absent": real-world CEM tools
+ * routinely omit empty optional arrays from serialization rather than
+ * emit `slots: []`. The Shoelace fixture in tests/__fixtures__/ and many
+ * other shipping libraries do this. A stricter "any absent → unknown"
+ * rule penalizes correct CEM serialization as if it were a completeness
+ * gap, which is the opposite of M2's intent.
+ *
+ * What this rule does NOT catch: a CEM that legitimately documents
+ * `members: [...]` but silently dropped its `events` key during a
+ * regen. That's a real partial-omission case M2 should detect — but
+ * without a source-fidelity cross-reference (compare CEM to source AST
+ * to determine whether the events key SHOULD be present), we cannot
+ * distinguish a real gap from a tool serialization choice.
+ *
+ * Catching partial omissions correctly is M2 follow-up work that
+ * depends on extending `analyzeCemSourceFidelity` to emit per-key
+ * absence findings, then using those findings to override this helper's
+ * verdict on a per-dimension basis. Until then, only the deeply-empty
+ * case (every key absent) flips to `unknown`.
+ *
+ * `unknown` is the M2 anti-gaslighting verdict: it pulls the weighted
+ * score down and counts against `Grade.maxUntestedCritical`, so missing
+ * CEM data is no longer silently rewarded.
+ */
+function resolveAnalyzerNull(
+  decl: CemDeclaration,
+  requiredKeys: CemPresenceKey[],
+): { score: 0; confidence: ConfidenceLevel; notApplicable?: boolean } {
+  const allAbsent = requiredKeys.every((key) => cemHas(decl, key) === 'absent');
+  if (allAbsent) {
+    // Every required input is missing — answer is "unknown."
+    // Note: we deliberately do NOT set notApplicable here, so the
+    // dimension flows into the weighted score with a 0 and pulls the
+    // grade down. Pre-M2, this case was silently dropped from grading.
+    return { score: 0, confidence: 'unknown' };
+  }
+  // At least one required key is present — dimension is legitimately
+  // N/A: the component has authoritatively declared "nothing here" for
+  // at least one input axis.
+  return { score: 0, confidence: 'untested', notApplicable: true };
+}
+
+/**
  * Dispatches CEM-native dimension scoring to the appropriate analyzer.
  */
 async function scoreCemNativeDimension(
@@ -845,12 +1103,67 @@ async function scoreCemNativeDimension(
   config?: McpWcConfig,
   cem?: Cem,
   namingConventions?: LibraryNamingConventions,
+  evidence?: HelixAaaEvidence,
 ): Promise<{
   score: number;
   confidence: ConfidenceLevel;
   subMetrics?: SubMetric[];
   notApplicable?: boolean;
 }> {
+  // Lazily ensure the evidence object exists for the 8 a11y arms below.
+  // The shared `evidence` is normally computed once per
+  // scoreComponentMultiDimensional call and threaded in; the fallback
+  // here keeps the dispatcher safe when an older direct caller forgets.
+  const ensureEvidence = (): HelixAaaEvidence => evidence ?? detectHelixAaaEvidence(decl);
+
+  // Translate a Phase-2 DimScoreResult into the dispatcher's return shape.
+  // notApplicable mirrors the analyzer null path — `unknown`/`untested`
+  // with measured=false flows through as a non-measured dim downstream.
+  const fromDim = (
+    r: DimScoreResult,
+  ): {
+    score: number;
+    confidence: ConfidenceLevel;
+    subMetrics?: SubMetric[];
+    notApplicable?: boolean;
+  } => {
+    // Only forward FAILURE-mode notes into the visible issues array.
+    // Scorers also emit informational notes on successful paths
+    // (e.g. `aaa-cert-fresh-and-supported`,
+    // `not-form-associated-correctly-declared`) that should NOT show up
+    // as audit issues for healthy components (codex push-gate P2 round 11,
+    // 2026-05-11). Heuristic: score < 100 OR confidence === 'unknown'.
+    if (r.notes && r.notes.length > 0 && (r.score < 100 || r.confidence === 'unknown')) {
+      for (const n of r.notes) issues.push(n);
+    }
+    const out: {
+      score: number;
+      confidence: ConfidenceLevel;
+      subMetrics?: SubMetric[];
+      notApplicable?: boolean;
+    } = {
+      score: r.score,
+      confidence: r.confidence,
+    };
+    if (r.subMetrics) {
+      out.subMetrics = r.subMetrics.map((s) => ({
+        name: s.name,
+        score: s.score,
+        maxScore: s.maxScore,
+        ...(s.note !== undefined ? { note: s.note } : {}),
+      }));
+    }
+    // `unknown` confidence on a measured-false scorer signals "input data
+    // missing — surface this as a real gap" per the plan (M2-strict). DO NOT
+    // mark notApplicable, otherwise computeWeightedScore drops it from the
+    // denominator and the score inflates over the dims we COULD measure —
+    // exactly the gaslighting case the dimensional upgrade was meant to fix
+    // (codex push-gate P1, 2026-05-10). Only `untested` (legit "doesn't
+    // apply / no external data") collapses out of the weighted average.
+    if (!r.measured && r.confidence === 'untested') out.notApplicable = true;
+    return out;
+  };
+
   switch (name) {
     case 'CEM Completeness': {
       const { score, subMetrics } = scoreCemCompleteness(decl);
@@ -860,38 +1173,50 @@ async function scoreCemNativeDimension(
       return { score, confidence: 'verified', subMetrics };
     }
 
-    case 'Accessibility': {
-      const a11y = analyzeAccessibility(decl);
-      const cemSubMetrics: SubMetric[] = Object.entries(a11y.dimensions).map(([key, dim]) => ({
-        name: key,
-        score: dim.points,
-        maxScore: dim.maxPoints,
-        note: dim.note,
-      }));
+    // ── Phase 3 dimensional upgrade — 8 a11y dim arms ─────────────────────
+    // Each arm pulls the shared HelixAaaEvidence (lifted once per call in
+    // scoreComponentMultiDimensional) and delegates to the matching Phase-2
+    // scorer. The DimScoreResult is reshaped into the dispatcher's return
+    // contract via the fromDim() helper above.
+    case 'WCAG Conformance': {
+      return fromDim(scoreWcagConformance(decl, ensureEvidence()));
+    }
 
-      // Source-based scoring — if source file is available, blend 30% CEM + 70% source
-      if (config && cem) {
-        const sourceA11y = await analyzeSourceAccessibility(config, cem, decl);
-        if (sourceA11y) {
-          const blendedScore = Math.round(a11y.score * 0.3 + sourceA11y.score * 0.7);
-          const subMetrics = [...cemSubMetrics, ...sourceA11y.subMetrics];
-          if (blendedScore < 50) {
-            issues.push(`Accessibility score is low (${blendedScore}%)`);
-          }
-          return { score: blendedScore, confidence: 'heuristic', subMetrics };
-        }
-      }
+    case 'APG Keyboard Contract': {
+      return fromDim(scoreApgKeyboard(decl, ensureEvidence()));
+    }
 
-      // Fallback: CEM-only
-      if (a11y.score < 50) {
-        issues.push(`Accessibility score is low (${a11y.score}%)`);
-      }
-      return { score: a11y.score, confidence: 'heuristic', subMetrics: cemSubMetrics };
+    case 'Focus Indicator': {
+      return fromDim(scoreFocusIndicator(decl, ensureEvidence()));
+    }
+
+    case 'Form Association': {
+      return fromDim(scoreFormAssociation(decl, ensureEvidence()));
+    }
+
+    case 'Accessible Label Pattern': {
+      return fromDim(scoreAccessibleLabel(decl, ensureEvidence()));
+    }
+
+    case 'Forced Colors Mode': {
+      return fromDim(scoreForcedColors(decl, ensureEvidence()));
+    }
+
+    case 'Form Validity Reporting': {
+      return fromDim(scoreFormValidityReporting(decl, ensureEvidence()));
+    }
+
+    case 'AAA Audit Self-Certification': {
+      return fromDim(scoreAaaAuditSelfCertification(decl, ensureEvidence()));
     }
 
     case 'Type Coverage': {
       const tc = analyzeTypeCoverage(decl);
-      if (!tc) return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+      // analyzeTypeCoverage inspects fields (members), methods (members),
+      // AND events. Include events in the required-keys list so a CEM
+      // missing the events key is correctly flagged as unknown rather
+      // than N/A. Codex round 3.
+      if (!tc) return resolveAnalyzerNull(decl, ['members', 'events']);
       if (tc.score < 50) {
         issues.push(`Type coverage is low (${tc.score}%)`);
       }
@@ -900,48 +1225,89 @@ async function scoreCemNativeDimension(
 
     case 'API Surface Quality': {
       const api = analyzeApiSurface(decl);
-      if (!api) return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+      // analyzeApiSurface only inspects `members`, so a present
+      // `description` doesn't make the dimension legitimately N/A —
+      // the analyzer never looked at it. Pre-fix this masked stale
+      // CEMs that kept top-level metadata but dropped `members`.
+      if (!api) return resolveAnalyzerNull(decl, ['members']);
       return api;
     }
 
     case 'CSS Architecture': {
       const css = analyzeCssArchitecture(decl);
-      if (!css) return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+      if (!css) return resolveAnalyzerNull(decl, ['cssProperties', 'cssParts']);
       return css;
     }
 
     case 'Event Architecture': {
       const evt = analyzeEventArchitecture(decl);
-      if (!evt) return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+      if (!evt) return resolveAnalyzerNull(decl, ['events']);
       return evt;
     }
 
     case 'CEM-Source Fidelity': {
       if (!config || !cem) {
-        return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+        // Caller didn't supply the full library CEM — preserve existing
+        // entry points like generateAuditReport(config, declarations)
+        // and direct scoreComponentMultiDimensional(config, decl) calls
+        // that score a single declaration. The caller explicitly opted
+        // out of cross-CEM analysis, so this is genuinely N/A.
+        // Codex round-2 P1 pinned this position; M2 strict mode
+        // (follow-up work) will surface this as `unknown` for callers
+        // that opt in.
+        return { score: 0, confidence: 'untested', notApplicable: true };
       }
       const fidelity = await analyzeCemSourceFidelity(config, cem, decl);
       if (!fidelity) {
-        return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+        // Analyzer ran but couldn't produce a fidelity score (typically:
+        // library has no local source tree, source files unavailable,
+        // or declaration not locatable in the CEM modules tree).
+        //
+        // FLIP-PIN: codex round-8 P2 wanted `unknown` here ("analyzer
+        // failed ≠ caller didn't ask"). Codex round-9 P1 reversed:
+        // "keep N/A when a library has no local source tree."
+        // Per runbook §6 step 3, both positions are defensible and
+        // codex is unstable on the call. We hold N/A — same as the
+        // no-CEM case above — because the most common trigger is
+        // "library has no source tree to compare against," which is
+        // genuinely N/A. M2 strict mode (follow-up) will let callers
+        // opt into surfacing this as `unknown`.
+        return { score: 0, confidence: 'untested', notApplicable: true };
       }
       return fidelity;
     }
 
     case 'Slot Architecture': {
       const slotResult = analyzeSlotArchitecture(decl);
-      if (!slotResult) {
-        return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
-      }
+      if (!slotResult) return resolveAnalyzerNull(decl, ['slots']);
       return slotResult;
     }
 
     case 'Naming Consistency': {
-      if (!namingConventions) {
-        return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+      // Prefer pre-computed conventions (passed from
+      // scoreAllComponentsMultiDimensional which detects them once for
+      // the whole library). Fall back to detecting from the CEM in this
+      // single-component path — callers like score_component and
+      // generateAuditReport pass a CEM but no precomputed conventions,
+      // and the data needed to detect conventions is right there in
+      // the CEM. Only emit `unknown` when neither is available.
+      let conventions = namingConventions;
+      if (!conventions && cem) {
+        // Flatten the CEM into a flat declarations list — the convention
+        // detector only needs the declarations, not the module structure.
+        const allDecls = cem.modules.flatMap((m) => m.declarations ?? []);
+        conventions = detectLibraryConventions(allDecls);
       }
-      const naming = analyzeNamingConsistency(decl, namingConventions);
+      if (!conventions) {
+        // No conventions available and no CEM to derive them from —
+        // single-component scoring can't compute consistency.
+        return { score: 0, confidence: 'unknown' };
+      }
+      const naming = analyzeNamingConsistency(decl, conventions);
       if (!naming) {
-        return { score: 0, confidence: 'untested' as ConfidenceLevel, notApplicable: true };
+        // Analyzer returned null even with conventions — typically a
+        // declaration with no name/attributes/members to compare.
+        return resolveAnalyzerNull(decl, ['attributes', 'members']);
       }
       return naming;
     }
@@ -959,6 +1325,7 @@ export async function scoreAllComponentsMultiDimensional(
   cemDeclarations: CemDeclaration[],
   cem?: Cem,
   libraryId = 'default',
+  libraryRoot?: string,
 ): Promise<MultiDimensionalHealth[]> {
   const withTag = cemDeclarations.filter((decl) => decl.tagName !== undefined);
 
@@ -967,7 +1334,7 @@ export async function scoreAllComponentsMultiDimensional(
 
   return Promise.all(
     withTag.map((decl) =>
-      scoreComponentMultiDimensional(config, decl, cem, libraryId, namingConventions),
+      scoreComponentMultiDimensional(config, decl, cem, libraryId, namingConventions, libraryRoot),
     ),
   );
 }

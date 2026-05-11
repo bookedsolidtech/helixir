@@ -70,6 +70,23 @@ export const SAFETY_TOOL_DEFINITIONS = [
 function formatDiffResult(tagName: string, baseBranch: string, diff: DiffResult): string {
   const lines: string[] = [];
 
+  // baseUnavailable means the diff couldn't actually be computed —
+  // the empty breaking[]/additions[] carry no semantic claim. Render
+  // an explicit "indeterminate" state so consumers don't read silence
+  // as a clean diff. Codex round-46/47 pin.
+  if (diff.baseUnavailable === true) {
+    lines.push(`⚠️ ${tagName} vs ${baseBranch} — DIFF UNAVAILABLE`);
+    if (diff.baseUnavailableReason !== undefined && diff.baseUnavailableReason !== '') {
+      lines.push('');
+      lines.push(`  Reason: ${diff.baseUnavailableReason}`);
+    }
+    lines.push('');
+    lines.push(
+      '  Cannot determine breaking changes from the base branch. Treat as INDETERMINATE — do not interpret silence as safe.',
+    );
+    return lines.join('\n');
+  }
+
   if (diff.isNew) {
     lines.push(`🆕 ${tagName} — NEW component (not present on ${baseBranch})`);
     return lines.join('\n');
@@ -114,26 +131,50 @@ function formatAggregatedResults(baseBranch: string, results: ComponentScanResul
     return `No components found in CEM. Nothing to check against ${baseBranch}.`;
   }
 
-  const breakingComponents = results.filter((r) => !r.diff.isNew && r.diff.breaking.length > 0);
-  const newComponents = results.filter((r) => r.diff.isNew);
+  // Components with baseUnavailable carry no semantic claim — bucket
+  // them separately so they don't pollute the breaking / clean counts.
+  // Codex round-47 P1.
+  const indeterminateComponents = results.filter((r) => r.diff.baseUnavailable === true);
+  const breakingComponents = results.filter(
+    (r) => r.diff.baseUnavailable !== true && !r.diff.isNew && r.diff.breaking.length > 0,
+  );
+  const newComponents = results.filter((r) => r.diff.baseUnavailable !== true && r.diff.isNew);
   const additionOnlyComponents = results.filter(
-    (r) => !r.diff.isNew && r.diff.breaking.length === 0 && r.diff.additions.length > 0,
+    (r) =>
+      r.diff.baseUnavailable !== true &&
+      !r.diff.isNew &&
+      r.diff.breaking.length === 0 &&
+      r.diff.additions.length > 0,
   );
   const cleanComponents = results.filter(
-    (r) => !r.diff.isNew && r.diff.breaking.length === 0 && r.diff.additions.length === 0,
+    (r) =>
+      r.diff.baseUnavailable !== true &&
+      !r.diff.isNew &&
+      r.diff.breaking.length === 0 &&
+      r.diff.additions.length === 0,
   );
 
   const lines: string[] = [];
 
   // Summary header
   const totalBreaking = breakingComponents.length;
+  const totalIndeterminate = indeterminateComponents.length;
   lines.push(`Breaking change scan vs ${baseBranch} — ${results.length} component(s) checked`);
   lines.push('');
 
-  if (totalBreaking === 0) {
+  if (totalBreaking === 0 && totalIndeterminate === 0) {
     lines.push('✅ No breaking changes detected across any component.');
+  } else if (totalBreaking === 0) {
+    lines.push(
+      `⚠️ Diff INDETERMINATE for ${totalIndeterminate} component(s) — base CEM unavailable; treat as not-yet-checked.`,
+    );
   } else {
     lines.push(`🔴 ${totalBreaking} component(s) have breaking changes.`);
+    if (totalIndeterminate > 0) {
+      lines.push(
+        `⚠️ Diff INDETERMINATE for ${totalIndeterminate} additional component(s) — base CEM unavailable.`,
+      );
+    }
   }
 
   lines.push('');
@@ -147,7 +188,7 @@ function formatAggregatedResults(baseBranch: string, results: ComponentScanResul
   // Compact summary table
   lines.push('---');
   lines.push(
-    `Summary: 🔴 ${breakingComponents.length} breaking  ⚠️ ${additionOnlyComponents.length} additions-only  ✅ ${cleanComponents.length} clean  🆕 ${newComponents.length} new`,
+    `Summary: 🔴 ${breakingComponents.length} breaking  ⚠️ ${additionOnlyComponents.length} additions-only  ✅ ${cleanComponents.length} clean  🆕 ${newComponents.length} new  ❓ ${indeterminateComponents.length} indeterminate`,
   );
 
   return lines.join('\n').trimEnd();
@@ -187,7 +228,7 @@ export async function handleSafetyCall(
 
     return createErrorResponse(`Unknown safety tool: ${name}`);
   } catch (err) {
-    const mcpErr = handleToolError(err);
+    const mcpErr = handleToolError(err, config.projectRoot);
     return createErrorResponse(`[${mcpErr.category}] ${mcpErr.message}`);
   }
 }

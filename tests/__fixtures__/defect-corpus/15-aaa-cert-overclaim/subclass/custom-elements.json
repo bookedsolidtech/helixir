@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "2.1.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "subclass/hx-cert-overclaim.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Subclass that inherits parent's AAA cert but breaks SC 2.4.13 focus-ring CSS.",
+          "name": "HxCertOverclaim",
+          "tagName": "hx-cert-overclaim",
+          "superclass": {
+            "name": "HxParentButton",
+            "module": "parent/hx-parent-button.ts"
+          },
+          "members": [],
+          "attributes": [],
+          "slots": [],
+          "helixMeta": {
+            "aaa": {
+              "certified": true,
+              "certifiedDate": "2025-11-14",
+              "criteria": ["1.4.11", "2.4.7", "2.4.11", "2.4.13"],
+              "auditUrl": "https://audits.helix.dev/hx-parent-button/aaa-2025-11"
+            },
+            "ariaPattern": "button",
+            "keyboardContract": {
+              "activate": ["Space", "Enter"],
+              "disabledSuppresses": true
+            }
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-cert-overclaim",
+          "declaration": { "name": "HxCertOverclaim", "module": "subclass/hx-cert-overclaim.ts" }
+        }
+      ]
+    }
+  ]
+}

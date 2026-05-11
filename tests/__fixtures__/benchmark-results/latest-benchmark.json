@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-03-26T00:21:46.680Z",
+  "timestamp": "2026-05-11T04:40:13.417Z",
   "scorecards": {
     "material": {
       "library": "material",
       "componentCount": 97,
-      "averageScore": 55.71,
+      "averageScore": 42.67,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -14,7 +14,6 @@
       },
       "dimensionAverages": {
         "CEM Completeness": 71.78,
-        "Accessibility": 16.46,
         "Type Coverage": 46.32,
         "API Surface Quality": 38.08,
         "CSS Architecture": 0,
@@ -26,59 +25,67 @@
         "Drupal Readiness": 0,
         "CEM-Source Fidelity": 59.36,
         "Slot Architecture": 0,
-        "Naming Consistency": 97.88
+        "Naming Consistency": 97.88,
+        "WCAG Conformance": 0,
+        "APG Keyboard Contract": 0,
+        "Focus Indicator": 0,
+        "Form Association": 0,
+        "Accessible Label Pattern": 14.43,
+        "Forced Colors Mode": 0,
+        "Form Validity Reporting": 0,
+        "AAA Audit Self-Certification": 0
       },
       "top5": [
         {
           "tagName": "md-divider",
-          "score": 77.9,
-          "grade": "F"
-        },
-        {
-          "tagName": "md-elevation",
-          "score": 75,
-          "grade": "F"
-        },
-        {
-          "tagName": "catalog-component-header-title",
-          "score": 75,
-          "grade": "F"
-        },
-        {
-          "tagName": "catalog-component-header",
-          "score": 75,
-          "grade": "F"
+          "score": 60.7,
+          "grade": "D"
         },
         {
           "tagName": "hct-slider",
-          "score": 74.2,
+          "score": 60.7,
+          "grade": "F"
+        },
+        {
+          "tagName": "md-navigation-drawer-modal",
+          "score": 53.9,
+          "grade": "F"
+        },
+        {
+          "tagName": "md-navigation-drawer",
+          "score": 53.9,
+          "grade": "F"
+        },
+        {
+          "tagName": "test-assist-chip",
+          "score": 53.4,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "test-element-internals",
-          "score": 37.8,
+          "score": 29.5,
           "grade": "F"
         },
         {
-          "tagName": "md-sub-menu",
-          "score": 39.8,
+          "tagName": "test-chip-set",
+          "score": 31,
           "grade": "F"
         },
         {
-          "tagName": "md-checkbox",
-          "score": 40.3,
+          "tagName": "test-default-value-form-associated",
+          "score": 31.4,
           "grade": "F"
         },
         {
           "tagName": "md-slider",
-          "score": 40.8,
+          "score": 32.1,
           "grade": "F"
         },
         {
-          "tagName": "test-custom-state-set",
-          "score": 41.7,
+          "tagName": "test-form-associated",
+          "score": 32.5,
           "grade": "F"
         }
       ],
@@ -87,64 +94,113 @@
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Significantly below average (26). Major drag on scores."
+          "confidence": "unknown",
+          "note": "Below average (17). Room for improvement."
         },
         {
           "dimension": "Test Coverage",
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (26). Major drag on scores."
+          "note": "Below average (17). Room for improvement."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (26). Major drag on scores."
+          "note": "Below average (17). Room for improvement."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (26). Major drag on scores."
+          "note": "Below average (17). Room for improvement."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (26). Major drag on scores."
+          "note": "Below average (17). Room for improvement."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (26). Major drag on scores."
+          "note": "Below average (17). Room for improvement."
         },
         {
           "dimension": "Slot Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Significantly below average (26). Major drag on scores."
+          "confidence": "unknown",
+          "note": "Below average (17). Room for improvement."
         },
         {
-          "dimension": "Accessibility",
-          "average": 16.46,
+          "dimension": "WCAG Conformance",
+          "average": 0,
           "tier": "critical",
-          "confidence": "heuristic",
+          "confidence": "unknown",
+          "note": "Below average (17). Room for improvement."
+        },
+        {
+          "dimension": "APG Keyboard Contract",
+          "average": 0,
+          "tier": "critical",
+          "confidence": "unknown",
+          "note": "Below average (17). Room for improvement."
+        },
+        {
+          "dimension": "Focus Indicator",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (17). Room for improvement."
+        },
+        {
+          "dimension": "Form Association",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (17). Room for improvement."
+        },
+        {
+          "dimension": "Forced Colors Mode",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (17). Room for improvement."
+        },
+        {
+          "dimension": "Form Validity Reporting",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "unknown",
+          "note": "Below average (17). Room for improvement."
+        },
+        {
+          "dimension": "AAA Audit Self-Certification",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "untested",
+          "note": "Below average (17). Room for improvement."
+        },
+        {
+          "dimension": "Accessible Label Pattern",
+          "average": 14.43,
+          "tier": "important",
+          "confidence": "unknown",
           "note": "Near average."
         },
         {
           "dimension": "Event Architecture",
           "average": 34.28,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Near average."
+          "confidence": "unknown",
+          "note": "Above average. Strong dimension."
         },
         {
           "dimension": "API Surface Quality",
@@ -184,25 +240,24 @@
       ],
       "confidenceBreakdown": {
         "verified": 185,
-        "heuristic": 426,
-        "untested": 747
+        "heuristic": 357,
+        "untested": 598
       },
-      "timestamp": "2026-03-26T00:21:46.678Z"
+      "timestamp": "2026-05-11T04:40:13.410Z"
     },
     "spectrum": {
       "library": "spectrum",
       "componentCount": 89,
-      "averageScore": 54.52,
+      "averageScore": 43.4,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
         "C": 0,
-        "D": 3,
-        "F": 86
+        "D": 0,
+        "F": 89
       },
       "dimensionAverages": {
         "CEM Completeness": 60.11,
-        "Accessibility": 30.27,
         "Type Coverage": 80.31,
         "API Surface Quality": 18.33,
         "CSS Architecture": 1.12,
@@ -214,59 +269,67 @@
         "Drupal Readiness": 0,
         "CEM-Source Fidelity": 47.15,
         "Slot Architecture": 57.67,
-        "Naming Consistency": 98
+        "Naming Consistency": 98,
+        "WCAG Conformance": 0,
+        "APG Keyboard Contract": 0.28,
+        "Focus Indicator": 0,
+        "Form Association": 0,
+        "Accessible Label Pattern": 17.42,
+        "Forced Colors Mode": 0,
+        "Form Validity Reporting": 0,
+        "AAA Audit Self-Certification": 0
       },
       "top5": [
         {
-          "tagName": "sp-table-head-cell",
-          "score": 65.5,
-          "grade": "D"
-        },
-        {
-          "tagName": "sp-table-checkbox-cell",
-          "score": 64.8,
+          "tagName": "sp-accordion-item",
+          "score": 54.3,
           "grade": "F"
         },
         {
-          "tagName": "sp-accordion-item",
-          "score": 64.7,
+          "tagName": "sp-toast",
+          "score": 51.9,
           "grade": "F"
         },
         {
           "tagName": "sp-contextual-help",
-          "score": 64.1,
+          "score": 50.5,
           "grade": "F"
         },
         {
-          "tagName": "sp-tab-panel",
-          "score": 64,
+          "tagName": "sp-tabs",
+          "score": 49.5,
+          "grade": "F"
+        },
+        {
+          "tagName": "sp-clear-button",
+          "score": 49.2,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
-          "tagName": "overlay-trigger",
-          "score": 39.9,
-          "grade": "F"
-        },
-        {
-          "tagName": "sp-slider-handle",
-          "score": 40.6,
-          "grade": "F"
-        },
-        {
           "tagName": "sp-table-row",
-          "score": 41.9,
+          "score": 31.8,
+          "grade": "F"
+        },
+        {
+          "tagName": "overlay-trigger",
+          "score": 33.1,
           "grade": "F"
         },
         {
           "tagName": "sp-switch",
-          "score": 41.9,
+          "score": 34.2,
           "grade": "F"
         },
         {
-          "tagName": "sp-dropzone",
-          "score": 43.9,
+          "tagName": "sp-slider-handle",
+          "score": 34.8,
+          "grade": "F"
+        },
+        {
+          "tagName": "sp-table",
+          "score": 36,
           "grade": "F"
         }
       ],
@@ -276,54 +339,103 @@
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (30). Major drag on scores."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (30). Major drag on scores."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (30). Major drag on scores."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (30). Major drag on scores."
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (30). Major drag on scores."
+          "note": "Below average (20). Room for improvement."
+        },
+        {
+          "dimension": "WCAG Conformance",
+          "average": 0,
+          "tier": "critical",
+          "confidence": "unknown",
+          "note": "Below average (20). Room for improvement."
+        },
+        {
+          "dimension": "Focus Indicator",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (20). Room for improvement."
+        },
+        {
+          "dimension": "Form Association",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (20). Room for improvement."
+        },
+        {
+          "dimension": "Forced Colors Mode",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (20). Room for improvement."
+        },
+        {
+          "dimension": "Form Validity Reporting",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "unknown",
+          "note": "Below average (20). Room for improvement."
+        },
+        {
+          "dimension": "AAA Audit Self-Certification",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "untested",
+          "note": "Below average (20). Room for improvement."
+        },
+        {
+          "dimension": "APG Keyboard Contract",
+          "average": 0.28,
+          "tier": "critical",
+          "confidence": "unknown",
+          "note": "Below average (20). Room for improvement."
         },
         {
           "dimension": "CSS Architecture",
           "average": 1.12,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Significantly below average (30). Major drag on scores."
+          "confidence": "unknown",
+          "note": "Below average (20). Room for improvement."
+        },
+        {
+          "dimension": "Accessible Label Pattern",
+          "average": 17.42,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Near average."
         },
         {
           "dimension": "API Surface Quality",
           "average": 18.33,
           "tier": "important",
-          "confidence": "heuristic",
-          "note": "Below average (30). Room for improvement."
-        },
-        {
-          "dimension": "Accessibility",
-          "average": 30.27,
-          "tier": "critical",
           "confidence": "heuristic",
           "note": "Near average."
         },
@@ -332,7 +444,7 @@
           "average": 32.66,
           "tier": "important",
           "confidence": "heuristic",
-          "note": "Near average."
+          "note": "Above average. Strong dimension."
         },
         {
           "dimension": "CEM-Source Fidelity",
@@ -372,25 +484,24 @@
       ],
       "confidenceBreakdown": {
         "verified": 241,
-        "heuristic": 404,
-        "untested": 601
+        "heuristic": 347,
+        "untested": 534
       },
-      "timestamp": "2026-03-26T00:21:46.678Z"
+      "timestamp": "2026-05-11T04:40:13.410Z"
     },
     "vaadin": {
       "library": "vaadin",
       "componentCount": 96,
-      "averageScore": 67.81,
+      "averageScore": 54.7,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
         "C": 0,
-        "D": 1,
-        "F": 95
+        "D": 0,
+        "F": 96
       },
       "dimensionAverages": {
         "CEM Completeness": 98.79,
-        "Accessibility": 16,
         "Type Coverage": 82.2,
         "API Surface Quality": 62.66,
         "CSS Architecture": 0,
@@ -402,59 +513,67 @@
         "Drupal Readiness": 0,
         "CEM-Source Fidelity": 34.91,
         "Slot Architecture": 0,
-        "Naming Consistency": 100
+        "Naming Consistency": 100,
+        "WCAG Conformance": 0,
+        "APG Keyboard Contract": 0,
+        "Focus Indicator": 0,
+        "Form Association": 0,
+        "Accessible Label Pattern": 2.6,
+        "Forced Colors Mode": 0,
+        "Form Validity Reporting": 0,
+        "AAA Audit Self-Certification": 0
       },
       "top5": [
         {
-          "tagName": "vaadin-master-detail-layout",
-          "score": 77.7,
-          "grade": "D"
-        },
-        {
-          "tagName": "vaadin-popover",
-          "score": 76.5,
+          "tagName": "vaadin-checkbox-group",
+          "score": 59.7,
           "grade": "F"
         },
         {
-          "tagName": "vaadin-rich-text-editor",
-          "score": 76.5,
+          "tagName": "vaadin-custom-field",
+          "score": 59.7,
+          "grade": "F"
+        },
+        {
+          "tagName": "vaadin-date-time-picker",
+          "score": 59.7,
+          "grade": "F"
+        },
+        {
+          "tagName": "vaadin-split-layout",
+          "score": 59.6,
           "grade": "F"
         },
         {
           "tagName": "vaadin-select",
-          "score": 75.7,
-          "grade": "F"
-        },
-        {
-          "tagName": "vaadin-crud",
-          "score": 75.5,
+          "score": 59.5,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "vaadin-map",
-          "score": 43.5,
+          "score": 36.3,
           "grade": "F"
         },
         {
           "tagName": "vaadin-field-highlighter",
-          "score": 50,
+          "score": 39,
           "grade": "F"
         },
         {
-          "tagName": "vaadin-virtual-list",
-          "score": 55.2,
+          "tagName": "vaadin-iconset",
+          "score": 44.7,
           "grade": "F"
         },
         {
-          "tagName": "vaadin-board",
-          "score": 55.8,
+          "tagName": "vaadin-vertical-layout",
+          "score": 45.2,
           "grade": "F"
         },
         {
-          "tagName": "vaadin-board-row",
-          "score": 55.8,
+          "tagName": "vaadin-horizontal-layout",
+          "score": 45.2,
           "grade": "F"
         }
       ],
@@ -463,64 +582,113 @@
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Significantly below average (32). Major drag on scores."
+          "confidence": "unknown",
+          "note": "Significantly below average (21). Major drag on scores."
         },
         {
           "dimension": "Test Coverage",
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (32). Major drag on scores."
+          "note": "Significantly below average (21). Major drag on scores."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (32). Major drag on scores."
+          "note": "Significantly below average (21). Major drag on scores."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (32). Major drag on scores."
+          "note": "Significantly below average (21). Major drag on scores."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (32). Major drag on scores."
+          "note": "Significantly below average (21). Major drag on scores."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (32). Major drag on scores."
+          "note": "Significantly below average (21). Major drag on scores."
         },
         {
           "dimension": "Slot Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Significantly below average (32). Major drag on scores."
+          "confidence": "unknown",
+          "note": "Significantly below average (21). Major drag on scores."
         },
         {
-          "dimension": "Accessibility",
-          "average": 16,
+          "dimension": "WCAG Conformance",
+          "average": 0,
           "tier": "critical",
-          "confidence": "heuristic",
-          "note": "Below average (32). Room for improvement."
+          "confidence": "unknown",
+          "note": "Significantly below average (21). Major drag on scores."
+        },
+        {
+          "dimension": "APG Keyboard Contract",
+          "average": 0,
+          "tier": "critical",
+          "confidence": "unknown",
+          "note": "Significantly below average (21). Major drag on scores."
+        },
+        {
+          "dimension": "Focus Indicator",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Significantly below average (21). Major drag on scores."
+        },
+        {
+          "dimension": "Form Association",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Significantly below average (21). Major drag on scores."
+        },
+        {
+          "dimension": "Forced Colors Mode",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Significantly below average (21). Major drag on scores."
+        },
+        {
+          "dimension": "Form Validity Reporting",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "unknown",
+          "note": "Significantly below average (21). Major drag on scores."
+        },
+        {
+          "dimension": "AAA Audit Self-Certification",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "untested",
+          "note": "Significantly below average (21). Major drag on scores."
+        },
+        {
+          "dimension": "Accessible Label Pattern",
+          "average": 2.6,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (21). Room for improvement."
         },
         {
           "dimension": "CEM-Source Fidelity",
           "average": 34.91,
           "tier": "critical",
           "confidence": "heuristic",
-          "note": "Near average."
+          "note": "Above average. Strong dimension."
         },
         {
           "dimension": "Event Architecture",
@@ -560,25 +728,24 @@
       ],
       "confidenceBreakdown": {
         "verified": 188,
-        "heuristic": 439,
-        "untested": 717
+        "heuristic": 348,
+        "untested": 619
       },
-      "timestamp": "2026-03-26T00:21:46.678Z"
+      "timestamp": "2026-05-11T04:40:13.411Z"
     },
     "fluentui": {
       "library": "fluentui",
       "componentCount": 41,
-      "averageScore": 65.27,
+      "averageScore": 51.57,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
-        "C": 1,
-        "D": 0,
-        "F": 40
+        "C": 0,
+        "D": 5,
+        "F": 36
       },
       "dimensionAverages": {
         "CEM Completeness": 92.02,
-        "Accessibility": 18.02,
         "Type Coverage": 71.83,
         "API Surface Quality": 37.41,
         "CSS Architecture": 29.27,
@@ -590,59 +757,67 @@
         "Drupal Readiness": 0,
         "CEM-Source Fidelity": 58.17,
         "Slot Architecture": 42.44,
-        "Naming Consistency": 100
+        "Naming Consistency": 100,
+        "WCAG Conformance": 0,
+        "APG Keyboard Contract": 0,
+        "Focus Indicator": 0,
+        "Form Association": 0,
+        "Accessible Label Pattern": 1.22,
+        "Forced Colors Mode": 0,
+        "Form Validity Reporting": 0,
+        "AAA Audit Self-Certification": 0
       },
       "top5": [
         {
-          "tagName": "fluent-radio-group",
-          "score": 79.4,
-          "grade": "C"
+          "tagName": "fluent-button",
+          "score": 63.1,
+          "grade": "D"
         },
         {
-          "tagName": "fluent-dropdown-option",
-          "score": 78.2,
-          "grade": "F"
+          "tagName": "fluent-compound-button",
+          "score": 62.8,
+          "grade": "D"
         },
         {
-          "tagName": "fluent-listbox",
-          "score": 75.8,
-          "grade": "F"
-        },
-        {
-          "tagName": "fluent-text",
-          "score": 73.8,
-          "grade": "F"
+          "tagName": "fluent-menu-button",
+          "score": 62.8,
+          "grade": "D"
         },
         {
           "tagName": "fluent-toggle-button",
-          "score": 73.2,
-          "grade": "F"
+          "score": 62.7,
+          "grade": "D"
+        },
+        {
+          "tagName": "fluent-link",
+          "score": 61.3,
+          "grade": "D"
         }
       ],
       "bottom5": [
         {
+          "tagName": "fluent-dialog-body",
+          "score": 33.8,
+          "grade": "F"
+        },
+        {
+          "tagName": "fluent-tab-panel",
+          "score": 36,
+          "grade": "F"
+        },
+        {
           "tagName": "fluent-tabs",
-          "score": 49.7,
-          "grade": "F"
-        },
-        {
-          "tagName": "fluent-drawer",
-          "score": 55.4,
-          "grade": "F"
-        },
-        {
-          "tagName": "fluent-dialog",
-          "score": 56.3,
+          "score": 36.9,
           "grade": "F"
         },
         {
           "tagName": "fluent-tablist",
-          "score": 56.8,
+          "score": 42.5,
           "grade": "F"
         },
         {
-          "tagName": "fluent-field",
-          "score": 57.5,
+          "tagName": "fluent-dialog",
+          "score": 43.2,
           "grade": "F"
         }
       ],
@@ -652,55 +827,104 @@
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (33). Major drag on scores."
+          "note": "Significantly below average (21). Major drag on scores."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (33). Major drag on scores."
+          "note": "Significantly below average (21). Major drag on scores."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (33). Major drag on scores."
+          "note": "Significantly below average (21). Major drag on scores."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (33). Major drag on scores."
+          "note": "Significantly below average (21). Major drag on scores."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (33). Major drag on scores."
+          "note": "Significantly below average (21). Major drag on scores."
+        },
+        {
+          "dimension": "WCAG Conformance",
+          "average": 0,
+          "tier": "critical",
+          "confidence": "unknown",
+          "note": "Significantly below average (21). Major drag on scores."
+        },
+        {
+          "dimension": "APG Keyboard Contract",
+          "average": 0,
+          "tier": "critical",
+          "confidence": "unknown",
+          "note": "Significantly below average (21). Major drag on scores."
+        },
+        {
+          "dimension": "Focus Indicator",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Significantly below average (21). Major drag on scores."
+        },
+        {
+          "dimension": "Form Association",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Significantly below average (21). Major drag on scores."
+        },
+        {
+          "dimension": "Forced Colors Mode",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Significantly below average (21). Major drag on scores."
+        },
+        {
+          "dimension": "Form Validity Reporting",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "unknown",
+          "note": "Significantly below average (21). Major drag on scores."
+        },
+        {
+          "dimension": "AAA Audit Self-Certification",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "untested",
+          "note": "Significantly below average (21). Major drag on scores."
+        },
+        {
+          "dimension": "Accessible Label Pattern",
+          "average": 1.22,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (21). Room for improvement."
         },
         {
           "dimension": "Event Architecture",
           "average": 11.1,
           "tier": "important",
           "confidence": "heuristic",
-          "note": "Significantly below average (33). Major drag on scores."
-        },
-        {
-          "dimension": "Accessibility",
-          "average": 18.02,
-          "tier": "critical",
-          "confidence": "heuristic",
-          "note": "Below average (33). Room for improvement."
+          "note": "Below average (21). Room for improvement."
         },
         {
           "dimension": "CSS Architecture",
           "average": 29.27,
           "tier": "important",
-          "confidence": "untested",
+          "confidence": "unknown",
           "note": "Near average."
         },
         {
@@ -708,14 +932,14 @@
           "average": 37.41,
           "tier": "important",
           "confidence": "heuristic",
-          "note": "Near average."
+          "note": "Above average. Strong dimension."
         },
         {
           "dimension": "Slot Architecture",
           "average": 42.44,
           "tier": "important",
           "confidence": "verified",
-          "note": "Near average."
+          "note": "Above average. Strong dimension."
         },
         {
           "dimension": "CEM-Source Fidelity",
@@ -748,25 +972,24 @@
       ],
       "confidenceBreakdown": {
         "verified": 142,
-        "heuristic": 139,
-        "untested": 293
+        "heuristic": 99,
+        "untested": 246
       },
-      "timestamp": "2026-03-26T00:21:46.678Z"
+      "timestamp": "2026-05-11T04:40:13.411Z"
     },
     "carbon": {
       "library": "carbon",
       "componentCount": 110,
-      "averageScore": 53.16,
+      "averageScore": 41.75,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
         "C": 0,
-        "D": 1,
-        "F": 109
+        "D": 0,
+        "F": 110
       },
       "dimensionAverages": {
         "CEM Completeness": 85.83,
-        "Accessibility": 19.55,
         "Type Coverage": 30.74,
         "API Surface Quality": 39.55,
         "CSS Architecture": 27.27,
@@ -778,59 +1001,67 @@
         "Drupal Readiness": 0,
         "CEM-Source Fidelity": 50.33,
         "Slot Architecture": 10.18,
-        "Naming Consistency": 87.59
+        "Naming Consistency": 87.59,
+        "WCAG Conformance": 0,
+        "APG Keyboard Contract": 0,
+        "Focus Indicator": 0,
+        "Form Association": 0,
+        "Accessible Label Pattern": 0.91,
+        "Forced Colors Mode": 0,
+        "Form Validity Reporting": 0,
+        "AAA Audit Self-Certification": 0
       },
       "top5": [
         {
           "tagName": "bx-select-item-group",
-          "score": 75.5,
+          "score": 58.3,
           "grade": "F"
         },
         {
           "tagName": "bx-select-item",
-          "score": 75.5,
+          "score": 58.3,
           "grade": "F"
         },
         {
-          "tagName": "bx-header-menu",
-          "score": 69.3,
+          "tagName": "bx-textarea",
+          "score": 54.8,
           "grade": "F"
         },
         {
-          "tagName": "bx-content-switcher-item",
-          "score": 68.8,
-          "grade": "D"
+          "tagName": "bx-input",
+          "score": 53.6,
+          "grade": "F"
         },
         {
-          "tagName": "bx-code-snippet",
-          "score": 66.3,
+          "tagName": "bx-modal-footer-button",
+          "score": 52.3,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "bx-accordion",
-          "score": 40.3,
+          "score": 31.4,
           "grade": "F"
         },
         {
           "tagName": "bx-side-nav-items",
-          "score": 42.1,
+          "score": 32.8,
           "grade": "F"
         },
         {
           "tagName": "bx-header",
-          "score": 42.1,
+          "score": 32.8,
           "grade": "F"
         },
         {
           "tagName": "bx-tile-group",
-          "score": 42.1,
+          "score": 32.8,
           "grade": "F"
         },
         {
           "tagName": "bx-structured-list-header-cell",
-          "score": 42.1,
+          "score": 32.8,
           "grade": "F"
         }
       ],
@@ -840,42 +1071,98 @@
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (26). Major drag on scores."
+          "note": "Below average (17). Room for improvement."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (26). Major drag on scores."
+          "note": "Below average (17). Room for improvement."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (26). Major drag on scores."
+          "note": "Below average (17). Room for improvement."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (26). Major drag on scores."
+          "note": "Below average (17). Room for improvement."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (26). Major drag on scores."
+          "note": "Below average (17). Room for improvement."
+        },
+        {
+          "dimension": "WCAG Conformance",
+          "average": 0,
+          "tier": "critical",
+          "confidence": "unknown",
+          "note": "Below average (17). Room for improvement."
+        },
+        {
+          "dimension": "APG Keyboard Contract",
+          "average": 0,
+          "tier": "critical",
+          "confidence": "unknown",
+          "note": "Below average (17). Room for improvement."
+        },
+        {
+          "dimension": "Focus Indicator",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (17). Room for improvement."
+        },
+        {
+          "dimension": "Form Association",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (17). Room for improvement."
+        },
+        {
+          "dimension": "Forced Colors Mode",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (17). Room for improvement."
+        },
+        {
+          "dimension": "Form Validity Reporting",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "unknown",
+          "note": "Below average (17). Room for improvement."
+        },
+        {
+          "dimension": "AAA Audit Self-Certification",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "untested",
+          "note": "Below average (17). Room for improvement."
+        },
+        {
+          "dimension": "Accessible Label Pattern",
+          "average": 0.91,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (17). Room for improvement."
         },
         {
           "dimension": "Slot Architecture",
           "average": 10.18,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Below average (26). Room for improvement."
+          "confidence": "unknown",
+          "note": "Near average."
         },
         {
           "dimension": "Event Architecture",
@@ -885,25 +1172,18 @@
           "note": "Near average."
         },
         {
-          "dimension": "Accessibility",
-          "average": 19.55,
-          "tier": "critical",
-          "confidence": "heuristic",
-          "note": "Near average."
-        },
-        {
           "dimension": "CSS Architecture",
           "average": 27.27,
           "tier": "important",
           "confidence": "heuristic",
-          "note": "Near average."
+          "note": "Above average. Strong dimension."
         },
         {
           "dimension": "Type Coverage",
           "average": 30.74,
           "tier": "critical",
           "confidence": "verified",
-          "note": "Near average."
+          "note": "Above average. Strong dimension."
         },
         {
           "dimension": "API Surface Quality",
@@ -936,15 +1216,15 @@
       ],
       "confidenceBreakdown": {
         "verified": 350,
-        "heuristic": 397,
-        "untested": 793
+        "heuristic": 289,
+        "untested": 660
       },
-      "timestamp": "2026-03-26T00:21:46.679Z"
+      "timestamp": "2026-05-11T04:40:13.412Z"
     },
     "ui5": {
       "library": "ui5",
       "componentCount": 170,
-      "averageScore": 42.01,
+      "averageScore": 31.06,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -954,7 +1234,6 @@
       },
       "dimensionAverages": {
         "CEM Completeness": 54.59,
-        "Accessibility": 10.16,
         "Type Coverage": 24.33,
         "API Surface Quality": 0,
         "CSS Architecture": 0,
@@ -966,59 +1245,67 @@
         "Drupal Readiness": 0,
         "CEM-Source Fidelity": 76.98,
         "Slot Architecture": 0,
-        "Naming Consistency": 93.74
+        "Naming Consistency": 93.74,
+        "WCAG Conformance": 0,
+        "APG Keyboard Contract": 0,
+        "Focus Indicator": 0,
+        "Form Association": 0,
+        "Accessible Label Pattern": 0.29,
+        "Forced Colors Mode": 0,
+        "Form Validity Reporting": 0,
+        "AAA Audit Self-Certification": 0
       },
       "top5": [
         {
           "tagName": "ui5-navigation-menu",
-          "score": 70.6,
+          "score": 36,
           "grade": "F"
         },
         {
           "tagName": "ui5-search-item-group",
-          "score": 69.4,
+          "score": 36,
           "grade": "F"
         },
         {
           "tagName": "ui5-user-menu-item",
-          "score": 69.4,
+          "score": 36,
           "grade": "F"
         },
         {
           "tagName": "ui5-user-menu-item-group",
-          "score": 69.4,
+          "score": 36,
           "grade": "F"
         },
         {
           "tagName": "ui5-user-settings-appearance-view-group",
-          "score": 69.4,
+          "score": 36,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "ui5-time-selection-clocks",
-          "score": 30.5,
+          "score": 22.3,
           "grade": "F"
         },
         {
           "tagName": "ui5-side-navigation-item",
-          "score": 32.9,
+          "score": 24.2,
+          "grade": "F"
+        },
+        {
+          "tagName": "ui5-popover",
+          "score": 25.3,
           "grade": "F"
         },
         {
           "tagName": "ui5-menu-item-group",
-          "score": 33.3,
-          "grade": "F"
-        },
-        {
-          "tagName": "ui5-user-settings-account-view",
-          "score": 33.3,
+          "score": 26,
           "grade": "F"
         },
         {
           "tagName": "ui5-dialog",
-          "score": 34.2,
+          "score": 26,
           "grade": "F"
         }
       ],
@@ -1028,63 +1315,112 @@
           "average": 0,
           "tier": "important",
           "confidence": "heuristic",
-          "note": "Below average (20). Room for improvement."
+          "note": "Below average (13). Room for improvement."
         },
         {
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
         },
         {
           "dimension": "Test Coverage",
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "note": "Below average (13). Room for improvement."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "note": "Below average (13). Room for improvement."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "note": "Below average (13). Room for improvement."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "note": "Below average (13). Room for improvement."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "note": "Below average (13). Room for improvement."
         },
         {
           "dimension": "Slot Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
         },
         {
-          "dimension": "Accessibility",
-          "average": 10.16,
+          "dimension": "WCAG Conformance",
+          "average": 0,
           "tier": "critical",
-          "confidence": "heuristic",
-          "note": "Near average."
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
+        },
+        {
+          "dimension": "APG Keyboard Contract",
+          "average": 0,
+          "tier": "critical",
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
+        },
+        {
+          "dimension": "Focus Indicator",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
+        },
+        {
+          "dimension": "Form Association",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
+        },
+        {
+          "dimension": "Forced Colors Mode",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
+        },
+        {
+          "dimension": "Form Validity Reporting",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
+        },
+        {
+          "dimension": "AAA Audit Self-Certification",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "untested",
+          "note": "Below average (13). Room for improvement."
+        },
+        {
+          "dimension": "Accessible Label Pattern",
+          "average": 0.29,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
         },
         {
           "dimension": "Event Architecture",
@@ -1098,7 +1434,7 @@
           "average": 24.33,
           "tier": "critical",
           "confidence": "verified",
-          "note": "Near average."
+          "note": "Above average. Strong dimension."
         },
         {
           "dimension": "CEM Completeness",
@@ -1124,15 +1460,15 @@
       ],
       "confidenceBreakdown": {
         "verified": 494,
-        "heuristic": 582,
-        "untested": 1304
+        "heuristic": 413,
+        "untested": 1020
       },
-      "timestamp": "2026-03-26T00:21:46.679Z"
+      "timestamp": "2026-05-11T04:40:13.416Z"
     },
     "calcite": {
       "library": "calcite",
       "componentCount": 106,
-      "averageScore": 40.7,
+      "averageScore": 28.14,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -1142,7 +1478,6 @@
       },
       "dimensionAverages": {
         "CEM Completeness": 60,
-        "Accessibility": 32.67,
         "Type Coverage": 0,
         "API Surface Quality": 0,
         "CSS Architecture": 0,
@@ -1154,59 +1489,67 @@
         "Drupal Readiness": 0,
         "CEM-Source Fidelity": 71.55,
         "Slot Architecture": 0,
-        "Naming Consistency": 99.98
+        "Naming Consistency": 99.98,
+        "WCAG Conformance": 0,
+        "APG Keyboard Contract": 0,
+        "Focus Indicator": 0,
+        "Form Association": 0,
+        "Accessible Label Pattern": 25.94,
+        "Forced Colors Mode": 0,
+        "Form Validity Reporting": 0,
+        "AAA Audit Self-Certification": 0
       },
       "top5": [
         {
-          "tagName": "calcite-combobox",
-          "score": 48.3,
+          "tagName": "calcite-autocomplete-item-group",
+          "score": 32.5,
           "grade": "F"
         },
         {
-          "tagName": "calcite-input-time-picker",
-          "score": 48,
+          "tagName": "calcite-flow",
+          "score": 31.2,
           "grade": "F"
         },
         {
-          "tagName": "calcite-input-date-picker",
-          "score": 47.7,
+          "tagName": "calcite-action",
+          "score": 29.2,
           "grade": "F"
         },
         {
-          "tagName": "calcite-autocomplete",
-          "score": 47.5,
+          "tagName": "calcite-autocomplete-item",
+          "score": 29.2,
           "grade": "F"
         },
         {
-          "tagName": "calcite-carousel",
-          "score": 46.5,
+          "tagName": "calcite-card-group",
+          "score": 29.2,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
-          "tagName": "calcite-accordion",
-          "score": 29.2,
-          "grade": "F"
-        },
-        {
-          "tagName": "calcite-shell",
-          "score": 31.3,
-          "grade": "F"
-        },
-        {
           "tagName": "calcite-tab",
-          "score": 31.8,
+          "score": 21.8,
+          "grade": "F"
+        },
+        {
+          "tagName": "calcite-tab-title",
+          "score": 22.3,
+          "grade": "F"
+        },
+        {
+          "tagName": "calcite-accordion",
+          "score": 22.7,
           "grade": "F"
         },
         {
           "tagName": "calcite-stack",
-          "score": 32.5,
+          "score": 24.3,
           "grade": "F"
         },
         {
-          "tagName": "calcite-scrim",
-          "score": 33.5,
+          "tagName": "calcite-shell",
+          "score": 24.4,
           "grade": "F"
         }
       ],
@@ -1216,76 +1559,125 @@
           "average": 0,
           "tier": "critical",
           "confidence": "verified",
-          "note": "Below average (19). Room for improvement."
+          "note": "Below average (12). Room for improvement."
         },
         {
           "dimension": "API Surface Quality",
           "average": 0,
           "tier": "important",
           "confidence": "heuristic",
-          "note": "Below average (19). Room for improvement."
+          "note": "Below average (12). Room for improvement."
         },
         {
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Below average (19). Room for improvement."
+          "confidence": "unknown",
+          "note": "Below average (12). Room for improvement."
         },
         {
           "dimension": "Event Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Below average (19). Room for improvement."
+          "confidence": "unknown",
+          "note": "Below average (12). Room for improvement."
         },
         {
           "dimension": "Test Coverage",
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Below average (19). Room for improvement."
+          "note": "Below average (12). Room for improvement."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (19). Room for improvement."
+          "note": "Below average (12). Room for improvement."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (19). Room for improvement."
+          "note": "Below average (12). Room for improvement."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Below average (19). Room for improvement."
+          "note": "Below average (12). Room for improvement."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Below average (19). Room for improvement."
+          "note": "Below average (12). Room for improvement."
         },
         {
           "dimension": "Slot Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Below average (19). Room for improvement."
+          "confidence": "unknown",
+          "note": "Below average (12). Room for improvement."
         },
         {
-          "dimension": "Accessibility",
-          "average": 32.67,
+          "dimension": "WCAG Conformance",
+          "average": 0,
           "tier": "critical",
-          "confidence": "heuristic",
+          "confidence": "unknown",
+          "note": "Below average (12). Room for improvement."
+        },
+        {
+          "dimension": "APG Keyboard Contract",
+          "average": 0,
+          "tier": "critical",
+          "confidence": "unknown",
+          "note": "Below average (12). Room for improvement."
+        },
+        {
+          "dimension": "Focus Indicator",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (12). Room for improvement."
+        },
+        {
+          "dimension": "Form Association",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (12). Room for improvement."
+        },
+        {
+          "dimension": "Forced Colors Mode",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (12). Room for improvement."
+        },
+        {
+          "dimension": "Form Validity Reporting",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "unknown",
+          "note": "Below average (12). Room for improvement."
+        },
+        {
+          "dimension": "AAA Audit Self-Certification",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "untested",
+          "note": "Below average (12). Room for improvement."
+        },
+        {
+          "dimension": "Accessible Label Pattern",
+          "average": 25.94,
+          "tier": "important",
+          "confidence": "unknown",
           "note": "Above average. Strong dimension."
         },
         {
@@ -1312,15 +1704,15 @@
       ],
       "confidenceBreakdown": {
         "verified": 318,
-        "heuristic": 318,
-        "untested": 848
+        "heuristic": 267,
+        "untested": 636
       },
-      "timestamp": "2026-03-26T00:21:46.679Z"
+      "timestamp": "2026-05-11T04:40:13.416Z"
     },
     "porsche": {
       "library": "porsche",
       "componentCount": 91,
-      "averageScore": 50.31,
+      "averageScore": 37.72,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -1330,7 +1722,6 @@
       },
       "dimensionAverages": {
         "CEM Completeness": 55.44,
-        "Accessibility": 12.88,
         "Type Coverage": 94.51,
         "API Surface Quality": 0,
         "CSS Architecture": 0,
@@ -1342,59 +1733,67 @@
         "Drupal Readiness": 0,
         "CEM-Source Fidelity": 49.1,
         "Slot Architecture": 0,
-        "Naming Consistency": 100
+        "Naming Consistency": 100,
+        "WCAG Conformance": 0,
+        "APG Keyboard Contract": 0,
+        "Focus Indicator": 0,
+        "Form Association": 0,
+        "Accessible Label Pattern": 0,
+        "Forced Colors Mode": 0,
+        "Form Validity Reporting": 0,
+        "AAA Audit Self-Certification": 0
       },
       "top5": [
         {
-          "tagName": "p-table-body",
-          "score": 69.4,
+          "tagName": "p-toast",
+          "score": 41.9,
           "grade": "F"
         },
         {
-          "tagName": "p-table-head-row",
-          "score": 69.4,
+          "tagName": "p-button-group",
+          "score": 39.6,
           "grade": "F"
         },
         {
-          "tagName": "p-table-head",
-          "score": 69.4,
+          "tagName": "p-button-pure",
+          "score": 39.6,
           "grade": "F"
         },
         {
-          "tagName": "p-table-row",
-          "score": 69.4,
+          "tagName": "p-button-tile",
+          "score": 39.6,
           "grade": "F"
         },
         {
-          "tagName": "p-text-list-item",
-          "score": 69.4,
+          "tagName": "p-button",
+          "score": 39.6,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
-          "tagName": "p-toast-item",
-          "score": 42.7,
+          "tagName": "p-select-option",
+          "score": 34.4,
           "grade": "F"
         },
         {
-          "tagName": "p-table",
-          "score": 42.7,
+          "tagName": "p-select-wrapper-dropdown",
+          "score": 34.4,
           "grade": "F"
         },
         {
-          "tagName": "p-stepper-horizontal",
-          "score": 42.7,
+          "tagName": "p-segmented-control-item",
+          "score": 34.4,
           "grade": "F"
         },
         {
-          "tagName": "p-link-tile-product",
-          "score": 42.7,
+          "tagName": "p-radio-group-option",
+          "score": 34.4,
           "grade": "F"
         },
         {
-          "tagName": "p-inline-notification",
-          "score": 42.7,
+          "tagName": "p-multi-select-option",
+          "score": 34.4,
           "grade": "F"
         }
       ],
@@ -1404,70 +1803,119 @@
           "average": 0,
           "tier": "important",
           "confidence": "heuristic",
-          "note": "Significantly below average (24). Major drag on scores."
+          "note": "Below average (16). Room for improvement."
         },
         {
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Significantly below average (24). Major drag on scores."
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
         },
         {
           "dimension": "Test Coverage",
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (24). Major drag on scores."
+          "note": "Below average (16). Room for improvement."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (24). Major drag on scores."
+          "note": "Below average (16). Room for improvement."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (24). Major drag on scores."
+          "note": "Below average (16). Room for improvement."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (24). Major drag on scores."
+          "note": "Below average (16). Room for improvement."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (24). Major drag on scores."
+          "note": "Below average (16). Room for improvement."
         },
         {
           "dimension": "Slot Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Significantly below average (24). Major drag on scores."
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
         },
         {
-          "dimension": "Accessibility",
-          "average": 12.88,
+          "dimension": "WCAG Conformance",
+          "average": 0,
           "tier": "critical",
-          "confidence": "heuristic",
-          "note": "Below average (24). Room for improvement."
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
+        },
+        {
+          "dimension": "APG Keyboard Contract",
+          "average": 0,
+          "tier": "critical",
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
+        },
+        {
+          "dimension": "Focus Indicator",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
+        },
+        {
+          "dimension": "Form Association",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
+        },
+        {
+          "dimension": "Accessible Label Pattern",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
+        },
+        {
+          "dimension": "Forced Colors Mode",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
+        },
+        {
+          "dimension": "Form Validity Reporting",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
+        },
+        {
+          "dimension": "AAA Audit Self-Certification",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "untested",
+          "note": "Below average (16). Room for improvement."
         },
         {
           "dimension": "Event Architecture",
           "average": 27.69,
           "tier": "important",
           "confidence": "heuristic",
-          "note": "Near average."
+          "note": "Above average. Strong dimension."
         },
         {
           "dimension": "CEM-Source Fidelity",
@@ -1500,25 +1948,24 @@
       ],
       "confidenceBreakdown": {
         "verified": 268,
-        "heuristic": 304,
-        "untested": 702
+        "heuristic": 213,
+        "untested": 546
       },
-      "timestamp": "2026-03-26T00:21:46.679Z"
+      "timestamp": "2026-05-11T04:40:13.416Z"
     },
     "ionic": {
       "library": "ionic",
       "componentCount": 97,
-      "averageScore": 51.8,
+      "averageScore": 37.81,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
         "C": 0,
-        "D": 1,
-        "F": 96
+        "D": 0,
+        "F": 97
       },
       "dimensionAverages": {
         "CEM Completeness": 54.74,
-        "Accessibility": 19.71,
         "Type Coverage": 91.75,
         "API Surface Quality": 0,
         "CSS Architecture": 0,
@@ -1530,59 +1977,67 @@
         "Drupal Readiness": 0,
         "CEM-Source Fidelity": 58.06,
         "Slot Architecture": 0,
-        "Naming Consistency": 100
+        "Naming Consistency": 100,
+        "WCAG Conformance": 0,
+        "APG Keyboard Contract": 0,
+        "Focus Indicator": 0,
+        "Form Association": 0,
+        "Accessible Label Pattern": 2.06,
+        "Forced Colors Mode": 0,
+        "Form Validity Reporting": 0,
+        "AAA Audit Self-Certification": 0
       },
       "top5": [
         {
-          "tagName": "ion-app",
-          "score": 72.1,
+          "tagName": "ion-picker",
+          "score": 43.2,
           "grade": "F"
         },
         {
-          "tagName": "ion-avatar",
-          "score": 69.4,
+          "tagName": "ion-ripple-effect",
+          "score": 43,
           "grade": "F"
         },
         {
-          "tagName": "ion-card-content",
-          "score": 69.4,
+          "tagName": "ion-toolbar",
+          "score": 42.6,
           "grade": "F"
         },
         {
-          "tagName": "ion-item-group",
-          "score": 69.4,
+          "tagName": "ion-badge",
+          "score": 41.9,
           "grade": "F"
         },
         {
-          "tagName": "ion-reorder",
-          "score": 69.4,
+          "tagName": "ion-buttons",
+          "score": 41.9,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "ion-tabs",
-          "score": 40,
+          "score": 33.8,
           "grade": "F"
         },
         {
           "tagName": "ion-route",
-          "score": 40,
+          "score": 33.8,
           "grade": "F"
         },
         {
           "tagName": "ion-route-redirect",
-          "score": 40,
+          "score": 33.8,
           "grade": "F"
         },
         {
-          "tagName": "ion-breadcrumbs",
-          "score": 41.1,
+          "tagName": "ion-picker-legacy",
+          "score": 34,
           "grade": "F"
         },
         {
-          "tagName": "ion-content",
-          "score": 41.2,
+          "tagName": "ion-tab-button",
+          "score": 34.3,
           "grade": "F"
         }
       ],
@@ -1592,68 +2047,117 @@
           "average": 0,
           "tier": "important",
           "confidence": "heuristic",
-          "note": "Significantly below average (24). Major drag on scores."
+          "note": "Below average (15). Room for improvement."
         },
         {
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Significantly below average (24). Major drag on scores."
+          "confidence": "unknown",
+          "note": "Below average (15). Room for improvement."
         },
         {
           "dimension": "Test Coverage",
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (24). Major drag on scores."
+          "note": "Below average (15). Room for improvement."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (24). Major drag on scores."
+          "note": "Below average (15). Room for improvement."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (24). Major drag on scores."
+          "note": "Below average (15). Room for improvement."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (24). Major drag on scores."
+          "note": "Below average (15). Room for improvement."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (24). Major drag on scores."
+          "note": "Below average (15). Room for improvement."
         },
         {
           "dimension": "Slot Architecture",
           "average": 0,
           "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (15). Room for improvement."
+        },
+        {
+          "dimension": "WCAG Conformance",
+          "average": 0,
+          "tier": "critical",
+          "confidence": "unknown",
+          "note": "Below average (15). Room for improvement."
+        },
+        {
+          "dimension": "APG Keyboard Contract",
+          "average": 0,
+          "tier": "critical",
+          "confidence": "unknown",
+          "note": "Below average (15). Room for improvement."
+        },
+        {
+          "dimension": "Focus Indicator",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (15). Room for improvement."
+        },
+        {
+          "dimension": "Form Association",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (15). Room for improvement."
+        },
+        {
+          "dimension": "Forced Colors Mode",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (15). Room for improvement."
+        },
+        {
+          "dimension": "Form Validity Reporting",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "unknown",
+          "note": "Below average (15). Room for improvement."
+        },
+        {
+          "dimension": "AAA Audit Self-Certification",
+          "average": 0,
+          "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (24). Major drag on scores."
+          "note": "Below average (15). Room for improvement."
+        },
+        {
+          "dimension": "Accessible Label Pattern",
+          "average": 2.06,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (15). Room for improvement."
         },
         {
           "dimension": "Event Architecture",
           "average": 17.75,
           "tier": "important",
-          "confidence": "heuristic",
-          "note": "Near average."
-        },
-        {
-          "dimension": "Accessibility",
-          "average": 19.71,
-          "tier": "critical",
           "confidence": "heuristic",
           "note": "Near average."
         },
@@ -1688,15 +2192,15 @@
       ],
       "confidenceBreakdown": {
         "verified": 283,
-        "heuristic": 331,
-        "untested": 744
+        "heuristic": 238,
+        "untested": 582
       },
-      "timestamp": "2026-03-26T00:21:46.680Z"
+      "timestamp": "2026-05-11T04:40:13.416Z"
     },
     "wired": {
       "library": "wired",
       "componentCount": 26,
-      "averageScore": 54.31,
+      "averageScore": 40.03,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -1706,7 +2210,6 @@
       },
       "dimensionAverages": {
         "CEM Completeness": 60,
-        "Accessibility": 17.96,
         "Type Coverage": 67.15,
         "API Surface Quality": 21.85,
         "CSS Architecture": 0,
@@ -1718,59 +2221,67 @@
         "Drupal Readiness": 0,
         "CEM-Source Fidelity": 78.96,
         "Slot Architecture": 0,
-        "Naming Consistency": 99.85
+        "Naming Consistency": 99.85,
+        "WCAG Conformance": 0,
+        "APG Keyboard Contract": 0,
+        "Focus Indicator": 0,
+        "Form Association": 0,
+        "Accessible Label Pattern": 1.92,
+        "Forced Colors Mode": 0,
+        "Form Validity Reporting": 0,
+        "AAA Audit Self-Certification": 0
       },
       "top5": [
         {
           "tagName": "wired-dialog",
-          "score": 63.7,
+          "score": 49,
+          "grade": "F"
+        },
+        {
+          "tagName": "wired-progress-ring",
+          "score": 43,
+          "grade": "F"
+        },
+        {
+          "tagName": "wired-textarea",
+          "score": 42.7,
+          "grade": "F"
+        },
+        {
+          "tagName": "wired-progress",
+          "score": 42.5,
           "grade": "F"
         },
         {
           "tagName": "wired-calendar",
-          "score": 59.2,
-          "grade": "F"
-        },
-        {
-          "tagName": "wired-combo",
-          "score": 58.7,
-          "grade": "F"
-        },
-        {
-          "tagName": "wired-input",
-          "score": 58.2,
-          "grade": "F"
-        },
-        {
-          "tagName": "wired-listbox",
-          "score": 57.8,
+          "score": 42.3,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
+          "tagName": "wired-radio-group",
+          "score": 36.9,
+          "grade": "F"
+        },
+        {
           "tagName": "wired-divider",
-          "score": 48.3,
+          "score": 37.7,
           "grade": "F"
         },
         {
-          "tagName": "wired-card",
-          "score": 49.2,
+          "tagName": "wired-combo",
+          "score": 37.9,
           "grade": "F"
         },
         {
-          "tagName": "wired-image",
-          "score": 49.8,
+          "tagName": "wired-tabs",
+          "score": 38.1,
           "grade": "F"
         },
         {
-          "tagName": "wired-spinner",
-          "score": 50.2,
-          "grade": "F"
-        },
-        {
-          "tagName": "wired-fab",
-          "score": 50.7,
+          "tagName": "wired-listbox",
+          "score": 38.2,
           "grade": "F"
         }
       ],
@@ -1779,64 +2290,113 @@
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Significantly below average (25). Major drag on scores."
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
         },
         {
           "dimension": "Event Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Significantly below average (25). Major drag on scores."
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
         },
         {
           "dimension": "Test Coverage",
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (25). Major drag on scores."
+          "note": "Below average (16). Room for improvement."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (25). Major drag on scores."
+          "note": "Below average (16). Room for improvement."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (25). Major drag on scores."
+          "note": "Below average (16). Room for improvement."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (25). Major drag on scores."
+          "note": "Below average (16). Room for improvement."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (25). Major drag on scores."
+          "note": "Below average (16). Room for improvement."
         },
         {
           "dimension": "Slot Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Significantly below average (25). Major drag on scores."
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
         },
         {
-          "dimension": "Accessibility",
-          "average": 17.96,
+          "dimension": "WCAG Conformance",
+          "average": 0,
           "tier": "critical",
-          "confidence": "heuristic",
-          "note": "Near average."
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
+        },
+        {
+          "dimension": "APG Keyboard Contract",
+          "average": 0,
+          "tier": "critical",
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
+        },
+        {
+          "dimension": "Focus Indicator",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
+        },
+        {
+          "dimension": "Form Association",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
+        },
+        {
+          "dimension": "Forced Colors Mode",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
+        },
+        {
+          "dimension": "Form Validity Reporting",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
+        },
+        {
+          "dimension": "AAA Audit Self-Certification",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "untested",
+          "note": "Below average (16). Room for improvement."
+        },
+        {
+          "dimension": "Accessible Label Pattern",
+          "average": 1.92,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (16). Room for improvement."
         },
         {
           "dimension": "API Surface Quality",
@@ -1876,15 +2436,15 @@
       ],
       "confidenceBreakdown": {
         "verified": 78,
-        "heuristic": 78,
-        "untested": 208
+        "heuristic": 53,
+        "untested": 156
       },
-      "timestamp": "2026-03-26T00:21:46.680Z"
+      "timestamp": "2026-05-11T04:40:13.417Z"
     },
     "elix": {
       "library": "elix",
       "componentCount": 74,
-      "averageScore": 67.98,
+      "averageScore": 35.14,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -1894,7 +2454,6 @@
       },
       "dimensionAverages": {
         "CEM Completeness": 85,
-        "Accessibility": 1.15,
         "Type Coverage": 0,
         "API Surface Quality": 0,
         "CSS Architecture": 0,
@@ -1906,59 +2465,67 @@
         "Drupal Readiness": 0,
         "CEM-Source Fidelity": 93.24,
         "Slot Architecture": 0,
-        "Naming Consistency": 100
+        "Naming Consistency": 100,
+        "WCAG Conformance": 0,
+        "APG Keyboard Contract": 0,
+        "Focus Indicator": 0,
+        "Form Association": 0,
+        "Accessible Label Pattern": 0,
+        "Forced Colors Mode": 0,
+        "Form Validity Reporting": 0,
+        "AAA Audit Self-Certification": 0
       },
       "top5": [
         {
           "tagName": "elix-arrow-direction-button",
-          "score": 70.6,
+          "score": 36,
+          "grade": "F"
+        },
+        {
+          "tagName": "elix-auto-size-textarea",
+          "score": 36,
+          "grade": "F"
+        },
+        {
+          "tagName": "elix-backdrop",
+          "score": 36,
           "grade": "F"
         },
         {
           "tagName": "elix-border-button",
-          "score": 70.6,
+          "score": 36,
           "grade": "F"
         },
         {
           "tagName": "elix-button",
-          "score": 70.6,
-          "grade": "F"
-        },
-        {
-          "tagName": "elix-calendar-day-button",
-          "score": 70.6,
-          "grade": "F"
-        },
-        {
-          "tagName": "elix-expand-collapse-toggle",
-          "score": 70.6,
+          "score": 36,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
+          "tagName": "elix-tooltip-button",
+          "score": 32.8,
+          "grade": "F"
+        },
+        {
           "tagName": "elix-popup-source",
-          "score": 63.1,
+          "score": 32.8,
+          "grade": "F"
+        },
+        {
+          "tagName": "elix-popup-button",
+          "score": 32.8,
           "grade": "F"
         },
         {
           "tagName": "elix-popup",
-          "score": 63.1,
+          "score": 32.8,
           "grade": "F"
         },
         {
           "tagName": "elix-overlay",
-          "score": 63.1,
-          "grade": "F"
-        },
-        {
-          "tagName": "elix-multi-select-list-box",
-          "score": 63.1,
-          "grade": "F"
-        },
-        {
-          "tagName": "elix-menu-item",
-          "score": 63.1,
+          "score": 32.8,
           "grade": "F"
         }
       ],
@@ -1967,78 +2534,127 @@
           "dimension": "Type Coverage",
           "average": 0,
           "tier": "critical",
-          "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
         },
         {
           "dimension": "API Surface Quality",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
         },
         {
           "dimension": "CSS Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
         },
         {
           "dimension": "Event Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
         },
         {
           "dimension": "Test Coverage",
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "note": "Below average (13). Room for improvement."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "note": "Below average (13). Room for improvement."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "note": "Below average (13). Room for improvement."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "note": "Below average (13). Room for improvement."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "note": "Below average (13). Room for improvement."
         },
         {
           "dimension": "Slot Architecture",
           "average": 0,
           "tier": "important",
-          "confidence": "untested",
-          "note": "Below average (20). Room for improvement."
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
         },
         {
-          "dimension": "Accessibility",
-          "average": 1.15,
+          "dimension": "WCAG Conformance",
+          "average": 0,
           "tier": "critical",
-          "confidence": "heuristic",
-          "note": "Below average (20). Room for improvement."
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
+        },
+        {
+          "dimension": "APG Keyboard Contract",
+          "average": 0,
+          "tier": "critical",
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
+        },
+        {
+          "dimension": "Focus Indicator",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
+        },
+        {
+          "dimension": "Form Association",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
+        },
+        {
+          "dimension": "Accessible Label Pattern",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
+        },
+        {
+          "dimension": "Forced Colors Mode",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
+        },
+        {
+          "dimension": "Form Validity Reporting",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "unknown",
+          "note": "Below average (13). Room for improvement."
+        },
+        {
+          "dimension": "AAA Audit Self-Certification",
+          "average": 0,
+          "tier": "advanced",
+          "confidence": "untested",
+          "note": "Below average (13). Room for improvement."
         },
         {
           "dimension": "CEM Completeness",
@@ -2064,90 +2680,97 @@
       ],
       "confidenceBreakdown": {
         "verified": 148,
-        "heuristic": 148,
-        "untested": 740
+        "heuristic": 74,
+        "untested": 444
       },
-      "timestamp": "2026-03-26T00:21:46.680Z"
+      "timestamp": "2026-05-11T04:40:13.417Z"
     },
     "helix": {
       "library": "helix",
-      "componentCount": 101,
-      "averageScore": 88.42,
+      "componentCount": 102,
+      "averageScore": 80.25,
       "gradeDistribution": {
         "A": 0,
-        "B": 19,
-        "C": 14,
-        "D": 15,
-        "F": 53
+        "B": 8,
+        "C": 1,
+        "D": 76,
+        "F": 17
       },
       "dimensionAverages": {
-        "CEM Completeness": 99.73,
-        "Accessibility": 44.35,
-        "Type Coverage": 94.56,
-        "API Surface Quality": 89.07,
-        "CSS Architecture": 96.73,
-        "Event Architecture": 56.44,
+        "CEM Completeness": 99.84,
+        "Type Coverage": 94.88,
+        "API Surface Quality": 89.19,
+        "CSS Architecture": 98.04,
+        "Event Architecture": 56.7,
         "Test Coverage": 0,
         "Bundle Size": 0,
         "Story Coverage": 0,
         "Performance": 0,
         "Drupal Readiness": 0,
-        "CEM-Source Fidelity": 91.33,
-        "Slot Architecture": 72.14,
-        "Naming Consistency": 98.55
+        "CEM-Source Fidelity": 92.09,
+        "Slot Architecture": 72.71,
+        "Naming Consistency": 98.39,
+        "WCAG Conformance": 22.97,
+        "APG Keyboard Contract": 14.9,
+        "Focus Indicator": 0,
+        "Form Association": 16.94,
+        "Accessible Label Pattern": 37.25,
+        "Forced Colors Mode": 0,
+        "Form Validity Reporting": 11.76,
+        "AAA Audit Self-Certification": 14.22
       },
       "top5": [
         {
           "tagName": "hx-menu",
-          "score": 96.1,
+          "score": 95.3,
+          "grade": "F"
+        },
+        {
+          "tagName": "hx-overflow-menu",
+          "score": 94,
+          "grade": "F"
+        },
+        {
+          "tagName": "hx-copy-button",
+          "score": 93.4,
           "grade": "B"
         },
         {
           "tagName": "hx-dropdown",
-          "score": 95.3,
-          "grade": "B"
+          "score": 93,
+          "grade": "F"
         },
         {
-          "tagName": "hx-tree-view",
-          "score": 95.3,
-          "grade": "C"
-        },
-        {
-          "tagName": "hx-menu-item",
-          "score": 95.1,
-          "grade": "B"
-        },
-        {
-          "tagName": "hx-overflow-menu",
-          "score": 94.7,
+          "tagName": "hx-split-button",
+          "score": 92.8,
           "grade": "B"
         }
       ],
       "bottom5": [
         {
-          "tagName": "hx-grid-item",
-          "score": 74.8,
-          "grade": "F"
-        },
-        {
-          "tagName": "hx-button-group",
-          "score": 75.7,
-          "grade": "F"
-        },
-        {
-          "tagName": "hx-theme",
-          "score": 76.9,
-          "grade": "F"
-        },
-        {
           "tagName": "hx-menu-divider",
-          "score": 77.8,
+          "score": 61.4,
           "grade": "F"
+        },
+        {
+          "tagName": "hx-grid-item",
+          "score": 63.1,
+          "grade": "D"
         },
         {
           "tagName": "hx-structured-list-row",
-          "score": 78.3,
+          "score": 66.9,
           "grade": "F"
+        },
+        {
+          "tagName": "hx-radio",
+          "score": 67.9,
+          "grade": "D"
+        },
+        {
+          "tagName": "hx-counter",
+          "score": 69.3,
+          "grade": "D"
         }
       ],
       "dimensionInsights": [
@@ -2156,106 +2779,155 @@
           "average": 0,
           "tier": "critical",
           "confidence": "untested",
-          "note": "Significantly below average (53). Major drag on scores."
+          "note": "Significantly below average (39). Major drag on scores."
         },
         {
           "dimension": "Bundle Size",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (53). Major drag on scores."
+          "note": "Significantly below average (39). Major drag on scores."
         },
         {
           "dimension": "Story Coverage",
           "average": 0,
           "tier": "important",
           "confidence": "untested",
-          "note": "Significantly below average (53). Major drag on scores."
+          "note": "Significantly below average (39). Major drag on scores."
         },
         {
           "dimension": "Performance",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (53). Major drag on scores."
+          "note": "Significantly below average (39). Major drag on scores."
         },
         {
           "dimension": "Drupal Readiness",
           "average": 0,
           "tier": "advanced",
           "confidence": "untested",
-          "note": "Significantly below average (53). Major drag on scores."
+          "note": "Significantly below average (39). Major drag on scores."
         },
         {
-          "dimension": "Accessibility",
-          "average": 44.35,
+          "dimension": "Focus Indicator",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Significantly below average (39). Major drag on scores."
+        },
+        {
+          "dimension": "Forced Colors Mode",
+          "average": 0,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Significantly below average (39). Major drag on scores."
+        },
+        {
+          "dimension": "Form Validity Reporting",
+          "average": 11.76,
+          "tier": "advanced",
+          "confidence": "unknown",
+          "note": "Significantly below average (39). Major drag on scores."
+        },
+        {
+          "dimension": "AAA Audit Self-Certification",
+          "average": 14.22,
+          "tier": "advanced",
+          "confidence": "untested",
+          "note": "Significantly below average (39). Major drag on scores."
+        },
+        {
+          "dimension": "APG Keyboard Contract",
+          "average": 14.9,
           "tier": "critical",
-          "confidence": "heuristic",
+          "confidence": "unknown",
+          "note": "Significantly below average (39). Major drag on scores."
+        },
+        {
+          "dimension": "Form Association",
+          "average": 16.94,
+          "tier": "important",
+          "confidence": "unknown",
+          "note": "Significantly below average (39). Major drag on scores."
+        },
+        {
+          "dimension": "WCAG Conformance",
+          "average": 22.97,
+          "tier": "critical",
+          "confidence": "unknown",
+          "note": "Below average (39). Room for improvement."
+        },
+        {
+          "dimension": "Accessible Label Pattern",
+          "average": 37.25,
+          "tier": "important",
+          "confidence": "unknown",
           "note": "Near average."
         },
         {
           "dimension": "Event Architecture",
-          "average": 56.44,
+          "average": 56.7,
           "tier": "important",
           "confidence": "heuristic",
-          "note": "Near average."
+          "note": "Above average. Strong dimension."
         },
         {
           "dimension": "Slot Architecture",
-          "average": 72.14,
+          "average": 72.71,
           "tier": "important",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "API Surface Quality",
-          "average": 89.07,
+          "average": 89.19,
           "tier": "important",
           "confidence": "heuristic",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "CEM-Source Fidelity",
-          "average": 91.33,
+          "average": 92.09,
           "tier": "critical",
           "confidence": "heuristic",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "Type Coverage",
-          "average": 94.56,
+          "average": 94.88,
           "tier": "critical",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "CSS Architecture",
-          "average": 96.73,
+          "average": 98.04,
           "tier": "important",
           "confidence": "heuristic",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "Naming Consistency",
-          "average": 98.55,
+          "average": 98.39,
           "tier": "important",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
         },
         {
           "dimension": "CEM Completeness",
-          "average": 99.73,
+          "average": 99.84,
           "tier": "critical",
           "confidence": "verified",
           "note": "Above average. Strong dimension."
         }
       ],
       "confidenceBreakdown": {
-        "verified": 388,
-        "heuristic": 453,
-        "untested": 573
+        "verified": 465,
+        "heuristic": 464,
+        "untested": 593
       },
-      "timestamp": "2026-03-26T00:21:46.680Z"
+      "timestamp": "2026-05-11T04:40:13.417Z"
     }
   },
   "comparisonTable": {
@@ -2263,84 +2935,84 @@
       {
         "rank": 1,
         "library": "helix",
-        "averageScore": 88.42,
-        "componentCount": 101,
+        "averageScore": 80.25,
+        "componentCount": 102,
         "grade": "B"
       },
       {
         "rank": 2,
-        "library": "elix",
-        "averageScore": 67.98,
-        "componentCount": 74,
-        "grade": "D"
+        "library": "vaadin",
+        "averageScore": 54.7,
+        "componentCount": 96,
+        "grade": "F"
       },
       {
         "rank": 3,
-        "library": "vaadin",
-        "averageScore": 67.81,
-        "componentCount": 96,
-        "grade": "D"
+        "library": "fluentui",
+        "averageScore": 51.57,
+        "componentCount": 41,
+        "grade": "F"
       },
       {
         "rank": 4,
-        "library": "fluentui",
-        "averageScore": 65.27,
-        "componentCount": 41,
-        "grade": "D"
+        "library": "spectrum",
+        "averageScore": 43.4,
+        "componentCount": 89,
+        "grade": "F"
       },
       {
         "rank": 5,
         "library": "material",
-        "averageScore": 55.71,
+        "averageScore": 42.67,
         "componentCount": 97,
         "grade": "F"
       },
       {
         "rank": 6,
-        "library": "spectrum",
-        "averageScore": 54.52,
-        "componentCount": 89,
+        "library": "carbon",
+        "averageScore": 41.75,
+        "componentCount": 110,
         "grade": "F"
       },
       {
         "rank": 7,
         "library": "wired",
-        "averageScore": 54.31,
+        "averageScore": 40.03,
         "componentCount": 26,
         "grade": "F"
       },
       {
         "rank": 8,
-        "library": "carbon",
-        "averageScore": 53.16,
-        "componentCount": 110,
-        "grade": "F"
-      },
-      {
-        "rank": 9,
         "library": "ionic",
-        "averageScore": 51.8,
+        "averageScore": 37.81,
         "componentCount": 97,
         "grade": "F"
       },
       {
-        "rank": 10,
+        "rank": 9,
         "library": "porsche",
-        "averageScore": 50.31,
+        "averageScore": 37.72,
         "componentCount": 91,
+        "grade": "F"
+      },
+      {
+        "rank": 10,
+        "library": "elix",
+        "averageScore": 35.14,
+        "componentCount": 74,
         "grade": "F"
       },
       {
         "rank": 11,
         "library": "ui5",
-        "averageScore": 42.01,
+        "averageScore": 31.06,
         "componentCount": 170,
         "grade": "F"
       },
       {
         "rank": 12,
         "library": "calcite",
-        "averageScore": 40.7,
+        "averageScore": 28.14,
         "componentCount": 106,
         "grade": "F"
       }
@@ -2351,7 +3023,7 @@
         "rankings": [
           {
             "library": "helix",
-            "average": 99.73,
+            "average": 99.84,
             "rank": 1
           },
           {
@@ -2410,80 +3082,14 @@
             "rank": 12
           }
         ],
-        "spread": 45.14
-      },
-      {
-        "dimension": "Accessibility",
-        "rankings": [
-          {
-            "library": "helix",
-            "average": 44.35,
-            "rank": 1
-          },
-          {
-            "library": "calcite",
-            "average": 32.67,
-            "rank": 2
-          },
-          {
-            "library": "spectrum",
-            "average": 30.27,
-            "rank": 3
-          },
-          {
-            "library": "ionic",
-            "average": 19.71,
-            "rank": 4
-          },
-          {
-            "library": "carbon",
-            "average": 19.55,
-            "rank": 5
-          },
-          {
-            "library": "fluentui",
-            "average": 18.02,
-            "rank": 6
-          },
-          {
-            "library": "wired",
-            "average": 17.96,
-            "rank": 7
-          },
-          {
-            "library": "material",
-            "average": 16.46,
-            "rank": 8
-          },
-          {
-            "library": "vaadin",
-            "average": 16,
-            "rank": 9
-          },
-          {
-            "library": "porsche",
-            "average": 12.88,
-            "rank": 10
-          },
-          {
-            "library": "ui5",
-            "average": 10.16,
-            "rank": 11
-          },
-          {
-            "library": "elix",
-            "average": 1.15,
-            "rank": 12
-          }
-        ],
-        "spread": 43.2
+        "spread": 45.25
       },
       {
         "dimension": "Type Coverage",
         "rankings": [
           {
             "library": "helix",
-            "average": 94.56,
+            "average": 94.88,
             "rank": 1
           },
           {
@@ -2542,14 +3148,14 @@
             "rank": 12
           }
         ],
-        "spread": 94.56
+        "spread": 94.88
       },
       {
         "dimension": "API Surface Quality",
         "rankings": [
           {
             "library": "helix",
-            "average": 89.07,
+            "average": 89.19,
             "rank": 1
           },
           {
@@ -2608,14 +3214,14 @@
             "rank": 12
           }
         ],
-        "spread": 89.07
+        "spread": 89.19
       },
       {
         "dimension": "CSS Architecture",
         "rankings": [
           {
             "library": "helix",
-            "average": 96.73,
+            "average": 98.04,
             "rank": 1
           },
           {
@@ -2674,7 +3280,7 @@
             "rank": 12
           }
         ],
-        "spread": 96.73
+        "spread": 98.04
       },
       {
         "dimension": "Event Architecture",
@@ -2686,7 +3292,7 @@
           },
           {
             "library": "helix",
-            "average": 56.44,
+            "average": 56.7,
             "rank": 2
           },
           {
@@ -3082,7 +3688,7 @@
           },
           {
             "library": "helix",
-            "average": 91.33,
+            "average": 92.09,
             "rank": 2
           },
           {
@@ -3143,7 +3749,7 @@
         "rankings": [
           {
             "library": "helix",
-            "average": 72.14,
+            "average": 72.71,
             "rank": 1
           },
           {
@@ -3202,7 +3808,7 @@
             "rank": 12
           }
         ],
-        "spread": 72.14
+        "spread": 72.71
       },
       {
         "dimension": "Naming Consistency",
@@ -3244,7 +3850,7 @@
           },
           {
             "library": "helix",
-            "average": 98.55,
+            "average": 98.39,
             "rank": 8
           },
           {
@@ -3269,6 +3875,534 @@
           }
         ],
         "spread": 12.41
+      },
+      {
+        "dimension": "WCAG Conformance",
+        "rankings": [
+          {
+            "library": "helix",
+            "average": 22.97,
+            "rank": 1
+          },
+          {
+            "library": "material",
+            "average": 0,
+            "rank": 2
+          },
+          {
+            "library": "spectrum",
+            "average": 0,
+            "rank": 3
+          },
+          {
+            "library": "vaadin",
+            "average": 0,
+            "rank": 4
+          },
+          {
+            "library": "fluentui",
+            "average": 0,
+            "rank": 5
+          },
+          {
+            "library": "carbon",
+            "average": 0,
+            "rank": 6
+          },
+          {
+            "library": "ui5",
+            "average": 0,
+            "rank": 7
+          },
+          {
+            "library": "calcite",
+            "average": 0,
+            "rank": 8
+          },
+          {
+            "library": "porsche",
+            "average": 0,
+            "rank": 9
+          },
+          {
+            "library": "ionic",
+            "average": 0,
+            "rank": 10
+          },
+          {
+            "library": "wired",
+            "average": 0,
+            "rank": 11
+          },
+          {
+            "library": "elix",
+            "average": 0,
+            "rank": 12
+          }
+        ],
+        "spread": 22.97
+      },
+      {
+        "dimension": "APG Keyboard Contract",
+        "rankings": [
+          {
+            "library": "helix",
+            "average": 14.9,
+            "rank": 1
+          },
+          {
+            "library": "spectrum",
+            "average": 0.28,
+            "rank": 2
+          },
+          {
+            "library": "material",
+            "average": 0,
+            "rank": 3
+          },
+          {
+            "library": "vaadin",
+            "average": 0,
+            "rank": 4
+          },
+          {
+            "library": "fluentui",
+            "average": 0,
+            "rank": 5
+          },
+          {
+            "library": "carbon",
+            "average": 0,
+            "rank": 6
+          },
+          {
+            "library": "ui5",
+            "average": 0,
+            "rank": 7
+          },
+          {
+            "library": "calcite",
+            "average": 0,
+            "rank": 8
+          },
+          {
+            "library": "porsche",
+            "average": 0,
+            "rank": 9
+          },
+          {
+            "library": "ionic",
+            "average": 0,
+            "rank": 10
+          },
+          {
+            "library": "wired",
+            "average": 0,
+            "rank": 11
+          },
+          {
+            "library": "elix",
+            "average": 0,
+            "rank": 12
+          }
+        ],
+        "spread": 14.9
+      },
+      {
+        "dimension": "Focus Indicator",
+        "rankings": [
+          {
+            "library": "material",
+            "average": 0,
+            "rank": 1
+          },
+          {
+            "library": "spectrum",
+            "average": 0,
+            "rank": 2
+          },
+          {
+            "library": "vaadin",
+            "average": 0,
+            "rank": 3
+          },
+          {
+            "library": "fluentui",
+            "average": 0,
+            "rank": 4
+          },
+          {
+            "library": "carbon",
+            "average": 0,
+            "rank": 5
+          },
+          {
+            "library": "ui5",
+            "average": 0,
+            "rank": 6
+          },
+          {
+            "library": "calcite",
+            "average": 0,
+            "rank": 7
+          },
+          {
+            "library": "porsche",
+            "average": 0,
+            "rank": 8
+          },
+          {
+            "library": "ionic",
+            "average": 0,
+            "rank": 9
+          },
+          {
+            "library": "wired",
+            "average": 0,
+            "rank": 10
+          },
+          {
+            "library": "elix",
+            "average": 0,
+            "rank": 11
+          },
+          {
+            "library": "helix",
+            "average": 0,
+            "rank": 12
+          }
+        ],
+        "spread": 0
+      },
+      {
+        "dimension": "Form Association",
+        "rankings": [
+          {
+            "library": "helix",
+            "average": 16.94,
+            "rank": 1
+          },
+          {
+            "library": "material",
+            "average": 0,
+            "rank": 2
+          },
+          {
+            "library": "spectrum",
+            "average": 0,
+            "rank": 3
+          },
+          {
+            "library": "vaadin",
+            "average": 0,
+            "rank": 4
+          },
+          {
+            "library": "fluentui",
+            "average": 0,
+            "rank": 5
+          },
+          {
+            "library": "carbon",
+            "average": 0,
+            "rank": 6
+          },
+          {
+            "library": "ui5",
+            "average": 0,
+            "rank": 7
+          },
+          {
+            "library": "calcite",
+            "average": 0,
+            "rank": 8
+          },
+          {
+            "library": "porsche",
+            "average": 0,
+            "rank": 9
+          },
+          {
+            "library": "ionic",
+            "average": 0,
+            "rank": 10
+          },
+          {
+            "library": "wired",
+            "average": 0,
+            "rank": 11
+          },
+          {
+            "library": "elix",
+            "average": 0,
+            "rank": 12
+          }
+        ],
+        "spread": 16.94
+      },
+      {
+        "dimension": "Accessible Label Pattern",
+        "rankings": [
+          {
+            "library": "helix",
+            "average": 37.25,
+            "rank": 1
+          },
+          {
+            "library": "calcite",
+            "average": 25.94,
+            "rank": 2
+          },
+          {
+            "library": "spectrum",
+            "average": 17.42,
+            "rank": 3
+          },
+          {
+            "library": "material",
+            "average": 14.43,
+            "rank": 4
+          },
+          {
+            "library": "vaadin",
+            "average": 2.6,
+            "rank": 5
+          },
+          {
+            "library": "ionic",
+            "average": 2.06,
+            "rank": 6
+          },
+          {
+            "library": "wired",
+            "average": 1.92,
+            "rank": 7
+          },
+          {
+            "library": "fluentui",
+            "average": 1.22,
+            "rank": 8
+          },
+          {
+            "library": "carbon",
+            "average": 0.91,
+            "rank": 9
+          },
+          {
+            "library": "ui5",
+            "average": 0.29,
+            "rank": 10
+          },
+          {
+            "library": "porsche",
+            "average": 0,
+            "rank": 11
+          },
+          {
+            "library": "elix",
+            "average": 0,
+            "rank": 12
+          }
+        ],
+        "spread": 37.25
+      },
+      {
+        "dimension": "Forced Colors Mode",
+        "rankings": [
+          {
+            "library": "material",
+            "average": 0,
+            "rank": 1
+          },
+          {
+            "library": "spectrum",
+            "average": 0,
+            "rank": 2
+          },
+          {
+            "library": "vaadin",
+            "average": 0,
+            "rank": 3
+          },
+          {
+            "library": "fluentui",
+            "average": 0,
+            "rank": 4
+          },
+          {
+            "library": "carbon",
+            "average": 0,
+            "rank": 5
+          },
+          {
+            "library": "ui5",
+            "average": 0,
+            "rank": 6
+          },
+          {
+            "library": "calcite",
+            "average": 0,
+            "rank": 7
+          },
+          {
+            "library": "porsche",
+            "average": 0,
+            "rank": 8
+          },
+          {
+            "library": "ionic",
+            "average": 0,
+            "rank": 9
+          },
+          {
+            "library": "wired",
+            "average": 0,
+            "rank": 10
+          },
+          {
+            "library": "elix",
+            "average": 0,
+            "rank": 11
+          },
+          {
+            "library": "helix",
+            "average": 0,
+            "rank": 12
+          }
+        ],
+        "spread": 0
+      },
+      {
+        "dimension": "Form Validity Reporting",
+        "rankings": [
+          {
+            "library": "helix",
+            "average": 11.76,
+            "rank": 1
+          },
+          {
+            "library": "material",
+            "average": 0,
+            "rank": 2
+          },
+          {
+            "library": "spectrum",
+            "average": 0,
+            "rank": 3
+          },
+          {
+            "library": "vaadin",
+            "average": 0,
+            "rank": 4
+          },
+          {
+            "library": "fluentui",
+            "average": 0,
+            "rank": 5
+          },
+          {
+            "library": "carbon",
+            "average": 0,
+            "rank": 6
+          },
+          {
+            "library": "ui5",
+            "average": 0,
+            "rank": 7
+          },
+          {
+            "library": "calcite",
+            "average": 0,
+            "rank": 8
+          },
+          {
+            "library": "porsche",
+            "average": 0,
+            "rank": 9
+          },
+          {
+            "library": "ionic",
+            "average": 0,
+            "rank": 10
+          },
+          {
+            "library": "wired",
+            "average": 0,
+            "rank": 11
+          },
+          {
+            "library": "elix",
+            "average": 0,
+            "rank": 12
+          }
+        ],
+        "spread": 11.76
+      },
+      {
+        "dimension": "AAA Audit Self-Certification",
+        "rankings": [
+          {
+            "library": "helix",
+            "average": 14.22,
+            "rank": 1
+          },
+          {
+            "library": "material",
+            "average": 0,
+            "rank": 2
+          },
+          {
+            "library": "spectrum",
+            "average": 0,
+            "rank": 3
+          },
+          {
+            "library": "vaadin",
+            "average": 0,
+            "rank": 4
+          },
+          {
+            "library": "fluentui",
+            "average": 0,
+            "rank": 5
+          },
+          {
+            "library": "carbon",
+            "average": 0,
+            "rank": 6
+          },
+          {
+            "library": "ui5",
+            "average": 0,
+            "rank": 7
+          },
+          {
+            "library": "calcite",
+            "average": 0,
+            "rank": 8
+          },
+          {
+            "library": "porsche",
+            "average": 0,
+            "rank": 9
+          },
+          {
+            "library": "ionic",
+            "average": 0,
+            "rank": 10
+          },
+          {
+            "library": "wired",
+            "average": 0,
+            "rank": 11
+          },
+          {
+            "library": "elix",
+            "average": 0,
+            "rank": 12
+          }
+        ],
+        "spread": 14.22
       }
     ],
     "differentiatingDimensions": [
@@ -3278,70 +4412,70 @@
       "Slot Architecture",
       "Event Architecture"
     ],
-    "timestamp": "2026-03-26T00:21:46.680Z"
+    "timestamp": "2026-05-11T04:40:13.417Z"
   },
   "performance": {
-    "totalMs": 3228,
+    "totalMs": 4068,
     "phases": [
       {
         "name": "load-libraries",
-        "durationMs": 179
+        "durationMs": 256
       },
       {
         "name": "score-all-libraries",
-        "durationMs": 3042
+        "durationMs": 3799
       },
       {
         "name": "score-material",
-        "durationMs": 248
+        "durationMs": 747
       },
       {
         "name": "score-spectrum",
-        "durationMs": 174
+        "durationMs": 252
       },
       {
         "name": "score-vaadin",
-        "durationMs": 847
+        "durationMs": 760
       },
       {
         "name": "score-fluentui",
-        "durationMs": 80
+        "durationMs": 29
       },
       {
         "name": "score-carbon",
-        "durationMs": 143
+        "durationMs": 106
       },
       {
         "name": "score-ui5",
-        "durationMs": 264
+        "durationMs": 308
       },
       {
         "name": "score-calcite",
-        "durationMs": 396
+        "durationMs": 556
       },
       {
         "name": "score-porsche",
-        "durationMs": 214
+        "durationMs": 138
       },
       {
         "name": "score-ionic",
-        "durationMs": 146
+        "durationMs": 116
       },
       {
         "name": "score-wired",
-        "durationMs": 52
+        "durationMs": 26
       },
       {
         "name": "score-elix",
-        "durationMs": 377
+        "durationMs": 464
       },
       {
         "name": "score-helix",
-        "durationMs": 101
+        "durationMs": 297
       },
       {
         "name": "generate-scorecards",
-        "durationMs": 7
+        "durationMs": 13
       },
       {
         "name": "generate-comparison",

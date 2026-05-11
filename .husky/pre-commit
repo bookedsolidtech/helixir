@@ -1,21 +1,69 @@
-# Secret scanning gate — must run BEFORE any other hooks
+#!/bin/sh
+# .husky/pre-commit — secret scan on staged files before commit
+#
+# Gates (in order):
+#   1. gitleaks protect --staged (REQUIRED — hard fail if not installed)
+#   2. .env and .envrc staged file check (always — no gitleaks dependency)
+#
+# Exit codes:
+#   0 = all gates passed
+#   1 = gate failed — commit blocked
+
+set -eu
+
+# ── Gate 1: gitleaks staged scan ──────────────────────────────────────────────
 if command -v gitleaks >/dev/null 2>&1; then
-  gitleaks protect --staged --config .gitleaks.toml --redact
-  if [ $? -ne 0 ]; then
+  echo "pre-commit: running gitleaks on staged files..."
+  if ! gitleaks protect --staged --redact --no-banner --config .gitleaks.toml 2>&1; then
     echo ""
-    echo "gitleaks: Potential secret detected in staged files. Commit blocked."
-    echo "Review the output above, remove the secret, and try again."
-    echo "To install gitleaks: brew install gitleaks"
+    echo "ERROR: gitleaks detected potential secrets in staged files."
+    echo "Review the output above, remove credentials, then re-stage."
+    echo ""
+    echo "To allowlist a false positive, add it to .gitleaks.toml [allowlist]"
     exit 1
   fi
+  echo "pre-commit: gitleaks scan passed"
 else
-  # Fallback: block commits that include .env* files if gitleaks is not installed
-  if git diff --cached --name-only | grep -qE '(^|/)\.env'; then
-    echo ""
-    echo "ERROR: Attempting to commit .env files. Install gitleaks to enable full secret scanning."
-    echo "To install: brew install gitleaks"
-    exit 1
-  fi
+  echo ""
+  echo "ERROR: gitleaks is required but not installed."
+  echo "Install: https://github.com/gitleaks/gitleaks#installing"
+  echo "  macOS:  brew install gitleaks"
+  echo "  Linux:  download from GitHub releases"
+  echo ""
+  echo "Secret scanning is mandatory. Install gitleaks and retry."
+  exit 1
 fi
 
-pnpm exec lint-staged
+# ── Gate 2: .env / .envrc staged file check ───────────────────────────────────
+# Check for .env* or .envrc files anywhere in the repo (including subdirectories)
+STAGED_ENV=$(git diff --cached --name-only 2>/dev/null \
+  | grep -E '(^|/)\.env(rc|$|\.)' \
+  | grep -v '\.example$' \
+  | grep -v '\.sample$' \
+  || true)
+
+if [ -n "$STAGED_ENV" ]; then
+  echo ""
+  echo "ERROR: Staged files include credential files:"
+  echo "$STAGED_ENV" | while IFS= read -r f; do echo "  $f"; done
+  echo ""
+  echo "These files must not be committed. Add them to .gitignore:"
+  echo "  echo '.env' >> .gitignore"
+  echo "  echo '.envrc' >> .gitignore"
+  echo ""
+  exit 1
+fi
+
+# ── Gate 3: lint-staged (ESLint + Prettier on staged files) ───────────────────
+# Restores the auto-fix/format pass that this hook used to run before the
+# rea-driven secret-scan rewrite. lint-staged is configured in package.json
+# under the "lint-staged" key.
+if [ -x "node_modules/.bin/lint-staged" ]; then
+  echo "pre-commit: running lint-staged..."
+  node_modules/.bin/lint-staged
+elif command -v pnpm > /dev/null 2>&1; then
+  echo "pre-commit: running lint-staged via pnpm exec..."
+  pnpm exec lint-staged
+fi
+
+exit 0

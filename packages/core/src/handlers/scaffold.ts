@@ -56,6 +56,10 @@ export interface DetectedConventions {
   prefix: string;
   /** Most common base class found in the CEM (e.g. "LitElement"). */
   baseClass: string;
+  /** Module path the base class is exported from, when the CEM records it. */
+  baseClassModule?: string | null;
+  /** Package name the base class is exported from, when the CEM records it. */
+  baseClassPackage?: string | null;
   /** Package name detected from inherited members, or null if not found. */
   packageName: string | null;
 }
@@ -113,11 +117,26 @@ export function detectConventions(cem: Cem, configPrefix?: string): DetectedConv
 
   // --- Base class ---
   let baseClass = 'LitElement';
+  let baseClassModule: string | null = null;
+  let baseClassPackage: string | null = null;
   const superclassCounts = new Map<string, number>();
+  // Track first-seen import origin (module/package) for each candidate base
+  // class so the eventual winner can be imported correctly in scaffolded code.
+  const superclassOrigins = new Map<string, { module: string | null; package: string | null }>();
   for (const decl of declarations) {
     if (decl.superclass?.name) {
       const sc = decl.superclass.name;
       superclassCounts.set(sc, (superclassCounts.get(sc) ?? 0) + 1);
+      // Merge origin metadata across declarations — once a non-null module or
+      // package is recorded for a candidate base class, it sticks. Mixed-
+      // quality CEMs (first decl omits superclass.module, a later one
+      // includes it) would otherwise leave the entry permanently empty and
+      // force the generator to emit a TODO instead of a real import.
+      const existing = superclassOrigins.get(sc) ?? { module: null, package: null };
+      superclassOrigins.set(sc, {
+        module: existing.module ?? decl.superclass.module ?? null,
+        package: existing.package ?? decl.superclass.package ?? null,
+      });
     }
   }
   let maxSc = 0;
@@ -125,6 +144,13 @@ export function detectConventions(cem: Cem, configPrefix?: string): DetectedConv
     if (n > maxSc) {
       maxSc = n;
       baseClass = sc;
+    }
+  }
+  if (baseClass !== 'LitElement') {
+    const origin = superclassOrigins.get(baseClass);
+    if (origin) {
+      baseClassModule = origin.module;
+      baseClassPackage = origin.package;
     }
   }
 
@@ -139,7 +165,7 @@ export function detectConventions(cem: Cem, configPrefix?: string): DetectedConv
     }
   }
 
-  return { prefix, baseClass, packageName };
+  return { prefix, baseClass, baseClassModule, baseClassPackage, packageName };
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -178,9 +204,85 @@ function generateComponentSource(
   const baseClass = options.baseClass ?? conventions.baseClass;
   const lines: string[] = [];
 
-  // Imports
+  // Imports — lit exports html/css always; LitElement only when it is the base
+  // class. Non-Lit base classes need a separate import resolved from the CEM's
+  // recorded origin (package preferred, module fallback) so the generated file
+  // does not reference an undefined symbol.
   lines.push(`import { ${baseClass === 'LitElement' ? 'LitElement, ' : ''}html, css } from 'lit';`);
   lines.push(`import { customElement, property } from 'lit/decorators.js';`);
+  if (baseClass !== 'LitElement') {
+    // Only trust origin metadata that belongs to THIS specific base class.
+    // Pinned per `bst-cto-kb/Projects/HELiXiR/HELiXiR migration retry
+    // runbook — rea 0.13.0 (2026-05-03).md` §4b: **package wins,
+    // bare-specifier module fallback, local-relative module → TODO.**
+    //
+    // The runbook recommends "module-first with package fallback" in
+    // the COMMON case where module is a published bare specifier
+    // (matches Node resolution). But CEM `superclass.module` is often
+    // a SOURCE-relative path that won't resolve at an arbitrary
+    // scaffold destination. Codex round-3 P2 correctly flagged that
+    // emitting such imports is broken-by-default. The reconciled
+    // pin: prefer package (portable everywhere); fall back to module
+    // only when it looks like a bare specifier; otherwise TODO.
+    //
+    // When options.baseClass overrides the detected one (e.g. caller
+    // forces FormAssociatedMixin while the library's detected base is
+    // BookedSolidElement), conventions.* describes the detected class,
+    // not the override — using it would import the override from the
+    // wrong package. Use the detected origin only when the names match.
+    // A "bare specifier" is one Node will resolve via package lookup —
+    // a published npm package name. A path that LOOKS bare-ish but
+    // starts with a conventional repo-directory prefix (packages/,
+    // src/, lib/, apps/, dist/, build/, node_modules/) is almost
+    // certainly a repo-relative module path that won't resolve at the
+    // scaffold destination. Reject those too, per codex round-8 P2.
+    const REPO_RELATIVE_PREFIXES = [
+      'packages/',
+      'src/',
+      'lib/',
+      'apps/',
+      'dist/',
+      'build/',
+      'node_modules/',
+    ];
+    const isBareSpecifier = (s: string): boolean => {
+      if (s === '') return false;
+      // POSIX path prefixes
+      if (s.startsWith('.') || s.startsWith('/')) return false;
+      // Windows path prefixes: backslash-leading and drive-letter forms.
+      // CEMs generated on Windows can record `C:\\repo\\base.js` or
+      // `src\\base.js`; either is a local path, not a npm bare specifier.
+      // Codex round-13 P2.
+      if (s.startsWith('\\') || /^[A-Za-z]:[\\/]/.test(s)) return false;
+      // Normalize Windows backslashes to POSIX so the conventional-prefix
+      // check catches multi-segment paths like `src\\generated\\base.js`
+      // and `node_modules\\pkg\\base.js`. Codex round-21 P2.
+      const normalized = s.includes('\\') ? s.split('\\').join('/') : s;
+      for (const prefix of REPO_RELATIVE_PREFIXES) {
+        if (normalized.startsWith(prefix)) return false;
+      }
+      return true;
+    };
+    const moduleIsBare =
+      typeof conventions.baseClassModule === 'string' &&
+      isBareSpecifier(conventions.baseClassModule);
+    const baseSpecifier =
+      baseClass === conventions.baseClass
+        ? (conventions.baseClassPackage ??
+          (moduleIsBare ? conventions.baseClassModule : null) ??
+          null)
+        : null;
+    if (baseSpecifier) {
+      lines.push(`import { ${baseClass} } from '${baseSpecifier}';`);
+    } else {
+      // Origin unknown, override with no metadata, OR module is a
+      // local-relative path that won't resolve at the destination.
+      // Emit a TODO so the generated file flags the missing import
+      // explicitly rather than silently referencing an undefined or
+      // wrong symbol.
+      lines.push(`// TODO: import { ${baseClass} } from '<package>';`);
+    }
+  }
   lines.push('');
 
   // JSDoc block with CEM annotations (@slot, @csspart, @fires)

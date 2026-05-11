@@ -1,0 +1,19 @@
+{
+  "generatedAt": "2026-05-10T20:28:11.924Z",
+  "standards": "WCAG 2.2 AAA",
+  "components": {
+    "hx-button": {
+      "1.4.9": { "verdict": "Supports", "evidence": "ok" },
+      "2.1.3": { "verdict": "Supports", "evidence": "ok" },
+      "2.3.3": { "verdict": "Supports", "evidence": "ok" },
+      "3.2.5": { "verdict": "Supports", "evidence": "ok" },
+      "3.3.6": { "verdict": "Supports", "evidence": "ok" },
+      "forced-colors": { "verdict": "Supports", "evidence": "ok" },
+      "apg-keyboard": { "verdict": "Supports", "evidence": "ok" },
+      "1.4.6": { "verdict": "Supports", "evidence": "ok" },
+      "2.4.12": { "verdict": "Supports", "evidence": "ok" },
+      "2.4.13": { "verdict": "Supports", "evidence": "ok" },
+      "2.5.5": { "verdict": "Supports", "evidence": "ok" }
+    }
+  }
+}

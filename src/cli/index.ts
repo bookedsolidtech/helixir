@@ -3,6 +3,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { loadConfig } from '../../packages/core/src/config.js';
+import { handleToolError } from '../../packages/core/src/shared/error-handling.js';
 import { CemSchema } from '../../packages/core/src/handlers/cem.js';
 import type { Cem, CemDeclaration } from '../../packages/core/src/handlers/cem.js';
 import { parseCem, diffCem, listAllComponents } from '../../packages/core/src/handlers/cem.js';
@@ -26,7 +27,7 @@ import { generateTypeDefinitions } from '../../packages/core/src/handlers/genera
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type OutputFormat = 'table' | 'json' | 'markdown';
+type OutputFormat = 'table' | 'json' | 'json-array' | 'markdown';
 
 interface CliOptions {
   format: OutputFormat;
@@ -138,7 +139,7 @@ async function cmdAnalyze(args: string[], opts: CliOptions): Promise<void> {
     const decl = getAllDeclarations(cem).find((d) => d.tagName === tag);
     const accessibility = decl ? analyzeAccessibility(decl) : null;
 
-    if (opts.format === 'json') {
+    if (opts.format === 'json' || opts.format === 'json-array') {
       output({ metadata: meta, accessibility }, 'json');
     } else {
       const rows: string[][] = [
@@ -160,7 +161,7 @@ async function cmdAnalyze(args: string[], opts: CliOptions): Promise<void> {
     }
   } else {
     const tags = listAllComponents(cem);
-    if (opts.format === 'json') {
+    if (opts.format === 'json' || opts.format === 'json-array') {
       output(tags, 'json');
     } else {
       output(
@@ -179,13 +180,13 @@ async function cmdHealth(args: string[], opts: CliOptions): Promise<void> {
   const config = loadConfig();
 
   if (opts.trend) {
-    const tag = args[0];
-    if (!tag) {
+    if (args.length < 1) {
       process.stderr.write('Error: --trend requires a tag name\n');
       process.exit(1);
     }
+    const tag = args[0] as string;
     const trend = await getHealthTrend(config, tag);
-    if (opts.format === 'json') {
+    if (opts.format === 'json' || opts.format === 'json-array') {
       output(trend, 'json');
     } else {
       const rows = trend.dataPoints.map((dp) => [dp.date, String(dp.score), dp.grade]);
@@ -209,7 +210,7 @@ async function cmdHealth(args: string[], opts: CliOptions): Promise<void> {
     scores = await scoreAllComponents(config, decls);
   }
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
     output(scores, 'json');
   } else {
     const rows = scores.map((s) => [s.tagName, String(s.score), s.grade, s.issues.join('; ')]);
@@ -239,11 +240,57 @@ async function cmdDiff(args: string[], opts: CliOptions): Promise<void> {
     const allBreaking = results.flatMap((r, i) =>
       r.breaking.map((b) => ({ tag: tags[i] as string, change: b })),
     );
+    const indeterminate = results
+      .map((r, i) => ({ tag: tags[i] as string, diff: r }))
+      .filter((r) => r.diff.baseUnavailable === true);
 
-    if (opts.format === 'json') {
-      output(allBreaking, 'json');
-    } else if (allBreaking.length === 0) {
+    if (opts.format === 'json' || opts.format === 'json-array') {
+      // Default `--format json` emits `{ schemaVersion, breaking,
+      // indeterminate }` — an object so stdout-only consumers can
+      // distinguish "clean" from "unscanned" (round 56/69 P1).
+      // Backward-compat `--format json-array` emits the historical
+      // top-level array of breaking changes (round 65/74 P1) for
+      // automation pinned to the old shape; indeterminate components
+      // are written as a sidecar JSON line on stderr in that mode.
+      // CHANGELOG: 0.6 changed default `--format json` from array
+      // to object. Pin `--format json-array` for the legacy shape.
+      if (opts.format === 'json-array') {
+        output(allBreaking, 'json');
+        if (indeterminate.length > 0) {
+          process.stderr.write(
+            JSON.stringify({
+              indeterminate: indeterminate.map((r) => ({
+                tag: r.tag,
+                baseUnavailableReason: r.diff.baseUnavailableReason ?? null,
+              })),
+            }) + '\n',
+          );
+        }
+      } else {
+        output(
+          {
+            schemaVersion: 2,
+            breaking: allBreaking,
+            indeterminate: indeterminate.map((r) => ({
+              tag: r.tag,
+              baseUnavailableReason: r.diff.baseUnavailableReason ?? null,
+            })),
+          },
+          'json',
+        );
+      }
+    } else if (allBreaking.length === 0 && indeterminate.length === 0) {
       process.stdout.write('No breaking changes detected.\n');
+    } else if (allBreaking.length === 0 && indeterminate.length > 0) {
+      // Surface the indeterminate state — the diff couldn't be
+      // computed for these components, so silence is NOT safety.
+      // Codex round-55 P2.
+      process.stdout.write(
+        `Diff INDETERMINATE for ${indeterminate.length} component(s) — base CEM unavailable. Treat as not-yet-checked, not as clean.\n`,
+      );
+      for (const { tag: t, diff } of indeterminate) {
+        process.stdout.write(`  • ${t}: ${diff.baseUnavailableReason ?? '<no reason>'}\n`);
+      }
     } else {
       output(
         null,
@@ -253,9 +300,16 @@ async function cmdDiff(args: string[], opts: CliOptions): Promise<void> {
           allBreaking.map((r) => [r.tag, r.change]),
         ),
       );
+      if (indeterminate.length > 0) {
+        process.stdout.write(
+          `\nAdditionally, ${indeterminate.length} component(s) returned INDETERMINATE diffs (base CEM unavailable).\n`,
+        );
+      }
     }
 
-    if (opts.ci && allBreaking.length > 0) {
+    // CI-fail when ANY breaking change OR any indeterminate diff —
+    // an indeterminate state is not safe to merge through.
+    if (opts.ci && (allBreaking.length > 0 || indeterminate.length > 0)) {
       process.exit(2);
     }
     return;
@@ -263,8 +317,21 @@ async function cmdDiff(args: string[], opts: CliOptions): Promise<void> {
 
   const diff = await diffCem(tag, opts.base, config, cem);
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
+    // Single-component diff: same DiffResult object regardless of
+    // json vs json-array since this isn't a multi-component aggregation
+    // (the legacy array shape only existed for multi-tag scans).
+    // Codex round-75 P2: pinning --format json-array globally
+    // shouldn't break per-tag jobs.
     output(diff, 'json');
+  } else if (diff.baseUnavailable === true) {
+    // Codex round-55 P2: indeterminate is distinct from clean.
+    process.stdout.write(
+      `Diff INDETERMINATE for <${tag}> vs ${opts.base} — base CEM unavailable.\n`,
+    );
+    if (diff.baseUnavailableReason !== undefined && diff.baseUnavailableReason !== '') {
+      process.stdout.write(`Reason: ${diff.baseUnavailableReason}\n`);
+    }
   } else if (diff.breaking.length === 0 && diff.additions.length === 0) {
     process.stdout.write(`No changes detected for <${tag}> vs ${opts.base}.\n`);
   } else {
@@ -275,7 +342,8 @@ async function cmdDiff(args: string[], opts: CliOptions): Promise<void> {
     output(null, opts.format, formatTable(['Type', 'Change'], rows));
   }
 
-  if (opts.ci && diff.breaking.length > 0) {
+  // CI-fail on breaking changes OR an indeterminate diff.
+  if (opts.ci && (diff.breaking.length > 0 || diff.baseUnavailable === true)) {
     process.exit(2);
   }
 }
@@ -283,16 +351,16 @@ async function cmdDiff(args: string[], opts: CliOptions): Promise<void> {
 async function cmdMigrate(args: string[], opts: CliOptions): Promise<void> {
   const config = loadConfig();
   const cem = loadCem(config.cemPath, config.projectRoot);
-  const tag = args[0];
 
-  if (!tag) {
+  if (args.length < 1) {
     process.stderr.write('Error: migrate requires a tag name\n');
     process.exit(1);
   }
+  const tag = args[0] as string;
 
   const guide = await generateMigrationGuide(tag, opts.base, config, cem);
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
     output(guide, 'json');
   } else {
     output(null, opts.format, guide.markdown);
@@ -302,16 +370,16 @@ async function cmdMigrate(args: string[], opts: CliOptions): Promise<void> {
 async function cmdSuggest(args: string[], opts: CliOptions): Promise<void> {
   const config = loadConfig();
   const cem = loadCem(config.cemPath, config.projectRoot);
-  const tag = args[0];
 
-  if (!tag) {
+  if (args.length < 1) {
     process.stderr.write('Error: suggest requires a tag name\n');
     process.exit(1);
   }
+  const tag = args[0] as string;
 
   const result = await suggestUsage(tag, config, cem);
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
     output(result, 'json');
   } else {
     const sections: string[] = [`HTML:\n${result.htmlSnippet}`];
@@ -324,17 +392,17 @@ async function cmdSuggest(args: string[], opts: CliOptions): Promise<void> {
 
 async function cmdBundle(args: string[], opts: CliOptions): Promise<void> {
   const config = loadConfig();
-  const tag = args[0];
 
-  if (!tag) {
+  if (args.length < 1) {
     process.stderr.write('Error: bundle requires a tag name\n');
     process.exit(1);
   }
+  const tag = args[0] as string;
 
   const result = await estimateBundleSize(tag, config);
   const fp = result.estimates.full_package;
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
     output(result, 'json');
   } else {
     const rows: string[][] = [
@@ -362,7 +430,7 @@ async function cmdTokens(args: string[], opts: CliOptions): Promise<void> {
     tokens = await getDesignTokens(config);
   }
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
     output(tokens, 'json');
   } else {
     const rows = tokens.map((t) => [t.name, String(t.value), t.category, t.description ?? '']);
@@ -372,17 +440,17 @@ async function cmdTokens(args: string[], opts: CliOptions): Promise<void> {
 
 async function cmdCompare(args: string[], opts: CliOptions): Promise<void> {
   const config = loadConfig();
-  const cemA = args[0];
-  const cemB = args[1];
 
-  if (!cemA || !cemB) {
+  if (args.length < 2) {
     process.stderr.write('Error: compare requires two CEM paths\n');
     process.exit(1);
   }
+  const cemA = args[0] as string;
+  const cemB = args[1] as string;
 
   const result = await compareLibraries({ cemPathA: cemA, cemPathB: cemB }, config);
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
     output(result, 'json');
   } else {
     const rows: string[][] = [
@@ -410,7 +478,7 @@ async function cmdBenchmark(args: string[], opts: CliOptions): Promise<void> {
   const libraries = args.map((p) => ({ label: p, cemPath: p }));
   const result = await benchmarkLibraries(libraries, config);
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
     output(result.scores, 'json');
   } else {
     output(null, opts.format, result.formatted);
@@ -419,12 +487,12 @@ async function cmdBenchmark(args: string[], opts: CliOptions): Promise<void> {
 
 async function cmdValidate(args: string[], opts: CliOptions): Promise<void> {
   const config = loadConfig();
-  const tag = args[0];
 
-  if (!tag) {
+  if (args.length < 1) {
     process.stderr.write('Error: validate requires a tag name\n');
     process.exit(1);
   }
+  const tag = args[0] as string;
   if (!opts.html) {
     process.stderr.write('Error: validate requires --html "<snippet>"\n');
     process.exit(1);
@@ -433,7 +501,7 @@ async function cmdValidate(args: string[], opts: CliOptions): Promise<void> {
   const cem = loadCem(config.cemPath, config.projectRoot);
   const result = validateUsage(tag, opts.html, cem);
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
     output(result, 'json');
   } else if (result.issues.length === 0) {
     process.stdout.write('Validation passed — no issues found.\n');
@@ -445,17 +513,16 @@ async function cmdValidate(args: string[], opts: CliOptions): Promise<void> {
 
 async function cmdCdn(args: string[], opts: CliOptions): Promise<void> {
   const config = loadConfig();
-  const pkg = args[0];
 
-  if (!pkg) {
+  if (args.length < 1) {
     process.stderr.write('Error: cdn requires a package name\n');
     process.exit(1);
   }
-
-  const version = args[1] ?? 'latest';
+  const pkg = args[0] as string;
+  const version = args.length >= 2 ? (args[1] as string) : 'latest';
   const result = await resolveCdnCem(pkg, version, opts.registry, config);
 
-  if (opts.format === 'json') {
+  if (opts.format === 'json' || opts.format === 'json-array') {
     output(result, 'json');
   } else {
     const rows: string[][] = [
@@ -480,7 +547,7 @@ async function cmdGenerateTypes(_args: string[], opts: CliOptions): Promise<void
     writeFileSync(outPath, result.typescript, 'utf-8');
     process.stdout.write(`Wrote TypeScript definitions to ${outPath}\n`);
     process.stdout.write(result.formatted + '\n');
-  } else if (opts.format === 'json') {
+  } else if (opts.format === 'json' || opts.format === 'json-array') {
     output({ typescript: result.typescript, componentCount: result.componentCount }, 'json');
   } else {
     process.stdout.write(result.typescript);
@@ -524,13 +591,13 @@ export async function runCli(): Promise<void> {
     values = result.values;
     positionals = result.positionals;
   } catch (err) {
-    process.stderr.write(`Error: ${String(err)}\n`);
+    process.stderr.write(`Error: ${handleToolError(err).message}\n`);
     process.exit(1);
   }
 
   const isTTY = Boolean(process.stdout.isTTY);
   const rawFormat = values.format ?? (isTTY ? 'table' : 'json');
-  const validFormats = ['table', 'json', 'markdown'] as const;
+  const validFormats = ['table', 'json', 'json-array', 'markdown'] as const;
   const format: OutputFormat = (validFormats as readonly string[]).includes(rawFormat)
     ? (rawFormat as OutputFormat)
     : 'table';
@@ -612,7 +679,7 @@ export async function runCli(): Promise<void> {
         process.exit(1);
     }
   } catch (err) {
-    process.stderr.write(`Error: ${String(err)}\n`);
+    process.stderr.write(`Error: ${handleToolError(err).message}\n`);
     process.exit(1);
   }
 }

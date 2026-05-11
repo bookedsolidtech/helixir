@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "rea-gateway": {
+      "command": "node",
+      "args": ["node_modules/@bookedsolid/rea/dist/cli/index.js", "serve"],
+      "env": {}
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "classId": "15-aaa-cert-overclaim",
+  "subclassTagName": "hx-cert-overclaim",
+  "parentTagName": "hx-parent-button",
+  "dimensions": {
+    "WCAG Conformance": {
+      "scoreMax": 70,
+      "confidenceIn": ["heuristic", "low"],
+      "issueIncludes": "cert-claim-evidence-mismatch"
+    },
+    "Focus Indicator": {
+      "scoreMax": 30,
+      "confidenceIn": ["heuristic", "high"],
+      "issueIncludes": "focus-ring-degraded"
+    }
+  },
+  "groundTruthCommit": "e54e069ff",
+  "notes": "Parent claims AAA SC 2.4.13. Subclass overrides focus-ring to 1px solid #888. Cert claim is inherited but contradicted by evidence."
+}

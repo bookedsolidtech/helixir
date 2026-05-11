@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "2.1.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "subclass/hx-focus-degraded.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Subclass that strips the parent's :focus-visible outline.",
+          "name": "HxFocusDegraded",
+          "tagName": "hx-focus-degraded",
+          "superclass": {
+            "name": "HxParentTab",
+            "module": "parent/hx-parent-tab.ts"
+          },
+          "members": [],
+          "attributes": [],
+          "helixMeta": {
+            "ariaPattern": "tab",
+            "keyboardContract": {
+              "activate": ["Enter", "Space"],
+              "navigate": ["ArrowLeft", "ArrowRight", "Home", "End"],
+              "disabledSuppresses": true
+            }
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-focus-degraded",
+          "declaration": { "name": "HxFocusDegraded", "module": "subclass/hx-focus-degraded.ts" }
+        }
+      ]
+    }
+  ]
+}

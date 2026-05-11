@@ -53,7 +53,13 @@ function renderAttributesInterface(decl: CemDeclaration): string | null {
       lines.push(`  /** ${m.description} */`);
     }
     // ✅ Use m.attribute (HTML attribute name), NOT m.name (JS property name).
-    lines.push(`  ${m.attribute}?: ${m.type?.text ?? 'string'};`);
+    // Kebab-case attribute names like "open-delay" are not valid TypeScript
+    // identifiers, so they must be emitted as quoted string-literal keys or
+    // the generated declaration file will fail to parse.
+    const key = /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(m.attribute as string)
+      ? (m.attribute as string)
+      : JSON.stringify(m.attribute);
+    lines.push(`  ${key}?: ${m.type?.text ?? 'string'};`);
   }
 
   lines.push('}');

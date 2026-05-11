@@ -2,8 +2,9 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { existsSync, readFileSync, watch as fsWatch } from 'fs';
-import { resolve, relative, sep } from 'path';
+import { isAbsolute, resolve, relative, sep } from 'path';
 import { loadConfig } from '../../packages/core/src/config.js';
+import { handleToolError } from '../../packages/core/src/shared/error-handling.js';
 import { CemSchema, loadLibrary, resolveCem } from '../../packages/core/src/handlers/cem.js';
 import type { Cem } from '../../packages/core/src/handlers/cem.js';
 import {
@@ -92,6 +93,42 @@ import {
   handleThemeCall,
   isThemeTool,
 } from '../../packages/core/src/tools/theme.js';
+import {
+  SCAFFOLD_TOOL_DEFINITIONS,
+  handleScaffoldCall,
+  isScaffoldTool,
+} from '../../packages/core/src/tools/scaffold.js';
+import {
+  EXTEND_TOOL_DEFINITIONS,
+  handleExtendCall,
+  isExtendTool,
+} from '../../packages/core/src/tools/extend.js';
+// M3 — per-component codex audit pipeline
+import {
+  CODEX_AUDIT_TOOL_DEFINITIONS,
+  handleCodexAuditTool,
+  isCodexAuditTool,
+} from '../../packages/core/src/tools/codex-audit.js';
+// M4 — token-extension verification (R12-R32 alias awareness)
+import {
+  TOKEN_VERIFICATION_TOOL_DEFINITIONS,
+  handleTokenVerificationTool,
+  isTokenVerificationTool,
+} from '../../packages/core/src/tools/verify-token-inheritance.js';
+// M5 — component-extension contract verification
+import {
+  VERIFY_EXTENSION_TOOL_DEFINITIONS,
+  handleVerifyExtensionTool,
+  isVerifyExtensionTool,
+} from '../../packages/core/src/tools/verify-extension.js';
+// M6 — adoption: machine-readable tool catalog so agents can
+// auto-discover what to call instead of greping docs.
+import {
+  TOOL_CATALOG_TOOL_DEFINITIONS,
+  handleToolCatalogCall,
+  isToolCatalogTool,
+  setCatalogedTools,
+} from '../../packages/core/src/tools/tool-catalog.js';
 import { createErrorResponse } from '../../packages/core/src/shared/mcp-helpers.js';
 import type { MCPToolResult } from '../../packages/core/src/shared/mcp-helpers.js';
 
@@ -138,7 +175,7 @@ function startCemWatcher(cemAbsPath: string): void {
         );
         prevCount = componentCount;
       } catch (err) {
-        process.stderr.write(`[helixir] CEM reload failed: ${String(err)}\n`);
+        process.stderr.write(`[helixir] CEM reload failed: ${handleToolError(err).message}\n`);
       } finally {
         cemReloading = false;
       }
@@ -154,8 +191,40 @@ export async function main(): Promise<void> {
   const resolvedProjectRoot = resolve(config.projectRoot);
   const cemAbsPath = resolve(resolvedProjectRoot, config.cemPath);
 
-  // Verify the resolved cemPath is contained within projectRoot (prevent absolute cemPath escaping).
-  if (!cemAbsPath.startsWith(resolvedProjectRoot + sep) && cemAbsPath !== resolvedProjectRoot) {
+  // Containment check on cemPath. Bypass paths (any of which is enough):
+  //   - MCP_WC_CEM_PATH is set to an ABSOLUTE path. Documented escape hatch
+  //     for editor/CI setups that point at a shared/fixture CEM. Absolute
+  //     = explicit user intent, no path-traversal exposure.
+  //   - MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1 was set AND the absolute
+  //     cemPath came through loadConfig's external-config opt-in
+  //     (config.ts §4a). Without this, sibling/vendored CEMs configured
+  //     through helixir.mcp.json are dropped at load time but the user
+  //     thinks they opted in successfully. Codex round-11 P1.
+  //
+  // Relative env-var values (e.g. `../shared/cem.json`) and unaccepted
+  // config-file values are still subject to containment — those ARE
+  // traversal vectors.
+  //
+  // Trade-off: out-of-tree CEMs degrade git-backed tools (diffCem,
+  // getHealthDiff) — both surface this with stderr warnings at call
+  // time so the user knows which features are degraded.
+  const cemEnvOverride = process.env['MCP_WC_CEM_PATH'];
+  const envCemOptIn =
+    cemEnvOverride !== undefined && cemEnvOverride !== '' && isAbsolute(cemEnvOverride);
+  // External-config opt-in: the loader stamps cemPathFromExternalConfig
+  // when the cemPath was actually preserved from the trusted
+  // MCP_WC_CONFIG_PATH external file via the
+  // MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1 opt-in. This is provenance
+  // ground-truth — env-var inference fell over for the cases codex
+  // rounds 12, 13, and 14 flagged (relative MCP_WC_CEM_PATH override,
+  // missing/malformed external path falling back to in-repo discovery).
+  const envConfigOptIn = config.cemPathFromExternalConfig === true;
+  if (
+    !envCemOptIn &&
+    !envConfigOptIn &&
+    !cemAbsPath.startsWith(resolvedProjectRoot + sep) &&
+    cemAbsPath !== resolvedProjectRoot
+  ) {
     process.stderr.write(`Fatal: cemPath resolves outside of projectRoot. Refusing to load.\n`);
     process.exit(1);
   }
@@ -173,7 +242,9 @@ export async function main(): Promise<void> {
     loadCem(cemAbsPath);
   } catch (err) {
     const relPath = relative(resolvedProjectRoot, cemAbsPath);
-    process.stderr.write(`Fatal: CEM file at ${relPath} is invalid: ${String(err)}\n`);
+    process.stderr.write(
+      `Fatal: CEM file at ${relPath} is invalid: ${handleToolError(err).message}\n`,
+    );
     process.exit(1);
   }
 
@@ -199,10 +270,24 @@ export async function main(): Promise<void> {
     ...TYPEGENERATE_TOOL_DEFINITIONS,
     ...STYLING_TOOL_DEFINITIONS,
     ...THEME_TOOL_DEFINITIONS,
+    ...SCAFFOLD_TOOL_DEFINITIONS,
+    ...EXTEND_TOOL_DEFINITIONS,
+    // M3 / M4 / M5 — per-component audit, token-inheritance verification,
+    // extension contract verification.
+    ...CODEX_AUDIT_TOOL_DEFINITIONS,
+    ...TOKEN_VERIFICATION_TOOL_DEFINITIONS,
+    ...VERIFY_EXTENSION_TOOL_DEFINITIONS,
+    // M6 — agent-discoverable tool catalog.
+    ...TOOL_CATALOG_TOOL_DEFINITIONS,
     ...tsTools,
   ];
 
   const allTools = [...coreTools, ...TOKEN_TOOL_DEFINITIONS];
+
+  // Tell the catalog handler about EVERY registered tool, not just
+  // coreTools — list_helixir_tools must agree with what ListTools
+  // advertises. Codex round-26 (M3-M6 local preview) P2.
+  setCatalogedTools(allTools);
 
   server.setRequestHandler(ListToolsRequestSchema, async () => {
     return { tools: allTools };
@@ -290,6 +375,66 @@ export async function main(): Promise<void> {
           );
         return handleThemeCall(name, typedArgs, resolveCem(libraryId, cemCache));
       }
+      if (isScaffoldTool(name)) {
+        if (cemCache === null || cemReloading)
+          return createErrorResponse(
+            'CEM not yet loaded — server is still initializing. Please retry.',
+          );
+        return handleScaffoldCall(name, typedArgs, config, resolveCem(libraryId, cemCache));
+      }
+      if (isExtendTool(name)) {
+        if (cemCache === null || cemReloading)
+          return createErrorResponse(
+            'CEM not yet loaded — server is still initializing. Please retry.',
+          );
+        return handleExtendCall(name, typedArgs, resolveCem(libraryId, cemCache));
+      }
+      // M3 — per-component codex audit. Requires CEM for surface extraction.
+      if (isCodexAuditTool(name)) {
+        if (cemCache === null || cemReloading)
+          return createErrorResponse(
+            'CEM not yet loaded — server is still initializing. Please retry.',
+          );
+        return handleCodexAuditTool(name, typedArgs, config, resolveCem(libraryId, cemCache));
+      }
+      // M4 — token-extension verification. analyze_token_canonicality
+      // only needs the deprecated-aliases map (no CEM data), so it
+      // bypasses the watch-mode reload race. NOTE: the SERVER itself
+      // still requires a CEM at startup (see main()'s containment
+      // check). True "tokens-only repo" support would need separate
+      // work to decouple server bootstrap from CEM presence — out of
+      // scope for this milestone. This bypass only avoids the in-flight
+      // reload race for an already-running server. Codex round-33 P3 +
+      // round-35 P2.
+      if (isTokenVerificationTool(name)) {
+        if (name === 'analyze_token_canonicality') {
+          return handleTokenVerificationTool(name, typedArgs, config, {
+            schemaVersion: '1.0.0',
+            modules: [],
+          });
+        }
+        if (cemCache === null || cemReloading)
+          return createErrorResponse(
+            'CEM not yet loaded — server is still initializing. Please retry.',
+          );
+        return handleTokenVerificationTool(
+          name,
+          typedArgs,
+          config,
+          resolveCem(libraryId, cemCache),
+        );
+      }
+      // M5 — component-extension contract verification. Requires CEM
+      // for both parent and subclass declarations.
+      if (isVerifyExtensionTool(name)) {
+        if (cemCache === null || cemReloading)
+          return createErrorResponse(
+            'CEM not yet loaded — server is still initializing. Please retry.',
+          );
+        return handleVerifyExtensionTool(name, typedArgs, config, resolveCem(libraryId, cemCache));
+      }
+      // M6 — tool catalog. No CEM dependency.
+      if (isToolCatalogTool(name)) return handleToolCatalogCall(name, typedArgs, config);
       if (isBenchmarkTool(name)) return handleBenchmarkCall(name, typedArgs, config);
       if (isTypegenerateTool(name)) {
         if (cemCache === null || cemReloading)

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "2.1.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "parent/hx-parent-button.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "AAA-certified parent button with 2px focus ring.",
+          "name": "HxParentButton",
+          "tagName": "hx-parent-button",
+          "members": [
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "attribute": "disabled",
+              "reflects": true
+            }
+          ],
+          "attributes": [{ "name": "disabled", "type": { "text": "boolean" } }],
+          "slots": [{ "name": "", "description": "Button label." }],
+          "helixMeta": {
+            "aaa": {
+              "certified": true,
+              "certifiedDate": "2025-11-14",
+              "criteria": ["1.4.11", "2.4.7", "2.4.11", "2.4.13"],
+              "auditUrl": "https://audits.helix.dev/hx-parent-button/aaa-2025-11"
+            },
+            "ariaPattern": "button",
+            "keyboardContract": {
+              "activate": ["Space", "Enter"],
+              "disabledSuppresses": true
+            }
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-parent-button",
+          "declaration": { "name": "HxParentButton", "module": "parent/hx-parent-button.ts" }
+        }
+      ]
+    }
+  ]
+}

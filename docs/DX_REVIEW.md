@@ -19,7 +19,7 @@ This review audits HELiXiR from the perspective of a skeptical first-time user: 
 | `files` array includes `build/`, `README.md`, `CHANGELOG.md`     | ✅ `package.json:10-14`      |
 | `main` points to `build/index.js`                                | ✅ `package.json:9`          |
 | `bin` points to `./build/index.js`                               | ✅ `package.json:6-8`        |
-| `engines.node >= 20.0.0`                                         | ✅ `package.json:66-68`      |
+| `engines.node >= 22.0.0`                                         | ✅ `package.json:117-120`    |
 | `typescript` is optional peerDependency (not devDep runtime use) | ✅ `package.json:45-52`      |
 | Version `0.1.0` consistent in `package.json` and `src/index.ts`  | ✅ `src/index.ts:86`         |
 | `npm pack --dry-run` — no test fixtures or `.automaker` dirs     | ✅ 159 files, 98.9kB tarball |

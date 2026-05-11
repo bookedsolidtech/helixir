@@ -19,4 +19,11 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    files: ['tests/__fixtures__/**/*.ts'],
+    rules: {
+      '@typescript-eslint/ban-ts-comment': 'off',
+      '@typescript-eslint/no-useless-constructor': 'off',
+    },
+  },
 );

@@ -139,10 +139,12 @@ const HIGH_CEM_LOW_TYPE_DECL: CemDeclaration = {
 // ─── scoreComponentMultiDimensional ──────────────────────────────────────────
 
 describe('scoreComponentMultiDimensional', () => {
-  it('returns all 13 dimensions', async () => {
+  it('returns all 21 dimensions', async () => {
+    // Phase 3 dimensional upgrade: legacy 'Accessibility' split into 8 dims
+    // → 14 - 1 + 8 = 21.
     const config = makeConfig();
     const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
-    expect(result.dimensions).toHaveLength(14);
+    expect(result.dimensions).toHaveLength(21);
   });
 
   it('includes tagName in result', async () => {
@@ -151,22 +153,69 @@ describe('scoreComponentMultiDimensional', () => {
     expect(result.tagName).toBe('perfect-component');
   });
 
-  it('all CEM-native dimensions are measured', async () => {
+  it('measurable CEM-native dimensions are measured; source-dependent a11y dims are unknown without libraryRoot', async () => {
     const config = makeConfig();
     const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
     const cemNative = result.dimensions.filter(
       (d) => DIMENSION_REGISTRY.find((r) => r.name === d.name)?.source === 'cem-native',
     );
-    // CEM-Source Fidelity requires a cem parameter and source files, so it's not measured in unit tests
+    // CEM-Source Fidelity stays N/A when no CEM is passed — caller hasn't
+    // asked for cross-CEM analysis (preserves existing entry points like
+    // generateAuditReport(config, declarations) per round-2 codex review).
+    // Strict mode (M2 follow-up work) will surface this as `unknown` for
+    // callers that opt in.
     const cemSourceFidelity = cemNative.find((d) => d.name === 'CEM-Source Fidelity');
     expect(cemSourceFidelity).toBeDefined();
     expect(cemSourceFidelity?.measured).toBe(false);
-    // Naming Consistency requires library-wide conventions (passed via scoreAllComponentsMultiDimensional)
+    // Naming Consistency: when no precomputed conventions are passed AND
+    // no CEM is available to derive them from, it's `unknown`.
     const namingConsistency = cemNative.find((d) => d.name === 'Naming Consistency');
     expect(namingConsistency).toBeDefined();
-    expect(namingConsistency?.measured).toBe(false);
+    expect(namingConsistency?.measured).toBe(true);
+    expect(namingConsistency?.confidence).toBe('unknown');
+
+    // Phase 3 dimensional upgrade: 6 of the 8 new a11y dims depend on
+    // helix-AAA source signals (sourceChecks / verdictSnapshot from
+    // helix-aaa-evidence) that require `libraryRoot`. Without it, the
+    // scorers return `unknown` / `measured: false` by contract — they
+    // refuse to gaslight a verified verdict from missing inputs.
+    const SOURCE_DEPENDENT_A11Y_DIMS = [
+      'APG Keyboard Contract',
+      'Focus Indicator',
+      'Form Association',
+      'Forced Colors Mode',
+      'Form Validity Reporting',
+      'AAA Audit Self-Certification',
+    ];
+    for (const name of SOURCE_DEPENDENT_A11Y_DIMS) {
+      const dim = cemNative.find((d) => d.name === name);
+      expect(dim, `expected '${name}' in CEM-native dims`).toBeDefined();
+      // No libraryRoot → no sourceChecks → unknown. Per the codex-fixed
+      // contract these stay `measured: true` so they pull the weighted
+      // score down at score 0 — surfacing the gap rather than silently
+      // dropping out of the denominator (codex push-gate P1, 2026-05-10).
+      // The AAA Audit Self-Certification dim is weight-0 informational
+      // and returns confidence:'untested' (no helix audit md → N/A), so
+      // it's the one exception that legitimately drops as notApplicable.
+      if (name === 'AAA Audit Self-Certification') {
+        expect(dim?.confidence).toBe('untested');
+      } else {
+        expect(dim?.confidence).toBe('unknown');
+        expect(dim?.score).toBe(0);
+        expect(dim?.measured).toBe(true);
+      }
+    }
+
+    // The remaining CEM-native dims (everything not in the exception sets
+    // above) must be `measured: true`. This covers CEM Completeness,
+    // Type Coverage, API Surface Quality, CSS/Event/Slot Architecture,
+    // plus WCAG Conformance and Accessible Label Pattern (the two new
+    // a11y dims that can score from CEM evidence alone).
     const measurableNative = cemNative.filter(
-      (d) => d.name !== 'CEM-Source Fidelity' && d.name !== 'Naming Consistency',
+      (d) =>
+        d.name !== 'CEM-Source Fidelity' &&
+        d.name !== 'Naming Consistency' &&
+        !SOURCE_DEPENDENT_A11Y_DIMS.includes(d.name),
     );
     expect(measurableNative.every((d) => d.measured)).toBe(true);
   });
@@ -186,7 +235,31 @@ describe('scoreComponentMultiDimensional', () => {
     const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
     expect(result.confidenceSummary).toBeDefined();
     expect(result.confidenceSummary.verified).toBeGreaterThan(0);
-    expect(result.confidenceSummary.untested).toBe(7); // 5 external + CEM-Source Fidelity + Naming Consistency (no cem/conventions in unit tests)
+    // Phase 3 buckets for a bare CEM-only PERFECT_DECL (no libraryRoot,
+    // no history):
+    //   verified  (3): CEM Completeness, Type Coverage, Slot Architecture
+    //   heuristic (5): API Surface Quality, CSS Architecture, Event
+    //                   Architecture, WCAG Conformance, Accessible Label
+    //                   Pattern
+    //   untested  (7): 5 external dims (Test Coverage, Bundle Size,
+    //                   Story Coverage, Performance, Drupal Readiness)
+    //                   + CEM-Source Fidelity (N/A without CEM)
+    //                   + AAA Audit Self-Certification (untested without
+    //                   verdict snapshot)
+    //   unknown   (6): Naming Consistency (no conventions, no CEM) +
+    //                   5 source-dependent a11y dims that require
+    //                   libraryRoot (APG Keyboard Contract, Focus
+    //                   Indicator, Form Association, Forced Colors Mode,
+    //                   Form Validity Reporting)
+    expect(result.confidenceSummary.untested).toBe(7);
+    expect(result.confidenceSummary.unknown).toBe(6);
+    // Spot-check that the four buckets sum to the registry length.
+    const total =
+      result.confidenceSummary.verified +
+      result.confidenceSummary.heuristic +
+      result.confidenceSummary.untested +
+      result.confidenceSummary.unknown;
+    expect(total).toBe(21);
   });
 
   it('includes a timestamp', async () => {
@@ -248,14 +321,71 @@ describe('scoreComponentMultiDimensional', () => {
     expect(cemDim!.subMetrics!.length).toBeGreaterThan(0);
   });
 
-  it('Accessibility dimension wires in analyzeAccessibility output', async () => {
+  // Phase 3 dimensional upgrade: the legacy `Accessibility` dim was split
+  // into 8 dims. Each test below asserts the dispatcher routes through
+  // the corresponding Phase-2 scorer for a CEM-only PERFECT_DECL. The
+  // first two dims can score from CEM alone; the rest need libraryRoot
+  // source evidence to score and report `unknown` without it.
+
+  it('WCAG Conformance dimension wires through scoreWcagConformance', async () => {
     const config = makeConfig();
     const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
-    const a11y = result.dimensions.find((d) => d.name === 'Accessibility');
-    expect(a11y).toBeDefined();
-    expect(a11y!.measured).toBe(true);
-    expect(a11y!.confidence).toBe('heuristic');
-    expect(a11y!.subMetrics).toBeDefined();
+    const dim = result.dimensions.find((d) => d.name === 'WCAG Conformance');
+    expect(dim).toBeDefined();
+    // Branch 4 of scoreWcagConformance: CEM has aria-* member ('aria-label')
+    // → score 30, heuristic, measured=true.
+    expect(dim!.measured).toBe(true);
+    expect(dim!.confidence).toBe('heuristic');
+    expect(dim!.score).toBe(30);
+  });
+
+  it('APG Keyboard Contract dimension wires through scoreApgKeyboard', async () => {
+    const config = makeConfig();
+    const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
+    const dim = result.dimensions.find((d) => d.name === 'APG Keyboard Contract');
+    expect(dim).toBeDefined();
+    // No helixMeta.keyboardContract, no @keyboard-contract JSDoc, no CEM
+    // event whose name includes keydown/keyup/keypress (PERFECT_DECL's
+    // 'key-press' is hyphenated and doesn't substring-match the scorer's
+    // CEM-fallback predicate). All branches miss → unknown / score 0 /
+    // measured:true (surfaces in weighted score per codex-fix contract).
+    expect(dim!.confidence).toBe('unknown');
+    expect(dim!.score).toBe(0);
+    expect(dim!.measured).toBe(true);
+  });
+
+  it('Focus Indicator dimension wires through scoreFocusIndicator', async () => {
+    const config = makeConfig();
+    const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
+    const dim = result.dimensions.find((d) => d.name === 'Focus Indicator');
+    expect(dim).toBeDefined();
+    // No libraryRoot → no sourceChecks → unknown / score 0 / measured:true.
+    expect(dim!.confidence).toBe('unknown');
+    expect(dim!.score).toBe(0);
+    expect(dim!.measured).toBe(true);
+  });
+
+  it('Form Association dimension wires through scoreFormAssociation', async () => {
+    const config = makeConfig();
+    const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
+    const dim = result.dimensions.find((d) => d.name === 'Form Association');
+    expect(dim).toBeDefined();
+    // No helixMeta + no sourceChecks → unknown / score 0 / measured:true.
+    expect(dim!.confidence).toBe('unknown');
+    expect(dim!.score).toBe(0);
+    expect(dim!.measured).toBe(true);
+  });
+
+  it('Accessible Label Pattern dimension wires through scoreAccessibleLabel', async () => {
+    const config = makeConfig();
+    const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
+    const dim = result.dimensions.find((d) => d.name === 'Accessible Label Pattern');
+    expect(dim).toBeDefined();
+    // PERFECT_DECL has slot `label` AND member `label` / `aria-label` →
+    // CEM-label-surface heuristic returns 50 / heuristic.
+    expect(dim!.measured).toBe(true);
+    expect(dim!.confidence).toBe('heuristic');
+    expect(dim!.score).toBe(50);
   });
 
   it('Type Coverage dimension measures type annotations', async () => {
@@ -271,7 +401,7 @@ describe('scoreComponentMultiDimensional', () => {
   it('minimal component still returns valid result', async () => {
     const config = makeConfig();
     const result = await scoreComponentMultiDimensional(config, MINIMAL_DECL);
-    expect(result.dimensions).toHaveLength(14);
+    expect(result.dimensions).toHaveLength(21);
     expect(typeof result.score).toBe('number');
     expect(['A', 'B', 'C', 'D', 'F']).toContain(result.grade);
   });
@@ -297,14 +427,16 @@ describe('enterprise grade algorithm integration', () => {
     expect(tcDim!.score).toBeLessThan(100);
   });
 
-  it('untested critical dimensions (Test Coverage) affect grade', async () => {
+  it('untested critical dimensions affect grade', async () => {
     const config = makeConfig();
     const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
-    // Test Coverage is untested → should generate grading notes
+    // Test Coverage is untested (no external history) → in untested-critical bucket.
     const testDim = result.dimensions.find((d) => d.name === 'Test Coverage');
     expect(testDim!.measured).toBe(false);
     expect(testDim!.confidence).toBe('untested');
-    // Grading notes should mention untested
+    // CEM-Source Fidelity stays N/A in this single-component path
+    // (round-2 codex review pinned this — preserves existing callers).
+    // Test Coverage alone (1 untested critical) gates A but B is reachable.
     expect(result.gradingNotes.some((n) => n.includes('untested'))).toBe(true);
   });
 
@@ -341,11 +473,11 @@ describe('scoreAllComponentsMultiDimensional', () => {
     expect(results[0]!.tagName).toBe('perfect-component');
   });
 
-  it('each result has all 13 dimensions', async () => {
+  it('each result has all 21 dimensions', async () => {
     const config = makeConfig();
     const results = await scoreAllComponentsMultiDimensional(config, [PERFECT_DECL, MINIMAL_DECL]);
     for (const result of results) {
-      expect(result.dimensions).toHaveLength(14);
+      expect(result.dimensions).toHaveLength(21);
     }
   });
 
@@ -365,7 +497,7 @@ describe('JSONL output shape', () => {
     const json = JSON.stringify(result);
     const parsed = JSON.parse(json) as MultiDimensionalHealth;
     expect(parsed.tagName).toBe('perfect-component');
-    expect(parsed.dimensions).toHaveLength(14);
+    expect(parsed.dimensions).toHaveLength(21);
   });
 
   it('each dimension in JSON has required fields', async () => {

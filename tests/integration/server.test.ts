@@ -140,7 +140,7 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
       });
     });
 
-    it('returns all expected tool names (71 core + 2 token when configured)', async () => {
+    it('returns all expected tool names (72 core + 2 token when configured)', async () => {
       sendRequest('tools/list', {});
       const response = await recv();
 
@@ -246,6 +246,8 @@ describe.skipIf(!SERVER_AVAILABLE)('MCP server integration (with tokensPath conf
         'verify_extension',
         // M6 — machine-readable tool catalog
         'list_helixir_tools',
+        // dimensional upgrade — helix AAA evidence detector
+        'detect_helix_evidence',
       ];
       const tokenTools = ['get_design_tokens', 'find_token'];
       const expectedTools = [...coreTools, ...tokenTools];

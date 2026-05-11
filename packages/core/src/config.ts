@@ -1,5 +1,5 @@
 import { readFileSync, existsSync } from 'fs';
-import { resolve } from 'path';
+import { dirname, isAbsolute, relative, resolve, sep } from 'path';
 import { discoverCemPath, FRIENDLY_CEM_ERROR } from './shared/discovery.js';
 
 /**
@@ -10,7 +10,12 @@ import { discoverCemPath, FRIENDLY_CEM_ERROR } from './shared/discovery.js';
 export interface ScoringWeights {
   /** CEM Completeness dimension */
   readonly documentation?: number;
-  /** Accessibility dimension */
+  /**
+   * Legacy single-axis accessibility multiplier.
+   * @deprecated use per-sub-dim weights; multiplier applies to all five
+   * split a11y dims (wcagConformance, apgKeyboard, focusIndicator,
+   * formAssociation, accessibleLabel) when set; removed in 0.8.0.
+   */
   readonly accessibility?: number;
   /** Type Coverage dimension */
   readonly typeCoverage?: number;
@@ -36,6 +41,23 @@ export interface ScoringWeights {
   readonly slotArchitecture?: number;
   /** Naming Consistency dimension */
   readonly naming?: number;
+  // ── Phase 3 dimensional upgrade: per-sub-dim a11y weights ─────────────
+  /** WCAG Conformance dimension */
+  readonly wcagConformance?: number;
+  /** APG Keyboard Contract dimension */
+  readonly apgKeyboard?: number;
+  /** Focus Indicator dimension */
+  readonly focusIndicator?: number;
+  /** Form Association dimension */
+  readonly formAssociation?: number;
+  /** Accessible Label Pattern dimension */
+  readonly accessibleLabel?: number;
+  /** Forced Colors Mode dimension */
+  readonly forcedColors?: number;
+  /** Form Validity Reporting dimension */
+  readonly formValidityReporting?: number;
+  /** AAA Audit Self-Certification dimension */
+  readonly aaaAuditSelfCertification?: number;
 }
 
 /**
@@ -60,6 +82,15 @@ export interface McpWcConfig {
   readonly watch: boolean;
   /** Optional scoring configuration for customizing health dimension weights. */
   readonly scoring?: ScoringConfig;
+  /**
+   * Provenance flag: true when cemPath was preserved as an absolute
+   * out-of-tree path through the MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1
+   * opt-in on an actual external config file (MCP_WC_CONFIG_PATH).
+   * Used by the MCP server's startup containment check to bypass
+   * the in-root requirement only for paths that genuinely came from
+   * the trusted external-config opt-in. Codex round-14 P1.
+   */
+  readonly cemPathFromExternalConfig?: boolean;
 }
 
 /** Mutable version used internally during config construction. */
@@ -109,15 +140,156 @@ const defaults: McpWcConfig = {
   watch: false,
 };
 
-function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
+// Path-bearing fields that should resolve relative to the config file's
+// directory when MCP_WC_CONFIG_PATH points outside projectRoot. URL fields
+// (cdnBase, cdnAutoloader, cdnStylesheet) are deliberately excluded.
+const CONFIG_PATH_FIELDS = ['cemPath', 'tsconfigPath', 'tokensPath', 'healthHistoryDir'] as const;
+
+function rebaseRelativePaths(
+  config: Partial<McpWcConfig>,
+  configDir: string,
+  projectRoot: string,
+): Partial<McpWcConfig> {
+  // Path resolution semantics for external configs (MCP_WC_CONFIG_PATH):
+  //
+  //   - Relative values are resolved against the CONFIG FILE'S directory
+  //     (`packages/ds/helixir.mcp.json` with `cemPath: "dist/cem.json"`
+  //     means `packages/ds/dist/cem.json`). After rebasing, results inside
+  //     projectRoot are relativized to projectRoot for git-backed
+  //     consumers; results outside projectRoot are dropped with warning
+  //     (the rebase math gave us something the user didn't sanction).
+  //
+  //   - Absolute values are taken as-is. Inside projectRoot they're
+  //     relativized; outside they're dropped (mcp/index.ts containment
+  //     check would fatal anyway, and silently letting them through means
+  //     analyzing the wrong workspace).
+  //
+  // Out-of-tree CEMs that genuinely belong on a shared host path should be
+  // pointed at via MCP_WC_CEM_PATH directly — env vars bypass this rebase.
+  const rebased: Record<string, unknown> = { ...config };
+  const normalizedRoot = resolve(projectRoot);
+  const dropped = new Set<string>();
+  for (const field of CONFIG_PATH_FIELDS) {
+    const value = rebased[field];
+    if (typeof value !== 'string' || value === '') continue;
+    const absolute = isAbsolute(value) ? value : resolve(configDir, value);
+    const inRoot = absolute === normalizedRoot || absolute.startsWith(normalizedRoot + sep);
+    if (!inRoot) {
+      // Out-of-tree cemPath: pinned per `bst-cto-kb/Projects/HELiXiR/
+      // HELiXiR migration retry runbook — rea 0.13.0 (2026-05-03).md` §4a:
+      // **drop with explicit allowlist override.**
+      //
+      // Default is drop (defense-in-depth — out-of-tree absolute paths
+      // are a path-traversal vector for the MCP server). Set
+      // `MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1` to opt back in for
+      // legitimate sibling-repo / vendored-CEM use cases. This pins
+      // codex's flip-flopping (drop R9/R17/R21/R28/R36/R38 vs
+      // preserve R19/R20/R24/R30/R37/R40) into one deliberate position
+      // with a documented escape hatch.
+      const allowExternal = process.env['MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS'] === '1';
+      if (field === 'cemPath' && !allowExternal) {
+        process.stderr.write(
+          `[helixir] Warning: cemPath in MCP_WC_CONFIG_PATH resolves to ${absolute}, which is outside projectRoot (${normalizedRoot}). Dropping per defense-in-depth default. (To allow: set MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1, or set MCP_WC_CEM_PATH directly.)\n`,
+        );
+        dropped.add(field);
+      } else {
+        rebased[field] = absolute;
+        // Provenance flag (cemPathFromExternalConfig) is NOT stamped
+        // here — the surrounding JSON object gets stripped of unknown
+        // keys downstream in loadConfig (round-15 anti-forgery fix),
+        // so anything we set here would be wiped before reaching the
+        // MCP server. The flag is stamped on the final config object
+        // in loadConfig after the JSON strip + Object.assign, where
+        // we can reliably detect the same conditions and the value
+        // is no longer at risk of forgery from user JSON.
+        // Codex round-18 P1.
+      }
+      continue;
+    }
+    // Inside projectRoot: emit project-relative POSIX path so git-backed
+    // consumers (gitShow's repo-relative allowlist) work, and so the path
+    // doesn't accidentally double-segment when later resolved against
+    // projectRoot.
+    rebased[field] = relative(normalizedRoot, absolute).split(sep).join('/');
+  }
+  return Object.fromEntries(
+    Object.entries(rebased).filter(([k]) => !dropped.has(k)),
+  ) as Partial<McpWcConfig>;
+}
+
+/**
+ * Result of readConfigFile — includes the partial config plus the directory
+ * the config was actually loaded FROM. CEM auto-discovery uses sourceDir
+ * to scope its search; null means "no config was loaded, use projectRoot".
+ */
+interface ConfigReadResult {
+  partial: Partial<McpWcConfig>;
+  sourceDir: string | null;
+  /**
+   * True when the config was loaded from MCP_WC_CONFIG_PATH (explicit
+   * external trigger), even if MCP_WC_CONFIG_PATH happens to point at
+   * a file inside projectRoot. Distinct from `sourceDir` location:
+   * an in-repo config file becomes "explicit external" when the env
+   * var was set and the file actually loaded. Drives the
+   * cemPathFromExternalConfig provenance stamp downstream — codex
+   * round-24 P1 (sourceDir-only check rejected legitimate
+   * MCP_WC_CONFIG_PATH=packages/ds/helixir.mcp.json setups).
+   */
+  loadedFromExplicitConfigEnv: boolean;
+}
+
+function readConfigFile(projectRoot: string): ConfigReadResult {
+  // Highest priority: explicit MCP_WC_CONFIG_PATH (e.g. set by the VS Code
+  // extension's helixir.configPath setting). When present, this absolute or
+  // project-relative path is read directly and the in-root discovery below is
+  // skipped — workspaces whose config lives outside the project root depend on
+  // this override.
+  const explicitConfigPath = process.env['MCP_WC_CONFIG_PATH'];
+  if (explicitConfigPath !== undefined && explicitConfigPath !== '') {
+    const resolvedExplicit = resolve(projectRoot, explicitConfigPath);
+    if (existsSync(resolvedExplicit)) {
+      try {
+        const raw = readFileSync(resolvedExplicit, 'utf-8');
+        const parsed = JSON.parse(raw) as Partial<McpWcConfig>;
+        // When the config file lives outside projectRoot (e.g. a colocated
+        // packages/ds/helixir.mcp.json), its relative path fields refer to the
+        // config's own directory, not the workspace root. Rebase them to be
+        // relative to projectRoot so downstream resolution against projectRoot
+        // points at the right tree without breaking consumers (containment
+        // checks, git-backed paths) that require repo-relative inputs.
+        return {
+          partial: rebaseRelativePaths(parsed, dirname(resolvedExplicit), projectRoot),
+          sourceDir: dirname(resolvedExplicit),
+          loadedFromExplicitConfigEnv: true,
+        };
+      } catch {
+        // Bad explicit-path JSON — warn and FALL THROUGH to the in-root
+        // discovery below. A stale or malformed editor setting should not
+        // silently drop an otherwise valid workspace config.
+        process.stderr.write(
+          `[helixir] Warning: MCP_WC_CONFIG_PATH=${explicitConfigPath} is malformed. Falling back to in-repo config.\n`,
+        );
+      }
+    } else {
+      process.stderr.write(
+        `[helixir] Warning: MCP_WC_CONFIG_PATH=${explicitConfigPath} not found. Falling back to in-repo config.\n`,
+      );
+    }
+    // Fall through to standard in-root discovery rather than returning {}.
+  }
+
   const primaryPath = resolve(projectRoot, 'helixir.mcp.json');
   if (existsSync(primaryPath)) {
     try {
       const raw = readFileSync(primaryPath, 'utf-8');
-      return JSON.parse(raw) as Partial<McpWcConfig>;
+      return {
+        partial: JSON.parse(raw) as Partial<McpWcConfig>,
+        sourceDir: projectRoot,
+        loadedFromExplicitConfigEnv: false,
+      };
     } catch {
       process.stderr.write(`[helixir] Warning: helixir.mcp.json is malformed. Using defaults.\n`);
-      return {};
+      return { partial: {}, sourceDir: null, loadedFromExplicitConfigEnv: false };
     }
   }
 
@@ -129,14 +301,18 @@ function readConfigFile(projectRoot: string): Partial<McpWcConfig> {
     );
     try {
       const raw = readFileSync(legacyPath, 'utf-8');
-      return JSON.parse(raw) as Partial<McpWcConfig>;
+      return {
+        partial: JSON.parse(raw) as Partial<McpWcConfig>,
+        sourceDir: projectRoot,
+        loadedFromExplicitConfigEnv: false,
+      };
     } catch {
       process.stderr.write(`[helixir] Warning: mcpwc.config.json is malformed. Using defaults.\n`);
-      return {};
+      return { partial: {}, sourceDir: null, loadedFromExplicitConfigEnv: false };
     }
   }
 
-  return {};
+  return { partial: {}, sourceDir: null, loadedFromExplicitConfigEnv: false };
 }
 
 export function loadConfig(): Readonly<McpWcConfig> {
@@ -149,7 +325,9 @@ export function loadConfig(): Readonly<McpWcConfig> {
   // Merge config file values (override defaults, lower priority than env vars).
   // Exclude projectRoot from file config — it's already determined from env/cwd,
   // and the config file is located relative to it (circular dependency).
-  const fileConfig = readConfigFile(effectiveRoot);
+  const fileConfigResult = readConfigFile(effectiveRoot);
+  const fileConfig = fileConfigResult.partial;
+  const configSourceDir = fileConfigResult.sourceDir;
   const fileCemPath = fileConfig.cemPath;
   // Prevent config file from overriding projectRoot (circular dependency).
   const safeFileConfig: Omit<Partial<McpWcConfig>, 'projectRoot'> = { ...fileConfig };
@@ -157,7 +335,41 @@ export function loadConfig(): Readonly<McpWcConfig> {
   // scoring needs special validation — extract before mass-assign and apply separately
   const rawScoringFromFile = (safeFileConfig as Record<string, unknown>)['scoring'];
   delete (safeFileConfig as Record<string, unknown>)['scoring'];
+  // Strip cemPathFromExternalConfig — this is an internal provenance
+  // flag stamped only by rebaseRelativePaths when the runtime opt-in
+  // fires. Accepting it from user-supplied JSON would let any local
+  // helixir.mcp.json forge "trusted external config" provenance and
+  // bypass the startup containment check. Codex round-15 P1.
+  delete (safeFileConfig as Record<string, unknown>)['cemPathFromExternalConfig'];
   Object.assign(config, safeFileConfig);
+
+  // Stamp the external-config provenance flag now that the JSON has
+  // been merged + stripped. We re-derive the conditions here from
+  // ground truth (env vars, the actual config-source directory, and
+  // resolved cemPath), so:
+  //   - User-supplied JSON cannot forge it (the strip above).
+  //   - The flag reflects the actual loader path that ran, not just
+  //     the env vars that were set.
+  //
+  // Critical: loadedFromExplicitConfigEnv tells us whether the JSON
+  // actually came from MCP_WC_CONFIG_PATH (round-24 P1) — distinct from
+  // the sourceDir heuristic, which mis-classified legitimate
+  // MCP_WC_CONFIG_PATH=packages/ds/helixir.mcp.json setups as "internal."
+  // The right ground truth is "did the explicit env-var loader path run
+  // successfully?" That's what the flag captures.
+  const projectRootResolved = resolve(effectiveRoot);
+  if (
+    fileConfigResult.loadedFromExplicitConfigEnv &&
+    fileCemPath !== undefined &&
+    process.env['MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS'] === '1' &&
+    typeof config.cemPath === 'string' &&
+    isAbsolute(config.cemPath)
+  ) {
+    const rel = relative(projectRootResolved, config.cemPath);
+    if (rel.startsWith('..') || isAbsolute(rel)) {
+      (config as Record<string, unknown>)['cemPathFromExternalConfig'] = true;
+    }
+  }
 
   // Apply validated scoring config (weights must be positive numbers)
   if (rawScoringFromFile !== undefined) {
@@ -168,9 +380,48 @@ export function loadConfig(): Readonly<McpWcConfig> {
   const cemPathExplicit = process.env['MCP_WC_CEM_PATH'] !== undefined || fileCemPath !== undefined;
 
   if (!cemPathExplicit) {
-    const discovered = discoverCemPath(effectiveRoot);
+    // Two-phase CEM discovery:
+    //   1. If the config was loaded from a directory inside projectRoot
+    //      (e.g. packages/ds/helixir.mcp.json), search there first so a
+    //      package-local dist/custom-elements.json wins.
+    //   2. If nothing is found there — or the config came from outside
+    //      projectRoot, or fall-through happened (missing/malformed
+    //      explicit config) — search projectRoot. This avoids missing a
+    //      workspace-root manifest in monorepos that use a nested config
+    //      only for tsconfigPath/tokensPath.
+    const normalizedRoot = resolve(effectiveRoot);
+    let discoveryRoot = effectiveRoot;
+    let discovered: string | null = null;
+    if (configSourceDir !== null) {
+      const normalizedSource = resolve(configSourceDir);
+      if (
+        (normalizedSource === normalizedRoot ||
+          normalizedSource.startsWith(normalizedRoot + sep)) &&
+        normalizedSource !== normalizedRoot
+      ) {
+        discovered = discoverCemPath(normalizedSource);
+        if (discovered !== null) {
+          discoveryRoot = normalizedSource;
+        }
+      }
+    }
+    if (discovered === null) {
+      discovered = discoverCemPath(effectiveRoot);
+      discoveryRoot = effectiveRoot;
+    }
     if (discovered !== null) {
-      config.cemPath = discovered;
+      // discoverCemPath returns a path relative to discoveryRoot; rebase to
+      // projectRoot so the containment check + git-backed consumers stay
+      // happy. Normalize to POSIX separators for Windows compatibility.
+      const absolute = resolve(discoveryRoot, discovered);
+      if (absolute === normalizedRoot || absolute.startsWith(normalizedRoot + sep)) {
+        const relPath = relative(normalizedRoot, absolute) || discovered;
+        config.cemPath = relPath.split(sep).join('/');
+      } else {
+        // Discovered CEM is outside projectRoot — would fail downstream.
+        // Fall back to the friendly-error path rather than handing it on.
+        process.stderr.write(FRIENDLY_CEM_ERROR);
+      }
     } else {
       process.stderr.write(FRIENDLY_CEM_ERROR);
     }
@@ -196,6 +447,13 @@ export function loadConfig(): Readonly<McpWcConfig> {
     const val = process.env[envKey];
     if (val !== undefined) {
       (config as Record<string, unknown>)[configKey] = val;
+      // If MCP_WC_CEM_PATH overrides cemPath, the new value did NOT
+      // come from the trusted external-config opt-in path — clear the
+      // provenance flag so the startup containment check evaluates
+      // the new path on its own merits. Codex round-15 P1.
+      if (envKey === 'MCP_WC_CEM_PATH') {
+        (config as Record<string, unknown>)['cemPathFromExternalConfig'] = false;
+      }
     }
   }
   for (const [envKey, configKey] of Object.entries(ENV_MAP_NULLABLE)) {

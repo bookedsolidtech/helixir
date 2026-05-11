@@ -1,0 +1,20 @@
+{
+  "classId": "16-keyboard-contract-drift",
+  "subclassTagName": "hx-keyboard-drift",
+  "parentTagName": "hx-parent-checkbox",
+  "dimensions": {
+    "APG Keyboard Contract": {
+      "verdict": "unknown",
+      "scoreMax": 50,
+      "confidenceIn": ["heuristic", "low"],
+      "issueIncludes": "parent-contract-no-longer-applies"
+    },
+    "Keyboard Interaction": {
+      "scoreMax": 60,
+      "confidenceIn": ["heuristic"],
+      "issueIncludes": "undeclared-key-handler"
+    }
+  },
+  "groundTruthCommit": "bf315a2fd",
+  "notes": "Parent declares @keyboard-contract activate=Space,Enter. Subclass adds an Escape keydown that dismisses the component. The inherited contract no longer reflects observed behavior — scorer should mark APG Keyboard Contract as unknown or flag undeclared-key-handler."
+}

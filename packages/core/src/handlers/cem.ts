@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isAbsolute, relative, resolve, sep } from 'node:path';
 import type { McpWcConfig } from '../config.js';
 import { GitOperations } from '../shared/git.js';
 import { MCPError, ErrorCategory } from '../shared/error-handling.js';
@@ -86,6 +87,21 @@ const CemDeclarationSchema = z.object({
   references: z.array(CemReferenceSchema).optional(),
   packageName: z.string().optional(),
   jsdocTags: z.array(CemJsdocTagSchema).optional(),
+  // Form-associated custom element flag. Standard CEM extension field —
+  // tools that emit this carry the `static formAssociated = true` from
+  // source, which defect-corpus class 10 uses to detect inheritance
+  // regressions. Codex round-27 P2 (M3-M6 local preview): without
+  // schema entry, Zod was stripping the field from real CEM input.
+  formAssociated: z.boolean().optional(),
+  // Helix-specific CEM extension carrying APG pattern, keyboard contract,
+  // AAA certification metadata, and priority tier. Kept as `unknown` here
+  // so the public CemDeclaration type stays library-agnostic — the
+  // helix-aaa evidence detector runtime-narrows it via its own Zod parser.
+  // Phase 1 (dimensional upgrade): the evidence detector at
+  // packages/core/src/handlers/evidence/helix-aaa-evidence.ts owns the
+  // typed view; downstream dim scorers consume HelixAaaEvidence, not the
+  // raw field.
+  helixMeta: z.unknown().optional(),
 });
 
 const CemModuleSchema = z.object({
@@ -139,6 +155,64 @@ export interface DiffResult {
   isNew: boolean;
   breaking: string[];
   additions: string[];
+  /**
+   * True when the base-branch CEM could not be read (e.g. cemPath is
+   * out-of-tree under MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS=1 — gitShow
+   * rejects absolute/external paths). Consumers should treat the diff
+   * as advisory rather than authoritative — `isNew: true` may be the
+   * fallback, not a real new-component signal. Codex round-36 P1
+   * compromise on the round-30 throw: report explicitly instead of
+   * silently degrading or failing hard.
+   */
+  baseUnavailable?: boolean;
+  /** Human-readable reason when baseUnavailable is true. */
+  baseUnavailableReason?: string;
+}
+
+// --- Presence helpers ---
+
+/**
+ * The CEM keys an analyzer might inspect on a declaration to decide whether
+ * a dimension is measurable. Used by `cemHas` to give analyzers an explicit,
+ * type-checked way to distinguish "key absent" from "key present, empty".
+ *
+ * Adding a new key here is a deliberate act — every site that branches on
+ * presence should opt in via this enum so the absent-vs-empty distinction
+ * is searchable.
+ */
+export type CemPresenceKey =
+  | 'attributes'
+  | 'members'
+  | 'events'
+  | 'slots'
+  | 'cssProperties'
+  | 'cssParts'
+  | 'description'
+  | 'summary'
+  | 'superclass'
+  | 'mixins';
+
+/**
+ * Returns whether the CEM declaration explicitly carries the named key.
+ *
+ * - `'present'`: the key exists on the declaration (array length may be 0
+ *   — that's still "present and empty," meaning the component has authoritatively
+ *   declared "no slots / no events / no css parts").
+ * - `'absent'`: the key is undefined. The declaration says nothing — the
+ *   analyzer cannot tell whether the component truly has none, or whether
+ *   the CEM regen dropped the data. This is the case M2 surfaces as
+ *   `confidence: 'unknown'`.
+ *
+ * Use this from analyzers that consume CEM data to anchor the
+ * absent-vs-empty distinction explicitly. Without it, analyzers that
+ * read `decl.slots ?? []` cannot tell the two cases apart and silently
+ * award the dimension full credit when data is missing.
+ */
+export function cemHas(decl: CemDeclaration, key: CemPresenceKey): 'present' | 'absent' {
+  // Index into a CemDeclaration whose Zod schema marks every member as optional.
+  // We deliberately read the raw key — `undefined` ≠ `[]`.
+  const value = (decl as Record<string, unknown>)[key];
+  return value === undefined ? 'absent' : 'present';
 }
 
 // --- Source path helpers ---
@@ -454,24 +528,124 @@ export async function diffCem(
   // Get current branch component metadata from cached CEM
   const current = parseCem(tagName, cem);
 
-  // Read base branch's CEM via git show — no stash, no checkout, no working-tree mutation
+  // Read base branch's CEM via git show — no stash, no checkout, no working-tree mutation.
+  //
+  // Guard: gitShow's allowlist rejects absolute paths. Two sub-cases for
+  // an absolute config.cemPath:
+  //   1. Path is INSIDE projectRoot (supported MCP_WC_CEM_PATH setup
+  //      pointing at e.g. /repo/custom-elements.json): relativize and
+  //      use gitShow normally.
+  //   2. Path is OUTSIDE projectRoot (the MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS
+  //      opt-in case): gitShow can't help — degrade with a warning.
+  // Codex round-10 P1 (initial guard), round-16 P1 (in-repo absolute
+  // path case).
   const gitOps = new GitOperations();
 
   let baseMeta: ComponentMetadata | null = null;
 
+  // Pinned position per runbook §6 step 3: codex round-10 → guard,
+  // round-16 → relativize in-repo, round-20 → throw out-of-tree,
+  // round-22 → "throwing regresses supported MCP_WC_CEM_PATH absolute
+  // configs." Codex is flipping. We stop at "best-effort + warn":
+  //   - In-repo absolute → relativize and gitShow normally
+  //   - Out-of-tree absolute → emit a warning to stderr (with the
+  //     absolute path REDACTED to a basename so it doesn't leak host
+  //     filesystem paths back through tool responses, codex round-22 P2)
+  //     and continue with baseMeta = null (component looks new in base)
+  // Consumers that need stronger semantics should switch to the
+  // M2-strict-mode follow-up flag.
+  // Relativize cemPath for gitShow. Two layers:
+  //   1. Repo root (git rev-parse --show-toplevel) is the canonical
+  //      base. In monorepo setups projectRoot is a subpackage and
+  //      relativizing against it produces the wrong path. Codex
+  //      round-23 P2.
+  //   2. Fall back to projectRoot if not in a git repo.
+  // Genuinely out-of-tree (relative to repo root) → best-effort + warn.
+  let cemPathForGit = config.cemPath;
+  // Wrap in try/catch so older injected mocks without getRepoRoot still
+  // work — they fall through to the projectRoot fallback. Real
+  // GitOperations always provides the method.
+  let repoRoot: string | null = null;
   try {
-    const cemContent = await gitOps.gitShow(baseBranch, config.cemPath);
-    const rawJson: unknown = JSON.parse(cemContent);
-    const baseCem = CemSchema.parse(rawJson);
-    const baseDecl = findDeclaration(baseCem, tagName);
-    if (baseDecl) {
-      baseMeta = mapDeclaration(baseDecl);
+    if (typeof gitOps.getRepoRoot === 'function') {
+      repoRoot = await gitOps.getRepoRoot();
     }
   } catch {
-    // CEM missing or unreadable on base branch — component is new
+    repoRoot = null;
+  }
+  const relativizationBase = repoRoot ?? resolve(config.projectRoot);
+  const cemAbsForRel = isAbsolute(config.cemPath)
+    ? config.cemPath
+    : resolve(config.projectRoot, config.cemPath);
+  const relFromRepo = relative(relativizationBase, cemAbsForRel);
+  let baseUnavailableReason = '';
+  if (relFromRepo === '' || relFromRepo.startsWith('..') || isAbsolute(relFromRepo)) {
+    // Genuinely out-of-tree. Compromise per codex round-36 P1: don't
+    // throw (round-30's previous resolution) and don't silently
+    // synthesize (round-23's pre-30 behavior). Mark the result as
+    // baseUnavailable + emit warning, return best-effort isNew:true
+    // fallback. Consumers can detect the flag and downgrade their
+    // confidence in the diff. Pinned with round-by-round flip
+    // history per runbook §6 step 3 — this is the unsettled case.
+    const redactedPath = cemAbsForRel.split(/[\\/]/).pop() ?? '<absolute>';
+    baseUnavailableReason = `cemPath (basename: ${redactedPath}) is out-of-tree relative to the git repo root; gitShow requires repo-relative paths. To restore real diff, unset MCP_WC_CONFIG_ALLOW_EXTERNAL_PATHS or move the CEM in-tree.`;
+    process.stderr.write(`[helixir] Warning: diffCem ${baseUnavailableReason}\n`);
+    cemPathForGit = '';
+  } else {
+    // In-repo absolute → relativize. Plain relative → also rebase
+    // against repo root in case projectRoot is a subpackage.
+    cemPathForGit = relFromRepo.split(sep).join('/');
+  }
+
+  if (cemPathForGit !== '') {
+    try {
+      const cemContent = await gitOps.gitShow(baseBranch, cemPathForGit);
+      const rawJson: unknown = JSON.parse(cemContent);
+      const baseCem = CemSchema.parse(rawJson);
+      const baseDecl = findDeclaration(baseCem, tagName);
+      if (baseDecl) {
+        baseMeta = mapDeclaration(baseDecl);
+      }
+    } catch {
+      // CEM missing or unreadable on base branch — component is new
+    }
   }
 
   if (!baseMeta) {
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // 🛑 PINNED PER RUNBOOK §6 STEP 3 — UNRESOLVABLE CODEX FLIP
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // Round-by-round codex flip log on this one branch:
+    //   R20 P1: throw (isNew:true silently hides regressions)
+    //   R22 P1: throw breaks in-repo absolute configs
+    //   R23 (settled): best-effort + warn
+    //   R30 P1: best-effort silently corrupts (back to throw)
+    //   R36 P1: throw breaks valid configs (best-effort + flag)
+    //   R39 P2: isNew:true is "false-clean" → isNew:false
+    //   R40 P1: isNew:false is ALSO "false-clean" (consumers
+    //           check breaking[].length not the flag)
+    //   R42 P2: stop reporting unavailable as new component
+    //   R46 P1: throw violates the advisory contract the
+    //           shape promises (baseUnavailable field)
+    //
+    // R46 lands the compromise. The DiffResult schema already
+    // includes baseUnavailable + baseUnavailableReason fields — the
+    // throw branch contradicted the schema. Return the advisory diff
+    // for the out-of-tree case so callers that DO check
+    // baseUnavailable get the metadata; callers that ignore the flag
+    // see an empty diff (better than crashing the audit pipeline).
+    // isNew is set to false because we don't know the answer; the
+    // empty breaking[]/additions[] arrays carry NO semantic claim
+    // when baseUnavailable is true — that's the contract.
+    if (baseUnavailableReason !== '') {
+      return {
+        isNew: false,
+        breaking: [],
+        additions: [],
+        baseUnavailable: true,
+        baseUnavailableReason,
+      };
+    }
     return { isNew: true, breaking: [], additions: [] };
   }
 

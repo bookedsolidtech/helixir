@@ -32,6 +32,12 @@ interface DiffOutput {
   minor: BreakingChange[];
   added: string[];
   removed: string[];
+  /**
+   * Components for which the base CEM could not be loaded — diff
+   * cannot be computed. Treat as not-yet-checked, NOT as clean.
+   * Codex round-58 P1.
+   */
+  indeterminate?: Array<{ tag: string; baseUnavailableReason: string | null }>;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -51,7 +57,7 @@ function getBooleanInput(name: string, fallback = false): boolean {
 async function runCli(
   args: string[],
   silent = false,
-): Promise<{ stdout: string; exitCode: number }> {
+): Promise<{ stdout: string; stderr: string; exitCode: number }> {
   let stdout = '';
   let stderr = '';
 
@@ -72,7 +78,7 @@ async function runCli(
     core.debug(`helixir stderr: ${stderr}`);
   }
 
-  return { stdout, exitCode };
+  return { stdout, stderr, exitCode };
 }
 
 function parseJsonSafe<T>(raw: string): T | null {
@@ -103,23 +109,53 @@ function buildSparkbar(score: number): string {
 }
 
 function buildBreakingChangesSection(diff: DiffOutput): string {
-  if (diff.breaking.length === 0 && diff.minor.length === 0) {
+  // Defensive: the multi-component CLI shape (`{breaking, indeterminate}`)
+  // omits `minor` / `added` / `removed`, so default each array. Codex
+  // round-59 P2 — without this, the comment builder threw TypeError
+  // on `diff.minor.length`.
+  const breaking = diff.breaking ?? [];
+  const minor = diff.minor ?? [];
+  const indeterminate = diff.indeterminate ?? [];
+
+  if (breaking.length === 0 && minor.length === 0 && indeterminate.length === 0) {
     return '### Breaking Changes\n\n✅ No breaking changes detected.';
   }
 
   const lines: string[] = ['### Breaking Changes'];
 
-  if (diff.breaking.length > 0) {
+  if (breaking.length > 0) {
     lines.push('\n**🚨 Breaking:**');
-    diff.breaking.forEach((c) => {
+    breaking.forEach((c) => {
+      // Tolerate both shapes:
+      //  - rich BreakingChange { component, description, type }
+      //  - CLI multi-tag { tag, change }
+      const anyC = c as unknown as {
+        component?: string;
+        description?: string;
+        type?: string;
+        tag?: string;
+        change?: string;
+      };
+      const name = anyC.component ?? anyC.tag ?? '<unknown>';
+      const desc = anyC.description ?? anyC.change ?? '';
+      const tag = anyC.type ?? '';
+      lines.push(`- \`${name}\`: ${desc}${tag ? ` *(${tag})*` : ''}`);
+    });
+  }
+
+  if (minor.length > 0) {
+    lines.push('\n**⚠️ Minor:**');
+    minor.forEach((c) => {
       lines.push(`- \`${c.component}\`: ${c.description} *(${c.type})*`);
     });
   }
 
-  if (diff.minor.length > 0) {
-    lines.push('\n**⚠️ Minor:**');
-    diff.minor.forEach((c) => {
-      lines.push(`- \`${c.component}\`: ${c.description} *(${c.type})*`);
+  if (indeterminate.length > 0) {
+    lines.push(
+      '\n**❓ Indeterminate (base CEM unavailable — treat as not-yet-checked, NOT as clean):**',
+    );
+    indeterminate.forEach((c) => {
+      lines.push(`- \`${c.tag}\`: ${c.baseUnavailableReason ?? '<no reason given>'}`);
     });
   }
 
@@ -216,23 +252,73 @@ async function run(): Promise<void> {
 
     // ── Breaking changes diff ─────────────────────────────────────────────────
     let diffData: DiffOutput | null = null;
+    let diffParseFailed = false;
     if (checks.includes('breaking-changes')) {
       const baseRef = process.env['GITHUB_BASE_REF'] ?? '';
       if (!baseRef) {
         core.warning('GITHUB_BASE_REF not set — skipping breaking-changes check');
       } else {
-        const { stdout, exitCode } = await runCli(
+        const { stdout, stderr, exitCode } = await runCli(
           ['diff', '--base', baseRef, '--ci', '--format', 'json', ...baseArgs],
           true,
         );
 
-        if (exitCode === 0 && stdout) {
-          diffData = parseJsonSafe<DiffOutput>(stdout);
-          if (!diffData) {
-            core.warning('Could not parse diff output as JSON');
+        // Parse JSON regardless of exit code. The CLI 0.6+ stdout is
+        // `{ schemaVersion, breaking, indeterminate }`. Older CLIs
+        // emitted either a top-level array (legacy ≤0.4) or
+        // `{ breaking, indeterminate }` (transitional 0.5).
+        // Pre-0.6 CLIs also emitted indeterminate components on
+        // stderr as `{indeterminate: [...]}` JSON line — STILL parsed
+        // here because helixir-version pinning lets workflows run
+        // older CLIs against this action. Codex round-58/63/69/76 P1.
+        diffParseFailed = false;
+        let stderrIndeterminate: Array<{ tag: string; baseUnavailableReason: string | null }> = [];
+        if (stderr) {
+          for (const line of stderr.split(/\r?\n/)) {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith('{')) continue;
+            const meta = parseJsonSafe<{ indeterminate?: typeof stderrIndeterminate }>(trimmed);
+            if (meta?.indeterminate) {
+              stderrIndeterminate = meta.indeterminate;
+              break;
+            }
           }
-        } else {
-          core.warning(`helixir diff exited with code ${exitCode}`);
+        }
+        if (stdout) {
+          const parsed = parseJsonSafe<unknown>(stdout);
+          if (parsed === null) {
+            diffParseFailed = true;
+            core.warning(
+              `Could not parse diff output as JSON (exit code ${exitCode}). Treating as failure to avoid silent pass.`,
+            );
+          } else if (Array.isArray(parsed)) {
+            // Legacy shape: top-level array of breaking changes.
+            // Pull indeterminate from stderr sidecar for pinned
+            // pre-0.6 CLIs.
+            diffData = {
+              breaking: parsed as BreakingChange[],
+              minor: [],
+              added: [],
+              removed: [],
+              indeterminate: stderrIndeterminate,
+            };
+          } else if (typeof parsed === 'object') {
+            const obj = parsed as DiffOutput;
+            diffData = {
+              ...obj,
+              indeterminate: obj.indeterminate ?? stderrIndeterminate,
+            };
+          } else {
+            diffParseFailed = true;
+            core.warning(
+              `helixir diff JSON was neither array nor object (exit code ${exitCode}). Treating as failure.`,
+            );
+          }
+        } else if (exitCode !== 0) {
+          diffParseFailed = true;
+          core.warning(
+            `helixir diff exited with code ${exitCode} with no stdout — treating as failure.`,
+          );
         }
       }
     }
@@ -242,6 +328,7 @@ async function run(): Promise<void> {
     const failingComponents = components.filter((c) => c.score < threshold);
     const hasBreaking = (diffData?.breaking ?? []).length > 0;
     const hasWarnings = (diffData?.minor ?? []).length > 0;
+    const hasIndeterminate = (diffData?.indeterminate ?? []).length > 0;
 
     const avgScore = components.length
       ? Math.round(components.reduce((s, c) => s + c.score, 0) / components.length)
@@ -250,12 +337,26 @@ async function run(): Promise<void> {
     core.setOutput('health-score', avgScore >= 0 ? String(avgScore) : '');
     core.setOutput('failing-components', String(failingComponents.length));
     core.setOutput('breaking-changes-count', String((diffData?.breaking ?? []).length));
+    core.setOutput('indeterminate-diffs-count', String((diffData?.indeterminate ?? []).length));
+    if (hasIndeterminate) {
+      core.warning(
+        `${(diffData?.indeterminate ?? []).length} component(s) returned INDETERMINATE diffs — base CEM unavailable. Treating as quality-gate failure.`,
+      );
+    }
     core.setOutput(
       'passed',
       String(
         failingComponents.length === 0 &&
           (!failOnBreaking || !hasBreaking) &&
-          (!failOnWarning || !hasWarnings),
+          (!failOnWarning || !hasWarnings) &&
+          // Indeterminate diffs are never a pass — silence is not safety.
+          // Codex round-58 P1.
+          !hasIndeterminate &&
+          // Diff parse failure is also never a pass — the check never
+          // ran. Without this, downstream workflows reading
+          // steps.helixir.outputs.passed see "true" while setFailed
+          // separately fails the job. Codex round-62 P1.
+          !diffParseFailed,
       ),
     );
 
@@ -312,14 +413,39 @@ async function run(): Promise<void> {
     }
 
     if (failOnBreaking && hasBreaking) {
-      const count = diffData?.breaking.length ?? 0;
+      const count = diffData?.breaking?.length ?? 0;
       core.setFailed(`Breaking changes detected: ${count} breaking change(s) found`);
       return;
     }
 
     if (failOnWarning && hasWarnings) {
-      const count = diffData?.minor.length ?? 0;
+      const count = diffData?.minor?.length ?? 0;
       core.setFailed(`Warning-level changes detected: ${count} minor change(s) found`);
+      return;
+    }
+
+    // Diff couldn't be parsed at all (CLI exited non-zero with no
+    // usable JSON, e.g. invalid config or git access failure). The
+    // breaking-change check never completed — fail closed rather
+    // than letting the workflow go green on empty data. Codex
+    // round-61 P2.
+    if (diffParseFailed) {
+      core.setFailed(
+        'helixir diff did not produce parseable JSON; breaking-change check did not complete. Failing closed.',
+      );
+      return;
+    }
+
+    // Indeterminate diffs are a hard quality-gate failure — silence is
+    // not safety. Must run after the other fail-conditions and outside
+    // the PR-comment block, otherwise non-PR events / comment:false
+    // configs would leave the workflow green despite the indeterminate
+    // state. Codex round-59 P2.
+    if (hasIndeterminate) {
+      const count = diffData?.indeterminate?.length ?? 0;
+      core.setFailed(
+        `Diff INDETERMINATE for ${count} component(s) — base CEM unavailable. Treating as quality-gate failure (silence is not safety).`,
+      );
       return;
     }
 

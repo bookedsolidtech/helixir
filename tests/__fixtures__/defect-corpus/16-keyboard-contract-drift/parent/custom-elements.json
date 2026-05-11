@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "2.1.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "parent/hx-parent-checkbox.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "APG-pattern checkbox with Space/Enter activation.",
+          "name": "HxParentCheckbox",
+          "tagName": "hx-parent-checkbox",
+          "members": [
+            {
+              "kind": "field",
+              "name": "checked",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "attribute": "checked",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "attribute": "disabled",
+              "reflects": true
+            }
+          ],
+          "attributes": [
+            { "name": "checked", "type": { "text": "boolean" } },
+            { "name": "disabled", "type": { "text": "boolean" } }
+          ],
+          "events": [{ "name": "change", "description": "Fired when the checked state toggles." }],
+          "helixMeta": {
+            "ariaPattern": "checkbox",
+            "keyboardContract": {
+              "activate": ["Space", "Enter"],
+              "disabledSuppresses": true
+            }
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-parent-checkbox",
+          "declaration": { "name": "HxParentCheckbox", "module": "parent/hx-parent-checkbox.ts" }
+        }
+      ]
+    }
+  ]
+}

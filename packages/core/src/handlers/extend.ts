@@ -70,7 +70,11 @@ export function extendComponent(
     throw new MCPError(`Component "${parentTagName}" not found in CEM.`, ErrorCategory.NOT_FOUND);
   }
 
-  const parentClassName = tagNameToClassName(parentTagName);
+  // Prefer the CEM declaration's own class name when available — many libraries
+  // expose tags whose backing class identifier does not match the PascalCase of
+  // the tag name (e.g. tag "sl-button" backed by class "SlButtonElement"). Only
+  // fall back to PascalCase derivation when the CEM does not record a name.
+  const parentClassName = parentDecl.name ?? tagNameToClassName(parentTagName);
   const derivedClassName = newClassName ?? tagNameToClassName(newTagName);
 
   const inheritedCssParts = (parentDecl.cssParts ?? []).map((p) => p.name);

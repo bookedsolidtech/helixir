@@ -8,16 +8,25 @@ import { handleToolError } from '../shared/error-handling.js';
 
 // ─── Input Schemas ─────────────────────────────────────────────────────────────
 
+// `libraryId` is a server-internal field that src/mcp/index.ts extracts to
+// pick the right CEM and then forwards in the args object — model it
+// explicitly so legitimate multi-library calls succeed, while keeping
+// `.strict()` so typos like `themeNmae` still fail loudly instead of being
+// silently dropped and producing a default theme.
 const CreateThemeArgsSchema = z
   .object({
     themeName: z.string().optional(),
     prefix: z.string().optional(),
+    libraryId: z.string().optional(),
   })
   .strict();
 
 const ApplyThemeTokensArgsSchema = z.object({
   themeTokens: z.record(z.string(), z.string()),
   tagNames: z.array(z.string()).optional(),
+  // Server-internal multi-library dispatch field — modeled explicitly so
+  // schema-aware clients can pass it without rejection.
+  libraryId: z.string().optional(),
 });
 
 // ─── Tool Definitions ──────────────────────────────────────────────────────────
@@ -44,6 +53,14 @@ export const THEME_TOOL_DEFINITIONS = [
           description:
             'Override the CSS custom property prefix detected from the CEM. ' +
             'E.g. "--hx-". When omitted, the prefix is detected automatically.',
+        },
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional multi-library dispatch hint. When set, src/mcp/index.ts ' +
+            'uses it to pick the correct CEM before invoking this tool. ' +
+            'Schema-aware MCP clients must allow it through to support ' +
+            'multi-library projects.',
         },
       },
       additionalProperties: false,
@@ -73,6 +90,12 @@ export const THEME_TOOL_DEFINITIONS = [
           description:
             'Optional list of component tag names to filter results. ' +
             'When omitted, all components with CSS properties are included.',
+        },
+        libraryId: {
+          type: 'string',
+          description:
+            'Optional multi-library dispatch hint. When set, src/mcp/index.ts ' +
+            'uses it to pick the correct CEM before invoking this tool.',
         },
       },
       required: ['themeTokens'],

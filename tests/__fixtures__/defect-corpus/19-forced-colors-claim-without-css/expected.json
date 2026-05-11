@@ -1,0 +1,19 @@
+{
+  "classId": "19-forced-colors-claim-without-css",
+  "subclassTagName": "hx-forced-colors-overclaim",
+  "parentTagName": "hx-parent-banner",
+  "dimensions": {
+    "Forced Colors": {
+      "scoreMax": 10,
+      "confidenceIn": ["heuristic", "high"],
+      "issueIncludes": "claim-vs-evidence-mismatch"
+    },
+    "High Contrast": {
+      "scoreMax": 20,
+      "confidenceIn": ["heuristic"],
+      "issueIncludes": "forced-colors-media-block-missing"
+    }
+  },
+  "groundTruthCommit": "helix-m5-verify-extension-class-06",
+  "notes": "Parent claims helixMeta.forcedColorsSupported: true and ships an @media (forced-colors: active) block. Subclass inherits the claim (and re-asserts it in CEM/JSDoc) but replaces the parent's styles array with a forced-colors-free override. Scorer must detect the claim/evidence mismatch by inspecting the subclass's resolved CSS, not just the inherited CEM."
+}

@@ -7,10 +7,10 @@ import {
   validateCompleteness,
   listAllComponents,
   diffCem,
+  cemHas,
   CemSchema,
 } from '../../packages/core/src/handlers/cem.js';
-import type { Cem } from '../../packages/core/src/handlers/cem.js';
-import { GitOperations } from '../../packages/core/src/shared/git.js';
+import type { Cem, CemDeclaration } from '../../packages/core/src/handlers/cem.js';
 import { ErrorCategory, MCPError } from '../../packages/core/src/shared/error-handling.js';
 import type { McpWcConfig } from '../../packages/core/src/config.js';
 
@@ -273,6 +273,67 @@ describe('listAllComponents', () => {
     const emptyCem = CemSchema.parse({ schemaVersion: '1.0.0', modules: [] });
     const result = listAllComponents(emptyCem);
     expect(result).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// cemHas — distinguishes "key absent" from "key present, empty"
+// ---------------------------------------------------------------------------
+
+describe('cemHas', () => {
+  function makeDecl(overrides: Partial<CemDeclaration> = {}): CemDeclaration {
+    return {
+      kind: 'class',
+      name: 'TestComponent',
+      tagName: 'test-component',
+      ...overrides,
+    } as CemDeclaration;
+  }
+
+  it('returns "absent" when the key is undefined on the declaration', () => {
+    const decl = makeDecl();
+    expect(cemHas(decl, 'slots')).toBe('absent');
+    expect(cemHas(decl, 'events')).toBe('absent');
+    expect(cemHas(decl, 'cssProperties')).toBe('absent');
+    expect(cemHas(decl, 'cssParts')).toBe('absent');
+    expect(cemHas(decl, 'attributes')).toBe('absent');
+    expect(cemHas(decl, 'members')).toBe('absent');
+  });
+
+  it('returns "present" when the key exists with a non-empty array', () => {
+    const decl = makeDecl({
+      slots: [{ name: '', description: 'default slot' }],
+      events: [{ name: 'change', type: { text: 'CustomEvent' } }],
+    });
+    expect(cemHas(decl, 'slots')).toBe('present');
+    expect(cemHas(decl, 'events')).toBe('present');
+  });
+
+  it('returns "present" when the key exists with an empty array', () => {
+    // The critical distinction: an empty array means the component
+    // *authoritatively* declared "no slots / no events" — that's not
+    // the same as the key being absent (which would be unknown).
+    const decl = makeDecl({ slots: [], events: [], cssProperties: [], cssParts: [] });
+    expect(cemHas(decl, 'slots')).toBe('present');
+    expect(cemHas(decl, 'events')).toBe('present');
+    expect(cemHas(decl, 'cssProperties')).toBe('present');
+    expect(cemHas(decl, 'cssParts')).toBe('present');
+  });
+
+  it('returns "present" for non-array keys when the value is set', () => {
+    const decl = makeDecl({
+      description: 'A test component',
+      summary: 'Tests cemHas',
+    });
+    expect(cemHas(decl, 'description')).toBe('present');
+    expect(cemHas(decl, 'summary')).toBe('present');
+  });
+
+  it('returns "absent" for non-array keys when the value is undefined', () => {
+    const decl = makeDecl();
+    expect(cemHas(decl, 'description')).toBe('absent');
+    expect(cemHas(decl, 'summary')).toBe('absent');
+    expect(cemHas(decl, 'superclass')).toBe('absent');
   });
 });
 

@@ -34,9 +34,21 @@ export function sanitizeErrorMessage(message: string, projectRoot: string): stri
   if (projectRoot) {
     // Normalize projectRoot to ensure no trailing slash
     const normalizedRoot = projectRoot.replace(/\/+$/, '');
-    // Match the projectRoot prefix (possibly followed by more path characters)
+    // Match the projectRoot prefix only when it is followed by either a
+    // path separator, end-of-string, whitespace, or a small allowlist of
+    // boundary characters (line-number colon, quote, paren, bracket,
+    // brace, comma, semicolon). Anything else — including filename-legal
+    // bytes like `+`, `~`, `=`, `@`, `&` — is treated as a continuation
+    // of a SIBLING directory and the prefix is NOT consumed, so the
+    // sibling path falls through to the [path redacted] redactor below.
+    // The earlier negative-class approach `(?![A-Za-z0-9_.-])` was too
+    // narrow: filenames legitimately contain `+`, `~`, etc., so
+    // /repo/app+prod/secrets.txt was leaking the suffix.
     const escapedRoot = normalizedRoot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const projectRootRegex = new RegExp(escapedRoot + '(/[^\\s]*)?', 'g');
+    const projectRootRegex = new RegExp(
+      escapedRoot + '(?:/[^\\s]*)?(?=$|[\\s/:\'"`),;\\]\\}])',
+      'g',
+    );
     sanitized = sanitized.replace(projectRootRegex, (match) => {
       // Compute the path relative to projectRoot
       const relativePath = relative(normalizedRoot, match);

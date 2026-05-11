@@ -1,0 +1,29 @@
+# .rea/registry.yaml — downstream MCP servers proxied through `rea serve`.
+# Every entry is subject to the 11-layer middleware chain (audit → kill-switch →
+# tier → policy → blocked-paths → rate-limit → circuit-breaker → injection →
+# redact → result-size-cap → terminal) and gets its tools surfaced to the MCP
+# client under the prefix `<name>__<tool>`.
+#
+# Servers configured here are invoked via `rea serve` (see .mcp.json). Do NOT
+# also list them in .mcp.json — that would double-register the catalog.
+#
+# env: values support ${VAR} interpolation against rea-serve's process.env.
+# Secret-looking values (TOKEN/KEY/SECRET/PASSWORD/CREDENTIAL) are redacted in
+# audit logs by default.
+version: '1'
+
+servers:
+  # Workstation-specific MCP servers (e.g. local protoMaker tooling) belong in
+  # a gitignored .rea/registry.yaml.local override that rea-serve merges on top
+  # of this committed catalog. The committed file ships only project-portable
+  # entries so a fresh clone does not point at paths that exist only on the
+  # original author's machine.
+  - name: discord-ops
+    command: npx
+    args:
+      - -y
+      - discord-ops@latest
+    env:
+      BOOKED_DISCORD_BOT_TOKEN: '${BOOKED_DISCORD_BOT_TOKEN}'
+      CLARITY_DISCORD_BOT_TOKEN: '${CLARITY_DISCORD_BOT_TOKEN}'
+    enabled: true

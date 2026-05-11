@@ -57,4 +57,23 @@ export class GitOperations {
     }
     return git('show', `${ref}:${filePath}`);
   }
+
+  /**
+   * Returns the absolute path of the git repository's top-level directory.
+   * Callers that need to convert a path relative to a sub-directory
+   * (projectRoot in a monorepo workspace) into a path relative to the
+   * repo root — which is what `gitShow` requires — call this first.
+   * Returns null if the current working tree isn't a git repository.
+   */
+  async getRepoRoot(): Promise<string | null> {
+    try {
+      const { stdout } = await execFileAsync('git', ['rev-parse', '--show-toplevel'], {
+        timeout: 30_000,
+      });
+      const root = stdout.trim();
+      return root === '' ? null : root;
+    } catch {
+      return null;
+    }
+  }
 }

@@ -1,5 +1,5 @@
 ---
-'@anthropic/helixir-core': minor
+'helixir': minor
 ---
 
 Add :root scope token detection to shadow DOM checker and suggest-fix pipeline

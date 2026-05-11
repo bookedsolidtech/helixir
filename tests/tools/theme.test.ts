@@ -119,10 +119,26 @@ describe('handleThemeCall — create_theme', () => {
     expect(parsed.themeName).toBe('enterprise');
   });
 
-  it('rejects unexpected extra properties (Zod strict validation)', async () => {
+  it('accepts the server-internal libraryId field from multi-library dispatch', async () => {
+    // src/mcp/index.ts extracts libraryId to pick the correct CEM, then forwards
+    // the original arg object into handleThemeCall. libraryId is modeled
+    // explicitly in the schema so this legitimate call succeeds.
     const result = await handleThemeCall(
       'create_theme',
-      { themeName: 'brand', unknownProp: 'bad' },
+      { themeName: 'brand', libraryId: 'hx' },
+      FAKE_CEM,
+    );
+    expect(result.isError).toBeFalsy();
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed.themeName).toBe('brand');
+  });
+
+  it('still rejects typos and unknown properties (Zod strict validation)', async () => {
+    // Strict validation guards against typos like `themeNmae` or `prefx` that
+    // would otherwise silently fall through and produce a default theme.
+    const result = await handleThemeCall(
+      'create_theme',
+      { themeNmae: 'brand', unknownProp: 'bad' },
       FAKE_CEM,
     );
     expect(result.isError).toBe(true);

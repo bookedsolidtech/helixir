@@ -141,7 +141,7 @@ Add edge-case tests for error paths and boundary conditions.
 - [x] `files` array includes `build/`, `README.md`, `CHANGELOG.md` (LICENSE auto-included by npm)
 - [x] `main` points to `build/index.js`
 - [x] `bin` points to `build/index.js`
-- [x] `engines.node` is set to `>=20.0.0`
+- [x] `engines.node` is set to `^22.0.0 || ^24.0.0` (Node 20 dropped — rea 0.15+ requires 22+)
 - [x] README.md tool count (33 tools) matches actual registered tools (29 core + 2 TS + 2 tokens = 33)
 - [x] All env var names in README match `src/config.ts` keys
 - [x] TypeScript as optional peer dependency with correct meta

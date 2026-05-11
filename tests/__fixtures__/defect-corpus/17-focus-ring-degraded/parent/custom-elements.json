@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "2.1.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "parent/hx-parent-tab.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Tab with AAA-compliant 2px focus-visible outline.",
+          "name": "HxParentTab",
+          "tagName": "hx-parent-tab",
+          "members": [
+            {
+              "kind": "field",
+              "name": "selected",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "attribute": "selected",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "attribute": "disabled",
+              "reflects": true
+            }
+          ],
+          "attributes": [
+            { "name": "selected", "type": { "text": "boolean" } },
+            { "name": "disabled", "type": { "text": "boolean" } }
+          ],
+          "helixMeta": {
+            "ariaPattern": "tab",
+            "keyboardContract": {
+              "activate": ["Enter", "Space"],
+              "navigate": ["ArrowLeft", "ArrowRight", "Home", "End"],
+              "disabledSuppresses": true
+            }
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-parent-tab",
+          "declaration": { "name": "HxParentTab", "module": "parent/hx-parent-tab.ts" }
+        }
+      ]
+    }
+  ]
+}

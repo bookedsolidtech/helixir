@@ -1,7 +1,117 @@
 #!/bin/sh
+# rea:husky-pre-push-gate v4
+# rea:gate-body-v4
+#
+# Husky pre-push hook installed by `rea init` / `rea upgrade`. Do NOT
+# edit by hand — the file is refreshed on every rea upgrade.
+#
+# Governance contract: HALT kill-switch check, then delegate to
+# `rea hook push-gate`. See src/hooks/push-gate/index.ts.
 
-# Gate: Format check — fails push if code is unformatted.
-# Auto-formatting runs in the pre-commit hook (lint-staged).
-# This hook is enforcement: if you bypassed pre-commit, your push fails here.
-# CI format check is the final un-bypassable backstop.
-pnpm run format:check
+set -eu
+
+# REA push-gate (0.11.0+). The heavy lifting — git diff resolution, Codex
+# invocation, verdict inference, audit write — lives in
+# `src/hooks/push-gate/` and is invoked via `rea hook push-gate`.
+# This stub only short-circuits on the kill-switch and resolves the rea
+# binary (in priority: project node_modules/.bin/rea → dogfood dist →
+# PATH → npx).
+#
+# The 0.10.x hooks assumed rea was on PATH. Consumers who bootstrap via
+# `npx @bookedsolid/rea init` have no persistent global rea install, so
+# the bare `exec rea` pattern fails with "rea: not found" on push. We
+# resolve against the project-local node_modules/.bin first, then PATH,
+# then fall back to npx so the gate runs in every documented setup.
+
+REA_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+if [ -f "${REA_ROOT}/.rea/HALT" ]; then
+  reason=$(awk 'NR==1 { print; exit }' "${REA_ROOT}/.rea/HALT" 2>/dev/null || printf 'unknown')
+  [ -z "${reason:-}" ] && reason='unknown'
+  printf 'REA HALT: %s\nAll push operations suspended. Run: rea unfreeze\n' "$reason" >&2
+  exit 1
+fi
+
+# Dispatch the rea CLI as a positional-args list rather than a string
+# (the 0.11.x `exec $REA_BIN ...` pattern broke when REA_ROOT contained
+# whitespace because the unquoted $REA_BIN expansion underwent word
+# splitting; `/Users/jane/My Projects/repo` produced four argv tokens
+# instead of two). The `set --` form below preserves spaces verbatim.
+#
+# 0.13.2 fix: the dispatch + invocation runs inside a SUBSHELL so the
+# `set --` rewrite does NOT bleed into the parent's $@. Before 0.13.2,
+# the parent's $@ ended up as the rea-CLI argv (`node /path/dist/cli/index.js
+# hook push-gate <remote-name> <remote-url>`) and the extension-fragment
+# loop below passed that mangled argv to fragments instead of git's
+# original `<remote-name> <remote-url>`. The subshell scopes the rewrite
+# so fragments see git's argv unchanged.
+#
+# The pre-push stdin carries one line per refspec; the subshell inherits
+# stdin unchanged. $@ on entry carries git's <remote-name> <remote-url>;
+# the subshell sees those as its initial $@, appends them inside each
+# `set --` arm, and the parent's $@ is preserved.
+
+if (
+  if [ -x "${REA_ROOT}/node_modules/.bin/rea" ]; then
+    set -- "${REA_ROOT}/node_modules/.bin/rea" hook push-gate "$@"
+  elif [ -f "${REA_ROOT}/dist/cli/index.js" ] && [ -f "${REA_ROOT}/package.json" ] && grep -q '"name": *"@bookedsolid/rea"' "${REA_ROOT}/package.json" 2>/dev/null; then
+    # rea's own repo (dogfood) — the package is not installed under
+    # node_modules here because we ARE the package. The built CLI
+    # entry point lives at dist/cli/index.js; node runs it directly.
+    # Gate this branch on `package.json` declaring `@bookedsolid/rea` so a
+    # consumer repo that happens to ship its own `dist/cli/index.js` does
+    # not get this hook executing the consumer's unrelated build.
+    set -- node "${REA_ROOT}/dist/cli/index.js" hook push-gate "$@"
+  elif command -v rea >/dev/null 2>&1; then
+    set -- rea hook push-gate "$@"
+  elif command -v npx >/dev/null 2>&1; then
+    # Last resort: npx will resolve the package from npm or the cache.
+    # Pass `--no-install` so a rare cache-cold machine surfaces a clear
+    # error instead of silently downloading at push time.
+    set -- npx --no-install @bookedsolid/rea hook push-gate "$@"
+  else
+    printf 'rea: cannot locate the rea CLI. Install locally (`pnpm add -D @bookedsolid/rea`) or globally (`npm i -g @bookedsolid/rea`).\n' >&2
+    exit 2
+  fi
+  exec "$@"
+); then
+  rea_status=0
+else
+  rea_status=$?
+fi
+if [ "$rea_status" -ne 0 ]; then
+  exit "$rea_status"
+fi
+
+# Extension-hook chaining: source every executable file under
+# `.husky/pre-push.d/` in lexical order. Missing directory = no-op
+# (backward compatible). Each fragment receives the original positional
+# args from git's `<remote-name> <remote-url>` invocation. Non-zero exit
+# from any fragment fails the push; this matches husky's normal hook
+# chaining semantics.
+#
+# The git pre-push contract delivers refspecs on stdin. Once rea's body has
+# consumed it (`exec rea hook push-gate "$@"` reads stdin during `runPushGate`),
+# subsequent fragments cannot replay it — that's by design: agents that need
+# refspec data should run before rea, not after. Fragments that need ambient
+# repo state can call `git rev-parse` themselves.
+ext_dir="${REA_ROOT}/.husky/pre-push.d"
+if [ -d "$ext_dir" ]; then
+  # Collect fragments deterministically. POSIX sort orders the same way on
+  # macOS (BSD sort) and Linux (GNU sort) for ASCII filenames; consumers who
+  # name their fragments `10-foo` / `20-bar` get predictable ordering.
+  for frag in "$ext_dir"/*; do
+    # Glob expands to itself when no matches — guard with -e.
+    [ -e "$frag" ] || continue
+    # Skip non-files (directories, sockets) and non-executables. The
+    # executable bit is the consumer's opt-in: dropping a non-executable
+    # README into the dir does not become a hook.
+    [ -f "$frag" ] || continue
+    [ -x "$frag" ] || continue
+    # Each fragment runs in its own subprocess with the original git args.
+    # Failures propagate via `set -eu` above (loop body inherits, so any
+    # non-zero exit blocks the push immediately).
+    "$frag" "$@"
+  done
+fi
+
+exit 0

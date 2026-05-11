@@ -98,6 +98,34 @@ describe('extendComponent', () => {
       expect(result.parentTagName).toBe('hx-button');
       expect(result.newTagName).toBe('my-button');
     });
+
+    it('uses the CEM declaration name when it does not match PascalCase(tagName)', () => {
+      // Many libraries expose tags whose backing class identifier differs from
+      // PascalCase(tagName) — e.g. "sl-button" → "SlButtonElement". Using the
+      // declaration name avoids generating a subclass that imports a symbol
+      // that does not exist in the parent module.
+      const ALIASED_CEM: Cem = {
+        schemaVersion: '1.0.0',
+        modules: [
+          {
+            kind: 'javascript-module',
+            path: './sl-button.js',
+            declarations: [
+              {
+                kind: 'class',
+                name: 'SlButtonElement',
+                tagName: 'sl-button',
+                customElement: true,
+              },
+            ],
+          },
+        ],
+      };
+      const result = extendComponent('sl-button', 'enterprise-button', ALIASED_CEM);
+      expect(result.parentClassName).toBe('SlButtonElement');
+      expect(result.source).toContain('extends SlButtonElement');
+      expect(result.source).toContain("import { SlButtonElement } from './sl-button.js'");
+    });
   });
 
   describe('generated source — inheritance chain syntax', () => {

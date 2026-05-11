@@ -110,10 +110,18 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Always clean stale containers, or do a full clean if requested
+# Always clean stale containers, or do a full clean if requested.
+# Avoid `xargs -r` — GNU-only flag, BSD xargs on macOS errors out.
+# Read the container IDs into a variable so the empty-list case is a
+# no-op instead of invoking `docker rm -f` with no arguments (which
+# itself errors). Codex round-4 P2.
 if [[ "$DO_CLEAN" == true ]]; then
   echo "Cleaning ALL act containers..."
-  docker ps -aq --filter "name=act-" 2>/dev/null | xargs -r docker rm -f >/dev/null 2>&1 || true
+  CONTAINERS=$(docker ps -aq --filter "name=act-" 2>/dev/null || true)
+  if [[ -n "$CONTAINERS" ]]; then
+    # shellcheck disable=SC2086 # intentional word-splitting on space-separated IDs
+    docker rm -f $CONTAINERS >/dev/null 2>&1 || true
+  fi
 else
   cleanup_stale_containers
 fi
@@ -132,10 +140,25 @@ fi
 
 if [[ "$USE_MATRIX" == true ]]; then
   ENV_ARGS="$ENV_ARGS --env ACT_MATRIX_TESTS=true --env ACT_FULL_TESTS=true"
-  TEST_MODE="full suite + Node 20/22/24 matrix (CI Matrix parity)"
+  TEST_MODE="full suite + Node 22/24 matrix (CI Matrix parity)"
 elif [[ "$USE_FULL" == true ]]; then
-  ENV_ARGS="$ENV_ARGS --env ACT_FULL_TESTS=true"
-  TEST_MODE="full suite (current Node)"
+  # Capture the host's major Node version so the workflow tests against
+  # the developer's actual runtime, not whatever the act runner image
+  # happens to ship. Codex round-7 P2 / round-73 P2. Falls back to 22
+  # (LTS) when node is missing OR when the host is on an unsupported
+  # major (engines.node now requires >=22; running act under Node 20
+  # would hit ENOTSUPPORTED at install time before any test ran).
+  HOST_NODE_MAJOR=$(node --version 2>/dev/null | sed -E 's/^v([0-9]+)\..*/\1/' || echo "22")
+  # Coerce any unsupported major (anything other than 22 or 24) to
+  # the LTS so install doesn't ENOTSUPPORTED. Codex round-73 P2 +
+  # round-74 P3: engines.node is `^22 || ^24` so odd majors like 23
+  # or 25 are also unsupported, not just <22.
+  if [[ -z "$HOST_NODE_MAJOR" ]] || [[ "$HOST_NODE_MAJOR" != "22" && "$HOST_NODE_MAJOR" != "24" ]]; then
+    echo "[act-ci] Host Node $HOST_NODE_MAJOR is outside the helixir engines floor (^22 || ^24); coercing to 22 for the act run." >&2
+    HOST_NODE_MAJOR=22
+  fi
+  ENV_ARGS="$ENV_ARGS --env ACT_FULL_TESTS=true --env ACT_FULL_NODE_VERSION=$HOST_NODE_MAJOR"
+  TEST_MODE="full suite (host Node $HOST_NODE_MAJOR)"
 else
   TEST_MODE="standard (quality-gates)"
 fi

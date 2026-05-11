@@ -22,7 +22,7 @@ GitHub Action that runs [helixir](https://github.com/bookedsolidtech/helixir) qu
 | `fail-on-warning`  | Fail if minor (warning-level) breaking changes are detected                  | `false`                                 |
 | `comment`          | Post a summary comment on the pull request                                   | `true`                                  |
 | `config-path`      | Path to `mcpwc.config.json` (auto-discovered if empty)                       | `""`                                    |
-| `node-version`     | Node.js version to use                                                       | `20`                                    |
+| `node-version`     | Node.js version (must be `>=22`; helixir requires Node 22 or 24)             | `22`                                    |
 | `helixir-version`  | Version of helixir to install                                                | `latest`                                |
 
 ## Outputs

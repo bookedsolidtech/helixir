@@ -7,6 +7,12 @@
  *
  * The helixir/mcp module exports a `main()` function that initialises and
  * starts the MCP server, listening on stdin/stdout.
+ *
+ * Imports via the `helixir/mcp` package export so the VS Code extension's
+ * own TypeScript project (rootDir = packages/vscode/src) keeps type-
+ * checking. The build is staleness-protected by the root prebuild script —
+ * `pnpm --filter helixir-vscode build` runs after the root build that
+ * produces the package's built artifact.
  */
 import { main } from 'helixir/mcp';
 

@@ -1,0 +1,18 @@
+#!/bin/sh
+# .husky/pre-push.d/01-format-check — Prettier format gate
+#
+# Runs after rea's push-gate (HALT + Codex review + audit). Catches
+# unformatted files before they hit CI's format job. The rea push-gate
+# only enforces Codex adversarial review; format checking is a
+# project-local quality gate so contributors don't push code that's
+# guaranteed to fail CI.
+#
+# Skipped when pnpm is unavailable (e.g. consumer environments without
+# the package manager); the rea gate above is the security boundary,
+# this is just convenience.
+
+set -eu
+
+if command -v pnpm >/dev/null 2>&1 && [ -f package.json ]; then
+  exec pnpm run format:check
+fi

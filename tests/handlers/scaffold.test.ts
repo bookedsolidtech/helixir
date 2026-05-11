@@ -300,4 +300,207 @@ describe('scaffoldComponent — custom baseClass option', () => {
   it('uses the provided baseClass', () => {
     expect(result.component).toContain('extends FormAssociatedMixin');
   });
+
+  it('emits a TODO import when the base class origin is unknown', () => {
+    // EMPTY_CEM has no superclass metadata, so we cannot resolve where to
+    // import FormAssociatedMixin from. The generator should leave a TODO
+    // import marker rather than silently shipping uncompilable output that
+    // references an undefined symbol.
+    expect(result.component).toContain('// TODO: import { FormAssociatedMixin }');
+  });
+});
+
+// ─── scaffoldComponent — non-Lit base class import (codex bug fix) ───────────
+
+describe('scaffoldComponent — non-Lit base class import', () => {
+  // CEM whose components extend a custom base class the generator must import.
+  const CUSTOM_BASE_CEM: Cem = {
+    schemaVersion: '1.0.0',
+    modules: [
+      {
+        kind: 'javascript-module',
+        path: './hx-button.js',
+        declarations: [
+          {
+            kind: 'class',
+            name: 'HxButton',
+            tagName: 'hx-button',
+            customElement: true,
+            superclass: {
+              name: 'BookedSolidElement',
+              package: '@bookedsolid/elements',
+            },
+          },
+        ],
+      },
+    ],
+  };
+
+  it('imports the detected non-Lit base class from its package', () => {
+    const result = scaffoldComponent({ tagName: 'hx-card' }, CUSTOM_BASE_CEM);
+    expect(result.component).toContain('extends BookedSolidElement');
+    expect(result.component).toContain(
+      "import { BookedSolidElement } from '@bookedsolid/elements';",
+    );
+    // LitElement should NOT be imported when it is not the base class
+    expect(result.component).not.toContain('LitElement,');
+  });
+
+  it('emits TODO when only a local-relative module path is recorded (runbook §4b)', () => {
+    // Per runbook §4b: package wins, BARE-SPECIFIER module fallback,
+    // local-relative module → TODO. A relative module path (./foo.js)
+    // is source-relative and won't resolve at the scaffold destination,
+    // so the right move is to flag it explicitly rather than emit a
+    // broken-by-default import.
+    const MODULE_ONLY_CEM: Cem = {
+      schemaVersion: '1.0.0',
+      modules: [
+        {
+          kind: 'javascript-module',
+          path: './hx-button.js',
+          declarations: [
+            {
+              kind: 'class',
+              name: 'HxButton',
+              tagName: 'hx-button',
+              customElement: true,
+              superclass: {
+                name: 'CustomBase',
+                module: './custom-base.js',
+              },
+            },
+          ],
+        },
+      ],
+    };
+    const result = scaffoldComponent({ tagName: 'hx-card' }, MODULE_ONLY_CEM);
+    expect(result.component).toContain('TODO: import { CustomBase }');
+    expect(result.component).not.toContain("from './custom-base.js'");
+  });
+
+  it('emits a TODO import when options.baseClass overrides the detected base class', () => {
+    // CEM detects BookedSolidElement from package @bookedsolid/elements, but
+    // the caller passes baseClass: FormAssociatedMixin. Importing
+    // FormAssociatedMixin from @bookedsolid/elements would be wrong — the
+    // generator must not reuse the detected metadata for the override.
+    const DETECTED_BASE_CEM: Cem = {
+      schemaVersion: '1.0.0',
+      modules: [
+        {
+          kind: 'javascript-module',
+          path: './hx-button.js',
+          declarations: [
+            {
+              kind: 'class',
+              name: 'HxButton',
+              tagName: 'hx-button',
+              customElement: true,
+              superclass: {
+                name: 'BookedSolidElement',
+                package: '@bookedsolid/elements',
+              },
+            },
+          ],
+        },
+      ],
+    };
+    const result = scaffoldComponent(
+      { tagName: 'hx-form-field', baseClass: 'FormAssociatedMixin' },
+      DETECTED_BASE_CEM,
+    );
+    expect(result.component).toContain('extends FormAssociatedMixin');
+    expect(result.component).toContain('// TODO: import { FormAssociatedMixin }');
+    // Critical: must NOT emit FormAssociatedMixin from the detected base's package
+    expect(result.component).not.toContain(
+      "import { FormAssociatedMixin } from '@bookedsolid/elements';",
+    );
+  });
+
+  it('merges superclass origin metadata across declarations (non-null wins)', () => {
+    // CEM where the first declaration of a shared superclass omits its
+    // package, but a later declaration of the same class includes it.
+    // Convention detection must keep the non-null metadata so scaffolds
+    // generate a real import, not a TODO.
+    const MIXED_QUALITY_CEM: Cem = {
+      schemaVersion: '1.0.0',
+      modules: [
+        {
+          kind: 'javascript-module',
+          path: './hx-button.js',
+          declarations: [
+            {
+              kind: 'class',
+              name: 'HxButton',
+              tagName: 'hx-button',
+              customElement: true,
+              superclass: { name: 'BookedSolidElement' }, // no package/module
+            },
+          ],
+        },
+        {
+          kind: 'javascript-module',
+          path: './hx-card.js',
+          declarations: [
+            {
+              kind: 'class',
+              name: 'HxCard',
+              tagName: 'hx-card',
+              customElement: true,
+              superclass: {
+                name: 'BookedSolidElement',
+                package: '@bookedsolid/elements',
+              },
+            },
+          ],
+        },
+      ],
+    };
+    const result = scaffoldComponent({ tagName: 'hx-input' }, MIXED_QUALITY_CEM);
+    expect(result.component).toContain('extends BookedSolidElement');
+    expect(result.component).toContain(
+      "import { BookedSolidElement } from '@bookedsolid/elements';",
+    );
+    expect(result.component).not.toContain('// TODO');
+  });
+
+  it('does NOT guess the base-class import from an unrelated inherited member package', () => {
+    // CEM where superclass has no module/package metadata, but an inherited
+    // member records a package. That inheritedFrom.package is unrelated to
+    // where the base class lives — emitting an import from it would compile
+    // to a "not exported from" error. The generator must leave a TODO.
+    const UNRELATED_PACKAGE_CEM: Cem = {
+      schemaVersion: '1.0.0',
+      modules: [
+        {
+          kind: 'javascript-module',
+          path: './hx-button.js',
+          declarations: [
+            {
+              kind: 'class',
+              name: 'HxButton',
+              tagName: 'hx-button',
+              customElement: true,
+              superclass: {
+                name: 'LocalBase',
+                // No module or package — locally defined, origin unknown
+              },
+              members: [
+                {
+                  kind: 'field',
+                  name: 'someInheritedField',
+                  inheritedFrom: {
+                    name: 'AnotherClass',
+                    package: '@unrelated/library',
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const result = scaffoldComponent({ tagName: 'hx-card' }, UNRELATED_PACKAGE_CEM);
+    expect(result.component).toContain('// TODO: import { LocalBase }');
+    expect(result.component).not.toContain('@unrelated/library');
+  });
 });

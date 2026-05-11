@@ -60,13 +60,15 @@ function makeFullDimensions(
 // ─── DIMENSION_REGISTRY ──────────────────────────────────────────────────────
 
 describe('DIMENSION_REGISTRY', () => {
-  it('contains exactly 14 dimensions', () => {
-    expect(DIMENSION_REGISTRY).toHaveLength(14);
+  it('contains exactly 21 dimensions', () => {
+    // Phase 3: legacy 'Accessibility' (1 dim) split into 8 new dims → 14 - 1 + 8 = 21.
+    expect(DIMENSION_REGISTRY).toHaveLength(21);
   });
 
-  it('has 9 cem-native dimensions', () => {
+  it('has 16 cem-native dimensions', () => {
+    // Phase 3: 9 original CEM-native minus Accessibility = 8, plus 8 new = 16.
     const cemNative = DIMENSION_REGISTRY.filter((d) => d.source === 'cem-native');
-    expect(cemNative).toHaveLength(9);
+    expect(cemNative).toHaveLength(16);
   });
 
   it('has 5 external dimensions', () => {
@@ -74,13 +76,20 @@ describe('DIMENSION_REGISTRY', () => {
     expect(external).toHaveLength(5);
   });
 
-  it('total weight equals 100', () => {
-    expect(TOTAL_WEIGHT).toBe(105);
+  it('total weight equals 107', () => {
+    // Phase 3: legacy Accessibility (10) replaced by 8 new dims summing to 12 → 105 - 10 + 12 = 107.
+    expect(TOTAL_WEIGHT).toBe(107);
   });
 
-  it('all dimensions have positive weight', () => {
+  it('all registry weights are non-negative (advanced "AAA Audit Self-Certification" is 0)', () => {
+    // Phase 3: AAA Audit Self-Certification is an advanced informational
+    // dim with weight 0 — it surfaces in reports but does not affect the
+    // weighted score. All other dims remain strictly positive.
     for (const d of DIMENSION_REGISTRY) {
-      expect(d.weight).toBeGreaterThan(0);
+      expect(d.weight).toBeGreaterThanOrEqual(0);
+      if (d.name !== 'AAA Audit Self-Certification') {
+        expect(d.weight).toBeGreaterThan(0);
+      }
     }
   });
 
@@ -90,32 +99,43 @@ describe('DIMENSION_REGISTRY', () => {
     }
   });
 
-  it('critical dimensions have the highest weights', () => {
-    const criticalWeights = DIMENSION_REGISTRY.filter((d) => d.tier === 'critical').map(
-      (d) => d.weight,
+  it('critical tier sum-weight exceeds advanced tier sum-weight', () => {
+    // Phase 3: per-dim weights are intentionally heterogeneous after the
+    // Accessibility split (APG Keyboard Contract is critical at weight 2;
+    // Performance is advanced at weight 5). The invariant we still hold
+    // is at the tier level: critical dims collectively outweigh advanced.
+    const criticalSum = DIMENSION_REGISTRY.filter((d) => d.tier === 'critical').reduce(
+      (s, d) => s + d.weight,
+      0,
     );
-    const advancedWeights = DIMENSION_REGISTRY.filter((d) => d.tier === 'advanced').map(
-      (d) => d.weight,
+    const advancedSum = DIMENSION_REGISTRY.filter((d) => d.tier === 'advanced').reduce(
+      (s, d) => s + d.weight,
+      0,
     );
-    const minCritical = Math.min(...criticalWeights);
-    const maxAdvanced = Math.max(...advancedWeights);
-    expect(minCritical).toBeGreaterThanOrEqual(maxAdvanced);
+    expect(criticalSum).toBeGreaterThan(advancedSum);
   });
 });
 
 // ─── DIMENSION_CLASSIFICATION ────────────────────────────────────────────────
 
 describe('DIMENSION_CLASSIFICATION', () => {
-  it('has 5 critical dimensions', () => {
-    expect(DIMENSION_CLASSIFICATION.critical).toHaveLength(5);
+  it('has 6 critical dimensions', () => {
+    // Phase 3: legacy 'Accessibility' (1 critical) → split into
+    // 'WCAG Conformance' + 'APG Keyboard Contract' (2 critical).
+    // Net: 5 - 1 + 2 = 6.
+    expect(DIMENSION_CLASSIFICATION.critical).toHaveLength(6);
   });
 
-  it('has 7 important dimensions', () => {
-    expect(DIMENSION_CLASSIFICATION.important).toHaveLength(7);
+  it('has 11 important dimensions', () => {
+    // Phase 3: previous 7 + Focus Indicator, Form Association,
+    // Accessible Label Pattern, Forced Colors Mode = 11.
+    expect(DIMENSION_CLASSIFICATION.important).toHaveLength(11);
   });
 
-  it('has 2 advanced dimensions', () => {
-    expect(DIMENSION_CLASSIFICATION.advanced).toHaveLength(2);
+  it('has 4 advanced dimensions', () => {
+    // Phase 3: previous 2 (Performance, Drupal Readiness) + new
+    // Form Validity Reporting + AAA Audit Self-Certification = 4.
+    expect(DIMENSION_CLASSIFICATION.advanced).toHaveLength(4);
   });
 
   it('all registry dimension names are classified', () => {
@@ -222,7 +242,7 @@ describe('calculateGrade', () => {
     const dims = makeFullDimensions(
       {
         'CEM Completeness': 95,
-        Accessibility: 85,
+        'WCAG Conformance': 85,
         'Type Coverage': 90,
         'Test Coverage': 85,
       },
@@ -237,7 +257,7 @@ describe('calculateGrade', () => {
     const dims = makeFullDimensions(
       {
         'CEM Completeness': 85,
-        Accessibility: 75,
+        'WCAG Conformance': 75,
         'Type Coverage': 80,
         'Test Coverage': 75,
       },
@@ -252,7 +272,7 @@ describe('calculateGrade', () => {
     const dims = makeFullDimensions(
       {
         'CEM Completeness': 30,
-        Accessibility: 30,
+        'WCAG Conformance': 30,
         'Type Coverage': 30,
         'Test Coverage': 30,
       },
@@ -267,7 +287,7 @@ describe('calculateGrade', () => {
     const dims = makeFullDimensions(
       {
         'CEM Completeness': 95,
-        Accessibility: 0,
+        'WCAG Conformance': 0,
         'Type Coverage': 95,
         'Test Coverage': 90,
       },
@@ -285,7 +305,7 @@ describe('calculateGrade', () => {
     const dims = makeFullDimensions(
       {
         'CEM Completeness': 95,
-        Accessibility: 40,
+        'WCAG Conformance': 40,
         'Type Coverage': 95,
         'Test Coverage': 90,
       },
@@ -311,11 +331,66 @@ describe('calculateGrade', () => {
     expect(result.gradingNotes.some((n) => n.includes('untested'))).toBe(true);
   });
 
+  // M2: `unknown` confidence = "input data missing" must count against
+  // maxUntestedCritical the same way `untested` does. Without this, a CEM
+  // with absent keys would silently exclude its dimensions from grading
+  // and the component would still score A — exactly the gaslighting
+  // pattern documented in defect-corpus class 12.
+  it('unknown-confidence critical dimensions count against maxUntestedCritical (same as untested)', () => {
+    const dims = DIMENSION_REGISTRY.map((def) => ({
+      name: def.name,
+      score: def.name === 'CEM-Source Fidelity' ? 0 : 95,
+      weight: def.weight,
+      tier: def.tier,
+      // CEM-Source Fidelity is critical — mark it `unknown` (input absent),
+      // not `untested` (no measurement). Both should drop the grade.
+      confidence: def.name === 'CEM-Source Fidelity' ? ('unknown' as const) : ('verified' as const),
+      // `measured: true` here — the analyzer ran, it just couldn't answer.
+      // This is the case M2 fixes: pre-M2, this dimension would have
+      // come back `notApplicable: true / measured: false` and dropped
+      // from the weighted score entirely.
+      measured: true,
+    }));
+    const result = calculateGrade(92, dims);
+    expect(result.grade).not.toBe('A');
+    expect(result.gradingNotes.some((n) => n.includes('untested'))).toBe(true);
+  });
+
+  it('mixing untested + unknown stacks against the same critical budget', () => {
+    // Grade B allows up to 1 untested critical. With 1 untested + 1 unknown,
+    // we have 2 in the pool and B should be unreachable.
+    const dims = DIMENSION_REGISTRY.map((def) => {
+      const isTestCoverage = def.name === 'Test Coverage';
+      const isFidelity = def.name === 'CEM-Source Fidelity';
+      let confidence: 'verified' | 'untested' | 'unknown' = 'verified';
+      let measured = true;
+      if (isTestCoverage) {
+        confidence = 'untested';
+        measured = false;
+      } else if (isFidelity) {
+        confidence = 'unknown';
+        measured = true;
+      }
+      return {
+        name: def.name,
+        score: isTestCoverage || isFidelity ? 0 : 95,
+        weight: def.weight,
+        tier: def.tier,
+        confidence,
+        measured,
+      };
+    });
+    const result = calculateGrade(85, dims);
+    // 2 in the untested+unknown pool — A=0, B=1, both gated; C=2 is the
+    // ceiling. Result must be C or worse.
+    expect(['C', 'D', 'F']).toContain(result.grade);
+  });
+
   it('a component with 95% CEM but 0% type coverage cannot get above C', () => {
     const dims = makeFullDimensions(
       {
         'CEM Completeness': 95,
-        Accessibility: 85,
+        'WCAG Conformance': 85,
         'Type Coverage': 0,
         'Test Coverage': 90,
       },
@@ -330,7 +405,7 @@ describe('calculateGrade', () => {
     const dims = makeFullDimensions(
       {
         'CEM Completeness': 95,
-        Accessibility: 0,
+        'WCAG Conformance': 0,
         'Type Coverage': 95,
         'Test Coverage': 90,
       },
@@ -339,7 +414,7 @@ describe('calculateGrade', () => {
     );
     const result = calculateGrade(85, dims);
     expect(result.gradingNotes.length).toBeGreaterThan(0);
-    expect(result.gradingNotes.some((n) => n.includes('Accessibility'))).toBe(true);
+    expect(result.gradingNotes.some((n) => n.includes('WCAG Conformance'))).toBe(true);
   });
 
   it('returns weightedScore in the result', () => {

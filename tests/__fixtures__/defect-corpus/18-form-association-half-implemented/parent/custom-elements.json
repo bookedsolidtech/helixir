@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "2.1.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "parent/hx-parent-field.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Form-associated input wrapper with full ElementInternals support.",
+          "name": "HxParentField",
+          "tagName": "hx-parent-field",
+          "members": [
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": { "text": "boolean" },
+              "default": "true",
+              "static": true
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": { "text": "string" },
+              "default": "''",
+              "attribute": "value",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "attribute": "required",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "_updateValidity",
+              "privacy": "protected"
+            }
+          ],
+          "attributes": [
+            { "name": "value", "type": { "text": "string" } },
+            { "name": "required", "type": { "text": "boolean" } }
+          ],
+          "helixMeta": {
+            "formAssociated": true
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-parent-field",
+          "declaration": { "name": "HxParentField", "module": "parent/hx-parent-field.ts" }
+        }
+      ]
+    }
+  ]
+}

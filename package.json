@@ -40,13 +40,15 @@
     "lint:fix": "eslint src packages/core/src --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "preflight": "bash scripts/preflight.sh",
     "cem:generate": "cem analyze && node scripts/normalize-cem.mjs",
     "cem:check": "pnpm run cem:generate && git diff --exit-code custom-elements.json",
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
-    "prepublishOnly": "pnpm run build",
-    "prepare": "husky"
+    "prepublishOnly": "node scripts/block-local-publish.mjs && pnpm run build",
+    "prepare": "husky",
+    "postinstall": "node -e \"try{require('fs').statSync('scripts/install-gitleaks-shim.mjs')}catch{process.exit(0)};require('child_process').spawnSync(process.execPath,['scripts/install-gitleaks-shim.mjs'],{stdio:'inherit'})\""
   },
   "keywords": [
     "mcp",
@@ -85,6 +87,7 @@
     }
   },
   "devDependencies": {
+    "@bookedsolid/rea": "^0.28.1",
     "@changesets/cli": "^2.29.4",
     "@commitlint/cli": "^20.4.3",
     "@commitlint/config-conventional": "^20.4.3",
@@ -94,6 +97,7 @@
     "@vitest/coverage-v8": "^3.0.0",
     "eslint": "^9.39.3",
     "eslint-config-prettier": "^10.1.8",
+    "gitleaks-secret-scanner": "^2.1.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "prettier": "^3.0.0",
@@ -107,13 +111,15 @@
       "@hono/node-server": ">=1.19.10",
       "express-rate-limit": ">=8.2.2",
       "undici": ">=7.24.0",
-      "flatted": ">=3.4.0"
+      "flatted": ">=3.4.0",
+      "fast-uri": ">=3.1.2"
     }
   },
   "engines": {
-    "node": "^20.0.0 || ^22.0.0 || ^24.0.0",
+    "node": "^22.0.0 || ^24.0.0",
     "pnpm": ">=9"
   },
+  "packageManager": "pnpm@9.15.9",
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "eslint --fix",

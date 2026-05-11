@@ -1,0 +1,19 @@
+{
+  "classId": "17-focus-ring-degraded",
+  "subclassTagName": "hx-focus-degraded",
+  "parentTagName": "hx-parent-tab",
+  "dimensions": {
+    "Focus Indicator": {
+      "scoreMax": 10,
+      "confidenceIn": ["heuristic", "high"],
+      "issueIncludes": "focus-visible-rule-degraded"
+    },
+    "WCAG Conformance": {
+      "scoreMax": 75,
+      "confidenceIn": ["heuristic"],
+      "issueIncludes": "sc-2-4-7"
+    }
+  },
+  "groundTruthCommit": "b011d70f4",
+  "notes": "Parent declares 2px AAA focus-visible outline (helix commit b011d70f4 bumped 8 components to this contract). Subclass replaces the rule with `outline: none`. Focus Indicator must score at or near 0; WCAG must flag SC 2.4.7 (Focus Visible)."
+}

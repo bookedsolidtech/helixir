@@ -30,10 +30,16 @@ export interface AuditSummary {
 export async function generateAuditReport(
   config: McpWcConfig,
   cemDeclarations: CemDeclaration[],
-  options?: { outputPath?: string; libraryId?: string; cem?: Cem },
+  options?: { outputPath?: string; libraryId?: string; cem?: Cem; libraryRoot?: string },
 ): Promise<{ lines: string[]; summary: AuditSummary }> {
   const withTag = cemDeclarations.filter((decl) => decl.tagName !== undefined);
   const libraryId = options?.libraryId ?? 'default';
+  // Default libraryRoot to config.projectRoot so audit_library picks up
+  // source-level evidence (focus-visible, attachInternals, forced-colors)
+  // the same way score_component does. Without this the two entry points
+  // produce divergent scores for the same input — codex push-gate P1,
+  // round 3 (2026-05-10).
+  const libraryRoot = options?.libraryRoot ?? config.projectRoot;
   const lines: string[] = [];
 
   const gradeDistribution = { A: 0, B: 0, C: 0, D: 0, F: 0 };
@@ -42,7 +48,14 @@ export async function generateAuditReport(
   let totalScore = 0;
 
   for (const decl of withTag) {
-    const health = await scoreComponentMultiDimensional(config, decl, options?.cem, libraryId);
+    const health = await scoreComponentMultiDimensional(
+      config,
+      decl,
+      options?.cem,
+      libraryId,
+      undefined,
+      libraryRoot,
+    );
     const line = JSON.stringify(health);
     lines.push(line);
 

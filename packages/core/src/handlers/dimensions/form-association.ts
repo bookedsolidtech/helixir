@@ -31,31 +31,40 @@ export function scoreFormAssociation(
 
   // ── N/A path: helixMeta says explicitly "not form-associated" ──────────
   if (helixMeta?.formAssociated === false) {
-    // If sourceChecks also confirm the absence, this is the strongest
-    // N/A signal we can produce.
-    if (checks && !checks.hasStaticFormAssociated) {
+    // Confirm the absence across ALL three FACE signals — static flag,
+    // attachInternals(), setValidity(). A partial removal (subclass
+    // drops `static formAssociated` but keeps attachInternals + setValidity)
+    // would otherwise score 100/verified while still behaving as a form
+    // control (codex push-gate P2 round 3, 2026-05-10).
+    if (checks) {
+      const anyFaceSignal =
+        checks.hasStaticFormAssociated || checks.hasAttachInternals || checks.hasSetValidityCall;
+      if (!anyFaceSignal) {
+        return {
+          score: 100,
+          confidence: 'verified',
+          measured: true,
+          notes: ['not-form-associated-correctly-declared'],
+        };
+      }
+      // Claim says not-form-associated but source has FACE signals —
+      // claim/source drift. Surface every signal that contradicts.
+      const driftNotes: string[] = ['form-association-claim-source-mismatch'];
+      if (checks.hasStaticFormAssociated) driftNotes.push('static-formAssociated-still-present');
+      if (checks.hasAttachInternals) driftNotes.push('attachInternals-still-called');
+      if (checks.hasSetValidityCall) driftNotes.push('setValidity-still-called');
       return {
-        score: 100,
-        confidence: 'verified',
+        score: 50,
+        confidence: 'heuristic',
         measured: true,
-        notes: ['not-form-associated-correctly-declared'],
+        notes: driftNotes,
       };
     }
-    if (!checks) {
-      return {
-        score: 100,
-        confidence: 'verified',
-        measured: true,
-        notes: ['not-form-associated'],
-      };
-    }
-    // Claim says not-form-associated but source has the static flag —
-    // claim/source drift. Score heuristic and surface it.
     return {
-      score: 50,
-      confidence: 'heuristic',
+      score: 100,
+      confidence: 'verified',
       measured: true,
-      notes: ['form-association-claim-source-mismatch'],
+      notes: ['not-form-associated'],
     };
   }
 

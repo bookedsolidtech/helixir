@@ -49,8 +49,13 @@ export function parseKeyboardContract(input: string | undefined | null): Keyboar
   const trimmed = input.trim();
   if (trimmed.length === 0) return null;
 
-  // Allow callers to pass the raw JSDoc line including `@keyboard-contract`.
-  const stripped = trimmed.replace(/^@?keyboard[-_ ]?contract\s*[:=-]?\s*/i, '');
+  // Locate `@keyboard-contract` anywhere in the description text, not
+  // only at the start. Multi-line JSDoc legacy layouts (a summary
+  // paragraph followed by the contract tag) otherwise fall through to
+  // the no-contract branch and a correct component scores zero
+  // (codex push-gate P2 round 3, 2026-05-10).
+  const tagMatch = /@?keyboard[-_ ]?contract\s*[:=-]?\s*/i.exec(trimmed);
+  const stripped = tagMatch ? trimmed.slice((tagMatch.index ?? 0) + tagMatch[0].length) : trimmed;
 
   const buckets = stripped
     .split(/[;\n|]/)

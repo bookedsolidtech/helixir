@@ -317,7 +317,18 @@ export function buildHelixAccessibilityReport(
   evidence: HelixAaaEvidence,
 ): HelixAccessibilityReport {
   const profile = analyzeAccessibility(decl);
-  if (evidence.helixMeta !== undefined || evidence.verdictSnapshot !== undefined) {
+  // Attach helixEvidence when ANY evidence source produced data, including
+  // source-only signals (focus-visible rules, attachInternals, forced-colors
+  // CSS, fresh AAA-AUDIT.md sidecar) collected via libraryRoot but without
+  // a helixMeta block or aaa-verdicts.json snapshot. Otherwise source-backed
+  // callers silently lose their detected evidence (codex push-gate P2,
+  // 2026-05-10).
+  if (
+    evidence.helixMeta !== undefined ||
+    evidence.verdictSnapshot !== undefined ||
+    evidence.sourceChecks !== undefined ||
+    evidence.auditMdPath !== undefined
+  ) {
     return { ...profile, helixEvidence: summarizeHelixEvidence(evidence) };
   }
   return profile;

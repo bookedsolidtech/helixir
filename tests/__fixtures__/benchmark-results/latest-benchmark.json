@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-05-11T02:00:50.169Z",
+  "timestamp": "2026-05-11T02:45:25.334Z",
   "scorecards": {
     "material": {
       "library": "material",
       "componentCount": 97,
-      "averageScore": 50.44,
+      "averageScore": 42.67,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
         "C": 0,
-        "D": 8,
-        "F": 89
+        "D": 1,
+        "F": 96
       },
       "dimensionAverages": {
         "CEM Completeness": 71.78,
@@ -38,54 +38,54 @@
       "top5": [
         {
           "tagName": "md-divider",
-          "score": 71.9,
+          "score": 60.7,
           "grade": "D"
         },
         {
           "tagName": "hct-slider",
-          "score": 69.8,
+          "score": 60.7,
           "grade": "F"
         },
         {
-          "tagName": "md-elevation",
-          "score": 66.7,
+          "tagName": "md-navigation-drawer-modal",
+          "score": 53.9,
           "grade": "F"
         },
         {
-          "tagName": "catalog-component-header-title",
-          "score": 66.7,
+          "tagName": "md-navigation-drawer",
+          "score": 53.9,
           "grade": "F"
         },
         {
-          "tagName": "catalog-component-header",
-          "score": 66.7,
+          "tagName": "test-assist-chip",
+          "score": 53.4,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "test-element-internals",
-          "score": 34.9,
+          "score": 29.5,
           "grade": "F"
         },
         {
           "tagName": "test-chip-set",
-          "score": 36.8,
+          "score": 31,
           "grade": "F"
         },
         {
           "tagName": "test-default-value-form-associated",
-          "score": 37.2,
+          "score": 31.4,
           "grade": "F"
         },
         {
           "tagName": "md-slider",
-          "score": 38.1,
+          "score": 32.1,
           "grade": "F"
         },
         {
           "tagName": "test-form-associated",
-          "score": 38.5,
+          "score": 32.5,
           "grade": "F"
         }
       ],
@@ -243,18 +243,18 @@
         "heuristic": 357,
         "untested": 598
       },
-      "timestamp": "2026-05-11T02:00:50.149Z"
+      "timestamp": "2026-05-11T02:45:25.329Z"
     },
     "spectrum": {
       "library": "spectrum",
       "componentCount": 89,
-      "averageScore": 50.85,
+      "averageScore": 43.4,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
         "C": 0,
-        "D": 1,
-        "F": 88
+        "D": 0,
+        "F": 89
       },
       "dimensionAverages": {
         "CEM Completeness": 60.11,
@@ -282,54 +282,54 @@
       "top5": [
         {
           "tagName": "sp-accordion-item",
-          "score": 62.4,
-          "grade": "D"
-        },
-        {
-          "tagName": "sp-toast",
-          "score": 61.5,
+          "score": 54.3,
           "grade": "F"
         },
         {
-          "tagName": "sp-illustrated-message",
-          "score": 58.3,
+          "tagName": "sp-toast",
+          "score": 51.9,
           "grade": "F"
         },
         {
           "tagName": "sp-contextual-help",
-          "score": 58,
+          "score": 50.5,
           "grade": "F"
         },
         {
-          "tagName": "sp-badge",
-          "score": 57.6,
+          "tagName": "sp-tabs",
+          "score": 49.5,
+          "grade": "F"
+        },
+        {
+          "tagName": "sp-clear-button",
+          "score": 49.2,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "sp-table-row",
-          "score": 37.6,
+          "score": 31.8,
           "grade": "F"
         },
         {
           "tagName": "overlay-trigger",
-          "score": 39.2,
-          "grade": "F"
-        },
-        {
-          "tagName": "sp-slider-handle",
-          "score": 40,
+          "score": 33.1,
           "grade": "F"
         },
         {
           "tagName": "sp-switch",
-          "score": 40.5,
+          "score": 34.2,
           "grade": "F"
         },
         {
-          "tagName": "sp-swatch",
-          "score": 41.4,
+          "tagName": "sp-slider-handle",
+          "score": 34.8,
+          "grade": "F"
+        },
+        {
+          "tagName": "sp-table",
+          "score": 36,
           "grade": "F"
         }
       ],
@@ -487,18 +487,18 @@
         "heuristic": 347,
         "untested": 534
       },
-      "timestamp": "2026-05-11T02:00:50.150Z"
+      "timestamp": "2026-05-11T02:45:25.329Z"
     },
     "vaadin": {
       "library": "vaadin",
       "componentCount": 96,
-      "averageScore": 65.19,
+      "averageScore": 54.7,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
         "C": 0,
-        "D": 5,
-        "F": 91
+        "D": 0,
+        "F": 96
       },
       "dimensionAverages": {
         "CEM Completeness": 98.79,
@@ -526,54 +526,54 @@
       "top5": [
         {
           "tagName": "vaadin-checkbox-group",
-          "score": 70.8,
+          "score": 59.7,
           "grade": "F"
         },
         {
           "tagName": "vaadin-custom-field",
-          "score": 70.8,
+          "score": 59.7,
           "grade": "F"
         },
         {
           "tagName": "vaadin-date-time-picker",
-          "score": 70.8,
+          "score": 59.7,
           "grade": "F"
         },
         {
           "tagName": "vaadin-split-layout",
-          "score": 70.6,
+          "score": 59.6,
           "grade": "F"
         },
         {
-          "tagName": "vaadin-message-list",
-          "score": 69.7,
+          "tagName": "vaadin-select",
+          "score": 59.5,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "vaadin-map",
-          "score": 43.5,
+          "score": 36.3,
           "grade": "F"
         },
         {
           "tagName": "vaadin-field-highlighter",
-          "score": 46.2,
+          "score": 39,
           "grade": "F"
         },
         {
           "tagName": "vaadin-iconset",
-          "score": 52.9,
+          "score": 44.7,
           "grade": "F"
         },
         {
-          "tagName": "vaadin-virtual-list",
-          "score": 55.2,
+          "tagName": "vaadin-vertical-layout",
+          "score": 45.2,
           "grade": "F"
         },
         {
-          "tagName": "vaadin-drawer-toggle",
-          "score": 55.6,
+          "tagName": "vaadin-horizontal-layout",
+          "score": 45.2,
           "grade": "F"
         }
       ],
@@ -731,18 +731,18 @@
         "heuristic": 348,
         "untested": 619
       },
-      "timestamp": "2026-05-11T02:00:50.150Z"
+      "timestamp": "2026-05-11T02:45:25.330Z"
     },
     "fluentui": {
       "library": "fluentui",
       "componentCount": 41,
-      "averageScore": 61.04,
+      "averageScore": 51.57,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
         "C": 0,
-        "D": 12,
-        "F": 29
+        "D": 5,
+        "F": 36
       },
       "dimensionAverages": {
         "CEM Completeness": 92.02,
@@ -770,54 +770,54 @@
       "top5": [
         {
           "tagName": "fluent-button",
-          "score": 74.7,
+          "score": 63.1,
           "grade": "D"
         },
         {
           "tagName": "fluent-compound-button",
-          "score": 74.4,
+          "score": 62.8,
           "grade": "D"
         },
         {
           "tagName": "fluent-menu-button",
-          "score": 74.4,
+          "score": 62.8,
           "grade": "D"
         },
         {
           "tagName": "fluent-toggle-button",
-          "score": 74.2,
+          "score": 62.7,
           "grade": "D"
         },
         {
           "tagName": "fluent-link",
-          "score": 72.6,
+          "score": 61.3,
           "grade": "D"
         }
       ],
       "bottom5": [
         {
           "tagName": "fluent-dialog-body",
-          "score": 40,
+          "score": 33.8,
           "grade": "F"
         },
         {
           "tagName": "fluent-tab-panel",
-          "score": 42.7,
+          "score": 36,
           "grade": "F"
         },
         {
           "tagName": "fluent-tabs",
-          "score": 43.8,
+          "score": 36.9,
           "grade": "F"
         },
         {
           "tagName": "fluent-tablist",
-          "score": 50.3,
+          "score": 42.5,
           "grade": "F"
         },
         {
           "tagName": "fluent-dialog",
-          "score": 51.2,
+          "score": 43.2,
           "grade": "F"
         }
       ],
@@ -975,18 +975,18 @@
         "heuristic": 99,
         "untested": 246
       },
-      "timestamp": "2026-05-11T02:00:50.151Z"
+      "timestamp": "2026-05-11T02:45:25.330Z"
     },
     "carbon": {
       "library": "carbon",
       "componentCount": 110,
-      "averageScore": 49.41,
+      "averageScore": 41.75,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
         "C": 0,
-        "D": 5,
-        "F": 105
+        "D": 0,
+        "F": 110
       },
       "dimensionAverages": {
         "CEM Completeness": 85.83,
@@ -1014,54 +1014,54 @@
       "top5": [
         {
           "tagName": "bx-select-item-group",
-          "score": 67,
-          "grade": "D"
+          "score": 58.3,
+          "grade": "F"
         },
         {
           "tagName": "bx-select-item",
-          "score": 67,
-          "grade": "D"
+          "score": 58.3,
+          "grade": "F"
         },
         {
           "tagName": "bx-textarea",
-          "score": 64.9,
-          "grade": "D"
+          "score": 54.8,
+          "grade": "F"
         },
         {
           "tagName": "bx-input",
-          "score": 63.5,
-          "grade": "D"
+          "score": 53.6,
+          "grade": "F"
         },
         {
           "tagName": "bx-modal-footer-button",
-          "score": 62,
-          "grade": "D"
+          "score": 52.3,
+          "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "bx-accordion",
-          "score": 37.2,
+          "score": 31.4,
           "grade": "F"
         },
         {
           "tagName": "bx-side-nav-items",
-          "score": 38.8,
+          "score": 32.8,
           "grade": "F"
         },
         {
           "tagName": "bx-header",
-          "score": 38.8,
+          "score": 32.8,
           "grade": "F"
         },
         {
           "tagName": "bx-tile-group",
-          "score": 38.8,
+          "score": 32.8,
           "grade": "F"
         },
         {
           "tagName": "bx-structured-list-header-cell",
-          "score": 38.8,
+          "score": 32.8,
           "grade": "F"
         }
       ],
@@ -1219,12 +1219,12 @@
         "heuristic": 289,
         "untested": 660
       },
-      "timestamp": "2026-05-11T02:00:50.155Z"
+      "timestamp": "2026-05-11T02:45:25.330Z"
     },
     "ui5": {
       "library": "ui5",
       "componentCount": 170,
-      "averageScore": 36.78,
+      "averageScore": 31.06,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -1258,54 +1258,54 @@
       "top5": [
         {
           "tagName": "ui5-navigation-menu",
-          "score": 42.7,
+          "score": 36,
           "grade": "F"
         },
         {
           "tagName": "ui5-search-item-group",
-          "score": 42.7,
+          "score": 36,
           "grade": "F"
         },
         {
           "tagName": "ui5-user-menu-item",
-          "score": 42.7,
+          "score": 36,
           "grade": "F"
         },
         {
           "tagName": "ui5-user-menu-item-group",
-          "score": 42.7,
+          "score": 36,
           "grade": "F"
         },
         {
           "tagName": "ui5-user-settings-appearance-view-group",
-          "score": 42.7,
+          "score": 36,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "ui5-time-selection-clocks",
-          "score": 26.5,
+          "score": 22.3,
           "grade": "F"
         },
         {
           "tagName": "ui5-side-navigation-item",
-          "score": 28.7,
+          "score": 24.2,
           "grade": "F"
         },
         {
           "tagName": "ui5-popover",
-          "score": 29.9,
+          "score": 25.3,
           "grade": "F"
         },
         {
           "tagName": "ui5-menu-item-group",
-          "score": 30.8,
+          "score": 26,
           "grade": "F"
         },
         {
           "tagName": "ui5-dialog",
-          "score": 30.8,
+          "score": 26,
           "grade": "F"
         }
       ],
@@ -1463,12 +1463,12 @@
         "heuristic": 413,
         "untested": 1020
       },
-      "timestamp": "2026-05-11T02:00:50.155Z"
+      "timestamp": "2026-05-11T02:45:25.331Z"
     },
     "calcite": {
       "library": "calcite",
       "componentCount": 106,
-      "averageScore": 32.82,
+      "averageScore": 28.14,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -1502,54 +1502,54 @@
       "top5": [
         {
           "tagName": "calcite-autocomplete-item-group",
-          "score": 37.3,
+          "score": 32.5,
           "grade": "F"
         },
         {
           "tagName": "calcite-flow",
-          "score": 36.9,
+          "score": 31.2,
           "grade": "F"
         },
         {
           "tagName": "calcite-action",
-          "score": 33.6,
+          "score": 29.2,
           "grade": "F"
         },
         {
           "tagName": "calcite-autocomplete-item",
-          "score": 33.6,
+          "score": 29.2,
           "grade": "F"
         },
         {
           "tagName": "calcite-card-group",
-          "score": 33.6,
+          "score": 29.2,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "calcite-tab",
-          "score": 25.8,
+          "score": 21.8,
           "grade": "F"
         },
         {
           "tagName": "calcite-tab-title",
-          "score": 26.5,
+          "score": 22.3,
           "grade": "F"
         },
         {
           "tagName": "calcite-accordion",
-          "score": 26.9,
+          "score": 22.7,
           "grade": "F"
         },
         {
           "tagName": "calcite-stack",
-          "score": 28.8,
+          "score": 24.3,
           "grade": "F"
         },
         {
           "tagName": "calcite-shell",
-          "score": 28.9,
+          "score": 24.4,
           "grade": "F"
         }
       ],
@@ -1707,12 +1707,12 @@
         "heuristic": 267,
         "untested": 636
       },
-      "timestamp": "2026-05-11T02:00:50.156Z"
+      "timestamp": "2026-05-11T02:45:25.331Z"
     },
     "porsche": {
       "library": "porsche",
       "componentCount": 91,
-      "averageScore": 44.7,
+      "averageScore": 37.72,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -1746,54 +1746,54 @@
       "top5": [
         {
           "tagName": "p-toast",
-          "score": 49.7,
+          "score": 41.9,
           "grade": "F"
         },
         {
           "tagName": "p-button-group",
-          "score": 46.9,
+          "score": 39.6,
           "grade": "F"
         },
         {
           "tagName": "p-button-pure",
-          "score": 46.9,
+          "score": 39.6,
           "grade": "F"
         },
         {
           "tagName": "p-button-tile",
-          "score": 46.9,
+          "score": 39.6,
           "grade": "F"
         },
         {
           "tagName": "p-button",
-          "score": 46.9,
+          "score": 39.6,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "p-select-option",
-          "score": 40.8,
+          "score": 34.4,
           "grade": "F"
         },
         {
           "tagName": "p-select-wrapper-dropdown",
-          "score": 40.8,
+          "score": 34.4,
           "grade": "F"
         },
         {
           "tagName": "p-segmented-control-item",
-          "score": 40.8,
+          "score": 34.4,
           "grade": "F"
         },
         {
           "tagName": "p-radio-group-option",
-          "score": 40.8,
+          "score": 34.4,
           "grade": "F"
         },
         {
           "tagName": "p-multi-select-option",
-          "score": 40.8,
+          "score": 34.4,
           "grade": "F"
         }
       ],
@@ -1951,12 +1951,12 @@
         "heuristic": 213,
         "untested": 546
       },
-      "timestamp": "2026-05-11T02:00:50.156Z"
+      "timestamp": "2026-05-11T02:45:25.331Z"
     },
     "ionic": {
       "library": "ionic",
       "componentCount": 97,
-      "averageScore": 44.75,
+      "averageScore": 37.81,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -1990,54 +1990,54 @@
       "top5": [
         {
           "tagName": "ion-picker",
-          "score": 51.2,
+          "score": 43.2,
           "grade": "F"
         },
         {
           "tagName": "ion-ripple-effect",
-          "score": 50.9,
+          "score": 43,
           "grade": "F"
         },
         {
           "tagName": "ion-toolbar",
-          "score": 50.5,
+          "score": 42.6,
           "grade": "F"
         },
         {
           "tagName": "ion-badge",
-          "score": 49.7,
+          "score": 41.9,
           "grade": "F"
         },
         {
           "tagName": "ion-buttons",
-          "score": 49.7,
+          "score": 41.9,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "ion-tabs",
-          "score": 40,
+          "score": 33.8,
           "grade": "F"
         },
         {
           "tagName": "ion-route",
-          "score": 40,
+          "score": 33.8,
           "grade": "F"
         },
         {
           "tagName": "ion-route-redirect",
-          "score": 40,
+          "score": 33.8,
           "grade": "F"
         },
         {
           "tagName": "ion-picker-legacy",
-          "score": 40.3,
+          "score": 34,
           "grade": "F"
         },
         {
-          "tagName": "ion-textarea",
-          "score": 40.6,
+          "tagName": "ion-tab-button",
+          "score": 34.3,
           "grade": "F"
         }
       ],
@@ -2195,12 +2195,12 @@
         "heuristic": 238,
         "untested": 582
       },
-      "timestamp": "2026-05-11T02:00:50.168Z"
+      "timestamp": "2026-05-11T02:45:25.331Z"
     },
     "wired": {
       "library": "wired",
       "componentCount": 26,
-      "averageScore": 47.36,
+      "averageScore": 40.03,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -2234,54 +2234,54 @@
       "top5": [
         {
           "tagName": "wired-dialog",
-          "score": 58,
+          "score": 49,
           "grade": "F"
         },
         {
           "tagName": "wired-progress-ring",
-          "score": 50.9,
+          "score": 43,
           "grade": "F"
         },
         {
           "tagName": "wired-textarea",
-          "score": 50.6,
+          "score": 42.7,
           "grade": "F"
         },
         {
           "tagName": "wired-progress",
-          "score": 50.3,
+          "score": 42.5,
           "grade": "F"
         },
         {
           "tagName": "wired-calendar",
-          "score": 50.2,
+          "score": 42.3,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "wired-radio-group",
-          "score": 43.7,
+          "score": 36.9,
           "grade": "F"
         },
         {
           "tagName": "wired-divider",
-          "score": 44.6,
+          "score": 37.7,
           "grade": "F"
         },
         {
           "tagName": "wired-combo",
-          "score": 44.9,
+          "score": 37.9,
           "grade": "F"
         },
         {
           "tagName": "wired-tabs",
-          "score": 45.1,
+          "score": 38.1,
           "grade": "F"
         },
         {
           "tagName": "wired-listbox",
-          "score": 45.2,
+          "score": 38.2,
           "grade": "F"
         }
       ],
@@ -2439,12 +2439,12 @@
         "heuristic": 53,
         "untested": 156
       },
-      "timestamp": "2026-05-11T02:00:50.168Z"
+      "timestamp": "2026-05-11T02:45:25.331Z"
     },
     "elix": {
       "library": "elix",
       "componentCount": 74,
-      "averageScore": 41.65,
+      "averageScore": 35.14,
       "gradeDistribution": {
         "A": 0,
         "B": 0,
@@ -2478,54 +2478,54 @@
       "top5": [
         {
           "tagName": "elix-arrow-direction-button",
-          "score": 42.7,
+          "score": 36,
           "grade": "F"
         },
         {
           "tagName": "elix-auto-size-textarea",
-          "score": 42.7,
+          "score": 36,
           "grade": "F"
         },
         {
           "tagName": "elix-backdrop",
-          "score": 42.7,
+          "score": 36,
           "grade": "F"
         },
         {
           "tagName": "elix-border-button",
-          "score": 42.7,
+          "score": 36,
           "grade": "F"
         },
         {
           "tagName": "elix-button",
-          "score": 42.7,
+          "score": 36,
           "grade": "F"
         }
       ],
       "bottom5": [
         {
           "tagName": "elix-tooltip-button",
-          "score": 38.8,
+          "score": 32.8,
           "grade": "F"
         },
         {
           "tagName": "elix-popup-source",
-          "score": 38.8,
+          "score": 32.8,
           "grade": "F"
         },
         {
           "tagName": "elix-popup-button",
-          "score": 38.8,
+          "score": 32.8,
           "grade": "F"
         },
         {
           "tagName": "elix-popup",
-          "score": 38.8,
+          "score": 32.8,
           "grade": "F"
         },
         {
           "tagName": "elix-overlay",
-          "score": 38.8,
+          "score": 32.8,
           "grade": "F"
         }
       ],
@@ -2683,12 +2683,12 @@
         "heuristic": 74,
         "untested": 444
       },
-      "timestamp": "2026-05-11T02:00:50.168Z"
+      "timestamp": "2026-05-11T02:45:25.331Z"
     },
     "helix": {
       "library": "helix",
       "componentCount": 102,
-      "averageScore": 90.96,
+      "averageScore": 80.25,
       "gradeDistribution": {
         "A": 0,
         "B": 8,
@@ -2721,55 +2721,55 @@
       },
       "top5": [
         {
-          "tagName": "hx-accordion-item",
-          "score": 98.5,
-          "grade": "D"
+          "tagName": "hx-menu",
+          "score": 95.3,
+          "grade": "F"
         },
         {
-          "tagName": "hx-list-item",
-          "score": 98.5,
-          "grade": "D"
+          "tagName": "hx-overflow-menu",
+          "score": 94,
+          "grade": "F"
         },
         {
-          "tagName": "hx-list",
-          "score": 98.5,
-          "grade": "D"
+          "tagName": "hx-copy-button",
+          "score": 93.4,
+          "grade": "B"
         },
         {
-          "tagName": "hx-menu-item",
-          "score": 98.5,
-          "grade": "D"
+          "tagName": "hx-dropdown",
+          "score": 93,
+          "grade": "F"
         },
         {
-          "tagName": "hx-link",
-          "score": 98.5,
-          "grade": "D"
+          "tagName": "hx-split-button",
+          "score": 92.8,
+          "grade": "B"
         }
       ],
       "bottom5": [
         {
+          "tagName": "hx-menu-divider",
+          "score": 61.4,
+          "grade": "F"
+        },
+        {
           "tagName": "hx-grid-item",
-          "score": 74.8,
+          "score": 63.1,
           "grade": "D"
         },
         {
-          "tagName": "hx-menu-divider",
-          "score": 77.8,
+          "tagName": "hx-structured-list-row",
+          "score": 66.9,
           "grade": "F"
         },
         {
           "tagName": "hx-radio",
-          "score": 78.1,
+          "score": 67.9,
           "grade": "D"
         },
         {
-          "tagName": "hx-icon",
-          "score": 78.8,
-          "grade": "F"
-        },
-        {
           "tagName": "hx-counter",
-          "score": 79.6,
+          "score": 69.3,
           "grade": "D"
         }
       ],
@@ -2927,7 +2927,7 @@
         "heuristic": 435,
         "untested": 622
       },
-      "timestamp": "2026-05-11T02:00:50.168Z"
+      "timestamp": "2026-05-11T02:45:25.333Z"
     }
   },
   "comparisonTable": {
@@ -2935,84 +2935,84 @@
       {
         "rank": 1,
         "library": "helix",
-        "averageScore": 90.96,
+        "averageScore": 80.25,
         "componentCount": 102,
-        "grade": "A"
+        "grade": "B"
       },
       {
         "rank": 2,
         "library": "vaadin",
-        "averageScore": 65.19,
+        "averageScore": 54.7,
         "componentCount": 96,
-        "grade": "D"
+        "grade": "F"
       },
       {
         "rank": 3,
         "library": "fluentui",
-        "averageScore": 61.04,
+        "averageScore": 51.57,
         "componentCount": 41,
-        "grade": "D"
+        "grade": "F"
       },
       {
         "rank": 4,
         "library": "spectrum",
-        "averageScore": 50.85,
+        "averageScore": 43.4,
         "componentCount": 89,
         "grade": "F"
       },
       {
         "rank": 5,
         "library": "material",
-        "averageScore": 50.44,
+        "averageScore": 42.67,
         "componentCount": 97,
         "grade": "F"
       },
       {
         "rank": 6,
         "library": "carbon",
-        "averageScore": 49.41,
+        "averageScore": 41.75,
         "componentCount": 110,
         "grade": "F"
       },
       {
         "rank": 7,
         "library": "wired",
-        "averageScore": 47.36,
+        "averageScore": 40.03,
         "componentCount": 26,
         "grade": "F"
       },
       {
         "rank": 8,
         "library": "ionic",
-        "averageScore": 44.75,
+        "averageScore": 37.81,
         "componentCount": 97,
         "grade": "F"
       },
       {
         "rank": 9,
         "library": "porsche",
-        "averageScore": 44.7,
+        "averageScore": 37.72,
         "componentCount": 91,
         "grade": "F"
       },
       {
         "rank": 10,
         "library": "elix",
-        "averageScore": 41.65,
+        "averageScore": 35.14,
         "componentCount": 74,
         "grade": "F"
       },
       {
         "rank": 11,
         "library": "ui5",
-        "averageScore": 36.78,
+        "averageScore": 31.06,
         "componentCount": 170,
         "grade": "F"
       },
       {
         "rank": 12,
         "library": "calcite",
-        "averageScore": 32.82,
+        "averageScore": 28.14,
         "componentCount": 106,
         "grade": "F"
       }
@@ -4412,70 +4412,70 @@
       "Slot Architecture",
       "Event Architecture"
     ],
-    "timestamp": "2026-05-11T02:00:50.169Z"
+    "timestamp": "2026-05-11T02:45:25.334Z"
   },
   "performance": {
-    "totalMs": 2512,
+    "totalMs": 2706,
     "phases": [
       {
         "name": "load-libraries",
-        "durationMs": 289
+        "durationMs": 214
       },
       {
         "name": "score-all-libraries",
-        "durationMs": 2198
+        "durationMs": 2486
       },
       {
         "name": "score-material",
-        "durationMs": 207
+        "durationMs": 199
       },
       {
         "name": "score-spectrum",
-        "durationMs": 112
+        "durationMs": 140
       },
       {
         "name": "score-vaadin",
-        "durationMs": 675
+        "durationMs": 921
       },
       {
         "name": "score-fluentui",
-        "durationMs": 27
+        "durationMs": 32
       },
       {
         "name": "score-carbon",
-        "durationMs": 87
+        "durationMs": 76
       },
       {
         "name": "score-ui5",
-        "durationMs": 154
+        "durationMs": 85
       },
       {
         "name": "score-calcite",
-        "durationMs": 193
-      },
-      {
-        "name": "score-porsche",
-        "durationMs": 66
-      },
-      {
-        "name": "score-ionic",
-        "durationMs": 154
-      },
-      {
-        "name": "score-wired",
-        "durationMs": 6
-      },
-      {
-        "name": "score-elix",
         "durationMs": 228
       },
       {
+        "name": "score-porsche",
+        "durationMs": 122
+      },
+      {
+        "name": "score-ionic",
+        "durationMs": 88
+      },
+      {
+        "name": "score-wired",
+        "durationMs": 11
+      },
+      {
+        "name": "score-elix",
+        "durationMs": 376
+      },
+      {
         "name": "score-helix",
-        "durationMs": 289
+        "durationMs": 208
       },
       {
         "name": "generate-scorecards",
-        "durationMs": 24
+        "durationMs": 5
       },
       {
         "name": "generate-comparison",

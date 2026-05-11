@@ -469,8 +469,23 @@ function checkAuditMarkdown(
   } catch {
     return undefined;
   }
+  // Freshness must compare against the LATEST mtime across both the .ts
+  // source AND the sibling .styles.ts — accessibility changes (focus-ring,
+  // forced-colors, color-contrast) commonly land in the stylesheet and
+  // would otherwise leave a stale audit reading as fresh (codex push-gate
+  // P2, 2026-05-10).
+  let latestSourceMtime = sourceStat.mtime.getTime();
+  const stylesPath = componentSourcePath.replace(/\.ts$/, '.styles.ts');
+  if (stylesPath !== componentSourcePath) {
+    try {
+      const stylesStat = statSync(stylesPath);
+      latestSourceMtime = Math.max(latestSourceMtime, stylesStat.mtime.getTime());
+    } catch {
+      // styles sidecar absent — fine, fall back to .ts only
+    }
+  }
   return {
     path: auditPath,
-    fresh: auditStat.mtime.getTime() >= sourceStat.mtime.getTime(),
+    fresh: auditStat.mtime.getTime() >= latestSourceMtime,
   };
 }

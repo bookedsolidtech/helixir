@@ -190,8 +190,20 @@ describe('scoreComponentMultiDimensional', () => {
     for (const name of SOURCE_DEPENDENT_A11Y_DIMS) {
       const dim = cemNative.find((d) => d.name === name);
       expect(dim, `expected '${name}' in CEM-native dims`).toBeDefined();
-      // No libraryRoot → no sourceChecks → unknown.
-      expect(dim?.measured).toBe(false);
+      // No libraryRoot → no sourceChecks → unknown. Per the codex-fixed
+      // contract these stay `measured: true` so they pull the weighted
+      // score down at score 0 — surfacing the gap rather than silently
+      // dropping out of the denominator (codex push-gate P1, 2026-05-10).
+      // The AAA Audit Self-Certification dim is weight-0 informational
+      // and returns confidence:'untested' (no helix audit md → N/A), so
+      // it's the one exception that legitimately drops as notApplicable.
+      if (name === 'AAA Audit Self-Certification') {
+        expect(dim?.confidence).toBe('untested');
+      } else {
+        expect(dim?.confidence).toBe('unknown');
+        expect(dim?.score).toBe(0);
+        expect(dim?.measured).toBe(true);
+      }
     }
 
     // The remaining CEM-native dims (everything not in the exception sets
@@ -335,9 +347,11 @@ describe('scoreComponentMultiDimensional', () => {
     // No helixMeta.keyboardContract, no @keyboard-contract JSDoc, no CEM
     // event whose name includes keydown/keyup/keypress (PERFECT_DECL's
     // 'key-press' is hyphenated and doesn't substring-match the scorer's
-    // CEM-fallback predicate). All branches miss → unknown / measured:false.
+    // CEM-fallback predicate). All branches miss → unknown / score 0 /
+    // measured:true (surfaces in weighted score per codex-fix contract).
     expect(dim!.confidence).toBe('unknown');
-    expect(dim!.measured).toBe(false);
+    expect(dim!.score).toBe(0);
+    expect(dim!.measured).toBe(true);
   });
 
   it('Focus Indicator dimension wires through scoreFocusIndicator', async () => {
@@ -345,9 +359,10 @@ describe('scoreComponentMultiDimensional', () => {
     const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
     const dim = result.dimensions.find((d) => d.name === 'Focus Indicator');
     expect(dim).toBeDefined();
-    // No libraryRoot → no sourceChecks → unknown / measured:false.
+    // No libraryRoot → no sourceChecks → unknown / score 0 / measured:true.
     expect(dim!.confidence).toBe('unknown');
-    expect(dim!.measured).toBe(false);
+    expect(dim!.score).toBe(0);
+    expect(dim!.measured).toBe(true);
   });
 
   it('Form Association dimension wires through scoreFormAssociation', async () => {
@@ -355,9 +370,10 @@ describe('scoreComponentMultiDimensional', () => {
     const result = await scoreComponentMultiDimensional(config, PERFECT_DECL);
     const dim = result.dimensions.find((d) => d.name === 'Form Association');
     expect(dim).toBeDefined();
-    // No helixMeta + no sourceChecks → unknown / measured:false.
+    // No helixMeta + no sourceChecks → unknown / score 0 / measured:true.
     expect(dim!.confidence).toBe('unknown');
-    expect(dim!.measured).toBe(false);
+    expect(dim!.score).toBe(0);
+    expect(dim!.measured).toBe(true);
   });
 
   it('Accessible Label Pattern dimension wires through scoreAccessibleLabel', async () => {

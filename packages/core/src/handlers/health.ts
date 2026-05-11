@@ -1147,7 +1147,14 @@ async function scoreCemNativeDimension(
         ...(s.note !== undefined ? { note: s.note } : {}),
       }));
     }
-    if (!r.measured) out.notApplicable = true;
+    // `unknown` confidence on a measured-false scorer signals "input data
+    // missing — surface this as a real gap" per the plan (M2-strict). DO NOT
+    // mark notApplicable, otherwise computeWeightedScore drops it from the
+    // denominator and the score inflates over the dims we COULD measure —
+    // exactly the gaslighting case the dimensional upgrade was meant to fix
+    // (codex push-gate P1, 2026-05-10). Only `untested` (legit "doesn't
+    // apply / no external data") collapses out of the weighted average.
+    if (!r.measured && r.confidence === 'untested') out.notApplicable = true;
     return out;
   };
 

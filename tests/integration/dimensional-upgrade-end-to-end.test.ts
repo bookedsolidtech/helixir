@@ -185,7 +185,17 @@ describe('dimensional upgrade — end-to-end bare-CEM pipeline', () => {
     ];
     for (const name of SOURCE_DEPENDENT) {
       const dim = result.dimensions.find((d) => d.name === name)!;
-      expect(dim.measured, `${name} should be unmeasured without sourceChecks`).toBe(false);
+      // Post-codex-fix: source-dependent dims that lack evidence stay
+      // measured:true so they pull the weighted score down at 0,
+      // surfacing the gap. The exception is AAA Audit Self-Certification
+      // (weight-0 informational, returns confidence:'untested' which
+      // collapses out of the denominator).
+      if (name === 'AAA Audit Self-Certification') {
+        expect(dim.confidence, `${name} should be untested without audit md`).toBe('untested');
+      } else {
+        expect(dim.confidence, `${name} should be unknown without sourceChecks`).toBe('unknown');
+        expect(dim.score, `${name} should be score 0 without sourceChecks`).toBe(0);
+      }
     }
 
     // Grade A requires 0 untested critical. With APG Keyboard Contract

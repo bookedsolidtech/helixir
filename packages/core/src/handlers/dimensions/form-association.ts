@@ -33,8 +33,15 @@ export function scoreFormAssociation(
   // so libraries that emit CEM without a helixMeta block still surface
   // their form-association intent (codex push-gate P1 round 5, 2026-05-10).
   const cemFormAssociated = (decl as { formAssociated?: boolean }).formAssociated;
-  const claimedFalse = helixMeta?.formAssociated === false || cemFormAssociated === false;
-  const claimedTrueClaim = helixMeta?.formAssociated === true || cemFormAssociated === true;
+  // When the CEM and helixMeta disagree, the CEM field wins because it's
+  // emitted by the canonical analyzer that reads source AST, while
+  // helixMeta is a hand-curated JSDoc tag that can go stale (codex
+  // push-gate P1 round 12, 2026-05-11). Only fall back to helixMeta when
+  // the CEM is silent.
+  const effectiveFormAssociated =
+    cemFormAssociated !== undefined ? cemFormAssociated : helixMeta?.formAssociated;
+  const claimedFalse = effectiveFormAssociated === false;
+  const claimedTrueClaim = effectiveFormAssociated === true;
 
   // ── N/A path: declaration says explicitly "not form-associated" ─────────
   if (claimedFalse) {

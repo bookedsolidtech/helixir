@@ -39,6 +39,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, isAbsolute, resolve } from 'node:path';
 import { z } from 'zod';
 import type { CemDeclaration } from '../cem.js';
+import { parseKeyboardContract as parseJsdocKeyboardContract } from '../dimensions/keyboard-contract-parser.js';
 
 // ---------------------------------------------------------------------------
 // Public contract — downstream dim scorers import these names verbatim.
@@ -343,59 +344,10 @@ function parseHelixMeta(raw: unknown): HelixAaaMeta | undefined {
 }
 
 // ---------------------------------------------------------------------------
-// JSDoc fallback for legacy @keyboard-contract tag
+// JSDoc fallback for legacy @keyboard-contract tag — imported from the
+// shared parser module so the detector and scorer can never drift
+// (codex push-gate P3 round 12, 2026-05-11).
 // ---------------------------------------------------------------------------
-
-/**
- * Parse the legacy `@keyboard-contract ...` JSDoc tag from a declaration's
- * description. Returns a KeyboardContract when at least one bucket parses,
- * else null. Kept in lockstep with apg-keyboard.ts:parseKeyboardContract;
- * they intentionally have identical grammars so callers see consistent
- * results no matter which entry point parses.
- */
-function parseJsdocKeyboardContract(input: string | undefined | null): KeyboardContract | null {
-  if (!input || typeof input !== 'string') return null;
-  const trimmed = input.trim();
-  if (trimmed.length === 0) return null;
-  const tagMatch = /@?keyboard[-_ ]?contract\s*[:=-]?\s*/i.exec(trimmed);
-  if (!tagMatch) return null;
-  const stripped = trimmed.slice((tagMatch.index ?? 0) + tagMatch[0].length);
-  const buckets = stripped
-    .split(/[;\n|]/)
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
-  if (buckets.length === 0) return null;
-  const result: KeyboardContract = { disabledSuppresses: false };
-  let anyParsed = false;
-  for (const clause of buckets) {
-    const m = /^([a-z][a-zA-Z]*)\s*[:=]\s*(.+)$/.exec(clause);
-    if (!m) continue;
-    const bucketName = (m[1] ?? '').toLowerCase();
-    const rhs = (m[2] ?? '').trim();
-    if (!bucketName || rhs.length === 0) continue;
-    if (bucketName === 'disabledsuppresses') {
-      result.disabledSuppresses = /^(true|yes|on|1)$/i.test(rhs);
-      anyParsed = true;
-      continue;
-    }
-    const keys = rhs
-      .split(/[,\s]+/)
-      .map((k) => k.trim())
-      .filter((k) => k.length > 0);
-    if (keys.length === 0) continue;
-    if (bucketName === 'activate') {
-      result.activate = keys;
-      anyParsed = true;
-    } else if (bucketName === 'navigate') {
-      result.navigate = keys;
-      anyParsed = true;
-    } else if (bucketName === 'dismiss') {
-      result.dismiss = keys;
-      anyParsed = true;
-    }
-  }
-  return anyParsed ? result : null;
-}
 
 // ---------------------------------------------------------------------------
 // Verdicts file loading + snapshot derivation
@@ -631,7 +583,66 @@ function runSourceChecks(componentSourcePath: string): SourceChecks | undefined 
  * doesn't fuse with neighbour tokens after stripping).
  */
 function stripComments(src: string): string {
-  return src.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ');
+  // String-aware: walk the source once, replacing comment bodies with
+  // spaces while leaving string literals (single, double, template) and
+  // their contents intact. A naive .replace would strip `//` and `/*`
+  // sequences that legitimately appear inside string literals
+  // (e.g. `const url = "https://...";`, `const note = '/* ... */'`),
+  // producing false negatives on real source signals (codex push-gate
+  // P2 round 12, 2026-05-11).
+  let out = '';
+  let i = 0;
+  const n = src.length;
+  while (i < n) {
+    const c = src[i];
+    const next = src[i + 1];
+    // line comment
+    if (c === '/' && next === '/') {
+      while (i < n && src[i] !== '\n') {
+        out += ' ';
+        i++;
+      }
+      continue;
+    }
+    // block comment
+    if (c === '/' && next === '*') {
+      out += '  ';
+      i += 2;
+      while (i < n && !(src[i] === '*' && src[i + 1] === '/')) {
+        out += src[i] === '\n' ? '\n' : ' ';
+        i++;
+      }
+      if (i < n) {
+        out += '  ';
+        i += 2;
+      }
+      continue;
+    }
+    // string literal
+    if (c === '"' || c === "'" || c === '`') {
+      const quote = c;
+      out += c;
+      i++;
+      while (i < n && src[i] !== quote) {
+        if (src[i] === '\\' && i + 1 < n) {
+          out += src[i] ?? '';
+          out += src[i + 1] ?? '';
+          i += 2;
+          continue;
+        }
+        out += src[i] ?? '';
+        i++;
+      }
+      if (i < n) {
+        out += src[i] ?? '';
+        i++;
+      }
+      continue;
+    }
+    out += c ?? '';
+    i++;
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------

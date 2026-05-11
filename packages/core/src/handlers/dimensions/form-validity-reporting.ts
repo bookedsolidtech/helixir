@@ -26,8 +26,12 @@ export function scoreFormValidityReporting(
   // `formAssociated` field — same plumbing as scoreFormAssociation
   // (codex push-gate P1 round 5, 2026-05-10).
   const cemFormAssociated = (decl as { formAssociated?: boolean }).formAssociated;
-  const claimedFalse = helixMeta?.formAssociated === false || cemFormAssociated === false;
-  const claimedTrue = helixMeta?.formAssociated === true || cemFormAssociated === true;
+  // CEM wins over helixMeta when they disagree — same precedence as
+  // scoreFormAssociation (codex push-gate P1 round 12, 2026-05-11).
+  const effectiveFormAssociated =
+    cemFormAssociated !== undefined ? cemFormAssociated : helixMeta?.formAssociated;
+  const claimedFalse = effectiveFormAssociated === false;
+  const claimedTrue = effectiveFormAssociated === true;
 
   // ── Branch 1: explicit N/A ──────────────────────────────────────────
   // Confirm the claim against source signals when available — symmetric

@@ -1,0 +1,13 @@
+{
+  "schema_version": 2,
+  "entries": {
+    "c64f4b1eb3e11220cb4e6d0f0100617d33f0fb55#4f53cda18c2baa0c": {
+      "verdict": "blocking",
+      "finding_count": 4,
+      "reviewed_at": "2026-05-11T04:22:22.055Z",
+      "model": "gpt-5.4",
+      "reasoning_effort": "high",
+      "ttl_ms": 86400000
+    }
+  }
+}

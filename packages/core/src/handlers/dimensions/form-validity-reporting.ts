@@ -17,14 +17,20 @@ import type { HelixAaaEvidence } from '../evidence/helix-aaa-evidence.js';
 import type { DimScoreResult } from './types.js';
 
 export function scoreFormValidityReporting(
-  _decl: CemDeclaration,
+  decl: CemDeclaration,
   evidence: HelixAaaEvidence,
 ): DimScoreResult {
   const helixMeta = evidence.helixMeta;
   const checks = evidence.sourceChecks;
+  // Read both helixMeta.formAssociated AND the top-level CEM
+  // `formAssociated` field — same plumbing as scoreFormAssociation
+  // (codex push-gate P1 round 5, 2026-05-10).
+  const cemFormAssociated = (decl as { formAssociated?: boolean }).formAssociated;
+  const claimedFalse = helixMeta?.formAssociated === false || cemFormAssociated === false;
+  const claimedTrue = helixMeta?.formAssociated === true || cemFormAssociated === true;
 
   // ── Branch 1: explicit N/A ──────────────────────────────────────────
-  if (helixMeta?.formAssociated === false) {
+  if (claimedFalse) {
     return {
       score: 100,
       confidence: 'verified',
@@ -49,8 +55,7 @@ export function scoreFormValidityReporting(
   }
 
   // ── Branch 4: form-associated with no validity reporting ────────────
-  const formAssociated =
-    helixMeta?.formAssociated === true || checks.hasStaticFormAssociated === true;
+  const formAssociated = claimedTrue || checks.hasStaticFormAssociated === true;
   if (formAssociated) {
     return {
       score: 0,

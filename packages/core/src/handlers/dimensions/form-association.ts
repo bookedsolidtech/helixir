@@ -23,14 +23,21 @@ import type { HelixAaaEvidence } from '../evidence/helix-aaa-evidence.js';
 import type { DimScoreResult, DimSubMetric } from './types.js';
 
 export function scoreFormAssociation(
-  _decl: CemDeclaration,
+  decl: CemDeclaration,
   evidence: HelixAaaEvidence,
 ): DimScoreResult {
   const helixMeta = evidence.helixMeta;
   const checks = evidence.sourceChecks;
+  // Standard CEM carries `formAssociated: boolean` at the declaration
+  // level (cem.ts:91-95). Read it as a co-equal signal alongside helixMeta
+  // so libraries that emit CEM without a helixMeta block still surface
+  // their form-association intent (codex push-gate P1 round 5, 2026-05-10).
+  const cemFormAssociated = (decl as { formAssociated?: boolean }).formAssociated;
+  const claimedFalse = helixMeta?.formAssociated === false || cemFormAssociated === false;
+  const claimedTrueClaim = helixMeta?.formAssociated === true || cemFormAssociated === true;
 
-  // ── N/A path: helixMeta says explicitly "not form-associated" ──────────
-  if (helixMeta?.formAssociated === false) {
+  // ── N/A path: declaration says explicitly "not form-associated" ─────────
+  if (claimedFalse) {
     // Confirm the absence across ALL three FACE signals — static flag,
     // attachInternals(), setValidity(). A partial removal (subclass
     // drops `static formAssociated` but keeps attachInternals + setValidity)
@@ -69,7 +76,7 @@ export function scoreFormAssociation(
   }
 
   // ── Affirmative path ─────────────────────────────────────────────────
-  const claimedTrue = helixMeta?.formAssociated === true;
+  const claimedTrue = claimedTrueClaim;
   const sourceFlag = checks?.hasStaticFormAssociated === true;
 
   if (claimedTrue || sourceFlag) {

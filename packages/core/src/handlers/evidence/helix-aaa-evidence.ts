@@ -192,7 +192,13 @@ const SET_VALIDITY_RE = /\.setValidity\s*\(/;
 // which matches both the canonical helix form and a literal `2px solid` shorthand.
 const FOCUS_VISIBLE_2PX_RE =
   /:focus-visible[\s\S]{0,200}outline:\s*(?:var\(--hx-focus-ring-width(?:[^)]*\))?|2px)\s+solid\s+var\(--hx-(?:[\w-]*-)?focus-ring-color/;
-const FOCUS_VISIBLE_LOOSE_RE = /:focus-visible[\s\S]{0,200}outline:/;
+// LOOSE matcher requires an outline declaration that's NOT degraded
+// (none / 0 / unset / initial / revert). A `:focus-visible { outline: none; }`
+// rule is a regression, not evidence of a focus indicator — defect class 17
+// reproduces this exact pattern and the scorer must treat it as no-rule
+// (codex push-gate P1 round 5, 2026-05-10).
+const FOCUS_VISIBLE_LOOSE_RE =
+  /:focus-visible[\s\S]{0,200}outline:\s*(?!(?:none|0|unset|initial|revert)\b)[^;}]+/;
 const FORCED_COLORS_RE = /@media\s*\(\s*forced-colors\s*:\s*active\s*\)/;
 
 // ---------------------------------------------------------------------------
@@ -221,15 +227,22 @@ export function detectHelixAaaEvidence(
   }
 
   const absRoot = isAbsolute(libraryRoot) ? libraryRoot : resolve(libraryRoot);
+  // mergeCems() rewrites colliding tags to `packageName:tagName` (cem.ts:732).
+  // Verdicts and manifests use the bare tag, so strip the prefix before
+  // file lookups. Multi-library sessions with collisions otherwise return
+  // no evidence (codex push-gate P2 round 5, 2026-05-10).
+  const bareTagName = decl.tagName.includes(':')
+    ? (decl.tagName.split(':').pop() ?? decl.tagName)
+    : decl.tagName;
 
   // ── verdictSnapshot ───────────────────────────────────────────────────
-  const verdictSnapshot = buildVerdictSnapshot(absRoot, decl.tagName, helixMeta);
+  const verdictSnapshot = buildVerdictSnapshot(absRoot, bareTagName, helixMeta);
   if (verdictSnapshot) {
     evidence.verdictSnapshot = verdictSnapshot;
   }
 
   // ── Locate component source file via package-manifest index ──────────
-  const sourcePath = resolveComponentSourcePath(absRoot, decl.tagName);
+  const sourcePath = resolveComponentSourcePath(absRoot, bareTagName);
   if (!sourcePath) {
     return evidence;
   }

@@ -55,6 +55,7 @@ const GetHealthDiffArgsSchema = z.object({
 
 const GetHealthSummaryArgsSchema = z.object({
   libraryId: z.string().optional(),
+  libraryRoot: z.string().optional(),
 });
 
 const AnalyzeAccessibilityArgsSchema = z.object({
@@ -348,16 +349,20 @@ export async function handleHealthCall(
     }
 
     if (name === 'get_health_summary') {
-      const { libraryId } = GetHealthSummaryArgsSchema.parse(args);
+      const { libraryId, libraryRoot } = GetHealthSummaryArgsSchema.parse(args);
       const cemData = await loadCemData(config, cem);
       const declarations = getAllDeclarations(cemData);
 
-      // Use multi-dimensional scoring for enriched summary
+      // Use multi-dimensional scoring for enriched summary. Thread
+      // libraryRoot so source-dependent a11y dims match what
+      // score_component / audit_library would produce for the same input
+      // (codex push-gate P2 round 5, 2026-05-10).
       const allScores = await scoreAllComponentsMultiDimensional(
         config,
         declarations,
         cem,
         libraryId,
+        libraryRoot ?? config.projectRoot,
       );
 
       const totalComponents = allScores.length;

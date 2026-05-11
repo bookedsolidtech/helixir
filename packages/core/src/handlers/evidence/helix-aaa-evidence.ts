@@ -256,44 +256,30 @@ export function detectHelixAaaEvidence(
   }
 
   const absRoot = isAbsolute(libraryRoot) ? libraryRoot : resolve(libraryRoot);
-  // mergeCems() rewrites colliding tags to `packageName:tagName` and stamps
-  // every declaration with a `packageName` field (cem.ts:732). The bare
-  // tag (without prefix) is what's keyed in verdicts/manifests, BUT in a
-  // multi-package monorepo with collisions, stripping the prefix and
-  // searching across all packages picks whichever manifest indexes the
-  // bare tag first — wrong source/verdicts for the new accessibility
-  // dimensions (codex push-gate P1 round 7, 2026-05-10).
+  // mergeCems() rewrites colliding tags to `<libraryId>:<tagName>` and
+  // stamps every declaration with `packageName: <libraryId>` (cem.ts:732).
+  // `libraryId` is a runtime identifier (`local`, `design-system`, …) —
+  // NOT a filesystem directory. The detector therefore can't use
+  // packageName as a path hint (codex push-gate P1 round 10, 2026-05-10
+  // — round-7's scoped-root approach was incorrect for this reason).
   //
-  // Resolution: scope evidence resolution to the declaration's specific
-  // package when `packageName` is set, falling back to library-wide
-  // search only when no package scope is available (single-package CEM).
+  // Resolution: strip the prefix from collided tags and do a library-wide
+  // search. Multi-library setups with cross-library tag collisions hit
+  // first-match resolution — a documented limitation. A future provenance
+  // map (libraryId → packageRoot) could tighten this, but the common
+  // single-library path (helix, the primary consumer) is unaffected.
   const bareTagName = decl.tagName.includes(':')
     ? (decl.tagName.split(':').pop() ?? decl.tagName)
     : decl.tagName;
-  const packageName = (decl as { packageName?: unknown }).packageName;
-  const scopedRoot =
-    typeof packageName === 'string' && packageName.length > 0
-      ? resolve(absRoot, 'packages', packageName)
-      : null;
 
   // ── verdictSnapshot ───────────────────────────────────────────────────
-  // Once a package scope is requested (declaration carries packageName),
-  // ONLY consult that package. Falling back to a library-wide search
-  // when the scoped package has no verdict file leaks evidence across
-  // packages — `pkg-b:x-foo` would silently resolve to `pkg-a:x-foo`'s
-  // verdicts if pkg-b had none of its own (codex push-gate P1 round 9,
-  // 2026-05-10).
-  const verdictSnapshot = scopedRoot
-    ? buildVerdictSnapshot(scopedRoot, bareTagName, helixMeta)
-    : buildVerdictSnapshot(absRoot, bareTagName, helixMeta);
+  const verdictSnapshot = buildVerdictSnapshot(absRoot, bareTagName, helixMeta);
   if (verdictSnapshot) {
     evidence.verdictSnapshot = verdictSnapshot;
   }
 
   // ── Locate component source file via package-manifest index ──────────
-  const sourcePath = scopedRoot
-    ? resolveComponentSourcePath(scopedRoot, bareTagName)
-    : resolveComponentSourcePath(absRoot, bareTagName);
+  const sourcePath = resolveComponentSourcePath(absRoot, bareTagName);
   if (!sourcePath) {
     return evidence;
   }

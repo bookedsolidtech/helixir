@@ -29,14 +29,15 @@ export function scoreAaaAuditSelfCertification(
 ): DimScoreResult {
   const hasAudit = typeof evidence.auditMdPath === 'string' && evidence.auditMdPath.length > 0;
   const fresh = evidence.auditMdFresh === true;
-  // Cert claim flows from either the verdict snapshot (preferred — derived
-  // post-audit) OR helixMeta.aaa.certified (CEM-declared). The sibling
-  // detectors and wcag-conformance scorer both accept either; this one
-  // matched only verdictSnapshot, which made the scorer disagree with
-  // the rest of the pipeline for CEM-only helix consumers that hadn't
-  // generated aaa-verdicts.json yet (codex push-gate P2, 2026-05-10).
+  // Cert claim authority: when a verdict snapshot exists it is the
+  // post-audit ground truth and overrides any stale CEM helixMeta claim
+  // (consistent with summarizeHelixEvidence + scoreWcagConformance, codex
+  // push-gate P3 round 10, 2026-05-10). When NO snapshot is available
+  // (CEM-only / pre-audit consumer), fall back to helixMeta.aaa.certified.
   const certified =
-    evidence.verdictSnapshot?.certified === true || evidence.helixMeta?.aaa?.certified === true;
+    evidence.verdictSnapshot !== undefined
+      ? evidence.verdictSnapshot.certified === true
+      : evidence.helixMeta?.aaa?.certified === true;
 
   if (hasAudit && fresh && certified) {
     return {

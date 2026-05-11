@@ -130,15 +130,33 @@ export function scoreFormAssociation(
   }
 
   // ── Nothing claimed, nothing detected ────────────────────────────────
-  // If helixMeta exists at all but is silent on form-association, AND
-  // sourceChecks are defined and all false, we have a measured "no form
-  // association" answer.
-  if (helixMeta !== undefined && checks && !checks.hasStaticFormAssociated) {
+  // If helixMeta exists but is silent on form-association, AND sourceChecks
+  // confirm ALL three FACE signals are absent (no static flag, no
+  // attachInternals, no setValidity), we have a measured "no form
+  // association" answer. Checking only the static flag would hide partial
+  // FACE implementations that omit the declaration but still wire up the
+  // runtime contract (codex push-gate P2 round 6, 2026-05-10).
+  if (helixMeta !== undefined && checks) {
+    const anyFaceSignal =
+      checks.hasStaticFormAssociated || checks.hasAttachInternals || checks.hasSetValidityCall;
+    if (!anyFaceSignal) {
+      return {
+        score: 100,
+        confidence: 'heuristic',
+        measured: true,
+        notes: ['form-association-not-applicable-by-omission'],
+      };
+    }
+    // helixMeta silent but FACE signals present — partial implementation.
+    const driftNotes: string[] = ['face-signals-without-claim'];
+    if (checks.hasStaticFormAssociated) driftNotes.push('static-formAssociated-without-claim');
+    if (checks.hasAttachInternals) driftNotes.push('attachInternals-without-claim');
+    if (checks.hasSetValidityCall) driftNotes.push('setValidity-without-claim');
     return {
-      score: 100,
+      score: 50,
       confidence: 'heuristic',
       measured: true,
-      notes: ['form-association-not-applicable-by-omission'],
+      notes: driftNotes,
     };
   }
 

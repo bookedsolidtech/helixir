@@ -34,12 +34,13 @@ export async function generateAuditReport(
 ): Promise<{ lines: string[]; summary: AuditSummary }> {
   const withTag = cemDeclarations.filter((decl) => decl.tagName !== undefined);
   const libraryId = options?.libraryId ?? 'default';
-  // Default libraryRoot to config.projectRoot so audit_library picks up
-  // source-level evidence (focus-visible, attachInternals, forced-colors)
-  // the same way score_component does. Without this the two entry points
-  // produce divergent scores for the same input — codex push-gate P1,
-  // round 3 (2026-05-10).
-  const libraryRoot = options?.libraryRoot ?? config.projectRoot;
+  // libraryRoot is opt-in via the MCP tool surface — DO NOT default to
+  // config.projectRoot. CDN-loaded libraries don't have source on disk
+  // anywhere, and a stray workspace fallback contaminates evidence with
+  // unrelated files (codex push-gate P1 round 6, 2026-05-10). When
+  // omitted, source-dependent dims return `unknown` confidence and the
+  // weighted score honestly reflects the missing evidence.
+  const libraryRoot = options?.libraryRoot;
   const lines: string[] = [];
 
   const gradeDistribution = { A: 0, B: 0, C: 0, D: 0, F: 0 };

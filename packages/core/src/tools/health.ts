@@ -72,6 +72,7 @@ const DetectHelixEvidenceArgsSchema = z.object({
 const AuditLibraryArgsSchema = z.object({
   outputPath: FilePathSchema.optional(),
   libraryId: z.string().optional(),
+  libraryRoot: z.string().optional(),
 });
 
 // ─── Tool definitions ─────────────────────────────────────────────────────────
@@ -188,6 +189,11 @@ export const HEALTH_TOOL_DEFINITIONS = [
           description:
             'Optional library ID to target a specific loaded library instead of the default.',
         },
+        libraryRoot: {
+          type: 'string',
+          description:
+            'Optional absolute path to the consuming library root. When provided, source-level evidence (focus-visible, attachInternals, forced-colors) feeds the multi-dim scoring. Omit for CDN-loaded libraries — source-dependent dims return unknown rather than being contaminated by unrelated workspace files.',
+        },
       },
       additionalProperties: false,
     },
@@ -241,7 +247,7 @@ export const HEALTH_TOOL_DEFINITIONS = [
   {
     name: 'audit_library',
     description:
-      'Generates a JSONL audit report scoring every component across 11 dimensions. Returns file path (if outputPath given) and summary stats. Each line is valid JSON for one component.',
+      'Generates a JSONL audit report scoring every component across all dimensions of the registered scoring system. Returns file path (if outputPath given) and summary stats. Each line is valid JSON for one component.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -253,6 +259,11 @@ export const HEALTH_TOOL_DEFINITIONS = [
         libraryId: {
           type: 'string',
           description: 'The library ID to audit (default: "default").',
+        },
+        libraryRoot: {
+          type: 'string',
+          description:
+            'Optional absolute path to the library root. When provided, source-level a11y evidence is collected for every component. Omit for CDN-loaded libraries — source-dependent dims return unknown rather than being scored against unrelated workspace files.',
         },
       },
       additionalProperties: false,
@@ -353,16 +364,15 @@ export async function handleHealthCall(
       const cemData = await loadCemData(config, cem);
       const declarations = getAllDeclarations(cemData);
 
-      // Use multi-dimensional scoring for enriched summary. Thread
-      // libraryRoot so source-dependent a11y dims match what
-      // score_component / audit_library would produce for the same input
-      // (codex push-gate P2 round 5, 2026-05-10).
+      // Thread libraryRoot opt-in only — CDN-loaded libraries don't have
+      // source on disk and a workspace fallback contaminates evidence
+      // (codex push-gate P2 round 6, 2026-05-10).
       const allScores = await scoreAllComponentsMultiDimensional(
         config,
         declarations,
         cem,
         libraryId,
-        libraryRoot ?? config.projectRoot,
+        libraryRoot,
       );
 
       const totalComponents = allScores.length;
@@ -447,13 +457,14 @@ export async function handleHealthCall(
     }
 
     if (name === 'audit_library') {
-      const { outputPath, libraryId } = AuditLibraryArgsSchema.parse(args);
+      const { outputPath, libraryId, libraryRoot } = AuditLibraryArgsSchema.parse(args);
       const cemData = await loadCemData(config, cem);
       const declarations = getAllDeclarations(cemData);
       const { lines, summary } = await generateAuditReport(config, declarations, {
         outputPath,
         libraryId,
         cem: cemData,
+        libraryRoot,
       });
       const response: Record<string, unknown> = { summary };
       if (outputPath) {

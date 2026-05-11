@@ -7,6 +7,7 @@
       "2.1.3": { "verdict": "Supports", "evidence": "ok" },
       "2.3.3": { "verdict": "Supports", "evidence": "ok" },
       "3.2.5": { "verdict": "Supports", "evidence": "ok" },
+      "3.3.6": { "verdict": "Supports", "evidence": "ok" },
       "forced-colors": { "verdict": "Supports", "evidence": "ok" },
       "apg-keyboard": { "verdict": "Supports", "evidence": "ok" },
       "1.4.6": { "verdict": "Supports", "evidence": "ok" },

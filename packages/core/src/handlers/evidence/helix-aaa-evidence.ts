@@ -280,6 +280,13 @@ function parseHelixMeta(raw: unknown): HelixAaaMeta | undefined {
 
 const HELIX_CERT_THRESHOLD = 9;
 
+// WCAG SC key shape: 1+ digit, dot, 1+ digit, optional dot + digits. Helix's
+// verdicts file mixes real SCs (1.4.6, 2.4.13) with helper rows (forced-colors,
+// apg-keyboard) — those helpers are NOT SCs and must not count toward the
+// 9-criterion certification threshold. Otherwise a component with 5 real SCs
+// + 4 helper rows looks certified (codex push-gate P1 round 4, 2026-05-10).
+const SC_KEY_RE = /^\d+\.\d+(?:\.\d+)?$/;
+
 function buildVerdictSnapshot(
   libraryRoot: string,
   tagName: string,
@@ -290,7 +297,7 @@ function buildVerdictSnapshot(
   if (!perCriterion) return undefined;
 
   const criteria = Object.entries(perCriterion)
-    .filter(([, entry]) => entry.verdict === 'Supports')
+    .filter(([sc, entry]) => entry.verdict === 'Supports' && SC_KEY_RE.test(sc))
     .map(([sc]) => sc);
 
   const snapshot: VerdictSnapshot = {
@@ -313,23 +320,27 @@ function loadVerdictsForRoot(
   const cached = verdictsCache.get(libraryRoot);
   if (cached !== undefined) return cached.byTag;
 
-  // The verdicts file lives under one of the packages — scan `packages/*`
-  // and pick the first that has an `aaa-verdicts.json`. Multiple packages
-  // are rare in practice; if more than one library carries verdicts, merge.
+  // Verdicts can live either under packages/<pkg>/aaa-verdicts.json
+  // (monorepo, helix shape) OR at libraryRoot/aaa-verdicts.json
+  // (single-package consumer). Both layouts are accepted per the
+  // detector contract (codex push-gate P2 round 4, 2026-05-10).
   const merged: Record<string, Record<string, { verdict: VerdictValue; evidence?: string }>> = {};
   let foundAny = false;
+  const candidatePaths: string[] = [];
   const packagesDir = resolve(libraryRoot, 'packages');
-  let packages: string[] = [];
   try {
-    packages = readdirSync(packagesDir, { withFileTypes: true })
+    const pkgs = readdirSync(packagesDir, { withFileTypes: true })
       .filter((d) => d.isDirectory())
       .map((d) => d.name);
+    for (const pkg of pkgs) {
+      candidatePaths.push(resolve(packagesDir, pkg, 'aaa-verdicts.json'));
+    }
   } catch {
-    packages = [];
+    // packages/ may not exist
   }
+  candidatePaths.push(resolve(libraryRoot, 'aaa-verdicts.json'));
 
-  for (const pkg of packages) {
-    const verdictsPath = resolve(packagesDir, pkg, 'aaa-verdicts.json');
+  for (const verdictsPath of candidatePaths) {
     try {
       const raw = readFileSync(verdictsPath, 'utf-8');
       const parsed = VerdictsFileSchema.safeParse(JSON.parse(raw));
@@ -339,7 +350,7 @@ function loadVerdictsForRoot(
         merged[tag] = { ...(merged[tag] ?? {}), ...scMap };
       }
     } catch {
-      // ignore — file may not exist for every package
+      // ignore — file may not exist at every candidate
     }
   }
 
@@ -366,20 +377,28 @@ function loadManifestIndex(libraryRoot: string): ManifestIndex[] | null {
   const cached = manifestIndexCache.get(libraryRoot);
   if (cached !== undefined) return cached;
 
+  // Discovery covers two layouts: (a) monorepo with packages/<pkg>/
+  // custom-elements.json, AND (b) single-package repos with the manifest
+  // directly at the libraryRoot. The plan documented libraryRoot as "the
+  // consuming library root" without committing to either layout, so the
+  // detector accepts both. Without the root fallback, single-package
+  // consumers silently return no evidence (codex push-gate P2 round 4,
+  // 2026-05-10).
+  const candidatePackageRoots: string[] = [];
   const packagesDir = resolve(libraryRoot, 'packages');
-  let packages: string[] = [];
   try {
-    packages = readdirSync(packagesDir, { withFileTypes: true })
+    const pkgs = readdirSync(packagesDir, { withFileTypes: true })
       .filter((d) => d.isDirectory())
       .map((d) => d.name);
+    for (const pkg of pkgs) candidatePackageRoots.push(resolve(packagesDir, pkg));
   } catch {
-    manifestIndexCache.set(libraryRoot, null);
-    return null;
+    // packages/ may not exist — fall through to root-level fallback.
   }
+  // Always consider libraryRoot itself; it's harmless if absent.
+  candidatePackageRoots.push(libraryRoot);
 
   const indices: ManifestIndex[] = [];
-  for (const pkg of packages) {
-    const packageRoot = resolve(packagesDir, pkg);
+  for (const packageRoot of candidatePackageRoots) {
     const manifestPath = resolve(packageRoot, 'custom-elements.json');
     let parsed: unknown;
     try {
@@ -442,15 +461,33 @@ function runSourceChecks(componentSourcePath: string): SourceChecks | undefined 
     stylesContent = '';
   }
 
+  // Strip comments before matching. Otherwise commented-out lines like
+  // `// this.attachInternals()` or `/* @media (forced-colors: active) */`
+  // register as real signals and silently inflate the source-check
+  // positives (codex push-gate P2 round 4, 2026-05-10).
+  const tsStripped = stripComments(tsContent);
+  const stylesStripped = stripComments(stylesContent);
+
   return {
-    hasStaticFormAssociated: STATIC_FORM_ASSOCIATED_RE.test(tsContent),
-    hasAttachInternals: ATTACH_INTERNALS_RE.test(tsContent),
-    hasSetValidityCall: SET_VALIDITY_RE.test(tsContent),
+    hasStaticFormAssociated: STATIC_FORM_ASSOCIATED_RE.test(tsStripped),
+    hasAttachInternals: ATTACH_INTERNALS_RE.test(tsStripped),
+    hasSetValidityCall: SET_VALIDITY_RE.test(tsStripped),
     hasFocusVisibleRule:
-      FOCUS_VISIBLE_2PX_RE.test(stylesContent) || FOCUS_VISIBLE_LOOSE_RE.test(stylesContent),
-    has2pxOutlineRule: FOCUS_VISIBLE_2PX_RE.test(stylesContent),
-    hasForcedColorsBlock: FORCED_COLORS_RE.test(stylesContent),
+      FOCUS_VISIBLE_2PX_RE.test(stylesStripped) || FOCUS_VISIBLE_LOOSE_RE.test(stylesStripped),
+    has2pxOutlineRule: FOCUS_VISIBLE_2PX_RE.test(stylesStripped),
+    hasForcedColorsBlock: FORCED_COLORS_RE.test(stylesStripped),
   };
+}
+
+/**
+ * Remove TS/JS/CSS line and block comments before regex matching.
+ * Preserves source character offsets is NOT required — the consumers
+ * only check `.test()` presence, not capture positions. The replacement
+ * uses single spaces to keep token boundaries (so `setValidity//(`
+ * doesn't fuse with neighbour tokens after stripping).
+ */
+function stripComments(src: string): string {
+  return src.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ');
 }
 
 // ---------------------------------------------------------------------------

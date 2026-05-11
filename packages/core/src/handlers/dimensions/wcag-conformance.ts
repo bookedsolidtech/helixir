@@ -88,6 +88,34 @@ export function scoreWcagConformance(
     };
   }
 
+  // ── Branch 1b: verdictSnapshot present but partial (criteria < threshold)
+  // Earlier this branch fell through to helixMeta and lost the snapshot's
+  // signal entirely. Use the snapshot's criteria count to interpolate a
+  // partial-credit score and still run overclaim detection — the snapshot
+  // is more authoritative than CEM helixMeta when both exist (codex
+  // push-gate P1 round 4, 2026-05-10).
+  if (snapshot && Array.isArray(snapshot.criteria)) {
+    const score = Math.round((snapshot.criteria.length / CERT_CRITERIA_THRESHOLD) * 70);
+    const overclaim = detectOverclaim(snapshot.criteria, evidence);
+    if (overclaim.length > 0) {
+      notes.push('cert-claim-evidence-mismatch', ...overclaim);
+    }
+    return {
+      score: Math.max(0, Math.min(70, score)),
+      confidence: 'heuristic',
+      measured: true,
+      notes: notes.length > 0 ? notes : undefined,
+      subMetrics: [
+        {
+          name: 'criteria-supported',
+          score: snapshot.criteria.length,
+          maxScore: CERT_CRITERIA_THRESHOLD,
+          note: 'partial verdict snapshot',
+        },
+      ],
+    };
+  }
+
   // ── Branch 2: helixMeta.aaa cert claim (no snapshot) ──────────────────
   const aaa = evidence.helixMeta?.aaa;
   if (

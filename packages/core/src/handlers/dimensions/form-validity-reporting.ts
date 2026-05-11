@@ -30,7 +30,28 @@ export function scoreFormValidityReporting(
   const claimedTrue = helixMeta?.formAssociated === true || cemFormAssociated === true;
 
   // ── Branch 1: explicit N/A ──────────────────────────────────────────
+  // Confirm the claim against source signals when available — symmetric
+  // to scoreFormAssociation's N/A path. A stale CEM/helixMeta that
+  // declares formAssociated:false while the implementation still calls
+  // attachInternals()/setValidity() should NOT score 100/verified
+  // (codex push-gate P2 round 7, 2026-05-10).
   if (claimedFalse) {
+    if (checks) {
+      const anyFaceSignal =
+        checks.hasStaticFormAssociated || checks.hasAttachInternals || checks.hasSetValidityCall;
+      if (anyFaceSignal) {
+        const driftNotes: string[] = ['form-validity-claim-source-mismatch'];
+        if (checks.hasSetValidityCall) driftNotes.push('setValidity-still-called');
+        if (checks.hasAttachInternals) driftNotes.push('attachInternals-still-called');
+        if (checks.hasStaticFormAssociated) driftNotes.push('static-formAssociated-still-present');
+        return {
+          score: 50,
+          confidence: 'heuristic',
+          measured: true,
+          notes: driftNotes,
+        };
+      }
+    }
     return {
       score: 100,
       confidence: 'verified',

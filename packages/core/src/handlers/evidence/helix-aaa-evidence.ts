@@ -227,22 +227,39 @@ export function detectHelixAaaEvidence(
   }
 
   const absRoot = isAbsolute(libraryRoot) ? libraryRoot : resolve(libraryRoot);
-  // mergeCems() rewrites colliding tags to `packageName:tagName` (cem.ts:732).
-  // Verdicts and manifests use the bare tag, so strip the prefix before
-  // file lookups. Multi-library sessions with collisions otherwise return
-  // no evidence (codex push-gate P2 round 5, 2026-05-10).
+  // mergeCems() rewrites colliding tags to `packageName:tagName` and stamps
+  // every declaration with a `packageName` field (cem.ts:732). The bare
+  // tag (without prefix) is what's keyed in verdicts/manifests, BUT in a
+  // multi-package monorepo with collisions, stripping the prefix and
+  // searching across all packages picks whichever manifest indexes the
+  // bare tag first — wrong source/verdicts for the new accessibility
+  // dimensions (codex push-gate P1 round 7, 2026-05-10).
+  //
+  // Resolution: scope evidence resolution to the declaration's specific
+  // package when `packageName` is set, falling back to library-wide
+  // search only when no package scope is available (single-package CEM).
   const bareTagName = decl.tagName.includes(':')
     ? (decl.tagName.split(':').pop() ?? decl.tagName)
     : decl.tagName;
+  const packageName = (decl as { packageName?: unknown }).packageName;
+  const scopedRoot =
+    typeof packageName === 'string' && packageName.length > 0
+      ? resolve(absRoot, 'packages', packageName)
+      : null;
 
   // ── verdictSnapshot ───────────────────────────────────────────────────
-  const verdictSnapshot = buildVerdictSnapshot(absRoot, bareTagName, helixMeta);
+  // Try package-scoped first; fall back to library-wide search.
+  const verdictSnapshot =
+    (scopedRoot && buildVerdictSnapshot(scopedRoot, bareTagName, helixMeta)) ??
+    buildVerdictSnapshot(absRoot, bareTagName, helixMeta);
   if (verdictSnapshot) {
     evidence.verdictSnapshot = verdictSnapshot;
   }
 
   // ── Locate component source file via package-manifest index ──────────
-  const sourcePath = resolveComponentSourcePath(absRoot, bareTagName);
+  const sourcePath =
+    (scopedRoot && resolveComponentSourcePath(scopedRoot, bareTagName)) ??
+    resolveComponentSourcePath(absRoot, bareTagName);
   if (!sourcePath) {
     return evidence;
   }
@@ -463,15 +480,23 @@ function runSourceChecks(componentSourcePath: string): SourceChecks | undefined 
     return undefined;
   }
 
-  // Styles file convention: sibling `<basename>.styles.ts`. If absent we
-  // still produce checks (CSS rules just come back false), but the TS
-  // file MUST be readable for sourceChecks to be defined at all.
-  const stylesPath = componentSourcePath.replace(/\.ts$/, '.styles.ts');
+  // Styles sidecar convention: `<basename>.styles.<ext>` next to the
+  // component. Supports .ts, .tsx, .js, .jsx, .mts, .cts module entries —
+  // the replace must match the actual source extension or stylesContent
+  // silently fuses with the component file itself, producing false
+  // focus-ring / forced-colors evidence (codex push-gate P2 round 7,
+  // 2026-05-10).
+  const stylesPath = componentSourcePath.replace(
+    /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs)$/,
+    '.styles.$1',
+  );
   let stylesContent = '';
-  try {
-    stylesContent = readFileSync(stylesPath, 'utf-8');
-  } catch {
-    stylesContent = '';
+  if (stylesPath !== componentSourcePath) {
+    try {
+      stylesContent = readFileSync(stylesPath, 'utf-8');
+    } catch {
+      stylesContent = '';
+    }
   }
 
   // Strip comments before matching. Otherwise commented-out lines like
@@ -525,7 +550,10 @@ function checkAuditMarkdown(
   // would otherwise leave a stale audit reading as fresh (codex push-gate
   // P2, 2026-05-10).
   let latestSourceMtime = sourceStat.mtime.getTime();
-  const stylesPath = componentSourcePath.replace(/\.ts$/, '.styles.ts');
+  const stylesPath = componentSourcePath.replace(
+    /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs)$/,
+    '.styles.$1',
+  );
   if (stylesPath !== componentSourcePath) {
     try {
       const stylesStat = statSync(stylesPath);

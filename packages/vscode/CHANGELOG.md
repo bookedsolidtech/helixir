@@ -1,5 +1,13 @@
 # helixir-vscode
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [162b1cd]
+- Updated dependencies [c172709]
+  - helixir@0.6.1
+
 ## 0.1.1
 
 ### Patch Changes

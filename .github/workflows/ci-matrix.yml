@@ -1,7 +1,7 @@
 # ============================================================================
 # Matrix CI Pipeline — HELiXiR MCP Server
 # ============================================================================
-# Tests across Node.js 20, 22, and 24 to ensure forward-compatibility
+# Tests across Node.js 22 and 24 to ensure forward-compatibility
 # and catch version-specific ESM / native module regressions.
 # ============================================================================
 

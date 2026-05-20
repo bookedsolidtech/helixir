@@ -1,6 +1,7 @@
 {
   "name": "@helixui/mcp",
   "version": "0.1.0",
+  "private": true,
   "description": "Standalone SDK for building custom MCP tools on top of helixir's web component analysis engine",
   "type": "module",
   "main": "./build/index.js",

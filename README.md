@@ -18,6 +18,7 @@ Stop AI hallucinations. Ground every component suggestion in your actual Custom 
 [![MCP Protocol](https://img.shields.io/badge/MCP-protocol-purple)](https://modelcontextprotocol.io)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript)](https://www.typescriptlang.org)
 [![Tools](https://img.shields.io/badge/tools-73-purple)](https://www.npmjs.com/package/helixir)
+[![SafeSkill 83/100](https://img.shields.io/badge/SafeSkill-83%2F100_Passes%20with%20Notes-yellow)](https://safeskill.dev/scan/bookedsolidtech-helixir)
 
 [Quick Start](#quick-start) · [Why HELiXiR](#why-helixir) · [Tools Reference](#tools-reference) · [Configuration](#configuration) · [AI Tool Configs](#ai-tool-configs)
 
